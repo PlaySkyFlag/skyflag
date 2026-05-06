@@ -1,5 +1,19 @@
-import { BOARD_SIZE, FORWARD_ROW_DELTA } from './constants';
-import type { BoardPiece, Coord, GameState } from './types';
+import { BOARD_SIZE, FORWARD_ROW_DELTA, LIFT_CELLS } from './constants';
+import type { BoardPiece, Coord, GameState, Layer } from './types';
+
+const LAYER_ABOVE: Partial<Record<Layer, Layer>> = {
+  ground: 'sky',
+  sky: 'space',
+};
+
+const LAYER_BELOW: Partial<Record<Layer, Layer>> = {
+  space: 'sky',
+  sky: 'ground',
+};
+
+function isLiftCell(row: number, col: number): boolean {
+  return LIFT_CELLS.some((c) => c.row === row && c.col === col);
+}
 
 const KING_DELTAS: ReadonlyArray<readonly [number, number]> = [
   [-1, -1], [-1, 0], [-1, 1],
@@ -27,11 +41,44 @@ function inBounds(row: number, col: number): boolean {
   return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
 }
 
-// All legal destinations for a piece, on the same layer.
-// Captain: king-move. Soldier: forward + diagonal capture. Rover: orthogonal
-// ≤2 sq (true limited rook — captures at any reachable distance). Pilot:
-// diagonal ≤2 sq (limited bishop). Neither Rover nor Pilot may jump.
+// Legal destinations for a piece, including same-layer movement AND any legal
+// lift steps to adjacent layers. Cross-layer Coords let App route the dot to
+// the correct Board automatically.
+//
+// Movement geometry:
+//   Captain   king-move (1 sq, 8 dirs)
+//   Soldier   forward + diagonal-forward capture (with first-move 2 sq)
+//   Rover     orthogonal ≤2 sq, captures at 1 OR 2 (true limited rook)
+//   Pilot     diagonal ≤2 sq, captures at 1 OR 2 (limited bishop)
+// Neither Rover nor Pilot may jump.
+//
+// Lift step (any piece):
+//   Must be on a lift cell at start of activation. Cannot have arrived this
+//   turn (two-turn rule). Destination cell on adjacent layer must be empty —
+//   lift step cannot capture.
 export function legalMovesFor(boardPiece: BoardPiece, state: GameState): Coord[] {
+  return movementMovesFor(boardPiece, state).concat(legalLiftSteps(boardPiece, state));
+}
+
+export function legalLiftSteps(bp: BoardPiece, state: GameState): Coord[] {
+  if (!isLiftCell(bp.coord.row, bp.coord.col)) return [];
+  if (bp.arrivedOnLiftThisTurn) return [];
+
+  const targets: Coord[] = [];
+  const above = LAYER_ABOVE[bp.coord.layer];
+  if (above) {
+    const t: Coord = { layer: above, row: bp.coord.row, col: bp.coord.col };
+    if (!pieceAt(state, t)) targets.push(t);
+  }
+  const below = LAYER_BELOW[bp.coord.layer];
+  if (below) {
+    const t: Coord = { layer: below, row: bp.coord.row, col: bp.coord.col };
+    if (!pieceAt(state, t)) targets.push(t);
+  }
+  return targets;
+}
+
+function movementMovesFor(boardPiece: BoardPiece, state: GameState): Coord[] {
   const { piece, coord } = boardPiece;
 
   if (piece.kind === 'captain') {
