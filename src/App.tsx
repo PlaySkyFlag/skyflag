@@ -1,4 +1,13 @@
+import { useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
+import {
+  DEPLOY_COORDS,
+  FLAG_COORDS,
+  LIFT_CELLS,
+  NEXUS_COORD,
+  createInitialGameState,
+} from './game/constants';
+import type { GameState, Layer, PieceKind, Player } from './game/types';
 import './App.css';
 
 const SPACE_THEME: BoardTheme = {
@@ -25,51 +34,87 @@ const GROUND_THEME: BoardTheme = {
   label: '#a4b89a',
 };
 
-const LIFT_CELLS: Array<[number, number]> = [
-  [1, 1], [1, 4], [4, 1], [4, 4],
-];
+const LAYER_THEMES: Record<Layer, BoardTheme> = {
+  space: SPACE_THEME,
+  sky: SKY_THEME,
+  ground: GROUND_THEME,
+};
 
-const liftMarkers: Marker[] = LIFT_CELLS.map(([row, col]) => ({
-  row, col, symbol: '⬆', kind: 'lift' as const,
-}));
+const LAYER_NAMES: Record<Layer, string> = {
+  space: 'Space / Empyrean',
+  sky: 'Sky / Meridian',
+  ground: 'Ground / Terran',
+};
 
-const GROUND_MARKERS: Marker[] = [
-  ...liftMarkers,
-  { row: 0, col: 0, symbol: '⚑', kind: 'p1' },
-  { row: 5, col: 5, symbol: '⚑', kind: 'p2' },
-];
+const PLAYERS: Player[] = ['p1', 'p2'];
 
-const GROUND_DEPLOY_CELLS: DeployCell[] = [
-  { row: 0, col: 3, player: 'p1' },
-  { row: 5, col: 2, player: 'p2' },
-];
+const PIECE_SYMBOL: Record<PieceKind, string> = {
+  captain: 'C',
+  soldier: 'S',
+  rover: 'R',
+  pilot: 'P',
+};
 
-const SKY_MARKERS: Marker[] = [
-  ...liftMarkers,
-  { row: 0, col: 5, symbol: '⚑', kind: 'p1' },
-  { row: 5, col: 0, symbol: '⚑', kind: 'p2' },
-];
+const flagSymbol = (layer: Layer): string => (layer === 'space' ? '★' : '⚑');
 
-const SPACE_MARKERS: Marker[] = [
-  ...liftMarkers,
-  { row: 0, col: 0, symbol: '★', kind: 'p1' },
-  { row: 5, col: 5, symbol: '★', kind: 'p2' },
-  { row: 3, col: 3, symbol: '◎', kind: 'nexus' },
-];
+function markersForLayer(layer: Layer, state: GameState): Marker[] {
+  const markers: Marker[] = [];
+
+  for (const cell of LIFT_CELLS) {
+    markers.push({ row: cell.row, col: cell.col, symbol: '⬆', kind: 'lift' });
+  }
+
+  for (const player of PLAYERS) {
+    if (!state.flags[layer][player]) {
+      const pos = FLAG_COORDS[player][layer];
+      markers.push({ row: pos.row, col: pos.col, symbol: flagSymbol(layer), kind: player });
+    }
+  }
+
+  if (layer === 'space') {
+    markers.push({ row: NEXUS_COORD.row, col: NEXUS_COORD.col, symbol: '◎', kind: 'nexus' });
+  }
+
+  for (const bp of state.onBoard) {
+    if (bp.coord.layer !== layer) continue;
+    markers.push({
+      row: bp.coord.row,
+      col: bp.coord.col,
+      symbol: PIECE_SYMBOL[bp.piece.kind],
+      kind: bp.piece.owner,
+    });
+  }
+
+  return markers;
+}
+
+function deployCellsForLayer(layer: Layer): DeployCell[] {
+  if (layer !== 'ground') return [];
+  return PLAYERS.map((player) => ({
+    row: DEPLOY_COORDS[player].row,
+    col: DEPLOY_COORDS[player].col,
+    player,
+  }));
+}
+
+const RENDER_ORDER: Layer[] = ['space', 'sky', 'ground'];
 
 export default function App() {
+  const [state] = useState(createInitialGameState);
+
   return (
     <main className="app">
       <h1>SkyFlag</h1>
       <div className="boards">
-        <Board name="Space / Empyrean" theme={SPACE_THEME} markers={SPACE_MARKERS} />
-        <Board name="Sky / Meridian" theme={SKY_THEME} markers={SKY_MARKERS} />
-        <Board
-          name="Ground / Terran"
-          theme={GROUND_THEME}
-          markers={GROUND_MARKERS}
-          deployCells={GROUND_DEPLOY_CELLS}
-        />
+        {RENDER_ORDER.map((layer) => (
+          <Board
+            key={layer}
+            name={LAYER_NAMES[layer]}
+            theme={LAYER_THEMES[layer]}
+            markers={markersForLayer(layer, state)}
+            deployCells={deployCellsForLayer(layer)}
+          />
+        ))}
       </div>
     </main>
   );
