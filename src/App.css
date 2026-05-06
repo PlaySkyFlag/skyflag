@@ -169,3 +169,26 @@ button.tray-piece:hover {
   opacity: 0.5;
   font-style: italic;
 }
+
+.tray-sublabel {
+  margin: 6px 0 -2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  color: #d68a8a;
+}
+
+.tray-piece-captured {
+  opacity: 0.4;
+  filter: grayscale(0.55);
+  border-color: rgba(214, 138, 138, 0.55) !important;
+  cursor: default;
+  pointer-events: none;
+}
+
+.tray-piece-captured .tray-piece-letter {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}

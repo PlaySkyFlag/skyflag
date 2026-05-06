@@ -72,6 +72,7 @@ export function createInitialGameState(): GameState {
       p2: buildPiecesFor('p2'),
     },
     onBoard: [],
+    captured: { p1: [], p2: [] },
     flags,
     currentPlayer: 'p1',
     activationsRemaining: ACTIVATIONS_PER_TURN,

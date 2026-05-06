@@ -96,6 +96,14 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
     newOnBoard.push(i === movingIdx ? movedPiece : state.onBoard[i]);
   }
 
+  // If we captured a piece, record it under the loser's captured list.
+  let newCaptured = state.captured;
+  if (captureIdx >= 0) {
+    const lost = state.onBoard[captureIdx].piece;
+    const loser = lost.owner;
+    newCaptured = { ...state.captured, [loser]: [...state.captured[loser], lost] };
+  }
+
   // Flag capture (rulebook turn step 3): runs AFTER any promotion so a Soldier
   // that promotes by reaching G(5,5)/G(0,0) can capture the opponent's Ground
   // flag in the same activation. Only Captains capture flags.
@@ -104,6 +112,7 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
   const next: GameState = {
     ...state,
     onBoard: newOnBoard,
+    captured: newCaptured,
     flags: newFlags,
     activationsRemaining: state.activationsRemaining - 1,
   };

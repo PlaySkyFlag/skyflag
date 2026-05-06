@@ -71,6 +71,8 @@ export type GameStatus =
 export type GameState = {
   inHand: Record<Player, Piece[]>;
   onBoard: BoardPiece[];
+  // Pieces each player has lost. captured.p1 = pieces P1 has lost.
+  captured: Record<Player, Piece[]>;
   flags: FlagsState;
   currentPlayer: Player;
   activationsRemaining: number;

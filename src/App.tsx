@@ -205,6 +205,7 @@ export default function App() {
       <PieceTray
         player="p1"
         pieces={state.inHand.p1}
+        capturedPieces={state.captured.p1}
         isInteractive={inProgress && state.currentPlayer === 'p1'}
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
@@ -213,6 +214,7 @@ export default function App() {
       <PieceTray
         player="p2"
         pieces={state.inHand.p2}
+        capturedPieces={state.captured.p2}
         isInteractive={inProgress && state.currentPlayer === 'p2'}
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
