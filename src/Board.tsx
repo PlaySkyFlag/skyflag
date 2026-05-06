@@ -15,7 +15,9 @@ export type BoardTheme = {
   label: string;
 };
 
-export type MarkerKind = 'lift' | 'nexus' | 'p1' | 'p2';
+import type { Player } from './game/types';
+
+export type MarkerKind = 'lift' | 'nexus' | Player;
 
 export type Marker = {
   row: number;
@@ -23,8 +25,6 @@ export type Marker = {
   symbol: string;
   kind: MarkerKind;
 };
-
-export type Player = 'p1' | 'p2';
 
 export type DeployCell = {
   row: number;
