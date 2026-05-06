@@ -3,6 +3,8 @@ import {
   DEPLOY_COORDS,
   FLAG_COORDS,
   LIFT_CELLS,
+  NEXUS_COORD,
+  TURN_LIMIT,
   createInitialGameState,
 } from './constants';
 import { legalMovesFor, pieceAt, sameCoord } from './moves';
@@ -122,7 +124,50 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
     activationsRemaining: state.activationsRemaining - 1,
   };
 
+  // Win checks happen after the move's effects are settled. Nexus first
+  // (rulebook turn step 4), then elimination. If either fires we skip
+  // passInitiative — game is over.
+  if (isNexusWin(next, newPiece, to)) {
+    return {
+      ...next,
+      status: { kind: 'won', winner: state.currentPlayer, reason: 'nexus' },
+    };
+  }
+  if (isEliminated(next, opponentOf(state.currentPlayer))) {
+    return {
+      ...next,
+      status: { kind: 'won', winner: state.currentPlayer, reason: 'elimination' },
+    };
+  }
+
   return next.activationsRemaining > 0 ? next : passInitiative(next);
+}
+
+// Nexus win: post-promotion piece is a Captain landing on Space(3,3) with
+// all three of the opponent's flags already captured.
+function isNexusWin(state: GameState, movingPiece: Piece, to: Coord): boolean {
+  if (movingPiece.kind !== 'captain') return false;
+  if (to.layer !== NEXUS_COORD.layer || to.row !== NEXUS_COORD.row || to.col !== NEXUS_COORD.col) {
+    return false;
+  }
+  const opp = opponentOf(movingPiece.owner);
+  return state.flags.ground[opp] && state.flags.sky[opp] && state.flags.space[opp];
+}
+
+// Elimination: a player has no Captain-capable pieces (Captains, original or
+// promoted, plus Soldiers — which can promote) anywhere — neither in hand nor
+// on the board.
+function isEliminated(state: GameState, player: Player): boolean {
+  const hasInHand = state.inHand[player].some(
+    (p) => p.kind === 'captain' || p.kind === 'soldier',
+  );
+  if (hasInHand) return false;
+  const hasOnBoard = state.onBoard.some(
+    (bp) =>
+      bp.piece.owner === player &&
+      (bp.piece.kind === 'captain' || bp.piece.kind === 'soldier'),
+  );
+  return !hasOnBoard;
 }
 
 // Indices of all onBoard pieces removed by this move. Today every piece type
@@ -190,6 +235,17 @@ function applyEndTurn(state: GameState): GameState {
 }
 
 function passInitiative(state: GameState): GameState {
+  const nextTurn = state.turnNumber + 1;
+  // Turn-limit draw: 180 turns without a win → game ends. Tiebreakers from
+  // rulebook section 7 (flags → pieces → captures → highest layer → Captain
+  // Chebyshev distance to Space(3,3)) are deferred — for now this is a flat
+  // draw.
+  if (nextTurn > TURN_LIMIT) {
+    return {
+      ...state,
+      status: { kind: 'draw', reason: 'turn-limit' },
+    };
+  }
   return {
     ...state,
     onBoard: state.onBoard.map((bp) =>
@@ -197,6 +253,6 @@ function passInitiative(state: GameState): GameState {
     ),
     currentPlayer: opponentOf(state.currentPlayer),
     activationsRemaining: ACTIVATIONS_PER_TURN,
-    turnNumber: state.turnNumber + 1,
+    turnNumber: nextTurn,
   };
 }
