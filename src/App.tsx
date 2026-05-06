@@ -1,4 +1,4 @@
-import Board, { type BoardTheme } from './Board';
+import Board, { type BoardTheme, type Marker } from './Board';
 import './App.css';
 
 const SPACE_THEME: BoardTheme = {
@@ -22,14 +22,41 @@ const GROUND_THEME: BoardTheme = {
   stroke: '#2d3b25',
 };
 
+const LIFT_CELLS: Array<[number, number]> = [
+  [1, 1], [1, 4], [4, 1], [4, 4],
+];
+
+const liftMarkers: Marker[] = LIFT_CELLS.map(([row, col]) => ({
+  row, col, symbol: '⬆', kind: 'lift' as const,
+}));
+
+const GROUND_MARKERS: Marker[] = [
+  ...liftMarkers,
+  { row: 0, col: 0, symbol: '⚑', kind: 'p1' },
+  { row: 5, col: 5, symbol: '⚑', kind: 'p2' },
+];
+
+const SKY_MARKERS: Marker[] = [
+  ...liftMarkers,
+  { row: 0, col: 5, symbol: '⚑', kind: 'p1' },
+  { row: 5, col: 0, symbol: '⚑', kind: 'p2' },
+];
+
+const SPACE_MARKERS: Marker[] = [
+  ...liftMarkers,
+  { row: 0, col: 0, symbol: '★', kind: 'p1' },
+  { row: 5, col: 5, symbol: '★', kind: 'p2' },
+  { row: 3, col: 3, symbol: '◎', kind: 'nexus' },
+];
+
 export default function App() {
   return (
     <main className="app">
       <h1>SkyFlag</h1>
       <div className="boards">
-        <Board name="Space / Empyrean" theme={SPACE_THEME} />
-        <Board name="Sky / Meridian" theme={SKY_THEME} />
-        <Board name="Ground / Terran" theme={GROUND_THEME} />
+        <Board name="Space / Empyrean" theme={SPACE_THEME} markers={SPACE_MARKERS} />
+        <Board name="Sky / Meridian" theme={SKY_THEME} markers={SKY_MARKERS} />
+        <Board name="Ground / Terran" theme={GROUND_THEME} markers={GROUND_MARKERS} />
       </div>
     </main>
   );
