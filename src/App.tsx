@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import PieceTray from './PieceTray';
+import StatusBar from './StatusBar';
 import {
   DEPLOY_COORDS,
   FLAG_COORDS,
@@ -114,6 +115,7 @@ export default function App() {
   return (
     <main className="app">
       <h1>SkyFlag</h1>
+      <StatusBar state={state} />
       {renderBoard('space', state)}
       {renderBoard('sky', state)}
       <PieceTray player="p1" pieces={state.inHand.p1} />

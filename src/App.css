@@ -15,6 +15,48 @@
   letter-spacing: 0.05em;
 }
 
+.hud {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.92rem;
+}
+
+.hud-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-divider {
+  opacity: 0.35;
+}
+
+.hud-pip {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.hud-pip-p1 {
+  background: #1a2540;
+}
+
+.hud-pip-p2 {
+  background: #f5e8d0;
+}
+
+.hud-finished {
+  font-size: 1rem;
+  background: rgba(245, 195, 67, 0.12);
+  border: 1px solid rgba(245, 195, 67, 0.45);
+}
+
 .tray {
   display: flex;
   flex-direction: column;
