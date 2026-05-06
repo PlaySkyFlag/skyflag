@@ -1,4 +1,4 @@
-import Board, { type BoardTheme, type Marker } from './Board';
+import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import './App.css';
 
 const SPACE_THEME: BoardTheme = {
@@ -39,6 +39,11 @@ const GROUND_MARKERS: Marker[] = [
   { row: 5, col: 5, symbol: '⚑', kind: 'p2' },
 ];
 
+const GROUND_DEPLOY_CELLS: DeployCell[] = [
+  { row: 0, col: 3, player: 'p1' },
+  { row: 5, col: 2, player: 'p2' },
+];
+
 const SKY_MARKERS: Marker[] = [
   ...liftMarkers,
   { row: 0, col: 5, symbol: '⚑', kind: 'p1' },
@@ -59,7 +64,12 @@ export default function App() {
       <div className="boards">
         <Board name="Space / Empyrean" theme={SPACE_THEME} markers={SPACE_MARKERS} />
         <Board name="Sky / Meridian" theme={SKY_THEME} markers={SKY_MARKERS} />
-        <Board name="Ground / Terran" theme={GROUND_THEME} markers={GROUND_MARKERS} />
+        <Board
+          name="Ground / Terran"
+          theme={GROUND_THEME}
+          markers={GROUND_MARKERS}
+          deployCells={GROUND_DEPLOY_CELLS}
+        />
       </div>
     </main>
   );
