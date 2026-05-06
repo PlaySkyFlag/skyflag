@@ -6,7 +6,7 @@ import {
   createInitialGameState,
 } from './constants';
 import { legalMovesFor, pieceAt, sameCoord } from './moves';
-import type { BoardPiece, Coord, FlagsState, GameState, PieceId } from './types';
+import type { BoardPiece, Coord, FlagsState, GameState, Piece, PieceId, Player } from './types';
 import { opponentOf } from './types';
 
 export type Action =
@@ -83,8 +83,9 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
     (bp, i) => i !== movingIdx && sameCoord(bp.coord, to),
   );
 
+  const newPiece = nextPieceState(moving.piece, to);
   const movedPiece: BoardPiece = {
-    ...moving,
+    piece: newPiece,
     coord: to,
     arrivedOnLiftThisTurn: isLiftCell(to),
   };
@@ -95,9 +96,10 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
     newOnBoard.push(i === movingIdx ? movedPiece : state.onBoard[i]);
   }
 
-  // Flag capture (rulebook turn step 3): only Captains capture flags, by
-  // landing on the opponent's flag cell. Free side-effect, no extra activation.
-  const newFlags = maybeCaptureFlag(state.flags, moving.piece.kind, state.currentPlayer, to);
+  // Flag capture (rulebook turn step 3): runs AFTER any promotion so a Soldier
+  // that promotes by reaching G(5,5)/G(0,0) can capture the opponent's Ground
+  // flag in the same activation. Only Captains capture flags.
+  const newFlags = maybeCaptureFlag(state.flags, newPiece.kind, state.currentPlayer, to);
 
   const next: GameState = {
     ...state,
@@ -107,6 +109,27 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
   };
 
   return next.activationsRemaining > 0 ? next : passInitiative(next);
+}
+
+// Apply any same-activation transformations to a piece that just moved to `to`:
+//   • Soldier → Captain promotion when reaching the far row on Ground.
+//   • Soldier hasMoved flag flips to true after its first move.
+// Captain / Rover / Pilot pass through unchanged.
+function nextPieceState(piece: Piece, to: Coord): Piece {
+  if (piece.kind !== 'soldier') return piece;
+  if (to.layer === 'ground' && isPromotionRow(piece.owner, to.row)) {
+    return {
+      id: piece.id,
+      owner: piece.owner,
+      kind: 'captain',
+      promotedFromSoldier: true,
+    };
+  }
+  return piece.hasMoved ? piece : { ...piece, hasMoved: true };
+}
+
+function isPromotionRow(owner: Player, row: number): boolean {
+  return (owner === 'p1' && row === 5) || (owner === 'p2' && row === 0);
 }
 
 function maybeCaptureFlag(
