@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
+import Help from './Help';
 import PieceTray from './PieceTray';
 import StatusBar from './StatusBar';
 import { chooseAction } from './game/ai';
@@ -229,6 +230,7 @@ export default function App() {
         onEndTurn={() => dispatch({ type: 'end-turn' })}
         onNewGame={() => dispatch({ type: 'new-game' })}
       />
+      <Help />
       {renderBoard('space')}
       {renderBoard('sky')}
       <PieceTray
