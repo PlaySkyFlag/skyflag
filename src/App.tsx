@@ -7,6 +7,7 @@ import { chooseAction } from './game/ai';
 import {
   DEPLOY_COORDS,
   FLAG_COORDS,
+  LAYER_ORDER,
   LIFT_CELLS,
   NEXUS_COORD,
   createInitialGameState,
@@ -151,10 +152,19 @@ export default function App() {
 
   const selectedHandId = selection?.kind === 'hand' ? selection.pieceId : null;
 
-  const legalTargetsByLayer: Record<Layer, Coord[]> = { ground: [], sky: [], space: [] };
+  type TargetCell = { row: number; col: number; kind: 'move' | 'lift-up' | 'lift-down' };
+  const legalTargetsByLayer: Record<Layer, TargetCell[]> = { ground: [], sky: [], space: [] };
   if (selectedBoardPiece) {
+    const sourceLayer = selectedBoardPiece.coord.layer;
+    const sourceIdx = LAYER_ORDER.indexOf(sourceLayer);
     for (const c of legalMovesFor(selectedBoardPiece, state)) {
-      legalTargetsByLayer[c.layer].push(c);
+      let kind: 'move' | 'lift-up' | 'lift-down' = 'move';
+      if (c.layer !== sourceLayer) {
+        // LAYER_ORDER is top-to-bottom (space, sky, ground), so a smaller
+        // index means a higher layer.
+        kind = LAYER_ORDER.indexOf(c.layer) < sourceIdx ? 'lift-up' : 'lift-down';
+      }
+      legalTargetsByLayer[c.layer].push({ row: c.row, col: c.col, kind });
     }
   }
 
@@ -226,7 +236,7 @@ export default function App() {
       <StatusBar
         state={state}
         aiPlayer={aiPlayer}
-        onToggleAi={() => setAiPlayer((p) => (p ? null : 'p2'))}
+        onSetMode={setAiPlayer}
         onEndTurn={() => dispatch({ type: 'end-turn' })}
         onNewGame={() => dispatch({ type: 'new-game' })}
       />

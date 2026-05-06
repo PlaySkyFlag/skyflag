@@ -47,7 +47,11 @@ const DEPLOY_STYLE: Record<Player, { stroke: string; fill: string; activeFill: s
   p2: { stroke: '#f5e8d0', fill: 'rgba(245,232,208,0.14)', activeFill: 'rgba(245,232,208,0.32)' },
 };
 
-type CellRef = { row: number; col: number };
+type CellRef = {
+  row: number;
+  col: number;
+  kind?: 'move' | 'lift-up' | 'lift-down';
+};
 
 type BoardProps = {
   name: string;
@@ -154,6 +158,34 @@ export default function Board({
   const targetEls = legalTargets.map((t) => {
     const cx = ORIGIN_X + t.col * CELL + CELL / 2;
     const cy = ORIGIN_Y + t.row * CELL + CELL / 2;
+    if (t.kind === 'lift-up' || t.kind === 'lift-down') {
+      const arrow = t.kind === 'lift-up' ? '↑' : '↓';
+      return (
+        <g key={`lt-${t.row}-${t.col}-${t.kind}`} pointerEvents="none">
+          <circle
+            cx={cx}
+            cy={cy}
+            r={CELL * 0.26}
+            fill="rgba(95, 213, 199, 0.92)"
+            stroke="rgba(0, 0, 0, 0.55)"
+            strokeWidth={0.9}
+          />
+          <text
+            x={cx}
+            y={cy + 1}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize={CELL * 0.42}
+            fontFamily="system-ui, sans-serif"
+            fontWeight={700}
+            fill="#0a1f1c"
+            style={{ userSelect: 'none' }}
+          >
+            {arrow}
+          </text>
+        </g>
+      );
+    }
     return (
       <circle
         key={`tgt-${t.row}-${t.col}`}

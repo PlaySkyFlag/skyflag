@@ -82,6 +82,62 @@
   opacity: 0.75;
 }
 
+.hud-current {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+}
+
+.hud-current .hud-pip {
+  align-self: center;
+  width: 14px;
+  height: 14px;
+}
+
+.hud-current-verb {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  letter-spacing: 0.02em;
+}
+
+.hud-mode {
+  display: inline-flex;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px;
+  gap: 2px;
+}
+
+.hud-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  opacity: 0.6;
+  transition: background-color 0.12s ease, opacity 0.12s ease;
+}
+
+.hud-mode-btn:hover {
+  opacity: 0.9;
+}
+
+.hud-mode-btn.is-active {
+  background: rgba(255, 255, 255, 0.14);
+  opacity: 1;
+  font-weight: 600;
+}
+
 .help {
   max-width: 540px;
   width: 100%;
