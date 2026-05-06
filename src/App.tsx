@@ -6,6 +6,7 @@ const SPACE_THEME: BoardTheme = {
   darkFill: '#3a3d6b',
   background: '#15172e',
   stroke: '#0a0b1c',
+  label: '#9ea4cf',
 };
 
 const SKY_THEME: BoardTheme = {
@@ -13,6 +14,7 @@ const SKY_THEME: BoardTheme = {
   darkFill: '#7eb3d4',
   background: '#2a4860',
   stroke: '#163040',
+  label: '#a8c4d8',
 };
 
 const GROUND_THEME: BoardTheme = {
@@ -20,6 +22,7 @@ const GROUND_THEME: BoardTheme = {
   darkFill: '#6b8e5a',
   background: '#1f2a17',
   stroke: '#2d3b25',
+  label: '#a4b89a',
 };
 
 const LIFT_CELLS: Array<[number, number]> = [

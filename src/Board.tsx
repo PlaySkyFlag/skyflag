@@ -1,13 +1,18 @@
 const BOARD_SIZE = 6;
 const CELL = 56;
 const PADDING = 14;
-const SVG_SIZE = BOARD_SIZE * CELL + PADDING * 2;
+const LABEL_GUTTER = 20;
+const ORIGIN_X = PADDING + LABEL_GUTTER;
+const ORIGIN_Y = PADDING + LABEL_GUTTER;
+const SVG_WIDTH = ORIGIN_X + BOARD_SIZE * CELL + PADDING;
+const SVG_HEIGHT = ORIGIN_Y + BOARD_SIZE * CELL + PADDING;
 
 export type BoardTheme = {
   lightFill: string;
   darkFill: string;
   background: string;
   stroke: string;
+  label: string;
 };
 
 export type MarkerKind = 'lift' | 'nexus' | 'p1' | 'p2';
@@ -40,8 +45,8 @@ export default function Board({ name, theme, markers = [] }: BoardProps) {
       cells.push(
         <rect
           key={`${row}-${col}`}
-          x={PADDING + col * CELL}
-          y={PADDING + row * CELL}
+          x={ORIGIN_X + col * CELL}
+          y={ORIGIN_Y + row * CELL}
           width={CELL}
           height={CELL}
           fill={isDark ? theme.darkFill : theme.lightFill}
@@ -52,13 +57,51 @@ export default function Board({ name, theme, markers = [] }: BoardProps) {
     }
   }
 
+  const colLabels = [];
+  for (let col = 0; col < BOARD_SIZE; col++) {
+    colLabels.push(
+      <text
+        key={`c-${col}`}
+        x={ORIGIN_X + col * CELL + CELL / 2}
+        y={ORIGIN_Y - LABEL_GUTTER / 2}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={11}
+        fontFamily="system-ui, sans-serif"
+        fill={theme.label}
+        style={{ userSelect: 'none' }}
+      >
+        {`c${col}`}
+      </text>
+    );
+  }
+
+  const rowLabels = [];
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    rowLabels.push(
+      <text
+        key={`r-${row}`}
+        x={ORIGIN_X - LABEL_GUTTER / 2}
+        y={ORIGIN_Y + row * CELL + CELL / 2}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={11}
+        fontFamily="system-ui, sans-serif"
+        fill={theme.label}
+        style={{ userSelect: 'none' }}
+      >
+        {`r${row}`}
+      </text>
+    );
+  }
+
   const markerEls = markers.map((m) => {
     const style = MARKER_STYLE[m.kind];
     return (
       <text
         key={`m-${m.row}-${m.col}-${m.symbol}`}
-        x={PADDING + m.col * CELL + CELL / 2}
-        y={PADDING + m.row * CELL + CELL / 2}
+        x={ORIGIN_X + m.col * CELL + CELL / 2}
+        y={ORIGIN_Y + m.row * CELL + CELL / 2}
         textAnchor="middle"
         dominantBaseline="central"
         fontSize={CELL * 0.6}
@@ -80,12 +123,14 @@ export default function Board({ name, theme, markers = [] }: BoardProps) {
         {name}
       </h2>
       <svg
-        width={SVG_SIZE}
-        height={SVG_SIZE}
-        viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}
+        width={SVG_WIDTH}
+        height={SVG_HEIGHT}
+        viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
         style={{ background: theme.background, borderRadius: 8 }}
       >
         {cells}
+        {colLabels}
+        {rowLabels}
         {markerEls}
       </svg>
     </div>
