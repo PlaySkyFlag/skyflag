@@ -9,8 +9,9 @@ import {
   NEXUS_COORD,
   createInitialGameState,
 } from './game/constants';
+import { legalMovesFor, pieceAt, sameCoord } from './game/moves';
 import { reduce } from './game/reducer';
-import type { GameState, Layer, PieceId, PieceKind, Player } from './game/types';
+import type { Coord, GameState, Layer, PieceId, PieceKind, Player } from './game/types';
 import './App.css';
 
 const SPACE_THEME: BoardTheme = {
@@ -100,42 +101,96 @@ function deployCellsForLayer(layer: Layer): DeployCell[] {
   }));
 }
 
+type Selection =
+  | null
+  | { kind: 'hand'; pieceId: PieceId }
+  | { kind: 'board'; pieceId: PieceId };
+
 export default function App() {
   const [state, dispatch] = useReducer(reduce, undefined, createInitialGameState);
-  const [selectedId, setSelectedId] = useState<PieceId | null>(null);
+  const [selection, setSelection] = useState<Selection>(null);
 
-  // Drop selection whenever the active player changes (turn ends).
+  // Drop selection whenever the active player or game status changes.
   useEffect(() => {
-    setSelectedId(null);
+    setSelection(null);
   }, [state.currentPlayer, state.status]);
 
+  const inProgress = state.status.kind === 'in-progress';
+
+  const selectedBoardPiece =
+    selection?.kind === 'board'
+      ? state.onBoard.find((bp) => bp.piece.id === selection.pieceId)
+      : undefined;
+
+  const selectedHandId = selection?.kind === 'hand' ? selection.pieceId : null;
+
+  const legalTargetsByLayer: Record<Layer, Coord[]> = { ground: [], sky: [], space: [] };
+  if (selectedBoardPiece) {
+    for (const c of legalMovesFor(selectedBoardPiece, state)) {
+      legalTargetsByLayer[c.layer].push(c);
+    }
+  }
+
   const handleSelectHandPiece = (id: PieceId) => {
-    setSelectedId((prev) => (prev === id ? null : id));
+    setSelection((prev) => (prev?.kind === 'hand' && prev.pieceId === id ? null : { kind: 'hand', pieceId: id }));
   };
 
   const handleDeployClick = (player: Player) => {
+    if (!inProgress) return;
     if (player !== state.currentPlayer) return;
-    if (!selectedId) return;
-    dispatch({ type: 'deploy', pieceId: selectedId });
-    setSelectedId(null);
+    if (selection?.kind !== 'hand') return;
+    dispatch({ type: 'deploy', pieceId: selection.pieceId });
+    setSelection(null);
+  };
+
+  const handleCellClick = (layer: Layer, row: number, col: number) => {
+    if (!inProgress) return;
+    const target: Coord = { layer, row, col };
+
+    // 1. If a board piece is selected and the click is a legal target → move.
+    if (selectedBoardPiece) {
+      const moves = legalMovesFor(selectedBoardPiece, state);
+      if (moves.some((c) => sameCoord(c, target))) {
+        dispatch({ type: 'move', pieceId: selectedBoardPiece.piece.id, to: target });
+        setSelection(null);
+        return;
+      }
+    }
+
+    // 2. If the clicked cell holds the current player's piece → select it.
+    const occupant = pieceAt(state, target);
+    if (occupant && occupant.piece.owner === state.currentPlayer) {
+      setSelection({ kind: 'board', pieceId: occupant.piece.id });
+      return;
+    }
+
+    // 3. Otherwise, deselect.
+    setSelection(null);
   };
 
   const activeDeployPlayer: Player | null =
-    selectedId && state.status.kind === 'in-progress' ? state.currentPlayer : null;
+    selection?.kind === 'hand' && inProgress ? state.currentPlayer : null;
 
-  const renderBoard = (layer: Layer) => (
-    <Board
-      key={layer}
-      name={LAYER_NAMES[layer]}
-      theme={LAYER_THEMES[layer]}
-      markers={markersForLayer(layer, state)}
-      deployCells={deployCellsForLayer(layer)}
-      activeDeployPlayer={layer === 'ground' ? activeDeployPlayer : null}
-      onDeployCellClick={layer === 'ground' ? handleDeployClick : undefined}
-    />
-  );
-
-  const inProgress = state.status.kind === 'in-progress';
+  const renderBoard = (layer: Layer) => {
+    const selectedCell =
+      selectedBoardPiece && selectedBoardPiece.coord.layer === layer
+        ? { row: selectedBoardPiece.coord.row, col: selectedBoardPiece.coord.col }
+        : null;
+    return (
+      <Board
+        key={layer}
+        name={LAYER_NAMES[layer]}
+        theme={LAYER_THEMES[layer]}
+        markers={markersForLayer(layer, state)}
+        deployCells={deployCellsForLayer(layer)}
+        activeDeployPlayer={layer === 'ground' ? activeDeployPlayer : null}
+        onDeployCellClick={layer === 'ground' ? handleDeployClick : undefined}
+        selectedCell={selectedCell}
+        legalTargets={legalTargetsByLayer[layer]}
+        onCellClick={(row, col) => handleCellClick(layer, row, col)}
+      />
+    );
+  };
 
   return (
     <main className="app">
@@ -151,7 +206,7 @@ export default function App() {
         player="p1"
         pieces={state.inHand.p1}
         isInteractive={inProgress && state.currentPlayer === 'p1'}
-        selectedId={selectedId}
+        selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
       />
       {renderBoard('ground')}
@@ -159,7 +214,7 @@ export default function App() {
         player="p2"
         pieces={state.inHand.p2}
         isInteractive={inProgress && state.currentPlayer === 'p2'}
-        selectedId={selectedId}
+        selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
       />
     </main>

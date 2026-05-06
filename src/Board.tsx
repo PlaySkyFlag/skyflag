@@ -44,6 +44,8 @@ const DEPLOY_STYLE: Record<Player, { stroke: string; fill: string; activeFill: s
   p2: { stroke: '#f5e8d0', fill: 'rgba(245,232,208,0.14)', activeFill: 'rgba(245,232,208,0.32)' },
 };
 
+type CellRef = { row: number; col: number };
+
 type BoardProps = {
   name: string;
   theme: BoardTheme;
@@ -52,6 +54,10 @@ type BoardProps = {
   // When set, the deploy cell for this player is highlighted as an active drop target.
   activeDeployPlayer?: Player | null;
   onDeployCellClick?: (player: Player) => void;
+  // Selection / movement support.
+  selectedCell?: CellRef | null;
+  legalTargets?: ReadonlyArray<CellRef>;
+  onCellClick?: (row: number, col: number) => void;
 };
 
 export default function Board({
@@ -61,11 +67,15 @@ export default function Board({
   deployCells = [],
   activeDeployPlayer = null,
   onDeployCellClick,
+  selectedCell = null,
+  legalTargets = [],
+  onCellClick,
 }: BoardProps) {
   const cells = [];
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       const isDark = (row + col) % 2 === 1;
+      const clickable = onCellClick !== undefined;
       cells.push(
         <rect
           key={`${row}-${col}`}
@@ -76,6 +86,8 @@ export default function Board({
           fill={isDark ? theme.darkFill : theme.lightFill}
           stroke={theme.stroke}
           strokeWidth={1}
+          onClick={clickable ? () => onCellClick(row, col) : undefined}
+          style={{ cursor: clickable ? 'pointer' : 'default' }}
         />
       );
     }
@@ -93,6 +105,7 @@ export default function Board({
         fontSize={11}
         fontFamily="system-ui, sans-serif"
         fill={theme.label}
+        pointerEvents="none"
         style={{ userSelect: 'none' }}
       >
         {`c${col}`}
@@ -112,12 +125,45 @@ export default function Board({
         fontSize={11}
         fontFamily="system-ui, sans-serif"
         fill={theme.label}
+        pointerEvents="none"
         style={{ userSelect: 'none' }}
       >
         {`r${row}`}
       </text>
     );
   }
+
+  const selectionEl = selectedCell ? (
+    <rect
+      key="selection"
+      x={ORIGIN_X + selectedCell.col * CELL + 2}
+      y={ORIGIN_Y + selectedCell.row * CELL + 2}
+      width={CELL - 4}
+      height={CELL - 4}
+      rx={4}
+      fill="none"
+      stroke="#f5c343"
+      strokeWidth={3}
+      pointerEvents="none"
+    />
+  ) : null;
+
+  const targetEls = legalTargets.map((t) => {
+    const cx = ORIGIN_X + t.col * CELL + CELL / 2;
+    const cy = ORIGIN_Y + t.row * CELL + CELL / 2;
+    return (
+      <circle
+        key={`tgt-${t.row}-${t.col}`}
+        cx={cx}
+        cy={cy}
+        r={CELL * 0.18}
+        fill="rgba(245, 195, 67, 0.85)"
+        stroke="rgba(0, 0, 0, 0.45)"
+        strokeWidth={0.8}
+        pointerEvents="none"
+      />
+    );
+  });
 
   const deployEls = deployCells.map((d) => {
     const style = DEPLOY_STYLE[d.player];
@@ -136,6 +182,7 @@ export default function Board({
         strokeWidth={isActive ? 2.5 : 1.5}
         strokeDasharray={isActive ? undefined : '4 3'}
         onClick={isActive && onDeployCellClick ? () => onDeployCellClick(d.player) : undefined}
+        pointerEvents={isActive && onDeployCellClick ? 'auto' : 'none'}
         style={{ cursor: isActive && onDeployCellClick ? 'pointer' : 'default' }}
       >
         {isActive && (
@@ -165,6 +212,7 @@ export default function Board({
         stroke={style.stroke}
         strokeWidth={style.strokeWidth}
         paintOrder="stroke"
+        pointerEvents="none"
         style={{ userSelect: 'none' }}
       >
         {m.symbol}
@@ -187,7 +235,9 @@ export default function Board({
         {colLabels}
         {rowLabels}
         {deployEls}
+        {selectionEl}
         {markerEls}
+        {targetEls}
       </svg>
     </div>
   );
