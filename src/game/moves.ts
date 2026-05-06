@@ -53,16 +53,18 @@ function inBounds(row: number, col: number): boolean {
 // Neither Rover nor Pilot may jump.
 //
 // Lift step (any piece):
-//   Must be on a lift cell at start of activation. Cannot have arrived this
-//   turn (two-turn rule). Destination cell on adjacent layer must be empty —
-//   lift step cannot capture.
+//   Must be on a lift cell at start of the activation. Two activations are
+//   needed for a transit (move to lift on one click, lift step on a separate
+//   click) — but since each click is one activation, that's enforced by the
+//   click model alone. Same-turn move-then-lift is allowed (revised from the
+//   v19.1 "two separate turns" rule). Destination cell on adjacent layer
+//   must be empty — lift step cannot capture.
 export function legalMovesFor(boardPiece: BoardPiece, state: GameState): Coord[] {
   return movementMovesFor(boardPiece, state).concat(legalLiftSteps(boardPiece, state));
 }
 
 export function legalLiftSteps(bp: BoardPiece, state: GameState): Coord[] {
   if (!isLiftCell(bp.coord.row, bp.coord.col)) return [];
-  if (bp.arrivedOnLiftThisTurn) return [];
 
   const targets: Coord[] = [];
   const above = LAYER_ABOVE[bp.coord.layer];

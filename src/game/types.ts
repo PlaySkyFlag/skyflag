@@ -43,11 +43,13 @@ export type PilotPiece = PieceCommon & { kind: 'pilot' };
 
 export type Piece = CaptainPiece | SoldierPiece | RoverPiece | PilotPiece;
 
-// A piece on the board — has a coord and one piece of transient turn-state.
+// A piece on the board — has a coord. The lift rule (revised from v19.1)
+// requires two separate activations to transit; with each click being one
+// activation, the constraint is automatic and no per-piece transient state
+// is needed.
 export type BoardPiece = {
   piece: Piece;
   coord: Coord;
-  arrivedOnLiftThisTurn: boolean;
 };
 
 // ─── Flags ─────────────────────────────────────────────────────────────────

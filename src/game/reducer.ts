@@ -2,7 +2,6 @@ import {
   ACTIVATIONS_PER_TURN,
   DEPLOY_COORDS,
   FLAG_COORDS,
-  LIFT_CELLS,
   NEXUS_COORD,
   TURN_LIMIT,
   createInitialGameState,
@@ -34,10 +33,6 @@ function isOccupied(state: GameState, c: Coord): boolean {
   return pieceAt(state, c) !== undefined;
 }
 
-function isLiftCell(c: Coord): boolean {
-  return LIFT_CELLS.some((lc) => lc.row === c.row && lc.col === c.col);
-}
-
 function applyDeploy(state: GameState, pieceId: PieceId): GameState {
   if (state.status.kind !== 'in-progress') return state;
   if (state.activationsRemaining <= 0) return state;
@@ -58,7 +53,7 @@ function applyDeploy(state: GameState, pieceId: PieceId): GameState {
     inHand: { ...state.inHand, [player]: newHand },
     onBoard: [
       ...state.onBoard,
-      { piece, coord: deployCoord, arrivedOnLiftThisTurn: false },
+      { piece, coord: deployCoord },
     ],
     activationsRemaining: state.activationsRemaining - 1,
   };
@@ -90,7 +85,6 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
   const movedPiece: BoardPiece = {
     piece: newPiece,
     coord: to,
-    arrivedOnLiftThisTurn: isLiftCell(to),
   };
 
   const captureSet = new Set(captureIndices);
@@ -248,9 +242,6 @@ function passInitiative(state: GameState): GameState {
   }
   return {
     ...state,
-    onBoard: state.onBoard.map((bp) =>
-      bp.arrivedOnLiftThisTurn ? { ...bp, arrivedOnLiftThisTurn: false } : bp,
-    ),
     currentPlayer: opponentOf(state.currentPlayer),
     activationsRemaining: ACTIVATIONS_PER_TURN,
     turnNumber: nextTurn,
