@@ -7,6 +7,10 @@ const KING_DELTAS: ReadonlyArray<readonly [number, number]> = [
   [ 1, -1], [ 1, 0], [ 1, 1],
 ] as const;
 
+const ORTHOGONAL_DELTAS: ReadonlyArray<readonly [number, number]> = [
+  [-1, 0], [1, 0], [0, -1], [0, 1],
+] as const;
+
 export function sameCoord(a: Coord, b: Coord): boolean {
   return a.layer === b.layer && a.row === b.row && a.col === b.col;
 }
@@ -20,8 +24,8 @@ function inBounds(row: number, col: number): boolean {
 }
 
 // All legal destinations for a piece, on the same layer.
-// Implemented today: Captain (king-move), Soldier (forward + diagonal capture).
-// Other piece types return [] until implemented.
+// Implemented today: Captain (king-move), Soldier (forward + diagonal capture),
+// Rover (orthogonal ≤2 sq, capture-at-1-only). Pilot still returns [].
 export function legalMovesFor(boardPiece: BoardPiece, state: GameState): Coord[] {
   const { piece, coord } = boardPiece;
 
@@ -72,6 +76,31 @@ export function legalMovesFor(boardPiece: BoardPiece, state: GameState): Coord[]
       if (occupant && occupant.piece.owner !== piece.owner) moves.push(target);
     }
 
+    return moves;
+  }
+
+  if (piece.kind === 'rover') {
+    const moves: Coord[] = [];
+    for (const [dr, dc] of ORTHOGONAL_DELTAS) {
+      // 1 step: empty or opponent (capture by landing). Friendly blocks both.
+      const r1 = coord.row + dr;
+      const c1 = coord.col + dc;
+      if (!inBounds(r1, c1)) continue;
+      const t1: Coord = { layer: coord.layer, row: r1, col: c1 };
+      const occ1 = pieceAt(state, t1);
+      if (occ1 && occ1.piece.owner === piece.owner) continue;
+      moves.push(t1);
+
+      // 2 steps: only legal if intermediate (t1) is empty AND destination is empty.
+      // Rovers cannot capture at 2 squares.
+      if (occ1) continue;
+      const r2 = coord.row + 2 * dr;
+      const c2 = coord.col + 2 * dc;
+      if (!inBounds(r2, c2)) continue;
+      const t2: Coord = { layer: coord.layer, row: r2, col: c2 };
+      if (pieceAt(state, t2)) continue;
+      moves.push(t2);
+    }
     return moves;
   }
 
