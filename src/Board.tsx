@@ -24,6 +24,9 @@ export type Marker = {
   col: number;
   symbol: string;
   kind: MarkerKind;
+  // Optional small glyph painted in the top-right corner of the cell.
+  // Used today for the promoted-Soldier indicator (★).
+  badge?: string;
 };
 
 export type DeployCell = {
@@ -220,6 +223,28 @@ export default function Board({
     );
   });
 
+  const badgeEls = markers
+    .filter((m) => m.badge)
+    .map((m) => (
+      <text
+        key={`bdg-${m.row}-${m.col}-${m.badge}`}
+        x={ORIGIN_X + m.col * CELL + CELL - 4}
+        y={ORIGIN_Y + m.row * CELL + 4}
+        textAnchor="end"
+        dominantBaseline="hanging"
+        fontSize={CELL * 0.28}
+        fontFamily="system-ui, sans-serif"
+        fill="#f5c343"
+        stroke="#1a1a1a"
+        strokeWidth={0.4}
+        paintOrder="stroke"
+        pointerEvents="none"
+        style={{ userSelect: 'none' }}
+      >
+        {m.badge}
+      </text>
+    ));
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
       <h2 style={{ margin: 0, fontFamily: 'system-ui, sans-serif', fontSize: '1.05rem' }}>
@@ -237,6 +262,7 @@ export default function Board({
         {deployEls}
         {selectionEl}
         {markerEls}
+        {badgeEls}
         {targetEls}
       </svg>
     </div>

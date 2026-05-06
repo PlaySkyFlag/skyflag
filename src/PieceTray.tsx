@@ -78,16 +78,22 @@ export default function PieceTray({
         <>
           <h4 className="tray-sublabel">captured</h4>
           <div className="tray-pieces">
-            {capturedPieces.map((p, i) => (
-              <div
-                key={`${p.id}-captured-${i}`}
-                className="tray-piece tray-piece-captured"
-                title={`${KIND_LABEL[p.kind]} (lost)`}
-              >
-                <span className="tray-piece-letter">{KIND_LETTER[p.kind]}</span>
-                <span className="tray-piece-name">{KIND_LABEL[p.kind]}</span>
-              </div>
-            ))}
+            {capturedPieces.map((p, i) => {
+              const wasPromoted = p.kind === 'captain' && p.promotedFromSoldier;
+              return (
+                <div
+                  key={`${p.id}-captured-${i}`}
+                  className="tray-piece tray-piece-captured"
+                  title={`${KIND_LABEL[p.kind]}${wasPromoted ? ' (promoted from Soldier)' : ''} — lost`}
+                >
+                  <span className="tray-piece-letter">
+                    {KIND_LETTER[p.kind]}
+                    {wasPromoted && <sup className="tray-piece-promoted-mark">★</sup>}
+                  </span>
+                  <span className="tray-piece-name">{KIND_LABEL[p.kind]}</span>
+                </div>
+              );
+            })}
           </div>
         </>
       )}

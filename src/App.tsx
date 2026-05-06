@@ -81,11 +81,14 @@ function markersForLayer(layer: Layer, state: GameState): Marker[] {
 
   for (const bp of state.onBoard) {
     if (bp.coord.layer !== layer) continue;
+    const badge =
+      bp.piece.kind === 'captain' && bp.piece.promotedFromSoldier ? '★' : undefined;
     markers.push({
       row: bp.coord.row,
       col: bp.coord.col,
       symbol: PIECE_SYMBOL[bp.piece.kind],
       kind: bp.piece.owner,
+      badge,
     });
   }
 

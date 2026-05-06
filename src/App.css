@@ -192,3 +192,10 @@ button.tray-piece:hover {
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
 }
+
+.tray-piece-promoted-mark {
+  margin-left: 2px;
+  font-size: 0.55em;
+  color: #f5c343;
+  text-decoration: none;
+}
