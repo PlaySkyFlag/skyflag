@@ -2,6 +2,7 @@ import { useEffect, useReducer, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import PieceTray from './PieceTray';
 import StatusBar from './StatusBar';
+import { chooseAction } from './game/ai';
 import {
   DEPLOY_COORDS,
   FLAG_COORDS,
@@ -13,6 +14,8 @@ import { legalMovesFor, pieceAt, sameCoord } from './game/moves';
 import { reduce } from './game/reducer';
 import type { Coord, GameState, Layer, PieceId, PieceKind, Player } from './game/types';
 import './App.css';
+
+const AI_THINK_DELAY_MS = 600;
 
 const SPACE_THEME: BoardTheme = {
   lightFill: '#5b5f9a',
@@ -112,13 +115,33 @@ type Selection =
 export default function App() {
   const [state, dispatch] = useReducer(reduce, undefined, createInitialGameState);
   const [selection, setSelection] = useState<Selection>(null);
+  const [aiPlayer, setAiPlayer] = useState<Player | null>('p2');
 
   // Drop selection whenever the active player or game status changes.
   useEffect(() => {
     setSelection(null);
   }, [state.currentPlayer, state.status]);
 
+  // AI loop: when it's the AI's turn and the game is in progress, pick an
+  // action and dispatch it after a small visible delay. The effect re-runs
+  // after each dispatch (state changes), automatically scheduling the next
+  // AI activation. When the turn passes back to the human, currentPlayer
+  // no longer matches aiPlayer and the loop stops.
+  useEffect(() => {
+    if (!aiPlayer) return;
+    if (state.status.kind !== 'in-progress') return;
+    if (state.currentPlayer !== aiPlayer) return;
+
+    const timer = setTimeout(() => {
+      const action = chooseAction(state);
+      dispatch(action ?? { type: 'end-turn' });
+    }, AI_THINK_DELAY_MS);
+
+    return () => clearTimeout(timer);
+  }, [aiPlayer, state]);
+
   const inProgress = state.status.kind === 'in-progress';
+  const isAiTurn = aiPlayer === state.currentPlayer && inProgress;
 
   const selectedBoardPiece =
     selection?.kind === 'board'
@@ -135,11 +158,12 @@ export default function App() {
   }
 
   const handleSelectHandPiece = (id: PieceId) => {
+    if (isAiTurn) return;
     setSelection((prev) => (prev?.kind === 'hand' && prev.pieceId === id ? null : { kind: 'hand', pieceId: id }));
   };
 
   const handleDeployClick = (player: Player) => {
-    if (!inProgress) return;
+    if (!inProgress || isAiTurn) return;
     if (player !== state.currentPlayer) return;
     if (selection?.kind !== 'hand') return;
     dispatch({ type: 'deploy', pieceId: selection.pieceId });
@@ -147,7 +171,7 @@ export default function App() {
   };
 
   const handleCellClick = (layer: Layer, row: number, col: number) => {
-    if (!inProgress) return;
+    if (!inProgress || isAiTurn) return;
     const target: Coord = { layer, row, col };
 
     // 1. If a board piece is selected and the click is a legal target → move.
@@ -200,6 +224,8 @@ export default function App() {
       <h1>SkyFlag</h1>
       <StatusBar
         state={state}
+        aiPlayer={aiPlayer}
+        onToggleAi={() => setAiPlayer((p) => (p ? null : 'p2'))}
         onEndTurn={() => dispatch({ type: 'end-turn' })}
         onNewGame={() => dispatch({ type: 'new-game' })}
       />
@@ -209,7 +235,7 @@ export default function App() {
         player="p1"
         pieces={state.inHand.p1}
         capturedPieces={state.captured.p1}
-        isInteractive={inProgress && state.currentPlayer === 'p1'}
+        isInteractive={inProgress && state.currentPlayer === 'p1' && aiPlayer !== 'p1'}
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
       />
@@ -218,7 +244,7 @@ export default function App() {
         player="p2"
         pieces={state.inHand.p2}
         capturedPieces={state.captured.p2}
-        isInteractive={inProgress && state.currentPlayer === 'p2'}
+        isInteractive={inProgress && state.currentPlayer === 'p2' && aiPlayer !== 'p2'}
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
       />
