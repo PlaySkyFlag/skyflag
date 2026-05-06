@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 24px;
+  gap: 20px;
   padding: 32px 16px;
   font-family: system-ui, -apple-system, sans-serif;
 }
@@ -15,9 +15,69 @@
   letter-spacing: 0.05em;
 }
 
-.boards {
+.tray {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  min-width: 280px;
+}
+
+.tray-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.tray-pieces {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tray-piece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  min-width: 56px;
+}
+
+.tray-p1 .tray-piece {
+  background: #1a2540;
+  color: #e8e8e8;
+  border: 1px solid #2a3858;
+}
+
+.tray-p2 .tray-piece {
+  background: #f5e8d0;
+  color: #1a1a1a;
+  border: 1px solid #ddd0b8;
+}
+
+.tray-piece-letter {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.tray-piece-name {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.tray-empty {
+  font-size: 0.85rem;
+  opacity: 0.5;
+  font-style: italic;
 }

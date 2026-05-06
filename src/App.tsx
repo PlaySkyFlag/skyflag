@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
+import PieceTray from './PieceTray';
 import {
   DEPLOY_COORDS,
   FLAG_COORDS,
@@ -97,7 +98,15 @@ function deployCellsForLayer(layer: Layer): DeployCell[] {
   }));
 }
 
-const RENDER_ORDER: Layer[] = ['space', 'sky', 'ground'];
+const renderBoard = (layer: Layer, state: GameState) => (
+  <Board
+    key={layer}
+    name={LAYER_NAMES[layer]}
+    theme={LAYER_THEMES[layer]}
+    markers={markersForLayer(layer, state)}
+    deployCells={deployCellsForLayer(layer)}
+  />
+);
 
 export default function App() {
   const [state] = useState(createInitialGameState);
@@ -105,17 +114,11 @@ export default function App() {
   return (
     <main className="app">
       <h1>SkyFlag</h1>
-      <div className="boards">
-        {RENDER_ORDER.map((layer) => (
-          <Board
-            key={layer}
-            name={LAYER_NAMES[layer]}
-            theme={LAYER_THEMES[layer]}
-            markers={markersForLayer(layer, state)}
-            deployCells={deployCellsForLayer(layer)}
-          />
-        ))}
-      </div>
+      {renderBoard('space', state)}
+      {renderBoard('sky', state)}
+      <PieceTray player="p1" pieces={state.inHand.p1} />
+      {renderBoard('ground', state)}
+      <PieceTray player="p2" pieces={state.inHand.p2} />
     </main>
   );
 }
