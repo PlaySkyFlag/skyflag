@@ -1,4 +1,4 @@
-import type { Piece, PieceKind, Player } from './game/types';
+import type { Piece, PieceId, PieceKind, Player } from './game/types';
 
 const KIND_LABEL: Record<PieceKind, string> = {
   captain: 'Captain',
@@ -22,22 +22,47 @@ const PLAYER_LABEL: Record<Player, string> = {
 type Props = {
   player: Player;
   pieces: Piece[];
+  isInteractive: boolean;
+  selectedId: PieceId | null;
+  onSelect: (id: PieceId) => void;
 };
 
-export default function PieceTray({ player, pieces }: Props) {
+export default function PieceTray({ player, pieces, isInteractive, selectedId, onSelect }: Props) {
   return (
-    <section className={`tray tray-${player}`} aria-label={`${PLAYER_LABEL[player]} hand`}>
+    <section
+      className={`tray tray-${player}${isInteractive ? '' : ' tray-inactive'}`}
+      aria-label={`${PLAYER_LABEL[player]} hand`}
+    >
       <h3 className="tray-label">{PLAYER_LABEL[player]} · in hand</h3>
       <div className="tray-pieces">
         {pieces.length === 0 ? (
           <span className="tray-empty">no pieces in hand</span>
         ) : (
-          pieces.map((p) => (
-            <div key={p.id} className="tray-piece" title={KIND_LABEL[p.kind]}>
-              <div className="tray-piece-letter">{KIND_LETTER[p.kind]}</div>
-              <div className="tray-piece-name">{KIND_LABEL[p.kind]}</div>
-            </div>
-          ))
+          pieces.map((p) => {
+            const isSelected = p.id === selectedId;
+            const className = `tray-piece${isSelected ? ' tray-piece-selected' : ''}`;
+            if (isInteractive) {
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={className}
+                  title={KIND_LABEL[p.kind]}
+                  aria-pressed={isSelected}
+                  onClick={() => onSelect(p.id)}
+                >
+                  <span className="tray-piece-letter">{KIND_LETTER[p.kind]}</span>
+                  <span className="tray-piece-name">{KIND_LABEL[p.kind]}</span>
+                </button>
+              );
+            }
+            return (
+              <div key={p.id} className={className} title={KIND_LABEL[p.kind]}>
+                <span className="tray-piece-letter">{KIND_LETTER[p.kind]}</span>
+                <span className="tray-piece-name">{KIND_LABEL[p.kind]}</span>
+              </div>
+            );
+          })
         )}
       </div>
     </section>

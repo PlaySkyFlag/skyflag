@@ -9,14 +9,21 @@ const REASON_LABEL: Record<'nexus' | 'elimination' | 'turn-limit', string> = {
   'turn-limit': 'turn-limit',
 };
 
-type Props = { state: GameState };
+type Props = {
+  state: GameState;
+  onEndTurn: () => void;
+  onNewGame: () => void;
+};
 
-export default function StatusBar({ state }: Props) {
+export default function StatusBar({ state, onEndTurn, onNewGame }: Props) {
   if (state.status.kind === 'won') {
     return (
       <div className="hud hud-finished">
         <span className={`hud-pip hud-pip-${state.status.winner}`} aria-hidden />
-        <span><strong>{PLAYER_NAME[state.status.winner]}</strong> wins by {REASON_LABEL[state.status.reason]}</span>
+        <span>
+          <strong>{PLAYER_NAME[state.status.winner]}</strong> wins by {REASON_LABEL[state.status.reason]}
+        </span>
+        <button type="button" className="hud-btn" onClick={onNewGame}>New game</button>
       </div>
     );
   }
@@ -25,6 +32,7 @@ export default function StatusBar({ state }: Props) {
     return (
       <div className="hud hud-finished">
         <span>Draw — {REASON_LABEL[state.status.reason]}</span>
+        <button type="button" className="hud-btn" onClick={onNewGame}>New game</button>
       </div>
     );
   }
@@ -44,6 +52,9 @@ export default function StatusBar({ state }: Props) {
       <span className="hud-section">
         Turn {state.turnNumber} / {TURN_LIMIT}
       </span>
+      <span className="hud-divider">·</span>
+      <button type="button" className="hud-btn" onClick={onEndTurn}>End turn</button>
+      <button type="button" className="hud-btn hud-btn-subtle" onClick={onNewGame}>New game</button>
     </div>
   );
 }

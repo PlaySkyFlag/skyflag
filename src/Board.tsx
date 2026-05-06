@@ -39,9 +39,9 @@ const MARKER_STYLE: Record<MarkerKind, { fill: string; stroke: string; strokeWid
   p2:    { fill: '#f5e8d0', stroke: '#1a1a1a', strokeWidth: 0.8 },
 };
 
-const DEPLOY_STYLE: Record<Player, { stroke: string; fill: string }> = {
-  p1: { stroke: '#a8b8d8', fill: 'rgba(168,184,216,0.14)' },
-  p2: { stroke: '#f5e8d0', fill: 'rgba(245,232,208,0.14)' },
+const DEPLOY_STYLE: Record<Player, { stroke: string; fill: string; activeFill: string }> = {
+  p1: { stroke: '#a8b8d8', fill: 'rgba(168,184,216,0.14)', activeFill: 'rgba(168,184,216,0.32)' },
+  p2: { stroke: '#f5e8d0', fill: 'rgba(245,232,208,0.14)', activeFill: 'rgba(245,232,208,0.32)' },
 };
 
 type BoardProps = {
@@ -49,9 +49,19 @@ type BoardProps = {
   theme: BoardTheme;
   markers?: Marker[];
   deployCells?: DeployCell[];
+  // When set, the deploy cell for this player is highlighted as an active drop target.
+  activeDeployPlayer?: Player | null;
+  onDeployCellClick?: (player: Player) => void;
 };
 
-export default function Board({ name, theme, markers = [], deployCells = [] }: BoardProps) {
+export default function Board({
+  name,
+  theme,
+  markers = [],
+  deployCells = [],
+  activeDeployPlayer = null,
+  onDeployCellClick,
+}: BoardProps) {
   const cells = [];
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
@@ -111,6 +121,7 @@ export default function Board({ name, theme, markers = [], deployCells = [] }: B
 
   const deployEls = deployCells.map((d) => {
     const style = DEPLOY_STYLE[d.player];
+    const isActive = activeDeployPlayer === d.player;
     const inset = 4;
     return (
       <rect
@@ -120,11 +131,22 @@ export default function Board({ name, theme, markers = [], deployCells = [] }: B
         width={CELL - inset * 2}
         height={CELL - inset * 2}
         rx={6}
-        fill={style.fill}
+        fill={isActive ? style.activeFill : style.fill}
         stroke={style.stroke}
-        strokeWidth={1.5}
-        strokeDasharray="4 3"
-      />
+        strokeWidth={isActive ? 2.5 : 1.5}
+        strokeDasharray={isActive ? undefined : '4 3'}
+        onClick={isActive && onDeployCellClick ? () => onDeployCellClick(d.player) : undefined}
+        style={{ cursor: isActive && onDeployCellClick ? 'pointer' : 'default' }}
+      >
+        {isActive && (
+          <animate
+            attributeName="opacity"
+            values="0.7;1;0.7"
+            dur="1.6s"
+            repeatCount="indefinite"
+          />
+        )}
+      </rect>
     );
   });
 

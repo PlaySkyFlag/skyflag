@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import PieceTray from './PieceTray';
 import StatusBar from './StatusBar';
@@ -9,7 +9,8 @@ import {
   NEXUS_COORD,
   createInitialGameState,
 } from './game/constants';
-import type { GameState, Layer, PieceKind, Player } from './game/types';
+import { reduce } from './game/reducer';
+import type { GameState, Layer, PieceId, PieceKind, Player } from './game/types';
 import './App.css';
 
 const SPACE_THEME: BoardTheme = {
@@ -99,28 +100,68 @@ function deployCellsForLayer(layer: Layer): DeployCell[] {
   }));
 }
 
-const renderBoard = (layer: Layer, state: GameState) => (
-  <Board
-    key={layer}
-    name={LAYER_NAMES[layer]}
-    theme={LAYER_THEMES[layer]}
-    markers={markersForLayer(layer, state)}
-    deployCells={deployCellsForLayer(layer)}
-  />
-);
-
 export default function App() {
-  const [state] = useState(createInitialGameState);
+  const [state, dispatch] = useReducer(reduce, undefined, createInitialGameState);
+  const [selectedId, setSelectedId] = useState<PieceId | null>(null);
+
+  // Drop selection whenever the active player changes (turn ends).
+  useEffect(() => {
+    setSelectedId(null);
+  }, [state.currentPlayer, state.status]);
+
+  const handleSelectHandPiece = (id: PieceId) => {
+    setSelectedId((prev) => (prev === id ? null : id));
+  };
+
+  const handleDeployClick = (player: Player) => {
+    if (player !== state.currentPlayer) return;
+    if (!selectedId) return;
+    dispatch({ type: 'deploy', pieceId: selectedId });
+    setSelectedId(null);
+  };
+
+  const activeDeployPlayer: Player | null =
+    selectedId && state.status.kind === 'in-progress' ? state.currentPlayer : null;
+
+  const renderBoard = (layer: Layer) => (
+    <Board
+      key={layer}
+      name={LAYER_NAMES[layer]}
+      theme={LAYER_THEMES[layer]}
+      markers={markersForLayer(layer, state)}
+      deployCells={deployCellsForLayer(layer)}
+      activeDeployPlayer={layer === 'ground' ? activeDeployPlayer : null}
+      onDeployCellClick={layer === 'ground' ? handleDeployClick : undefined}
+    />
+  );
+
+  const inProgress = state.status.kind === 'in-progress';
 
   return (
     <main className="app">
       <h1>SkyFlag</h1>
-      <StatusBar state={state} />
-      {renderBoard('space', state)}
-      {renderBoard('sky', state)}
-      <PieceTray player="p1" pieces={state.inHand.p1} />
-      {renderBoard('ground', state)}
-      <PieceTray player="p2" pieces={state.inHand.p2} />
+      <StatusBar
+        state={state}
+        onEndTurn={() => dispatch({ type: 'end-turn' })}
+        onNewGame={() => dispatch({ type: 'new-game' })}
+      />
+      {renderBoard('space')}
+      {renderBoard('sky')}
+      <PieceTray
+        player="p1"
+        pieces={state.inHand.p1}
+        isInteractive={inProgress && state.currentPlayer === 'p1'}
+        selectedId={selectedId}
+        onSelect={handleSelectHandPiece}
+      />
+      {renderBoard('ground')}
+      <PieceTray
+        player="p2"
+        pieces={state.inHand.p2}
+        isInteractive={inProgress && state.currentPlayer === 'p2'}
+        selectedId={selectedId}
+        onSelect={handleSelectHandPiece}
+      />
     </main>
   );
 }
