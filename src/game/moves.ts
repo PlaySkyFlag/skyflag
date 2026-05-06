@@ -11,6 +11,10 @@ const ORTHOGONAL_DELTAS: ReadonlyArray<readonly [number, number]> = [
   [-1, 0], [1, 0], [0, -1], [0, 1],
 ] as const;
 
+const DIAGONAL_DELTAS: ReadonlyArray<readonly [number, number]> = [
+  [-1, -1], [-1, 1], [1, -1], [1, 1],
+] as const;
+
 export function sameCoord(a: Coord, b: Coord): boolean {
   return a.layer === b.layer && a.row === b.row && a.col === b.col;
 }
@@ -24,8 +28,9 @@ function inBounds(row: number, col: number): boolean {
 }
 
 // All legal destinations for a piece, on the same layer.
-// Implemented today: Captain (king-move), Soldier (forward + diagonal capture),
-// Rover (orthogonal ≤2 sq, capture-at-1-only). Pilot still returns [].
+// Captain: king-move. Soldier: forward + diagonal capture. Rover: orthogonal
+// ≤2 sq (true limited rook — captures at any reachable distance). Pilot:
+// diagonal ≤2 sq (limited bishop). Neither Rover nor Pilot may jump.
 export function legalMovesFor(boardPiece: BoardPiece, state: GameState): Coord[] {
   const { piece, coord } = boardPiece;
 
@@ -79,10 +84,10 @@ export function legalMovesFor(boardPiece: BoardPiece, state: GameState): Coord[]
     return moves;
   }
 
-  if (piece.kind === 'rover') {
+  if (piece.kind === 'pilot') {
     const moves: Coord[] = [];
-    for (const [dr, dc] of ORTHOGONAL_DELTAS) {
-      // 1 step: empty or opponent (capture by landing). Friendly blocks both.
+    for (const [dr, dc] of DIAGONAL_DELTAS) {
+      // 1 step: empty or opponent. Friendly blocks both 1- and 2-step.
       const r1 = coord.row + dr;
       const c1 = coord.col + dc;
       if (!inBounds(r1, c1)) continue;
@@ -91,14 +96,44 @@ export function legalMovesFor(boardPiece: BoardPiece, state: GameState): Coord[]
       if (occ1 && occ1.piece.owner === piece.owner) continue;
       moves.push(t1);
 
-      // 2 steps: only legal if intermediate (t1) is empty AND destination is empty.
-      // Rovers cannot capture at 2 squares.
+      // 2 step: only legal if the intermediate (t1) is EMPTY (no jumping).
+      // Unlike the Rover, the Pilot CAN capture at distance 2 — destination
+      // may be empty or opponent.
       if (occ1) continue;
       const r2 = coord.row + 2 * dr;
       const c2 = coord.col + 2 * dc;
       if (!inBounds(r2, c2)) continue;
       const t2: Coord = { layer: coord.layer, row: r2, col: c2 };
-      if (pieceAt(state, t2)) continue;
+      const occ2 = pieceAt(state, t2);
+      if (occ2 && occ2.piece.owner === piece.owner) continue;
+      moves.push(t2);
+    }
+    return moves;
+  }
+
+  if (piece.kind === 'rover') {
+    const moves: Coord[] = [];
+    for (const [dr, dc] of ORTHOGONAL_DELTAS) {
+      // 1 step: empty or opponent. Friendly blocks both 1- and 2-step.
+      const r1 = coord.row + dr;
+      const c1 = coord.col + dc;
+      if (!inBounds(r1, c1)) continue;
+      const t1: Coord = { layer: coord.layer, row: r1, col: c1 };
+      const occ1 = pieceAt(state, t1);
+      if (occ1 && occ1.piece.owner === piece.owner) continue;
+      moves.push(t1);
+
+      // 2 steps: only legal if intermediate (t1) is empty (no jumping).
+      // Destination may be empty or opponent (capture-by-landing at 2 sq is
+      // allowed — Rover behaves as a true limited rook, revised from v19.1
+      // which restricted capture to 1 sq).
+      if (occ1) continue;
+      const r2 = coord.row + 2 * dr;
+      const c2 = coord.col + 2 * dc;
+      if (!inBounds(r2, c2)) continue;
+      const t2: Coord = { layer: coord.layer, row: r2, col: c2 };
+      const occ2 = pieceAt(state, t2);
+      if (occ2 && occ2.piece.owner === piece.owner) continue;
       moves.push(t2);
     }
     return moves;

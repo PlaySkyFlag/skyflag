@@ -77,11 +77,12 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
   const legal = legalMovesFor(moving, state);
   if (!legal.some((c) => sameCoord(c, to))) return state;
 
-  // Capture: opponent piece at destination is removed (legalMovesFor already
-  // ensures we never land on a friendly piece).
-  const captureIdx = state.onBoard.findIndex(
-    (bp, i) => i !== movingIdx && sameCoord(bp.coord, to),
-  );
+  // Compute every onBoard index that's captured by this move:
+  //   • destination piece if it's an opponent (capture by landing)
+  //   • for Pilot 2-sq diagonal moves: the intermediate piece if it's an
+  //     opponent ("jumped piece is captured"). Friendly pieces may be jumped
+  //     over but are never captured.
+  const captureIndices = capturesFor(state, movingIdx, moving, to);
 
   const newPiece = nextPieceState(moving.piece, to);
   const movedPiece: BoardPiece = {
@@ -90,18 +91,22 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
     arrivedOnLiftThisTurn: isLiftCell(to),
   };
 
+  const captureSet = new Set(captureIndices);
   const newOnBoard: BoardPiece[] = [];
   for (let i = 0; i < state.onBoard.length; i++) {
-    if (i === captureIdx) continue;
+    if (captureSet.has(i)) continue;
     newOnBoard.push(i === movingIdx ? movedPiece : state.onBoard[i]);
   }
 
-  // If we captured a piece, record it under the loser's captured list.
-  let newCaptured = state.captured;
-  if (captureIdx >= 0) {
-    const lost = state.onBoard[captureIdx].piece;
+  // Record each captured piece in the loser's captured list.
+  let newCaptured: Record<Player, Piece[]> = state.captured;
+  for (const idx of captureIndices) {
+    const lost = state.onBoard[idx].piece;
     const loser = lost.owner;
-    newCaptured = { ...state.captured, [loser]: [...state.captured[loser], lost] };
+    newCaptured = {
+      ...newCaptured,
+      [loser]: [...newCaptured[loser], lost],
+    };
   }
 
   // Flag capture (rulebook turn step 3): runs AFTER any promotion so a Soldier
@@ -118,6 +123,27 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
   };
 
   return next.activationsRemaining > 0 ? next : passInitiative(next);
+}
+
+// Indices of all onBoard pieces removed by this move. Today every piece type
+// can capture only the destination piece (if it's an opponent). The list shape
+// leaves room for future multi-capture rules without further refactoring.
+function capturesFor(
+  state: GameState,
+  movingIdx: number,
+  moving: BoardPiece,
+  to: Coord,
+): number[] {
+  const captures: number[] = [];
+
+  const destIdx = state.onBoard.findIndex(
+    (bp, i) => i !== movingIdx && sameCoord(bp.coord, to),
+  );
+  if (destIdx >= 0 && state.onBoard[destIdx].piece.owner !== moving.piece.owner) {
+    captures.push(destIdx);
+  }
+
+  return captures;
 }
 
 // Apply any same-activation transformations to a piece that just moved to `to`:
