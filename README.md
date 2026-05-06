@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+# SkyFlag
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A two-player tactical race played across a three-layer arcology — Ground (Terran), Sky (Meridian), and Space (Empyrean). Each player commands four pieces (Captain, Soldier, Rover, Pilot) and must capture the opponent's three claim-flags, then land their Captain on the Caelum Nexus at Space(3,3) to win.
 
-Currently, two official plugins are available:
+This repository contains the **web prototype** — a React + TypeScript + Vite implementation of the v19.1 *Cross-Board* rulebook, intended to wrap into a Capacitor-based iOS app once Phase 1 (single-player and hot-seat) is solid.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> Game design and rulebook © 2026 Limnology Research Corp. · Dr. Nelson Jatel, P.Ag.
 
-## React Compiler
+## Status
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Phase 1 prototype, very early. What renders today:
 
-## Expanding the ESLint configuration
+- All three boards (Space → Sky → Ground), each a 6×6 grid with `r0–r5` / `c0–c5` coordinate labels matching the rulebook
+- Static landmarks: 12 Lifts, 6 starting Flags, 1 Nexus, both deploy cells
+- In-hand piece trays for both players
+- HUD showing whose turn it is, activations remaining, and turn count
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+What does **not** work yet: piece deployment, movement, capture, win checks, or any actual game logic. Game state is defined (`src/game/`) but not yet driven by user actions.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Running locally
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Requirements: Node 20+, npm 10+.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Then open http://localhost:5173/.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Other scripts:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `npm run build` — production build to `dist/`
+- `npm run preview` — preview the production build
+- `npm run lint` — run ESLint
+
+## Project layout
+
 ```
+docs/
+  rulebook-v19.1.pdf      Canonical rulebook (Kaleo Edition · Edition 1.0)
+src/
+  App.tsx                 Top-level layout: HUD, boards, trays
+  Board.tsx               One 6×6 SVG board with markers and deploy cells
+  PieceTray.tsx           In-hand pieces for one player
+  StatusBar.tsx           Turn / activations / outcome HUD
+  game/
+    types.ts              Layer, Coord, Player, Piece, GameState, etc.
+    constants.ts          Lift / flag / deploy positions and createInitialGameState()
+```
+
+## Tech stack
+
+- **React 19** with TypeScript for the UI
+- **Vite** for the dev server and build
+- **SVG** for board rendering (no Three.js — the prototype stays 2D)
+- **Capacitor** (planned, Phase 2) to package for iOS
+
+## License
+
+All game design, rules text, illustrations, and game-specific code are the property of Limnology Research Corp. and not licensed for redistribution.
