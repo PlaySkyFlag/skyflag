@@ -734,7 +734,7 @@ export default function App() {
             Check for updates
           </button>
           <span className="app-build-time">
-            Build {new Date(__BUILD_TIME__).toLocaleString(undefined, {
+            v{__GIT_SHA__} · Build {new Date(__BUILD_TIME__).toLocaleString(undefined, {
               year: 'numeric',
               month: 'short',
               day: 'numeric',
