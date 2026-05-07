@@ -90,6 +90,22 @@
   border-bottom-color: #ffe9b5;
 }
 
+.app-footer-build {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px !important;
+  flex-wrap: wrap;
+}
+
+.app-build-time {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
 .hud {
   display: flex;
   align-items: center;

@@ -609,6 +609,30 @@ export default function App() {
             njatel@limnology.ca
           </a>
         </p>
+        <p className="app-footer-build">
+          <button
+            type="button"
+            className="hud-btn hud-btn-subtle"
+            onClick={() => {
+              // Force a fresh fetch from the network so the user picks up
+              // the latest deployed bundle. On iOS / Capacitor this reloads
+              // the bundled web assets — TestFlight handles native updates.
+              window.location.reload();
+            }}
+            title="Reload to get the latest version"
+          >
+            Check for updates
+          </button>
+          <span className="app-build-time">
+            Build {new Date(__BUILD_TIME__).toLocaleString(undefined, {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        </p>
       </footer>
     </main>
   );
