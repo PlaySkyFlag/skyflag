@@ -14,6 +14,7 @@ import {
 } from './game/constants';
 import { legalMovesFor, pieceAt, sameCoord } from './game/moves';
 import { reduce } from './game/reducer';
+import { loadSession, saveSession } from './game/storage';
 import type { Coord, GameState, Layer, PieceId, PieceKind, Player } from './game/types';
 import './App.css';
 
@@ -114,10 +115,25 @@ type Selection =
   | { kind: 'hand'; pieceId: PieceId }
   | { kind: 'board'; pieceId: PieceId };
 
+// Read once at module load so initial state is hydrated synchronously.
+const INITIAL_SESSION = loadSession();
+
 export default function App() {
-  const [state, dispatch] = useReducer(reduce, undefined, createInitialGameState);
+  const [state, dispatch] = useReducer(
+    reduce,
+    undefined,
+    () => INITIAL_SESSION?.game ?? createInitialGameState(),
+  );
   const [selection, setSelection] = useState<Selection>(null);
-  const [aiPlayer, setAiPlayer] = useState<Player | null>('p2');
+  const [aiPlayer, setAiPlayer] = useState<Player | null>(
+    INITIAL_SESSION?.aiPlayer ?? 'p2',
+  );
+
+  // Auto-save on any state or AI-mode change. Selection state is transient
+  // and intentionally not persisted.
+  useEffect(() => {
+    saveSession({ game: state, aiPlayer });
+  }, [state, aiPlayer]);
 
   // Drop selection whenever the active player or game status changes.
   useEffect(() => {
