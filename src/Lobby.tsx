@@ -103,6 +103,19 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom }: Props) {
         setError(`${c.from_nickname || 'They'} declined the challenge.`);
         setTimeout(() => setError(null), 3000);
       })
+      .on('broadcast', { event: 'challenge-accept' }, ({ payload }) => {
+        // Recipient accepted — close our "Challenging…" overlay and
+        // hand the room up to App so the challenger also enters it.
+        const c = payload as Challenge;
+        if (c.from_user_id !== user.id) return;
+        setOutgoing(null);
+        setAvailable(false);
+        onEnterRoom({
+          code: c.room_code,
+          role: 'p1',
+          status: 'playing',
+        });
+      })
       .subscribe();
 
     return () => {
@@ -189,6 +202,17 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom }: Props) {
   // ── Recipient flow ───────────────────────────────────────────────────
   const acceptIncoming = useCallback(async () => {
     if (!supabase || !incoming) return;
+    // Notify the challenger so their "Challenging…" overlay clears and
+    // they also enter the room. Without this broadcast their UI stays
+    // stuck behind a full-screen modal blocking every click.
+    const channel = channelRef.current;
+    if (channel) {
+      await channel.send({
+        type: 'broadcast',
+        event: 'challenge-accept',
+        payload: incoming,
+      });
+    }
     // Joining the room is identical to typing the code in by hand, so we
     // hand the room state up to the parent and let the existing room flow
     // take over (sync, render, etc.).
