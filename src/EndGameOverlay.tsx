@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { GameState, Player } from './game/types';
 
-const PLAYER_NAME: Record<Player, string> = { p1: 'Slate', p2: 'Ivory' };
+const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
 const REASON_LABEL: Record<'nexus' | 'elimination' | 'turn-limit', string> = {
   nexus: 'Nexus capture',

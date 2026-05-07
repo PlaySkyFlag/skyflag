@@ -6,7 +6,8 @@ import MoveHistory from './MoveHistory';
 import Multiplayer from './Multiplayer';
 import PieceTray from './PieceTray';
 import StatusBar from './StatusBar';
-import { chooseAction } from './game/ai';
+import AiWorker from './game/aiWorker?worker';
+import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
 import { supabase } from './game/supabase';
 import {
   DEPLOY_COORDS,
@@ -31,6 +32,7 @@ const SPACE_THEME: BoardTheme = {
   background: '#15172e',
   stroke: '#0a0b1c',
   label: '#9ea4cf',
+  kind: 'space',
 };
 
 const SKY_THEME: BoardTheme = {
@@ -39,6 +41,7 @@ const SKY_THEME: BoardTheme = {
   background: '#2a4860',
   stroke: '#163040',
   label: '#a8c4d8',
+  kind: 'sky',
 };
 
 const GROUND_THEME: BoardTheme = {
@@ -47,6 +50,7 @@ const GROUND_THEME: BoardTheme = {
   background: '#1f2a17',
   stroke: '#2d3b25',
   label: '#a4b89a',
+  kind: 'ground',
 };
 
 const LAYER_THEMES: Record<Layer, BoardTheme> = {
@@ -277,23 +281,58 @@ export default function App() {
     setSelection(null);
   }, [state.currentPlayer, state.status]);
 
-  // AI loop: when it's the AI's turn and the game is in progress, pick an
-  // action and dispatch it after a small visible delay. The effect re-runs
-  // after each dispatch (state changes), automatically scheduling the next
-  // AI activation. When the turn passes back to the human, currentPlayer
-  // no longer matches aiPlayer and the loop stops.
+  // Web Worker for AI search — kept alive across renders via ref so the
+  // worker (and its in-memory transposition table) persists between turns.
+  // Each request carries an incrementing id; responses for stale ids are
+  // ignored (e.g., when the user starts a new game while AI is still
+  // thinking about the previous state).
+  const aiWorkerRef = useRef<Worker | null>(null);
+  const aiRequestIdRef = useRef(0);
+  if (aiWorkerRef.current === null && typeof window !== 'undefined') {
+    aiWorkerRef.current = new AiWorker();
+  }
+  useEffect(() => {
+    return () => {
+      aiWorkerRef.current?.terminate();
+      aiWorkerRef.current = null;
+    };
+  }, []);
+
+  // AI loop: when it's the AI's turn and the game is in progress, send the
+  // state to the worker and dispatch its chosen action when it comes back.
+  // The effect re-runs after each dispatch (state changes), automatically
+  // scheduling the next AI activation. When the turn passes back to the
+  // human, currentPlayer no longer matches aiPlayer and the loop stops.
   useEffect(() => {
     if (room) return;
     if (!aiPlayer) return;
     if (state.status.kind !== 'in-progress') return;
     if (state.currentPlayer !== aiPlayer) return;
+    const worker = aiWorkerRef.current;
+    if (!worker) return;
+
+    const requestId = ++aiRequestIdRef.current;
+    let cancelled = false;
+
+    const handleMessage = (event: MessageEvent<AiWorkerResponse>) => {
+      if (cancelled) return;
+      if (event.data.id !== requestId) return;
+      worker.removeEventListener('message', handleMessage);
+      dispatch(event.data.action ?? { type: 'end-turn' });
+    };
+    worker.addEventListener('message', handleMessage);
 
     const timer = setTimeout(() => {
-      const action = chooseAction(state);
-      dispatch(action ?? { type: 'end-turn' });
+      if (cancelled) return;
+      const req: AiWorkerRequest = { id: requestId, type: 'choose', state };
+      worker.postMessage(req);
     }, AI_THINK_DELAY_MS);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      worker.removeEventListener('message', handleMessage);
+    };
   }, [aiPlayer, state, room]);
 
   const inProgress = state.status.kind === 'in-progress';
@@ -407,7 +446,15 @@ export default function App() {
 
   return (
     <main className="app">
-      <h1>SkyFlag</h1>
+      <header className="app-header">
+        <img
+          src="/skyflag-logo.png"
+          alt="SkyFlag"
+          className="app-logo"
+          width={120}
+          height={120}
+        />
+      </header>
       <StatusBar
         state={state}
         aiPlayer={aiPlayer}
@@ -456,13 +503,13 @@ export default function App() {
             <linearGradient
               id="flow-ground-sky"
               gradientUnits="userSpaceOnUse"
-              x1="66"
-              y1="72"
-              x2="78"
-              y2="64"
+              x1="50"
+              y1="68"
+              x2="68"
+              y2="32"
             >
-              <stop offset="0%" stopColor="#7ba868" />
-              <stop offset="100%" stopColor="#7eb3d4" />
+              <stop offset="0%"   stopColor="#9bcf7f" />
+              <stop offset="100%" stopColor="#8ec8e0" />
             </linearGradient>
             <linearGradient
               id="flow-sky-space"
@@ -472,36 +519,57 @@ export default function App() {
               x2="32"
               y2="16"
             >
-              <stop offset="0%" stopColor="#7eb3d4" />
-              <stop offset="100%" stopColor="#7d7eb8" />
+              <stop offset="0%"   stopColor="#8ec8e0" />
+              <stop offset="100%" stopColor="#a899d6" />
+            </linearGradient>
+            {/* Soft "halo" gradient painted under the main strokes for a
+                ribbon-like glow that ties the design element together. */}
+            <linearGradient id="flow-halo" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
+              <stop offset="0%"   stopColor="rgba(150, 200, 220, 0)" />
+              <stop offset="50%"  stopColor="rgba(170, 200, 230, 0.35)" />
+              <stop offset="100%" stopColor="rgba(150, 200, 220, 0)" />
             </linearGradient>
             <marker
               id="flow-arrow"
               viewBox="0 0 10 10"
-              refX="9"
+              refX="6"
               refY="5"
-              markerWidth="3.5"
-              markerHeight="3.5"
+              markerWidth="4"
+              markerHeight="4"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(160, 180, 210, 0.6)" />
+              <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" fill="rgba(200, 215, 235, 0.85)" />
             </marker>
           </defs>
+          {/* Halo pass — wider, softer, painted first so the colored strokes
+              sit on top. Gives each arrow a glowing ribbon feel. */}
           <g
             fill="none"
-            strokeWidth={1.8}
+            strokeWidth={5}
+            strokeLinecap="round"
+            stroke="rgba(170, 200, 230, 0.18)"
+            vectorEffect="non-scaling-stroke"
+          >
+            <path d="M 50 67 C 70 67, 78 50, 70 33" />
+            <path d="M 70 16 Q 50 -2 30 16" />
+          </g>
+          {/* Main pass — colored gradient strokes with arrowheads at both
+              ends to indicate that lifts travel up and down. */}
+          <g
+            fill="none"
+            strokeWidth={2.4}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            opacity={0.55}
+            opacity={0.85}
           >
             <path
-              d="M 66,72 Q 78,72 78,64"
+              d="M 50 67 C 70 67, 78 50, 70 33"
               stroke="url(#flow-ground-sky)"
               markerStart="url(#flow-arrow)"
               markerEnd="url(#flow-arrow)"
             />
             <path
-              d="M 68,16 Q 50,2 32,16"
+              d="M 70 16 Q 50 -2 30 16"
               stroke="url(#flow-sky-space)"
               markerStart="url(#flow-arrow)"
               markerEnd="url(#flow-arrow)"
@@ -533,6 +601,15 @@ export default function App() {
         state={state}
         onPlayAgain={() => dispatch({ type: 'new-game' })}
       />
+      <footer className="app-footer">
+        <p>© 2026 Limnology Research Corp. · SkyFlag™ Kaleo Edition.</p>
+        <p>
+          Test feedback:{' '}
+          <a href="mailto:njatel@limnology.ca?subject=SkyFlag%20Test%20Feedback">
+            njatel@limnology.ca
+          </a>
+        </p>
+      </footer>
     </main>
   );
 }

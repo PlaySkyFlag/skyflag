@@ -6,13 +6,13 @@ export default function Help() {
         <ol>
           <li>
             <strong>Choose a mode</strong> from the dropdown in the HUD —
-            <em> 1P · Slate</em> (you're Slate, AI plays Ivory),{' '}
-            <em>1P · Ivory</em> (the reverse), or <em>2P</em> (two humans
-            on one device).
+            <em> 1P · Ravens</em> (you're the Grey Ravens, AI plays the
+            White Stags), <em>1P · Stags</em> (the reverse), or{' '}
+            <em>2P</em> (two humans on one device).
           </li>
           <li>
-            <strong>Click "New game"</strong> in the HUD to begin. Slate
-            moves first.
+            <strong>Click "New game"</strong> in the HUD to begin. The
+            Grey Ravens move first.
           </li>
           <li>
             <strong>Each turn you have 2 activations.</strong> An
@@ -54,6 +54,18 @@ export default function Help() {
           Ground row. Rover — orthogonal up to 2 squares. Pilot — diagonal
           up to 2 squares. None may jump. Capture by landing on an
           opponent.
+        </p>
+        <p className="help-rulebook">
+          Want the full story and complete rules?{' '}
+          <a
+            href="/skyflag-rulebook.pdf"
+            download="SkyFlag-Rulebook.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Download the SkyFlag rulebook (PDF)
+          </a>
+          .
         </p>
       </div>
     </details>

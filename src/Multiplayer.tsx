@@ -180,7 +180,7 @@ export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
           <>
             <p>
               Room <strong className="mp-code">{room.code}</strong>
-              {' · '}You are <strong>{room.role === 'p1' ? 'Slate' : 'Ivory'}</strong>
+              {' · '}You are <strong>{room.role === 'p1' ? 'Grey Ravens' : 'White Stags'}</strong>
               {' · '}
               {room.status === 'waiting'
                 ? 'Waiting for opponent…'

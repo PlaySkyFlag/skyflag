@@ -3,7 +3,7 @@ import { TURN_LIMIT } from './game/constants';
 import { isMuted, setMuted } from './game/sound';
 import type { GameState, Player } from './game/types';
 
-const PLAYER_NAME: Record<Player, string> = { p1: 'Slate', p2: 'Ivory' };
+const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
 const REASON_LABEL: Record<'nexus' | 'elimination' | 'turn-limit', string> = {
   nexus: 'Nexus',
@@ -21,11 +21,11 @@ type Props = {
   onNewGame: () => void;
 };
 
-// Dropdown value strings map cleanly to/from the aiPlayer slot. Keeping
-// the same Slate/Ivory/2P labels the segmented control had.
+// Dropdown value strings map cleanly to/from the aiPlayer slot. The
+// option keys are the AI's player slot, so 'p2' means "AI plays Stags".
 const SELECT_TO_MODE: Record<string, Mode> = {
-  'p2': 'p2',   // 1P · Slate — you are Slate, AI plays Ivory (p2)
-  'p1': 'p1',   // 1P · Ivory — you are Ivory, AI plays Slate (p1)
+  'p2': 'p2',   // 1P · Ravens — you are Ravens (p1), AI plays Stags (p2)
+  'p1': 'p1',   // 1P · Stags  — you are Stags (p2), AI plays Ravens (p1)
   'none': null, // 2P hot-seat — no AI
 };
 
@@ -55,8 +55,8 @@ export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNew
       aria-label="Players"
       title="Choose 1-player or 2-player mode"
     >
-      <option value="p2">1P · Slate</option>
-      <option value="p1">1P · Ivory</option>
+      <option value="p2">1P · Ravens</option>
+      <option value="p1">1P · Stags</option>
       <option value="none">2P</option>
     </select>
   );

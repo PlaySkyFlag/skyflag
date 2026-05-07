@@ -43,14 +43,65 @@
   letter-spacing: 0.05em;
 }
 
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+.app-logo {
+  width: clamp(96px, 14vw, 140px);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.app-footer {
+  margin-top: 24px;
+  padding: 14px 18px 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: #e8edf6;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  background: rgba(8, 14, 28, 0.55);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.app-footer p {
+  margin: 2px 0;
+}
+
+.app-footer a {
+  color: #ffd884;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 216, 132, 0.55);
+  font-weight: 600;
+}
+
+.app-footer a:hover {
+  color: #ffe9b5;
+  border-bottom-color: #ffe9b5;
+}
+
 .hud {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 18px;
+  padding: 10px 20px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.05);
-  font-size: 0.92rem;
+  background: #0a1224;
+  border: 1px solid rgba(168, 184, 216, 0.35);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
   flex-wrap: wrap;
   justify-content: center;
   max-width: 100%;
@@ -60,10 +111,13 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .hud-divider {
-  opacity: 0.35;
+  opacity: 0.5;
+  color: #ffffff;
 }
 
 .hud-pip {
@@ -119,6 +173,15 @@
   gap: 10px;
   font-size: 1.4rem;
   letter-spacing: 0.04em;
+  padding: 8px 18px;
+  border-radius: 16px;
+  background: rgba(12, 20, 38, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.hud-current strong {
+  color: #ffffff;
 }
 
 .hud-current .hud-pip {
@@ -129,7 +192,8 @@
 
 .hud-current-verb {
   font-size: 0.9rem;
-  opacity: 0.7;
+  opacity: 0.85;
+  color: #e8edf6;
   letter-spacing: 0.02em;
 }
 
@@ -264,6 +328,25 @@
 
 .help-body li:last-child {
   margin-bottom: 0;
+}
+
+.help-rulebook {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(245, 195, 67, 0.10);
+  border: 1px solid rgba(245, 195, 67, 0.35);
+}
+
+.help-rulebook a {
+  color: #ffd884;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.help-rulebook a:hover {
+  color: #ffe9b5;
 }
 
 /* Move history list — scrollable, monospace-ish for compact notation. */
@@ -485,22 +568,29 @@
    color-shifted so it reads at a glance: "X activations left" while it's
    your turn, "waiting" when it isn't. */
 .tray-note {
-  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: none;
-  opacity: 0.95;
-  padding: 2px 10px;
+  padding: 4px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #0a1224;
+  border: 1px solid rgba(168, 184, 216, 0.45);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  line-height: 1.2;
 }
 
-/* When the tray is the active player's, brighten the note so it pops. */
+/* When the tray is the active player's, switch to gold so the urgent
+   "X activations left" pops next to inactive trays. */
 .tray:not(.tray-inactive) .tray-note {
-  background: rgba(245, 195, 67, 0.25);
-  border-color: rgba(245, 195, 67, 0.55);
-  color: #fff;
+  background: #b88c1e;
+  border-color: #ffd884;
+  color: #ffffff;
 }
 
 .tray-pieces {
