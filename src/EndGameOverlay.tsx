@@ -30,9 +30,9 @@ export default function EndGameOverlay({ state, onPlayAgain }: Props) {
   if (state.status.kind === 'in-progress') return null;
   if (dismissed) return null;
 
-  const isWin = state.status.kind === 'won';
-  const winner: Player | null = isWin ? state.status.winner : null;
-  const reason = state.status.reason;
+  // Pull the status into a local so the discriminated union narrows below.
+  const status = state.status;
+  const winner: Player | null = status.kind === 'won' ? status.winner : null;
   const cardClass = winner
     ? `end-game-card end-game-card--${winner}`
     : 'end-game-card';
@@ -44,10 +44,12 @@ export default function EndGameOverlay({ state, onPlayAgain }: Props) {
           <span className={`hud-pip hud-pip-${winner} end-game-pip`} aria-hidden />
         )}
         <h2 className="end-game-title">
-          {isWin ? `${PLAYER_NAME[winner!]} wins!` : 'Draw'}
+          {status.kind === 'won' ? `${PLAYER_NAME[status.winner]} wins!` : 'Draw'}
         </h2>
         <p className="end-game-reason">
-          {isWin ? `by ${REASON_LABEL[reason]}` : REASON_LABEL[reason]}
+          {status.kind === 'won'
+            ? `by ${REASON_LABEL[status.reason]}`
+            : REASON_LABEL[status.reason]}
         </p>
         <div className="end-game-actions">
           <button type="button" className="hud-btn" onClick={onPlayAgain}>
