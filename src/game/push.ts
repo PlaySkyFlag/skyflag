@@ -1,9 +1,21 @@
-// Web Push helper — registers the service worker, requests notification
-// permission, and creates/retrieves the push subscription. Stage 2 will add
-// the Supabase storage of the subscription and the Edge Function that
-// dispatches the actual notifications.
+// Push notification helper — Web Push (browser) on the web bundle and
+// APNs (Capacitor PushNotifications) on the iOS native build. Both paths
+// converge on storing a row in public.push_subscriptions; the Edge
+// Function dispatches via the matching delivery channel.
+
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 const SW_PATH = '/sw.js';
+
+export type Platform = 'web' | 'ios';
+
+export function getPushPlatform(): Platform | 'unsupported' {
+  if (typeof window === 'undefined') return 'unsupported';
+  if (Capacitor.getPlatform() === 'ios') return 'ios';
+  if (isPushSupported()) return 'web';
+  return 'unsupported';
+}
 
 // Public VAPID key — safe to expose in client code (the matching private
 // key lives only in the Edge Function's secrets). Generated once via
@@ -127,4 +139,41 @@ export function serializeSubscription(sub: PushSubscription): {
     p256dh: keys.p256dh ?? '',
     auth: keys.auth ?? '',
   };
+}
+
+// ─── iOS / APNs flow (Capacitor) ─────────────────────────────────────────
+// On the native iOS build, push works via APNs. Capacitor's
+// PushNotifications plugin handles permission + APNs registration; the
+// resulting device token is what the Edge Function uses to dispatch via
+// Apple's HTTP/2 push provider API.
+
+export type IosEnableResult =
+  | { ok: true; token: string }
+  | { ok: false; reason: 'denied' | 'error' | 'not-ios'; message?: string };
+
+export async function enableIosPush(): Promise<IosEnableResult> {
+  if (Capacitor.getPlatform() !== 'ios') return { ok: false, reason: 'not-ios' };
+
+  const perm = await PushNotifications.requestPermissions();
+  if (perm.receive !== 'granted') return { ok: false, reason: 'denied' };
+
+  return new Promise((resolve) => {
+    let resolved = false;
+    const finish = (r: IosEnableResult) => {
+      if (resolved) return;
+      resolved = true;
+      regL.then((s) => s.remove()).catch(() => undefined);
+      errL.then((s) => s.remove()).catch(() => undefined);
+      resolve(r);
+    };
+    const regL = PushNotifications.addListener('registration', (token) => {
+      finish({ ok: true, token: token.value });
+    });
+    const errL = PushNotifications.addListener('registrationError', (err) => {
+      finish({ ok: false, reason: 'error', message: err.error });
+    });
+    PushNotifications.register().catch((e: unknown) =>
+      finish({ ok: false, reason: 'error', message: String(e) }),
+    );
+  });
 }

@@ -5,8 +5,10 @@ import { createInitialGameState } from './game/constants';
 import { getEffectiveUserId } from './game/identity';
 import { loadProfile, type Profile } from './game/profile';
 import {
+  enableIosPush,
   enablePush,
   getPermissionState,
+  getPushPlatform,
   isPushSupported,
   serializeSubscription,
 } from './game/push';
@@ -37,35 +39,38 @@ function generateRoomCode(): string {
   return out;
 }
 
-// Small inline control for the in-room "Enable browser notifications"
-// flow. After the browser grants permission and yields a PushSubscription,
-// the keys are upserted to public.push_subscriptions so the notify-turn
-// Edge Function can deliver a push when the opponent moves.
+// Inline control for the in-room "Enable turn notifications" flow.
+// Dispatches by platform: Web Push (browser) or APNs via Capacitor (iOS).
+// Both paths upsert into public.push_subscriptions keyed by
+// (user_id, platform), so a user with both web and iOS gets pings on
+// either device.
 function NotificationsControl() {
   const { user: authUser } = useAuthUser();
-  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>(
-    () => (typeof window === 'undefined' ? 'unsupported' : getPermissionState()),
+  const platform = getPushPlatform();
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported' | 'native'>(
+    () => (platform === 'ios' ? 'native' : platform === 'web' ? getPermissionState() : 'unsupported'),
   );
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    setPermission(getPermissionState());
-  }, []);
+    if (platform === 'web') setPermission(getPermissionState());
+  }, [platform]);
 
-  if (!isPushSupported()) {
-    return (
-      <p className="mp-note">Browser notifications aren't supported on this device.</p>
-    );
+  if (platform === 'unsupported') {
+    return <p className="mp-note">Notifications aren't supported on this device.</p>;
   }
-  if (permission === 'granted') {
+  if (platform === 'web' && !isPushSupported()) {
+    return <p className="mp-note">Browser notifications aren't supported on this device.</p>;
+  }
+  if (platform === 'web' && permission === 'granted') {
     return (
       <p className="mp-note">
-        ✓ Notifications enabled. You'll be alerted when it's your turn.
+        ✓ Notifications enabled. You'll be pinged when it's your turn.
       </p>
     );
   }
-  if (permission === 'denied') {
+  if (platform === 'web' && permission === 'denied') {
     return (
       <p className="mp-note">
         Notifications were blocked. Allow them from your browser's site
@@ -73,6 +78,7 @@ function NotificationsControl() {
       </p>
     );
   }
+
   return (
     <div className="mp-notify">
       <button
@@ -82,12 +88,45 @@ function NotificationsControl() {
         onClick={async () => {
           setBusy(true);
           setMessage(null);
+          if (platform === 'ios') {
+            const result = await enableIosPush();
+            setBusy(false);
+            if (!result.ok) {
+              setMessage(
+                result.reason === 'denied'
+                  ? 'Permission denied. Enable Notifications for SkyFlag in iOS Settings.'
+                  : `Couldn't enable: ${result.message ?? result.reason}`,
+              );
+              return;
+            }
+            if (authUser && supabase) {
+              const { error: saveErr } = await supabase
+                .from('push_subscriptions')
+                .upsert(
+                  {
+                    user_id: authUser.id,
+                    platform: 'ios',
+                    apns_token: result.token,
+                    user_agent: navigator.userAgent,
+                  },
+                  { onConflict: 'user_id,platform' },
+                );
+              setMessage(
+                saveErr
+                  ? `Subscribed locally, but couldn't save: ${saveErr.message}`
+                  : "✓ Subscribed. You'll be pinged when it's your turn.",
+              );
+            } else {
+              setMessage('Sign in to enable server-side delivery.');
+            }
+            return;
+          }
+
+          // Web platform path.
           const result = await enablePush();
           setBusy(false);
           setPermission(getPermissionState());
           if (result.ok) {
-            // Persist subscription to Supabase so the Edge Function can
-            // look it up and dispatch pushes when opponents move.
             if (authUser && supabase) {
               const row = serializeSubscription(result.subscription);
               const { error: saveErr } = await supabase
@@ -95,18 +134,19 @@ function NotificationsControl() {
                 .upsert(
                   {
                     user_id: authUser.id,
+                    platform: 'web',
                     ...row,
                     user_agent: navigator.userAgent,
                   },
-                  { onConflict: 'user_id' },
+                  { onConflict: 'user_id,platform' },
                 );
               if (saveErr) {
-                setMessage(`Subscribed locally, but couldn't save to server: ${saveErr.message}`);
+                setMessage(`Subscribed locally, but couldn't save: ${saveErr.message}`);
               } else {
-                setMessage('✓ Subscribed. You\'ll be pinged when it\'s your turn.');
+                setMessage("✓ Subscribed. You'll be pinged when it's your turn.");
               }
             } else {
-              setMessage('✓ Subscribed locally. Sign in to enable server-side delivery.');
+              setMessage('Subscribed locally. Sign in to enable server-side delivery.');
             }
           } else if (result.reason === 'denied') {
             setMessage('Permission denied.');
