@@ -574,35 +574,65 @@ export default function Board({
     return els;
   })();
 
-  // Threat rings — pulsing red circles under pieces that the opponent
-  // could capture next ply. Painted before the marker so the piece sits
-  // on top of the warning ring.
+  // Threat rings — pulsing red ring under any of the current player's
+  // pieces sitting on a square the opponent could move onto next ply.
+  // Painted before the marker so the piece reads on top of the warning.
+  // Two layers: a soft red wash inside the cell + a bright pulsing ring
+  // around it, plus a small "!" badge in the top-left corner so the warn
+  // is visible even when the piece itself fills most of the cell.
   const threatEls = threatenedCells.map((t) => {
-    const cx = ORIGIN_X + t.col * CELL + CELL / 2;
-    const cy = ORIGIN_Y + t.row * CELL + CELL / 2;
+    const x = ORIGIN_X + t.col * CELL;
+    const y = ORIGIN_Y + t.row * CELL;
+    const cx = x + CELL / 2;
+    const cy = y + CELL / 2;
     return (
       <g key={`thr-${t.row}-${t.col}`} pointerEvents="none">
+        {/* Soft red fill across the whole cell */}
+        <rect
+          x={x + 1}
+          y={y + 1}
+          width={CELL - 2}
+          height={CELL - 2}
+          rx={3}
+          fill="rgba(255, 70, 70, 0.22)"
+        />
+        {/* Bright pulsing ring around the piece */}
         <circle
           cx={cx}
           cy={cy}
-          r={CELL * 0.42}
+          r={CELL * 0.44}
           fill="none"
-          stroke="rgba(255, 90, 90, 0.85)"
-          strokeWidth={2.5}
+          stroke="#ff4d4d"
+          strokeWidth={3.2}
         >
           <animate
             attributeName="opacity"
-            values="0.45;1;0.45"
-            dur="1.4s"
+            values="0.55;1;0.55"
+            dur="1.2s"
             repeatCount="indefinite"
           />
           <animate
-            attributeName="r"
-            values={`${CELL * 0.40};${CELL * 0.46};${CELL * 0.40}`}
-            dur="1.4s"
+            attributeName="stroke-width"
+            values="2.8;3.8;2.8"
+            dur="1.2s"
             repeatCount="indefinite"
           />
         </circle>
+        {/* Warning badge in the top-left corner */}
+        <circle cx={x + 8} cy={y + 8} r={6.5} fill="#ff4d4d" stroke="#1a0606" strokeWidth={0.8} />
+        <text
+          x={x + 8}
+          y={y + 8.5}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={9}
+          fontWeight={900}
+          fontFamily="system-ui, sans-serif"
+          fill="#ffffff"
+          style={{ userSelect: 'none' }}
+        >
+          !
+        </text>
       </g>
     );
   });
