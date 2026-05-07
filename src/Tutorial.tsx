@@ -7,10 +7,11 @@ import type { GameState } from './game/types';
 //
 // Stages (advance trigger in parens):
 //   0 Welcome             — manual "Begin" button
-//   1 First activation    — player records any deploy/move (history grows)
-//   2 Second activation   — another deploy/move
-//   3 End your turn       — an end-turn entry appears
-//   4 Last tips           — manual "Got it" button to finish
+//   1 How to win          — manual Next button (info-only)
+//   2 First activation    — player records any deploy/move (history grows)
+//   3 Second activation   — another deploy/move
+//   4 End your turn       — an end-turn entry appears
+//   5 Last tips           — manual "Got it" button to finish
 
 type Props = {
   state: GameState;
@@ -18,12 +19,16 @@ type Props = {
   onClose: () => void;
 };
 
+const TOTAL_STAGES = 6;
+const FINAL_STAGE = TOTAL_STAGES - 1;
+
 const STAGE_TITLES: Record<number, string> = {
   0: 'Welcome to SkyFlag',
-  1: 'Try your first activation',
-  2: 'Now your second activation',
-  3: 'End your turn',
-  4: 'You’re playing!',
+  1: 'How to win',
+  2: 'Try your first activation',
+  3: 'Now your second activation',
+  4: 'End your turn',
+  5: 'You’re playing!',
 };
 
 export default function Tutorial({ state, open, onClose }: Props) {
@@ -40,23 +45,23 @@ export default function Tutorial({ state, open, onClose }: Props) {
     }
   }, [open, state.history.length]);
 
-  // Advance stages by watching history. Each new entry that matches the
-  // current stage's trigger bumps us forward. Multiple entries arriving
-  // at once (e.g., a remote-sync) are walked in order.
+  // Advance stages by watching history. Auto-advance only fires from the
+  // gameplay stages (2-4) — the info stages (0, 1) and the final tips
+  // stage (5) require manual Next/Got it.
   useEffect(() => {
     if (!open) return;
-    if (stage === 0 || stage >= 4) return;
+    if (stage < 2 || stage >= FINAL_STAGE) return;
     const len = state.history.length;
     if (len <= seenLen.current) return;
     let nextStage = stage;
     for (let i = seenLen.current; i < len; i++) {
       const entry = state.history[i];
-      if (nextStage === 1 && (entry.kind === 'deploy' || entry.kind === 'move')) {
-        nextStage = 2;
-      } else if (nextStage === 2 && (entry.kind === 'deploy' || entry.kind === 'move')) {
+      if (nextStage === 2 && (entry.kind === 'deploy' || entry.kind === 'move')) {
         nextStage = 3;
-      } else if (nextStage === 3 && entry.kind === 'end-turn') {
+      } else if (nextStage === 3 && (entry.kind === 'deploy' || entry.kind === 'move')) {
         nextStage = 4;
+      } else if (nextStage === 4 && entry.kind === 'end-turn') {
+        nextStage = 5;
       }
     }
     seenLen.current = len;
@@ -73,13 +78,40 @@ export default function Tutorial({ state, open, onClose }: Props) {
             <p>
               I'll guide you through your first turn. Three boards stacked —
               <strong> Terran</strong>, <strong>Meridian</strong>,{' '}
-              <strong>Empyrean</strong> — capture all three enemy flags and
-              touch the Nexus to win.
+              <strong>Empyrean</strong> — and you'll command one of two clans:
+              the Grey Ravens or the White Stags.
             </p>
             <p>Tap <em>Begin</em> when you're ready.</p>
           </>
         );
       case 1:
+        return (
+          <>
+            <p>You can win in two ways:</p>
+            <ul>
+              <li>
+                <strong>Capture all three enemy flags</strong>{' '}
+                (<span className="tut-glyph">⚑</span>) — one on each layer —
+                with your Captain (<span className="tut-glyph">♚</span>) or a
+                promoted Soldier, <em>then</em> move a Captain onto the{' '}
+                <strong>Nexus</strong> at the centre of Empyrean.
+              </li>
+              <li>
+                <strong>Eliminate every opposing Captain</strong> (capture
+                them by landing on them).
+              </li>
+            </ul>
+            <p>
+              The game ends in a draw if turn 30 is reached without a winner.
+            </p>
+            <p className="tut-aside">
+              You'll start with a fresh tray of pieces — deploy them onto
+              Terran, then push toward the enemy's territory. Lifts let you
+              cross between layers (more on those soon).
+            </p>
+          </>
+        );
+      case 2:
         return (
           <>
             <p>
@@ -96,7 +128,7 @@ export default function Tutorial({ state, open, onClose }: Props) {
             </p>
           </>
         );
-      case 2:
+      case 3:
         return (
           <>
             <p>Nice — that was activation 1.</p>
@@ -107,7 +139,7 @@ export default function Tutorial({ state, open, onClose }: Props) {
             </p>
           </>
         );
-      case 3:
+      case 4:
         return (
           <>
             <p>You've spent both activations.</p>
@@ -117,7 +149,7 @@ export default function Tutorial({ state, open, onClose }: Props) {
             </p>
           </>
         );
-      case 4:
+      case 5:
         return (
           <>
             <p>
@@ -131,9 +163,8 @@ export default function Tutorial({ state, open, onClose }: Props) {
               activation tap the same cell on a different layer.
             </p>
             <p>
-              <strong>Win:</strong> Captain (or promoted Soldier) onto each
-              enemy flag <span className="tut-glyph">⚑</span>, then a Captain
-              onto the Nexus.
+              Re-open this tutorial any time from the <em>Tutorial</em> button
+              in the help row.
             </p>
           </>
         );
@@ -145,7 +176,7 @@ export default function Tutorial({ state, open, onClose }: Props) {
   return (
     <div className="tutorial-card" role="dialog" aria-live="polite">
       <div className="tutorial-header">
-        <span className="tutorial-progress">{stage + 1} / 5</span>
+        <span className="tutorial-progress">{stage + 1} / {TOTAL_STAGES}</span>
         <button
           type="button"
           className="tutorial-skip"
@@ -158,7 +189,7 @@ export default function Tutorial({ state, open, onClose }: Props) {
       <h3 className="tutorial-title">{STAGE_TITLES[stage]}</h3>
       <div className="tutorial-body">{body}</div>
       <div className="tutorial-actions">
-        {stage > 0 && stage < 4 && (
+        {stage > 0 && stage < FINAL_STAGE && (
           <button
             type="button"
             className="end-game-btn end-game-btn--subtle"
@@ -172,16 +203,16 @@ export default function Tutorial({ state, open, onClose }: Props) {
             Begin
           </button>
         )}
-        {stage > 0 && stage < 4 && (
+        {stage > 0 && stage < FINAL_STAGE && (
           <button
             type="button"
             className="end-game-btn"
-            onClick={() => setStage((s) => Math.min(4, s + 1))}
+            onClick={() => setStage((s) => Math.min(FINAL_STAGE, s + 1))}
           >
             Next
           </button>
         )}
-        {stage === 4 && (
+        {stage === FINAL_STAGE && (
           <button type="button" className="end-game-btn" onClick={onClose}>
             Got it
           </button>
