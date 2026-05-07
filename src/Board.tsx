@@ -278,15 +278,29 @@ export default function Board({
     ));
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 8,
+        width: '100%',
+        maxWidth: SVG_WIDTH,
+      }}
+    >
       <h2 style={{ margin: 0, fontFamily: 'system-ui, sans-serif', fontSize: '1.05rem' }}>
         {name}
       </h2>
       <svg
-        width={SVG_WIDTH}
-        height={SVG_HEIGHT}
+        width="100%"
         viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-        style={{ background: theme.background, borderRadius: 8 }}
+        preserveAspectRatio="xMidYMid meet"
+        style={{
+          background: theme.background,
+          borderRadius: 8,
+          height: 'auto',
+          display: 'block',
+        }}
       >
         {cells}
         {colLabels}
