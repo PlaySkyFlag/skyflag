@@ -6,10 +6,12 @@ import MoveHistory from './MoveHistory';
 import Multiplayer from './Multiplayer';
 import PieceTray from './PieceTray';
 import AccountModal from './AccountModal';
+import StatsModal from './StatsModal';
 import StatusBar from './StatusBar';
 import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { loadProfile, type Profile } from './game/profile';
+import { recordGame, type StatsMode } from './game/stats';
 import AiWorker from './game/aiWorker?worker';
 import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
 import { supabase } from './game/supabase';
@@ -251,6 +253,50 @@ export default function App() {
       cancelled = true;
     };
   }, [authUser]);
+
+  const [statsOpen, setStatsOpen] = useState(false);
+
+  // Record a stats row exactly once per game completion. Compare the
+  // previous status kind against the current — if it just transitioned
+  // from in-progress to won/draw, we have a fresh result to log.
+  const prevStatusKind = useRef(state.status.kind);
+  useEffect(() => {
+    const prev = prevStatusKind.current;
+    const curr = state.status.kind;
+    prevStatusKind.current = curr;
+    if (prev === 'in-progress' && (curr === 'won' || curr === 'draw')) {
+      // Determine the player's "side" for stats: 1P uses the non-AI side,
+      // online MP uses the room role. 2P hot-seat isn't tracked because
+      // both sides are the same human.
+      let mode: StatsMode | null = null;
+      let mySide: Player | null = null;
+      if (room && room.status === 'playing') {
+        mode = room.role === 'p1' ? 'online-ravens' : 'online-stags';
+        mySide = room.role;
+      } else if (aiPlayer) {
+        // aiPlayer is the AI's slot, so my slot is the opposite.
+        mySide = aiPlayer === 'p1' ? 'p2' : 'p1';
+        mode = mySide === 'p1' ? '1p-ravens' : '1p-stags';
+      }
+      if (mode && mySide) {
+        const result: 'win' | 'loss' | 'draw' =
+          state.status.kind === 'draw'
+            ? 'draw'
+            : state.status.winner === mySide
+              ? 'win'
+              : 'loss';
+        const reason: 'nexus' | 'elimination' | 'turn-limit' =
+          state.status.kind === 'draw' ? 'turn-limit' : state.status.reason;
+        recordGame({
+          when: new Date().toISOString(),
+          mode,
+          result,
+          reason,
+          turns: state.turnNumber,
+        });
+      }
+    }
+  }, [state.status, state.turnNumber, aiPlayer, room]);
 
   // Tutorial is shown once for first-time users — gated by a localStorage
   // flag. The "Tutorial" button in the help row re-opens it any time.
@@ -587,16 +633,26 @@ export default function App() {
           width={120}
           height={120}
         />
-        <button
-          type="button"
-          className="hud-btn app-header-account"
-          onClick={() => setAccountOpen(true)}
-          title={authUser ? 'Manage your account' : 'Sign in for online play'}
-        >
-          {authUser
-            ? `Account: ${profile?.nickname ?? authUser.email ?? 'signed in'}`
-            : 'Sign in'}
-        </button>
+        <div className="app-header-actions">
+          <button
+            type="button"
+            className="hud-btn app-header-account"
+            onClick={() => setAccountOpen(true)}
+            title={authUser ? 'Manage your account' : 'Sign in for online play'}
+          >
+            {authUser
+              ? `Account: ${profile?.nickname ?? authUser.email ?? 'signed in'}`
+              : 'Sign in'}
+          </button>
+          <button
+            type="button"
+            className="hud-btn app-header-stats"
+            onClick={() => setStatsOpen(true)}
+            title="View your win/loss record and recent games"
+          >
+            Stats
+          </button>
+        </div>
       </header>
       <StatusBar
         state={state}
@@ -761,6 +817,7 @@ export default function App() {
         onClose={() => setAccountOpen(false)}
         onProfileChange={setProfile}
       />
+      <StatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
       <footer className="app-footer">
         <p>© 2026 Limnology Research Corp. · SkyFlag™ Kaleo Edition.</p>
         <p>

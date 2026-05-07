@@ -54,7 +54,15 @@
   position: relative;
 }
 
-.app-header-account {
+.app-header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.app-header-account,
+.app-header-stats {
   font-size: 0.9rem;
   font-weight: 600;
   padding: 8px 16px;
@@ -63,9 +71,124 @@
   color: #ffffff;
 }
 
-.app-header-account:hover {
+.app-header-account:hover,
+.app-header-stats:hover {
   background: #11192e;
   border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Stats modal layout — grid of high-level numbers, then per-mode table,
+   then a recent-games list. Same dark navy card chrome as Account. */
+.stats-card {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 8px 0 16px;
+}
+
+.stats-cell {
+  background: #050a16;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.stats-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.stats-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-top: 2px;
+}
+
+.stats-w   { color: #6fff8a; }
+.stats-l   { color: #ff8a8a; }
+.stats-d   { color: #ffd884; }
+.stats-sep { opacity: 0.45; padding: 0 4px; }
+
+.stats-subtitle {
+  margin: 14px 0 8px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  font-weight: 700;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.stats-table th,
+.stats-table td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stats-table th {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  font-weight: 700;
+}
+
+.stats-table td:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-recent {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+}
+
+.stats-recent-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.85rem;
+}
+
+.stats-recent-result {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.stats-result-win  .stats-recent-result { background: rgba(111, 255, 138, 0.20); color: #6fff8a; }
+.stats-result-loss .stats-recent-result { background: rgba(255, 138, 138, 0.20); color: #ff8a8a; }
+.stats-result-draw .stats-recent-result { background: rgba(255, 216, 132, 0.20); color: #ffd884; }
+
+.stats-recent-meta,
+.stats-recent-when {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
 }
 
 .app-logo {
