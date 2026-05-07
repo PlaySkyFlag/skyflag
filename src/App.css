@@ -240,6 +240,53 @@
   margin-bottom: 0;
 }
 
+/* Move history list — scrollable, monospace-ish for compact notation. */
+.move-history-empty {
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.move-history-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.move-history-entry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  border-radius: 4px;
+}
+
+.move-history-entry + .move-history-entry {
+  border-top: 1px dashed rgba(255, 255, 255, 0.06);
+}
+
+.move-history-turn {
+  font-size: 0.7rem;
+  opacity: 0.45;
+  min-width: 24px;
+}
+
+.move-history-text {
+  letter-spacing: 0.01em;
+}
+
+.move-history-p1 .move-history-text {
+  color: #c8d2e8;
+}
+
+.move-history-p2 .move-history-text {
+  color: #f1e5cf;
+}
+
 .help-glyph {
   font-size: 0.95em;
 }

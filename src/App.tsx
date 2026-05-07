@@ -2,6 +2,7 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import EndGameOverlay from './EndGameOverlay';
 import Help from './Help';
+import MoveHistory from './MoveHistory';
 import Multiplayer, { type RoomState } from './Multiplayer';
 import PieceTray from './PieceTray';
 import StatusBar from './StatusBar';
@@ -385,6 +386,7 @@ export default function App() {
           onRoomEntered={setRoom}
           onLeave={() => setRoom(null)}
         />
+        <MoveHistory history={state.history} />
       </div>
       <PieceTray
         player="p1"

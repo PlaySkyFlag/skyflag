@@ -68,6 +68,36 @@ export type GameStatus =
   | { kind: 'won'; winner: Player; reason: 'nexus' | 'elimination' }
   | { kind: 'draw'; reason: 'turn-limit' };
 
+// ─── Move history ──────────────────────────────────────────────────────────
+
+export type HistoryEntry =
+  | {
+      kind: 'deploy';
+      turn: number;
+      player: Player;
+      pieceKind: PieceKind;
+      coord: Coord;
+    }
+  | {
+      kind: 'move';
+      turn: number;
+      player: Player;
+      pieceKind: PieceKind;
+      from: Coord;
+      to: Coord;
+      // Set when this move ended with a capture.
+      captured?: { kind: PieceKind; owner: Player };
+      // Set when a Soldier promoted to Captain on the far Ground row.
+      promoted?: boolean;
+      // Set when a Captain landed on a flag and removed it from the board.
+      flagCaptured?: { layer: Layer; owner: Player };
+    }
+  | {
+      kind: 'end-turn';
+      turn: number;
+      player: Player;
+    };
+
 // ─── Whole game state ──────────────────────────────────────────────────────
 
 export type GameState = {
@@ -80,4 +110,6 @@ export type GameState = {
   activationsRemaining: number;
   turnNumber: number;
   status: GameStatus;
+  // Append-only running log of every player action, oldest first.
+  history: HistoryEntry[];
 };

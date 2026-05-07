@@ -78,5 +78,6 @@ export function createInitialGameState(): GameState {
     activationsRemaining: ACTIVATIONS_PER_TURN,
     turnNumber: 1,
     status: { kind: 'in-progress' },
+    history: [],
   };
 }

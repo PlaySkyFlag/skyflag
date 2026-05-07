@@ -7,7 +7,16 @@ import {
   createInitialGameState,
 } from './constants';
 import { legalMovesFor, pieceAt, sameCoord } from './moves';
-import type { BoardPiece, Coord, FlagsState, GameState, Piece, PieceId, Player } from './types';
+import type {
+  BoardPiece,
+  Coord,
+  FlagsState,
+  GameState,
+  HistoryEntry,
+  Piece,
+  PieceId,
+  Player,
+} from './types';
 import { opponentOf } from './types';
 
 export type Action =
@@ -53,6 +62,14 @@ function applyDeploy(state: GameState, pieceId: PieceId): GameState {
   const piece = hand[idx];
   const newHand = [...hand.slice(0, idx), ...hand.slice(idx + 1)];
 
+  const entry: HistoryEntry = {
+    kind: 'deploy',
+    turn: state.turnNumber,
+    player,
+    pieceKind: piece.kind,
+    coord: deployCoord,
+  };
+
   const next: GameState = {
     ...state,
     inHand: { ...state.inHand, [player]: newHand },
@@ -61,6 +78,7 @@ function applyDeploy(state: GameState, pieceId: PieceId): GameState {
       { piece, coord: deployCoord },
     ],
     activationsRemaining: state.activationsRemaining - 1,
+    history: [...state.history, entry],
   };
 
   return next.activationsRemaining > 0 ? next : passInitiative(next);
@@ -115,12 +133,43 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
   // flag in the same activation. Only Captains capture flags.
   const newFlags = maybeCaptureFlag(state.flags, newPiece.kind, state.currentPlayer, to);
 
+  // Record the move for the history log. Capture and promotion details are
+  // attached so the log has enough context to render meaningfully later.
+  const captured = captureIndices.length
+    ? {
+        kind: state.onBoard[captureIndices[0]].piece.kind,
+        owner: state.onBoard[captureIndices[0]].piece.owner,
+      }
+    : undefined;
+  const promoted = moving.piece.kind === 'soldier' && newPiece.kind === 'captain';
+  const flagCapturedNow = (Object.keys(newFlags) as Array<keyof FlagsState>).find(
+    (layer) => {
+      const opp = opponentOf(state.currentPlayer);
+      return newFlags[layer][opp] && !state.flags[layer][opp];
+    },
+  );
+  const flagCaptured = flagCapturedNow
+    ? { layer: flagCapturedNow, owner: opponentOf(state.currentPlayer) }
+    : undefined;
+  const entry: HistoryEntry = {
+    kind: 'move',
+    turn: state.turnNumber,
+    player: state.currentPlayer,
+    pieceKind: moving.piece.kind,
+    from: moving.coord,
+    to,
+    ...(captured ? { captured } : {}),
+    ...(promoted ? { promoted: true } : {}),
+    ...(flagCaptured ? { flagCaptured } : {}),
+  };
+
   const next: GameState = {
     ...state,
     onBoard: newOnBoard,
     captured: newCaptured,
     flags: newFlags,
     activationsRemaining: state.activationsRemaining - 1,
+    history: [...state.history, entry],
   };
 
   // Win checks happen after the move's effects are settled. Nexus first
@@ -230,7 +279,15 @@ function maybeCaptureFlag(
 
 function applyEndTurn(state: GameState): GameState {
   if (state.status.kind !== 'in-progress') return state;
-  return passInitiative(state);
+  const entry: HistoryEntry = {
+    kind: 'end-turn',
+    turn: state.turnNumber,
+    player: state.currentPlayer,
+  };
+  return passInitiative({
+    ...state,
+    history: [...state.history, entry],
+  });
 }
 
 function passInitiative(state: GameState): GameState {
