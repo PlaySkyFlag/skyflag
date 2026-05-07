@@ -264,18 +264,35 @@
   left: 34%;
 }
 
-/* Portrait fallback: if the user is holding the phone upright, switch to
-   a taller, narrower fan so the boards don't squash. */
+/* Portrait fallback: when the viewport is taller than wide (phones held
+   upright, narrow desktop windows), abandon the fan and stack the boards
+   vertically — each board gets its own full-width row, readable at any
+   width, no risk of Space and Sky overlapping. */
 @media (orientation: portrait) {
   .board-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    /* Cancel the fan's aspect-ratio so the stack grows to fit its boards. */
+    aspect-ratio: auto;
     max-width: 380px;
-    aspect-ratio: 19 / 22;
   }
-  .board-stack-item {
-    width: 70%;
-  }
+  /* Override the absolute positioning used by the fan layout. */
+  .board-stack-item,
+  .board-stack-item--space,
+  .board-stack-item--sky,
   .board-stack-item--ground {
-    left: 15%;
+    position: relative;
+    width: 100%;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+  }
+  /* Flow arrows are tied to the fan geometry; hide them in stacked mode. */
+  .layer-flow {
+    display: none;
   }
 }
 
