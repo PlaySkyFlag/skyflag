@@ -18,8 +18,9 @@ import {
 } from './game/constants';
 import { legalMovesFor, pieceAt, sameCoord } from './game/moves';
 import { reduce } from './game/reducer';
+import { sounds } from './game/sound';
 import { loadSession, saveSession } from './game/storage';
-import type { Coord, GameState, Layer, PieceId, PieceKind, Player, RoomState } from './game/types';
+import type { Coord, GameState, HistoryEntry, Layer, PieceId, PieceKind, Player, RoomState } from './game/types';
 import './App.css';
 
 const AI_THINK_DELAY_MS = 600;
@@ -125,6 +126,25 @@ type Selection =
 // Read once at module load so initial state is hydrated synchronously.
 const INITIAL_SESSION = loadSession();
 
+// Maps a HistoryEntry to the right sound. Called when history grows by 1.
+function playSoundFor(entry: HistoryEntry): void {
+  if (entry.kind === 'deploy') {
+    sounds.deploy();
+    return;
+  }
+  if (entry.kind === 'end-turn') {
+    sounds.endTurn();
+    return;
+  }
+  // Move with optional capture / promotion / lift transit. Capture takes
+  // precedence (it's the most narratively significant), then layer change,
+  // then promotion, then a plain move click.
+  if (entry.captured) sounds.capture();
+  else if (entry.from.layer !== entry.to.layer) sounds.lift();
+  else if (entry.promoted) sounds.promotion();
+  else sounds.move();
+}
+
 export default function App() {
   const [state, dispatch] = useReducer(
     reduce,
@@ -147,6 +167,23 @@ export default function App() {
   useEffect(() => {
     saveSession({ game: state, aiPlayer, room });
   }, [state, aiPlayer, room]);
+
+  // Sound: when the history grows by exactly one entry, play the cue for
+  // the latest action. Bulk increases (a multiplayer remote-sync that
+  // hydrates 5 prior moves at once) are skipped so we don't dump 5 sounds.
+  const prevHistoryLen = useRef(state.history.length);
+  useEffect(() => {
+    const len = state.history.length;
+    if (len === prevHistoryLen.current + 1) {
+      playSoundFor(state.history[len - 1]);
+    }
+    prevHistoryLen.current = len;
+  }, [state.history.length, state.history]);
+
+  // Win fanfare — fires once when the game ends.
+  useEffect(() => {
+    if (state.status.kind === 'won') sounds.win();
+  }, [state.status.kind]);
 
   // Multiplayer: when entering a room, hydrate local state from the row
   // in Supabase, then subscribe to realtime UPDATE events so the opponent's

@@ -115,6 +115,14 @@
   letter-spacing: 0.02em;
 }
 
+/* Mute toggle — emoji icon, no text. Slightly larger to make the
+   speaker glyph readable. */
+.hud-mute-btn {
+  font-size: 1rem;
+  line-height: 1;
+  padding: 4px 10px;
+}
+
 /* Mode selector: a single pill-shaped dropdown replacing the previous
    3-button segmented control. Saves horizontal space in the HUD. */
 .hud-mode-select {

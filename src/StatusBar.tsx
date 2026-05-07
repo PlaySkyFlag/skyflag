@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { TURN_LIMIT } from './game/constants';
+import { isMuted, setMuted } from './game/sound';
 import type { GameState, Player } from './game/types';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Slate', p2: 'Ivory' };
@@ -28,6 +30,23 @@ const SELECT_TO_MODE: Record<string, Mode> = {
 };
 
 export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNewGame }: Props) {
+  const [mutedNow, setMutedNow] = useState(isMuted());
+  const muteControl = (
+    <button
+      type="button"
+      className="hud-btn hud-btn-subtle hud-mute-btn"
+      aria-label={mutedNow ? 'Unmute sounds' : 'Mute sounds'}
+      title={mutedNow ? 'Unmute' : 'Mute'}
+      onClick={() => {
+        const next = !mutedNow;
+        setMuted(next);
+        setMutedNow(next);
+      }}
+    >
+      {mutedNow ? '🔇' : '🔊'}
+    </button>
+  );
+
   const modeControl = (
     <select
       className="hud-mode-select"
@@ -51,6 +70,7 @@ export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNew
         </span>
         <button type="button" className="hud-btn" onClick={onNewGame}>New game</button>
         {modeControl}
+        {muteControl}
       </div>
     );
   }
@@ -61,6 +81,7 @@ export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNew
         <span>Draw — {REASON_LABEL[state.status.reason]}</span>
         <button type="button" className="hud-btn" onClick={onNewGame}>New game</button>
         {modeControl}
+        {muteControl}
       </div>
     );
   }
