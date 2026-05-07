@@ -39,21 +39,21 @@ export type DeployCell = {
 };
 
 // Hex values mirror the player palette in App.css (:root section):
-//   p1.fill      = --slate-fill      (#1a2540)
-//   p2.fill      = --ivory-fill      (#f5e8d0)
+//   p1.fill      = --slate-fill      (#0f1830)
+//   p2.fill      = --ivory-fill      (#fff4dc)
 //   p1 deploy    = --slate-accent    (#a8b8d8 / rgba(168,184,216,…))
-//   p2 deploy    = --ivory-fill      (#f5e8d0 / rgba(245,232,208,…))
+//   p2 deploy    = --ivory-fill      (#fff4dc / rgba(255,244,220,…))
 // Keep the two sources in sync if either side changes.
 const MARKER_STYLE: Record<MarkerKind, { fill: string; stroke: string; strokeWidth: number }> = {
   lift:  { fill: '#e8e8e8', stroke: '#1a1a1a', strokeWidth: 0.6 },
   nexus: { fill: '#f5c343', stroke: '#1a1a1a', strokeWidth: 0.8 },
-  p1:    { fill: '#1a2540', stroke: '#e8e8e8', strokeWidth: 0.8 },
-  p2:    { fill: '#f5e8d0', stroke: '#1a1a1a', strokeWidth: 0.8 },
+  p1:    { fill: '#0f1830', stroke: '#e8e8e8', strokeWidth: 0.8 },
+  p2:    { fill: '#fff4dc', stroke: '#1a1a1a', strokeWidth: 0.8 },
 };
 
 const DEPLOY_STYLE: Record<Player, { stroke: string; fill: string; activeFill: string }> = {
   p1: { stroke: '#a8b8d8', fill: 'rgba(168,184,216,0.30)', activeFill: 'rgba(168,184,216,0.55)' },
-  p2: { stroke: '#f5e8d0', fill: 'rgba(245,232,208,0.30)', activeFill: 'rgba(245,232,208,0.55)' },
+  p2: { stroke: '#fff4dc', fill: 'rgba(255,244,220,0.30)', activeFill: 'rgba(255,244,220,0.55)' },
 };
 
 type CellRef = {

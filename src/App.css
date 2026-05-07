@@ -6,13 +6,13 @@
      Ivory fill    #f5e8d0  ↔  --ivory-fill    (= rgba(245,232,208,…))
    Keep them in sync if either side changes. */
 :root {
-  --slate-fill: #1a2540;
-  --slate-border: #2a3858;
+  --slate-fill: #0f1830;
+  --slate-border: #1e2a48;
   --slate-accent: #a8b8d8;
   --slate-text: #c8d2e8;
 
-  --ivory-fill: #f5e8d0;
-  --ivory-border: #ddd0b8;
+  --ivory-fill: #fff4dc;
+  --ivory-border: #ebd9b8;
   --ivory-dark-text: #1a1a1a;
 }
 
@@ -722,10 +722,11 @@ button.tray-piece:hover {
     0 0 80px rgba(168, 184, 216, 0.25);
 }
 .end-game-card--p2 {
-  border-color: rgba(245, 232, 208, 0.55);
+  /* rgba mirror of --ivory-fill (#fff4dc). */
+  border-color: rgba(255, 244, 220, 0.55);
   box-shadow:
     0 16px 48px rgba(0, 0, 0, 0.55),
-    0 0 80px rgba(245, 232, 208, 0.25);
+    0 0 80px rgba(255, 244, 220, 0.25);
 }
 
 .end-game-pip {
