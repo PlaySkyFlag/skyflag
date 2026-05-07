@@ -522,8 +522,10 @@ export default function App() {
     selection?.kind === 'hand' && inProgress ? state.currentPlayer : null;
 
   // Per-player move note shown next to each tray label so each side has an
-  // at-a-glance status ("2 activations left", "waiting", "AI moving…",
-  // win/lose) without scrolling up to the HUD.
+  // at-a-glance status (activations left, "waiting", win/lose) without
+  // scrolling up to the HUD. Prefix tells the player WHO is acting:
+  // "AI" when the slot is AI-controlled, "Player 1/2" in 2P hot-seat,
+  // and "You" when it's the human's slot in 1P.
   const moveNote = (player: Player): string => {
     if (state.status.kind === 'won') {
       return state.status.winner === player ? 'won!' : 'lost';
@@ -532,9 +534,18 @@ export default function App() {
       return 'draw';
     }
     if (state.currentPlayer !== player) return 'waiting';
-    if (aiPlayer === player) return 'AI moving…';
     const acts = state.activationsRemaining;
-    return `${acts} activation${acts === 1 ? '' : 's'} left`;
+    const actsLabel = `${acts} activation${acts === 1 ? '' : 's'} left`;
+    let prefix: string;
+    if (aiPlayer === player) {
+      prefix = 'AI';
+    } else if (aiPlayer === null) {
+      // 2P hot-seat — label by player number.
+      prefix = player === 'p1' ? 'Player 1' : 'Player 2';
+    } else {
+      prefix = 'You';
+    }
+    return `${prefix} · ${actsLabel}`;
   };
 
   const lastMove = findLastMove(state);
@@ -576,6 +587,16 @@ export default function App() {
           width={120}
           height={120}
         />
+        <button
+          type="button"
+          className="hud-btn app-header-account"
+          onClick={() => setAccountOpen(true)}
+          title={authUser ? 'Manage your account' : 'Sign in for online play'}
+        >
+          {authUser
+            ? `Account: ${profile?.nickname ?? authUser.email ?? 'signed in'}`
+            : 'Sign in'}
+        </button>
       </header>
       <StatusBar
         state={state}
@@ -749,16 +770,6 @@ export default function App() {
           </a>
         </p>
         <p className="app-footer-build">
-          <button
-            type="button"
-            className="hud-btn hud-btn-subtle"
-            onClick={() => setAccountOpen(true)}
-            title={authUser ? 'Manage your account' : 'Sign in for online play'}
-          >
-            {authUser
-              ? `Account: ${profile?.nickname ?? authUser.email ?? 'signed in'}`
-              : 'Sign in'}
-          </button>
           <button
             type="button"
             className="hud-btn hud-btn-subtle"

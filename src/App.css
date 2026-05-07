@@ -47,8 +47,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 16px;
   margin: 0;
   padding: 0;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.app-header-account {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  background: #0a1224;
+  border: 1px solid rgba(168, 184, 216, 0.45);
+  color: #ffffff;
+}
+
+.app-header-account:hover {
+  background: #11192e;
+  border-color: rgba(255, 255, 255, 0.55);
 }
 
 .app-logo {
@@ -402,16 +419,17 @@
 
 .move-history-text {
   letter-spacing: 0.01em;
+  font-weight: 600;
 }
 
 .move-history-p1 .move-history-text {
-  color: var(--slate-text);
+  /* Ravens — saturated cool blue, bolder than the prior pastel grey */
+  color: #6fa5ff;
 }
 
 .move-history-p2 .move-history-text {
-  /* Was #f1e5cf — unified to the canonical Ivory fill (the difference was
-     unnoticeable but inconsistent with every other Ivory accent use). */
-  color: var(--ivory-fill);
+  /* Stags — rich gold/amber, bolder than the prior pale cream */
+  color: #ffc94a;
 }
 
 .help-glyph {
