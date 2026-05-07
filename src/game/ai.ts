@@ -12,11 +12,12 @@ import type {
 } from './types';
 import { opponentOf } from './types';
 
-// Search depth in plies (one ply = one activation). 4 plies = exactly two
-// full turns of foresight (you + opponent), the qualitative jump where the
-// AI starts seeing trades and counter-attacks. Runs on the Web Worker so
+// Default search depth in plies (one ply = one activation). 4 plies = two
+// full turns of foresight (you + opponent), the qualitative level where the
+// AI starts seeing trades and counter-attacks. The UI difficulty selector
+// can override this — easy=2, medium=3, hard=4. Runs on the Web Worker so
 // UI stays smooth even when search takes longer.
-const SEARCH_DEPTH = 4;
+const DEFAULT_SEARCH_DEPTH = 4;
 
 // ─── Transposition table ───────────────────────────────────────────────────
 // Caches search results so the same position reached via different move
@@ -449,7 +450,7 @@ function minimax(
   return value;
 }
 
-export function chooseAction(state: GameState): Action | null {
+export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEARCH_DEPTH): Action | null {
   // History isn't read by the search and the reducer clones the array on
   // every action. Stripping it on entry removes that growing per-clone
   // cost, which is the main reason the AI was getting laggy mid-game now
@@ -473,7 +474,7 @@ export function chooseAction(state: GameState): Action | null {
   let lastBestAction: Action | undefined;
   let scored: Array<{ action: Action; value: number }> = [];
 
-  for (let depth = 1; depth <= SEARCH_DEPTH; depth++) {
+  for (let depth = 1; depth <= searchDepth; depth++) {
     const ordered = orderActionsWithPriority(state, actions, lastBestAction);
     let bestValue = -Infinity;
     let alpha = -Infinity;

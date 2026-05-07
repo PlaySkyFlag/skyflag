@@ -1,6 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createInitialGameState } from './game/constants';
 import { getUserId } from './game/identity';
+import {
+  enablePush,
+  getPermissionState,
+  isPushSupported,
+} from './game/push';
 import { isMultiplayerAvailable, supabase } from './game/supabase';
 import type { RoomState } from './game/types';
 
@@ -26,6 +31,70 @@ function generateRoomCode(): string {
     out += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)];
   }
   return out;
+}
+
+// Small inline control for the in-room "Enable browser notifications"
+// flow. Stage 2 will save the resulting subscription to Supabase so the
+// Edge Function can dispatch a push when the opponent moves.
+function NotificationsControl() {
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>(
+    () => (typeof window === 'undefined' ? 'unsupported' : getPermissionState()),
+  );
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPermission(getPermissionState());
+  }, []);
+
+  if (!isPushSupported()) {
+    return (
+      <p className="mp-note">Browser notifications aren't supported on this device.</p>
+    );
+  }
+  if (permission === 'granted') {
+    return (
+      <p className="mp-note">
+        ✓ Notifications enabled. You'll be alerted when it's your turn.
+      </p>
+    );
+  }
+  if (permission === 'denied') {
+    return (
+      <p className="mp-note">
+        Notifications were blocked. Allow them from your browser's site
+        settings, then reload to try again.
+      </p>
+    );
+  }
+  return (
+    <div className="mp-notify">
+      <button
+        type="button"
+        className="hud-btn"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          setMessage(null);
+          const result = await enablePush();
+          setBusy(false);
+          setPermission(getPermissionState());
+          if (result.ok) {
+            setMessage('✓ Subscribed. Push delivery wires up in stage 2.');
+          } else if (result.reason === 'denied') {
+            setMessage('Permission denied.');
+          } else if (result.reason === 'no-vapid') {
+            setMessage('Push key not configured — needs VITE_VAPID_PUBLIC_KEY.');
+          } else {
+            setMessage(`Couldn't enable: ${result.message ?? result.reason}`);
+          }
+        }}
+      >
+        {busy ? 'Requesting…' : 'Enable turn notifications'}
+      </button>
+      {message && <p className="mp-note">{message}</p>}
+    </div>
+  );
 }
 
 export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
@@ -186,6 +255,7 @@ export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
                 ? 'Waiting for opponent…'
                 : 'Opponent connected — game in progress.'}
             </p>
+            <NotificationsControl />
             <button type="button" className="hud-btn hud-btn-subtle" onClick={onLeave}>
               Leave room
             </button>

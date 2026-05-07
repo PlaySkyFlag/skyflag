@@ -6,6 +6,7 @@ import MoveHistory from './MoveHistory';
 import Multiplayer from './Multiplayer';
 import PieceTray from './PieceTray';
 import StatusBar from './StatusBar';
+import Tutorial from './Tutorial';
 import AiWorker from './game/aiWorker?worker';
 import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
 import { supabase } from './game/supabase';
@@ -20,8 +21,9 @@ import {
 import { legalMovesFor, pieceAt, sameCoord } from './game/moves';
 import { reduce } from './game/reducer';
 import { sounds } from './game/sound';
-import { loadSession, saveSession } from './game/storage';
+import { loadSession, saveSession, type Difficulty } from './game/storage';
 import type { Coord, GameState, HistoryEntry, Layer, PieceId, PieceKind, Player, RoomState } from './game/types';
+import { opponentOf } from './game/types';
 import './App.css';
 
 const AI_THINK_DELAY_MS = 600;
@@ -122,6 +124,68 @@ function deployCellsForLayer(layer: Layer): DeployCell[] {
   }));
 }
 
+// Walks history backwards to find the most recent move/deploy. End-turn
+// entries are skipped — they don't represent a piece moving and would
+// otherwise hide the player's last actual action behind a turn boundary.
+type LastMove = {
+  fromLayer: Layer;
+  from: { row: number; col: number };
+  toLayer: Layer;
+  to: { row: number; col: number };
+};
+function findLastMove(state: GameState): LastMove | null {
+  for (let i = state.history.length - 1; i >= 0; i--) {
+    const h = state.history[i];
+    if (h.kind === 'move') {
+      return {
+        fromLayer: h.from.layer,
+        from: { row: h.from.row, col: h.from.col },
+        toLayer: h.to.layer,
+        to: { row: h.to.row, col: h.to.col },
+      };
+    }
+    if (h.kind === 'deploy') {
+      // Treat deploy as a degenerate move where from == to. The board
+      // will render only the destination highlight (no arrow).
+      return {
+        fromLayer: h.coord.layer,
+        from: { row: h.coord.row, col: h.coord.col },
+        toLayer: h.coord.layer,
+        to: { row: h.coord.row, col: h.coord.col },
+      };
+    }
+  }
+  return null;
+}
+
+// Computes which of the current player's on-board pieces are sitting on
+// a square the opponent could move to next ply — i.e., immediate
+// capture threats. Grouped by layer for the per-board renderer.
+function computeThreats(state: GameState): Record<Layer, Array<{ row: number; col: number }>> {
+  const result: Record<Layer, Array<{ row: number; col: number }>> = {
+    ground: [],
+    sky: [],
+    space: [],
+  };
+  if (state.status.kind !== 'in-progress') return result;
+  const opp = opponentOf(state.currentPlayer);
+  const attacks = new Set<string>();
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner !== opp) continue;
+    for (const t of legalMovesFor(bp, state)) {
+      attacks.add(`${t.layer}:${t.row}:${t.col}`);
+    }
+  }
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner !== state.currentPlayer) continue;
+    const key = `${bp.coord.layer}:${bp.coord.row}:${bp.coord.col}`;
+    if (attacks.has(key)) {
+      result[bp.coord.layer].push({ row: bp.coord.row, col: bp.coord.col });
+    }
+  }
+  return result;
+}
+
 type Selection =
   | null
   | { kind: 'hand'; pieceId: PieceId }
@@ -162,15 +226,35 @@ export default function App() {
   const [room, setRoom] = useState<RoomState | null>(
     INITIAL_SESSION?.room ?? null,
   );
+  const [difficulty, setDifficulty] = useState<Difficulty>(
+    INITIAL_SESSION?.difficulty ?? 'hard',
+  );
+  // Tutorial is shown once for first-time users — gated by a localStorage
+  // flag. The "Tutorial" button in the help row re-opens it any time.
+  const [tutorialOpen, setTutorialOpen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('skyflag.tutorial.v1.seen') !== '1';
+    } catch {
+      return false;
+    }
+  });
+  const closeTutorial = () => {
+    setTutorialOpen(false);
+    try {
+      localStorage.setItem('skyflag.tutorial.v1.seen', '1');
+    } catch {
+      // Storage may be unavailable in private mode — fine to lose the flag.
+    }
+  };
   // Tracks whether a state change came from a remote sync, so the local
   // "push to Supabase" effect doesn't echo it back into a feedback loop.
   const remoteSyncInFlight = useRef(false);
 
-  // Auto-save game state, AI mode, and room (so a refresh keeps you in
-  // the same Supabase room). Selection state is transient and not persisted.
+  // Auto-save game state, AI mode, room, and difficulty (so a refresh
+  // keeps everything intact). Selection state is transient and not persisted.
   useEffect(() => {
-    saveSession({ game: state, aiPlayer, room });
-  }, [state, aiPlayer, room]);
+    saveSession({ game: state, aiPlayer, room, difficulty });
+  }, [state, aiPlayer, room, difficulty]);
 
   // Sound: when the history grows by exactly one entry, play the cue for
   // the latest action. Bulk increases (a multiplayer remote-sync that
@@ -324,7 +408,13 @@ export default function App() {
 
     const timer = setTimeout(() => {
       if (cancelled) return;
-      const req: AiWorkerRequest = { id: requestId, type: 'choose', state };
+      const searchDepth = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 3 : 4;
+      const req: AiWorkerRequest = {
+        id: requestId,
+        type: 'choose',
+        state,
+        searchDepth,
+      };
       worker.postMessage(req);
     }, AI_THINK_DELAY_MS);
 
@@ -333,7 +423,7 @@ export default function App() {
       clearTimeout(timer);
       worker.removeEventListener('message', handleMessage);
     };
-  }, [aiPlayer, state, room]);
+  }, [aiPlayer, state, room, difficulty]);
 
   const inProgress = state.status.kind === 'in-progress';
   const isAiTurn = aiPlayer === state.currentPlayer && inProgress;
@@ -424,11 +514,17 @@ export default function App() {
     return `${acts} activation${acts === 1 ? '' : 's'} left`;
   };
 
+  const lastMove = findLastMove(state);
+  const threats = computeThreats(state);
   const renderBoard = (layer: Layer) => {
     const selectedCell =
       selectedBoardPiece && selectedBoardPiece.coord.layer === layer
         ? { row: selectedBoardPiece.coord.row, col: selectedBoardPiece.coord.col }
         : null;
+    const lastMoveFrom =
+      lastMove && lastMove.fromLayer === layer ? lastMove.from : null;
+    const lastMoveTo =
+      lastMove && lastMove.toLayer === layer ? lastMove.to : null;
     return (
       <Board
         key={layer}
@@ -440,6 +536,9 @@ export default function App() {
         selectedCell={selectedCell}
         legalTargets={legalTargetsByLayer[layer]}
         onCellClick={(row, col) => handleCellClick(layer, row, col)}
+        lastMoveFrom={lastMoveFrom}
+        lastMoveTo={lastMoveTo}
+        threatenedCells={threats[layer]}
       />
     );
   };
@@ -459,6 +558,8 @@ export default function App() {
         state={state}
         aiPlayer={aiPlayer}
         onSetMode={setAiPlayer}
+        difficulty={difficulty}
+        onSetDifficulty={setDifficulty}
         onEndTurn={() => {
           if (isInputBlocked) return;
           dispatch({ type: 'end-turn' });
@@ -467,6 +568,14 @@ export default function App() {
       />
       <div className="help-row">
         <Help />
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle help-tutorial-btn"
+          onClick={() => setTutorialOpen(true)}
+          title="Start the interactive guided tutorial"
+        >
+          Tutorial
+        </button>
         <Multiplayer
           room={room}
           onRoomEntered={setRoom}
@@ -601,6 +710,7 @@ export default function App() {
         state={state}
         onPlayAgain={() => dispatch({ type: 'new-game' })}
       />
+      <Tutorial state={state} open={tutorialOpen} onClose={closeTutorial} />
       <footer className="app-footer">
         <p>© 2026 Limnology Research Corp. · SkyFlag™ Kaleo Edition.</p>
         <p>

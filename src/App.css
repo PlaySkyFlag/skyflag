@@ -767,6 +767,21 @@ button.tray-piece:hover {
   font-size: 0.85rem;
 }
 
+.mp-notify {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.mp-note {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
 /* Layer-flow overlay: SVG positioned to cover the entire .board-stack so
    the curved arrows can span Ground ↔ Sky ↔ Space at the right scale.
    Rendered first in DOM (before the board items) so it paints BEHIND
@@ -802,17 +817,18 @@ button.tray-piece:hover {
 }
 
 .end-game-card {
-  background: rgba(28, 30, 50, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #0a1224;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
-  padding: 28px 40px 24px;
+  padding: 32px 44px 26px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   max-width: 90vw;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
   animation: end-game-rise 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+  color: #ffffff;
 }
 
 @keyframes end-game-rise {
@@ -820,43 +836,173 @@ button.tray-piece:hover {
   to   { transform: translateY(0);    opacity: 1; }
 }
 
-/* Winner-specific glow halo around the card. */
-.end-game-card--p1 {
-  border-color: rgba(168, 184, 216, 0.55);
-  box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.55),
-    0 0 80px rgba(168, 184, 216, 0.25);
-}
-.end-game-card--p2 {
-  /* rgba mirror of --ivory-fill (#fff4dc). */
-  border-color: rgba(255, 244, 220, 0.55);
-  box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.55),
-    0 0 80px rgba(255, 244, 220, 0.25);
-}
-
-.end-game-pip {
-  width: 36px !important;
-  height: 36px !important;
-  margin-bottom: 4px;
-}
-
 .end-game-title {
   margin: 0;
-  font-size: 1.85rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.04em;
+  color: #ffffff;
 }
 
 .end-game-reason {
   margin: 0;
-  font-size: 0.92rem;
-  opacity: 0.75;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.78);
   letter-spacing: 0.02em;
 }
 
 .end-game-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.end-game-btn {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: #050a16;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #ffffff;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.end-game-btn:hover {
+  background: #11192e;
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.end-game-btn:active {
+  transform: translateY(1px);
+}
+
+.end-game-btn--subtle {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.end-game-btn--subtle:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+}
+
+/* Tutorial — floating tip card pinned to the bottom-right corner. Doesn't
+   block input on the rest of the page; the player keeps interacting with
+   the game while the card guides them. Slides up on appear. */
+.tutorial-card {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: min(340px, calc(100vw - 32px));
+  background: #0a1224;
+  border: 1px solid rgba(245, 195, 67, 0.55);
+  border-radius: 14px;
+  padding: 14px 16px 14px;
+  color: #ffffff;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(245, 195, 67, 0.10);
+  z-index: 60;
+  animation: tutorial-rise 0.35s cubic-bezier(0.2, 0.8, 0.3, 1);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+@keyframes tutorial-rise {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.tutorial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.tutorial-progress {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffd884;
+  font-weight: 700;
+}
+
+.tutorial-skip {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.tutorial-skip:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tutorial-title {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.tutorial-body p {
+  margin: 0 0 8px;
+}
+
+.tutorial-body p:last-child {
+  margin-bottom: 0;
+}
+
+.tutorial-body ul {
+  margin: 4px 0 8px;
+  padding-left: 18px;
+}
+
+.tutorial-body li {
+  margin-bottom: 2px;
+}
+
+.tutorial-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.tutorial-actions .end-game-btn {
+  font-size: 0.85rem;
+  padding: 7px 16px;
+}
+
+.tut-glyph {
+  display: inline-block;
+  font-size: 1em;
+  color: #ffd884;
+  font-weight: 700;
+}
+
+.tut-threat {
+  color: #ff6e6e;
+  font-weight: 700;
+}
+
+.tut-aside {
+  font-size: 0.82rem;
+  opacity: 0.78;
+  font-style: italic;
+}
+
+.help-tutorial-btn {
+  align-self: flex-start;
+  margin-top: 4px;
 }

@@ -14,6 +14,9 @@ export type AiWorkerRequest = {
   id: number;
   type: 'choose';
   state: GameState;
+  // Optional search-depth override from the difficulty selector.
+  // Falls back to chooseAction's default if omitted.
+  searchDepth?: number;
 };
 
 export type AiWorkerResponse = {
@@ -25,7 +28,7 @@ export type AiWorkerResponse = {
 self.addEventListener('message', (event: MessageEvent<AiWorkerRequest>) => {
   const msg = event.data;
   if (msg.type !== 'choose') return;
-  const action = chooseAction(msg.state);
+  const action = chooseAction(msg.state, msg.searchDepth);
   const response: AiWorkerResponse = { id: msg.id, type: 'action', action };
   (self as unknown as Worker).postMessage(response);
 });

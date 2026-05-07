@@ -8,6 +8,7 @@ const SVG_WIDTH = ORIGIN_X + BOARD_SIZE * CELL + PADDING;
 const SVG_HEIGHT = ORIGIN_Y + BOARD_SIZE * CELL + PADDING;
 
 
+import type { ReactElement } from 'react';
 import type { Layer, Player } from './game/types';
 
 export type BoardTheme = {
@@ -114,6 +115,14 @@ type BoardProps = {
   selectedCell?: CellRef | null;
   legalTargets?: ReadonlyArray<CellRef>;
   onCellClick?: (row: number, col: number) => void;
+  // Last-move highlight: the from/to cells of the most recent action,
+  // each only set if it occurred on this layer (cross-layer lift moves
+  // will set one or the other but not both).
+  lastMoveFrom?: { row: number; col: number } | null;
+  lastMoveTo?: { row: number; col: number } | null;
+  // Cells where a friendly piece is in opponent's attack range — get
+  // a pulsing red threat ring so the player notices before blundering.
+  threatenedCells?: ReadonlyArray<{ row: number; col: number }>;
 };
 
 export default function Board({
@@ -125,6 +134,9 @@ export default function Board({
   selectedCell = null,
   legalTargets = [],
   onCellClick,
+  lastMoveFrom = null,
+  lastMoveTo = null,
+  threatenedCells = [],
 }: BoardProps) {
   // Layer-specific atmosphere: gradient/nebula painted before the cells,
   // and a starfield overlay for Space that floats above the cells at low
@@ -471,6 +483,130 @@ export default function Board({
     );
   }
 
+  // Last-move highlight: from cell gets a soft outline, to cell a stronger
+  // colored fill, and if both are on this layer we draw an arrow between
+  // them. Uses cyan/teal to read as different from selection (gold) and
+  // legal targets (gold dots).
+  const lastMoveEls = (() => {
+    const els: ReactElement[] = [];
+    if (lastMoveFrom) {
+      els.push(
+        <rect
+          key="lm-from"
+          x={ORIGIN_X + lastMoveFrom.col * CELL + 2}
+          y={ORIGIN_Y + lastMoveFrom.row * CELL + 2}
+          width={CELL - 4}
+          height={CELL - 4}
+          rx={4}
+          fill="rgba(95, 200, 220, 0.18)"
+          stroke="rgba(95, 200, 220, 0.55)"
+          strokeWidth={1.5}
+          strokeDasharray="4 3"
+          pointerEvents="none"
+        />,
+      );
+    }
+    if (lastMoveTo) {
+      els.push(
+        <rect
+          key="lm-to"
+          x={ORIGIN_X + lastMoveTo.col * CELL + 2}
+          y={ORIGIN_Y + lastMoveTo.row * CELL + 2}
+          width={CELL - 4}
+          height={CELL - 4}
+          rx={4}
+          fill="rgba(95, 200, 220, 0.30)"
+          stroke="rgba(95, 200, 220, 0.85)"
+          strokeWidth={1.8}
+          pointerEvents="none"
+        />,
+      );
+    }
+    if (
+      lastMoveFrom &&
+      lastMoveTo &&
+      (lastMoveFrom.row !== lastMoveTo.row || lastMoveFrom.col !== lastMoveTo.col)
+    ) {
+      const fx = ORIGIN_X + lastMoveFrom.col * CELL + CELL / 2;
+      const fy = ORIGIN_Y + lastMoveFrom.row * CELL + CELL / 2;
+      const tx = ORIGIN_X + lastMoveTo.col * CELL + CELL / 2;
+      const ty = ORIGIN_Y + lastMoveTo.row * CELL + CELL / 2;
+      // Shorten the line a touch on each end so the arrowhead doesn't
+      // overlap pieces sitting in those cells.
+      const dx = tx - fx;
+      const dy = ty - fy;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const inset = CELL * 0.32;
+      const x1 = fx + ux * inset;
+      const y1 = fy + uy * inset;
+      const x2 = tx - ux * inset;
+      const y2 = ty - uy * inset;
+      els.push(
+        <g key="lm-arrow" pointerEvents="none">
+          <defs>
+            <marker
+              id="lm-arrowhead"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="5"
+              markerHeight="5"
+              orient="auto"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" fill="rgba(95, 200, 220, 0.95)" />
+            </marker>
+          </defs>
+          <line
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            stroke="rgba(95, 200, 220, 0.85)"
+            strokeWidth={3}
+            strokeLinecap="round"
+            markerEnd="url(#lm-arrowhead)"
+          />
+        </g>,
+      );
+    }
+    return els;
+  })();
+
+  // Threat rings — pulsing red circles under pieces that the opponent
+  // could capture next ply. Painted before the marker so the piece sits
+  // on top of the warning ring.
+  const threatEls = threatenedCells.map((t) => {
+    const cx = ORIGIN_X + t.col * CELL + CELL / 2;
+    const cy = ORIGIN_Y + t.row * CELL + CELL / 2;
+    return (
+      <g key={`thr-${t.row}-${t.col}`} pointerEvents="none">
+        <circle
+          cx={cx}
+          cy={cy}
+          r={CELL * 0.42}
+          fill="none"
+          stroke="rgba(255, 90, 90, 0.85)"
+          strokeWidth={2.5}
+        >
+          <animate
+            attributeName="opacity"
+            values="0.45;1;0.45"
+            dur="1.4s"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="r"
+            values={`${CELL * 0.40};${CELL * 0.46};${CELL * 0.40}`}
+            dur="1.4s"
+            repeatCount="indefinite"
+          />
+        </circle>
+      </g>
+    );
+  });
+
   const selectionEl = selectedCell ? (
     <rect
       key="selection"
@@ -796,6 +932,7 @@ export default function Board({
       >
         {atmosphereBack}
         {cells}
+        {lastMoveEls}
         {colLabels}
         {rowLabels}
         {atmosphereFront}
@@ -803,6 +940,7 @@ export default function Board({
         {selectionEl}
         {liftEls}
         {nexusEls}
+        {threatEls}
         {markerEls}
         {badgeEls}
         {targetEls}

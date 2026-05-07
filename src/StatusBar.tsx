@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TURN_LIMIT } from './game/constants';
 import { isMuted, setMuted } from './game/sound';
+import type { Difficulty } from './game/storage';
 import type { GameState, Player } from './game/types';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
@@ -17,6 +18,8 @@ type Props = {
   state: GameState;
   aiPlayer: Player | null;
   onSetMode: (mode: Mode) => void;
+  difficulty: Difficulty;
+  onSetDifficulty: (d: Difficulty) => void;
   onEndTurn: () => void;
   onNewGame: () => void;
 };
@@ -29,7 +32,15 @@ const SELECT_TO_MODE: Record<string, Mode> = {
   'none': null, // 2P hot-seat — no AI
 };
 
-export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNewGame }: Props) {
+export default function StatusBar({
+  state,
+  aiPlayer,
+  onSetMode,
+  difficulty,
+  onSetDifficulty,
+  onEndTurn,
+  onNewGame,
+}: Props) {
   const [mutedNow, setMutedNow] = useState(isMuted());
   const muteControl = (
     <button
@@ -61,6 +72,23 @@ export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNew
     </select>
   );
 
+  // Difficulty selector — only meaningful in 1P modes (where the AI is
+  // actually playing). Disabled in 2P so it can't be changed accidentally.
+  const difficultyControl = (
+    <select
+      className="hud-mode-select"
+      value={difficulty}
+      onChange={(e) => onSetDifficulty(e.target.value as Difficulty)}
+      aria-label="AI difficulty"
+      title="AI difficulty (search depth)"
+      disabled={aiPlayer === null}
+    >
+      <option value="easy">AI Easy</option>
+      <option value="medium">AI Medium</option>
+      <option value="hard">AI Hard</option>
+    </select>
+  );
+
   if (state.status.kind === 'won') {
     return (
       <div className="hud hud-finished">
@@ -70,6 +98,7 @@ export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNew
         </span>
         <button type="button" className="hud-btn" onClick={onNewGame}>New game</button>
         {modeControl}
+        {difficultyControl}
         {muteControl}
       </div>
     );
@@ -81,6 +110,7 @@ export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNew
         <span>Draw — {REASON_LABEL[state.status.reason]}</span>
         <button type="button" className="hud-btn" onClick={onNewGame}>New game</button>
         {modeControl}
+        {difficultyControl}
         {muteControl}
       </div>
     );
@@ -107,6 +137,7 @@ export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNew
         <button type="button" className="hud-btn" onClick={onEndTurn} disabled={isAiTurn}>End turn</button>
         <button type="button" className="hud-btn hud-btn-subtle" onClick={onNewGame}>New game</button>
         {modeControl}
+        {difficultyControl}
       </div>
     </>
   );
