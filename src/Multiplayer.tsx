@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useAuthUser } from './game/auth';
 import { createInitialGameState } from './game/constants';
-import { getUserId } from './game/identity';
+import { getEffectiveUserId } from './game/identity';
 import {
   enablePush,
   getPermissionState,
@@ -98,6 +99,7 @@ function NotificationsControl() {
 }
 
 export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
+  const { user: authUser } = useAuthUser();
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -122,7 +124,7 @@ export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const userId = getUserId();
+      const userId = getEffectiveUserId(authUser?.id ?? null);
       // Retry on (rare) room-code collisions — unique constraint on the table.
       for (let attempt = 0; attempt < 5; attempt++) {
         const tryCode = generateRoomCode();
@@ -158,7 +160,7 @@ export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
     setBusy(true);
     setError(null);
     try {
-      const userId = getUserId();
+      const userId = getEffectiveUserId(authUser?.id ?? null);
       const { data: existing, error: fetchErr } = await supabase
         .from('games')
         .select('*')

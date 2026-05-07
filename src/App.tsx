@@ -5,8 +5,11 @@ import Help from './Help';
 import MoveHistory from './MoveHistory';
 import Multiplayer from './Multiplayer';
 import PieceTray from './PieceTray';
+import AccountModal from './AccountModal';
 import StatusBar from './StatusBar';
 import Tutorial from './Tutorial';
+import { useAuthUser } from './game/auth';
+import { loadProfile, type Profile } from './game/profile';
 import AiWorker from './game/aiWorker?worker';
 import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
 import { supabase } from './game/supabase';
@@ -229,6 +232,26 @@ export default function App() {
   const [difficulty, setDifficulty] = useState<Difficulty>(
     INITIAL_SESSION?.difficulty ?? 'hard',
   );
+  // Auth + profile state. The AccountModal handles sign-in (magic link)
+  // and the first-time profile form; this component just keeps a local
+  // copy of the loaded profile for the footer label and downstream use.
+  const { user: authUser } = useAuthUser();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [accountOpen, setAccountOpen] = useState(false);
+  useEffect(() => {
+    if (!authUser) {
+      setProfile(null);
+      return;
+    }
+    let cancelled = false;
+    loadProfile(authUser.id).then((p) => {
+      if (!cancelled) setProfile(p);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser]);
+
   // Tutorial is shown once for first-time users — gated by a localStorage
   // flag. The "Tutorial" button in the help row re-opens it any time.
   const [tutorialOpen, setTutorialOpen] = useState<boolean>(() => {
@@ -711,6 +734,12 @@ export default function App() {
         onPlayAgain={() => dispatch({ type: 'new-game' })}
       />
       <Tutorial state={state} open={tutorialOpen} onClose={closeTutorial} />
+      <AccountModal
+        user={authUser}
+        open={accountOpen}
+        onClose={() => setAccountOpen(false)}
+        onProfileChange={setProfile}
+      />
       <footer className="app-footer">
         <p>© 2026 Limnology Research Corp. · SkyFlag™ Kaleo Edition.</p>
         <p>
@@ -720,6 +749,16 @@ export default function App() {
           </a>
         </p>
         <p className="app-footer-build">
+          <button
+            type="button"
+            className="hud-btn hud-btn-subtle"
+            onClick={() => setAccountOpen(true)}
+            title={authUser ? 'Manage your account' : 'Sign in for online play'}
+          >
+            {authUser
+              ? `Account: ${profile?.nickname ?? authUser.email ?? 'signed in'}`
+              : 'Sign in'}
+          </button>
           <button
             type="button"
             className="hud-btn hud-btn-subtle"

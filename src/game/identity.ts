@@ -17,6 +17,14 @@ function generateUserId(): string {
   ).join('');
 }
 
+// Returns the canonical "who am I" identifier for multiplayer purposes.
+// When an authenticated user is signed in, prefer their auth uid (stable
+// across devices, ties to a profile). Otherwise fall back to the anonymous
+// device-local id so unsigned players can still create/join rooms.
+export function getEffectiveUserId(authUserId: string | null): string {
+  return authUserId ?? getUserId();
+}
+
 export function getUserId(): string {
   // Dev/test override: ?u=<anything> in the URL forces that value as the
   // userId for this tab without touching localStorage. Lets two browser
