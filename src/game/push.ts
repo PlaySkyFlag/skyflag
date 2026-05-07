@@ -112,3 +112,19 @@ export async function disablePush(): Promise<void> {
   const sub = await getExistingSubscription();
   if (sub) await sub.unsubscribe();
 }
+
+// Serializes a PushSubscription's keys into the columns we store in
+// public.push_subscriptions. Pulls endpoint + p256dh + auth.
+export function serializeSubscription(sub: PushSubscription): {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+} {
+  const json = sub.toJSON();
+  const keys = json.keys ?? {};
+  return {
+    endpoint: json.endpoint as string,
+    p256dh: keys.p256dh ?? '',
+    auth: keys.auth ?? '',
+  };
+}

@@ -8,6 +8,7 @@ import {
   enablePush,
   getPermissionState,
   isPushSupported,
+  serializeSubscription,
 } from './game/push';
 import { isMultiplayerAvailable, supabase } from './game/supabase';
 import type { RoomState } from './game/types';
@@ -37,9 +38,11 @@ function generateRoomCode(): string {
 }
 
 // Small inline control for the in-room "Enable browser notifications"
-// flow. Stage 2 will save the resulting subscription to Supabase so the
-// Edge Function can dispatch a push when the opponent moves.
+// flow. After the browser grants permission and yields a PushSubscription,
+// the keys are upserted to public.push_subscriptions so the notify-turn
+// Edge Function can deliver a push when the opponent moves.
 function NotificationsControl() {
+  const { user: authUser } = useAuthUser();
   const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>(
     () => (typeof window === 'undefined' ? 'unsupported' : getPermissionState()),
   );
@@ -83,7 +86,28 @@ function NotificationsControl() {
           setBusy(false);
           setPermission(getPermissionState());
           if (result.ok) {
-            setMessage('✓ Subscribed. Push delivery wires up in stage 2.');
+            // Persist subscription to Supabase so the Edge Function can
+            // look it up and dispatch pushes when opponents move.
+            if (authUser && supabase) {
+              const row = serializeSubscription(result.subscription);
+              const { error: saveErr } = await supabase
+                .from('push_subscriptions')
+                .upsert(
+                  {
+                    user_id: authUser.id,
+                    ...row,
+                    user_agent: navigator.userAgent,
+                  },
+                  { onConflict: 'user_id' },
+                );
+              if (saveErr) {
+                setMessage(`Subscribed locally, but couldn't save to server: ${saveErr.message}`);
+              } else {
+                setMessage('✓ Subscribed. You\'ll be pinged when it\'s your turn.');
+              }
+            } else {
+              setMessage('✓ Subscribed locally. Sign in to enable server-side delivery.');
+            }
           } else if (result.reason === 'denied') {
             setMessage('Permission denied.');
           } else if (result.reason === 'no-vapid') {

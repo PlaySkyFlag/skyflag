@@ -145,7 +145,7 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom }: Props) {
       // The opponent's client will join by code when they accept.
       const code = generateRoomCode();
       const insertResult = await supabase
-        .from('rooms')
+        .from('games')
         .insert({
           room_code: code,
           state: createInitialGameState(),
@@ -182,7 +182,7 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom }: Props) {
       });
     }
     // Tear down the room we created since it'll never be joined.
-    await supabase.from('rooms').delete().eq('room_code', outgoing.room_code);
+    await supabase.from('games').delete().eq('room_code', outgoing.room_code);
     setOutgoing(null);
   }, [outgoing]);
 
@@ -214,7 +214,7 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom }: Props) {
     if (supabase) {
       // The challenger's room is now orphaned — clean it up so it doesn't
       // count toward their open rooms.
-      await supabase.from('rooms').delete().eq('room_code', incoming.room_code);
+      await supabase.from('games').delete().eq('room_code', incoming.room_code);
     }
     setIncoming(null);
   }, [incoming]);

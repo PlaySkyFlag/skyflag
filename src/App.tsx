@@ -417,15 +417,54 @@ export default function App() {
   // originate locally (not from a remote sync). The `remoteSyncInFlight`
   // flag is set just before a remote-sync dispatch, so the immediately-
   // following push effect skips, breaking the loop.
+  //
+  // After a successful push, if the turn just passed to the OTHER player,
+  // also fire-and-forget the notify-turn Edge Function so the opponent
+  // gets a Web Push (when their browser has subscribed).
+  const lastSyncedTurnPlayer = useRef<Player | null>(null);
   useEffect(() => {
     if (!room) return;
     if (!supabase) return;
     if (remoteSyncInFlight.current) return;
-    supabase
-      .from('games')
+    const sb = supabase;
+    sb.from('games')
       .update({ state })
       .eq('room_code', room.code)
-      .then();
+      .then(({ error }) => {
+        if (error) return;
+        // Fire push only when the *current player after the local change*
+        // is the opponent (i.e., my move ended my turn). Without this guard
+        // we'd notify the opponent on every activation, including ones
+        // they already know about.
+        const opponentRole: Player = room.role === 'p1' ? 'p2' : 'p1';
+        const currentTurnPlayer = state.currentPlayer;
+        if (
+          currentTurnPlayer === opponentRole &&
+          lastSyncedTurnPlayer.current !== opponentRole
+        ) {
+          sb.from('games')
+            .select('p1_id, p2_id')
+            .eq('room_code', room.code)
+            .single()
+            .then(({ data }) => {
+              if (!data) return;
+              const recipientId = opponentRole === 'p1' ? data.p1_id : data.p2_id;
+              if (!recipientId) return;
+              sb.functions
+                .invoke('notify-turn', {
+                  body: {
+                    recipient_user_id: recipientId,
+                    room_code: room.code,
+                    from_nickname: profile?.nickname ?? null,
+                  },
+                })
+                .catch(() => {
+                  // Best-effort — push is a nice-to-have, never block the game.
+                });
+            });
+        }
+        lastSyncedTurnPlayer.current = currentTurnPlayer;
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, room?.code]);
 
