@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import Lobby from './Lobby';
 import { useAuthUser } from './game/auth';
 import { createInitialGameState } from './game/constants';
 import { getEffectiveUserId } from './game/identity';
+import { loadProfile, type Profile } from './game/profile';
 import {
   enablePush,
   getPermissionState,
@@ -100,9 +102,26 @@ function NotificationsControl() {
 
 export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
   const { user: authUser } = useAuthUser();
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Keep a copy of the signed-in user's profile so Lobby can show their
+  // nickname when broadcasting presence. Refreshed when the user changes.
+  useEffect(() => {
+    if (!authUser) {
+      setProfile(null);
+      return;
+    }
+    let cancelled = false;
+    loadProfile(authUser.id).then((p) => {
+      if (!cancelled) setProfile(p);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser]);
 
   if (!isMultiplayerAvailable) {
     return (
@@ -214,6 +233,20 @@ export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
     <details className="help" open={inRoom}>
       <summary className="help-summary">Multiplayer</summary>
       <div className="help-body">
+        {!inRoom && authUser && (
+          <Lobby
+            user={authUser}
+            profile={profile}
+            inRoom={inRoom}
+            onEnterRoom={onRoomEntered}
+          />
+        )}
+        {!inRoom && !authUser && (
+          <p className="lobby-hint">
+            Sign in (button at the top of the page) to see other players online
+            and challenge them. You can still play by code below.
+          </p>
+        )}
         {!inRoom && (
           <>
             <p>

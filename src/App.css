@@ -1145,3 +1145,76 @@ button.tray-piece:hover {
   color: rgba(255, 255, 255, 0.85);
   line-height: 1.4;
 }
+
+/* Lobby — embedded in the Multiplayer panel above the code-based create
+   /join controls when the user is signed in and not yet in a room. */
+.lobby {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+.lobby-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.lobby-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.lobby-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #ffd884;
+}
+
+.lobby-count {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  letter-spacing: 0.02em;
+}
+
+.lobby-hint {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.78;
+  line-height: 1.4;
+}
+
+.lobby-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lobby-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 8px;
+}
+
+.lobby-nickname {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
