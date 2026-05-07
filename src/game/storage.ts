@@ -21,6 +21,12 @@ export function loadSession(): Session | null {
     if (!game || !Array.isArray(game.onBoard) || !game.flags || !game.inHand || !game.captured) {
       return null;
     }
+    // Sessions saved before the move-history feature shipped won't have a
+    // history field; backfill it to an empty array so render code can rely
+    // on it being present.
+    if (!Array.isArray(game.history)) {
+      game.history = [];
+    }
     return parsed as Session;
   } catch {
     return null;
