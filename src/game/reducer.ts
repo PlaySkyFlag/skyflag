@@ -14,7 +14,10 @@ export type Action =
   | { type: 'deploy'; pieceId: PieceId }
   | { type: 'move'; pieceId: PieceId; to: Coord }
   | { type: 'end-turn' }
-  | { type: 'new-game' };
+  | { type: 'new-game' }
+  // Replace the entire state — used by the multiplayer realtime sync to
+  // adopt an opponent's authoritative state without re-running rules.
+  | { type: 'remote-sync'; state: GameState };
 
 export function reduce(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -26,6 +29,8 @@ export function reduce(state: GameState, action: Action): GameState {
       return applyMove(state, action.pieceId, action.to);
     case 'end-turn':
       return applyEndTurn(state);
+    case 'remote-sync':
+      return action.state;
   }
 }
 

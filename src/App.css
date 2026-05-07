@@ -1,4 +1,5 @@
 .app {
+  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -150,6 +151,18 @@
   font-weight: 600;
 }
 
+/* "How to play" + "Multiplayer" side by side, sharing horizontal space.
+   On narrow screens they wrap back to a stacked column. */
+.help-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  max-width: 1100px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
 .help {
   max-width: 540px;
   width: 100%;
@@ -157,6 +170,13 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
+}
+
+/* Inside the help-row, share width equally with a sensible min-basis so
+   each card stays readable on phones until the row gets too narrow. */
+.help-row > .help {
+  flex: 1 1 280px;
+  max-width: none;
 }
 
 .help[open] {
@@ -205,6 +225,127 @@
 
 .help-glyph {
   font-size: 0.95em;
+}
+
+/* True fan, optimised for landscape phone use. Ground anchors the
+   bottom-center as the base; Sky pins to the upper-right edge; Space
+   pins to the upper-left edge. Boards are sized small relative to the
+   stack so Sky and Space sit far out at the corners with a wide gap
+   between them, leaving Ground clearly visible at the bottom-center. */
+.board-stack {
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  /* Wide-and-short aspect for landscape phones — fan spreads horizontally. */
+  aspect-ratio: 2 / 1;
+  margin: 0 auto;
+  perspective: 1100px;
+  perspective-origin: 50% 85%;
+}
+
+.board-stack-item {
+  position: absolute;
+  width: 32%;
+}
+
+.board-stack-item--space {
+  top: 0;
+  left: 0;
+}
+
+.board-stack-item--sky {
+  top: 0;
+  right: 0;
+}
+
+.board-stack-item--ground {
+  bottom: 0;
+  /* (100% − 32%) / 2 = 34%, centers Ground horizontally in the stack. */
+  left: 34%;
+}
+
+/* Portrait fallback: if the user is holding the phone upright, switch to
+   a taller, narrower fan so the boards don't squash. */
+@media (orientation: portrait) {
+  .board-stack {
+    max-width: 380px;
+    aspect-ratio: 19 / 22;
+  }
+  .board-stack-item {
+    width: 70%;
+  }
+  .board-stack-item--ground {
+    left: 15%;
+  }
+}
+
+.board-stack-label {
+  position: absolute;
+  /* Centered horizontally above the playing surface. */
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  /* Match the rest of the app's system stack — clean and crisp on screen. */
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.95;
+  pointer-events: none;
+  white-space: nowrap;
+  /* Black outline (1-pixel four-corner shadows) keeps the colored label
+     legible against any tile color, plus a soft drop shadow underneath. */
+  text-shadow:
+    -1px -1px 0 rgba(0, 0, 0, 0.95),
+     1px -1px 0 rgba(0, 0, 0, 0.95),
+    -1px  1px 0 rgba(0, 0, 0, 0.95),
+     1px  1px 0 rgba(0, 0, 0, 0.95),
+     0    2px 4px rgba(0, 0, 0, 0.55);
+}
+
+/* Each layer's label takes a tinted color matching its theme — visual
+   shorthand for which board you're looking at. */
+.board-stack-item--space .board-stack-label {
+  color: rgb(190, 175, 235);
+}
+.board-stack-item--sky .board-stack-label {
+  color: rgb(175, 220, 240);
+}
+.board-stack-item--ground .board-stack-label {
+  color: rgb(185, 220, 160);
+}
+
+/* Forward tilt — boards angle up like lecterns, exposing their playing
+   surface to a viewer at table-level. The drop-shadow chain is overridden
+   per layer so each board glows in its theme color. */
+.board-stack-tile {
+  transform: rotateX(50deg);
+  transform-origin: 50% 50%;
+  border-radius: 8px;
+}
+
+.board-stack-item--space .board-stack-tile {
+  opacity: 0.55;
+  filter:
+    drop-shadow(0 0 6px rgba(150, 130, 220, 0.75))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
+}
+
+.board-stack-item--sky .board-stack-tile {
+  opacity: 0.78;
+  filter:
+    drop-shadow(0 0 6px rgba(126, 179, 212, 0.85))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
+}
+
+.board-stack-item--ground .board-stack-tile {
+  /* Ground stays at full opacity — the solid base of the fan. Green LED
+     glow ties it to the layer's theme. */
+  filter:
+    drop-shadow(0 0 6px rgba(140, 220, 130, 0.8))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
 }
 
 .tray {
@@ -324,4 +465,93 @@ button.tray-piece:hover {
   font-size: 0.55em;
   color: #f5c343;
   text-decoration: none;
+}
+
+/* Smooth animation for piece moves: when a piece's coord changes, React
+   reuses the same DOM element (because the key is the stable piece id),
+   and the SVG x/y attributes transition instead of jumping. Modern Safari
+   and iOS Safari both support transitioning SVG positional attributes. */
+.piece-marker {
+  transition:
+    x 0.18s cubic-bezier(0.2, 0.7, 0.3, 1),
+    y 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* Multiplayer lobby controls — sit inside the Multiplayer disclosure
+   body. The Create/Join row stays compact and centered on phones. */
+.mp-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.mp-or {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.mp-input {
+  font: inherit;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  text-align: center;
+  width: 90px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+}
+
+.mp-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mp-code {
+  letter-spacing: 0.2em;
+  font-size: 1.05em;
+  color: #f5c343;
+}
+
+.mp-error {
+  margin-top: 6px;
+  color: #ff8a8a;
+  font-size: 0.85rem;
+}
+
+/* Layer-flow overlay: SVG positioned to cover the entire .board-stack so
+   the curved arrows can span Ground ↔ Sky ↔ Space at the right scale.
+   Rendered first in DOM (before the board items) so it paints BEHIND
+   them — a subtle background design element. */
+.layer-flow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Concept-render watermark: a small translucent thumbnail anchored to the
+   bottom-right of the page (not the viewport), so it stays put as the
+   user scrolls — a static background reference, not a floating overlay. */
+.layout-reference {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 160px;
+  height: auto;
+  opacity: 0.4;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 0;
 }

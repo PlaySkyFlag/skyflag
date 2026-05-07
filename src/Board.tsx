@@ -27,6 +27,9 @@ export type Marker = {
   // Optional small glyph painted in the top-right corner of the cell.
   // Used today for the promoted-Soldier indicator (★).
   badge?: string;
+  // Stable identity (piece id) used as the React key so the same DOM
+  // element persists across moves and CSS can animate x/y transitions.
+  id?: string;
 };
 
 export type DeployCell = {
@@ -54,7 +57,6 @@ type CellRef = {
 };
 
 type BoardProps = {
-  name: string;
   theme: BoardTheme;
   markers?: Marker[];
   deployCells?: DeployCell[];
@@ -68,7 +70,6 @@ type BoardProps = {
 };
 
 export default function Board({
-  name,
   theme,
   markers = [],
   deployCells = [],
@@ -109,7 +110,7 @@ export default function Board({
         y={ORIGIN_Y - LABEL_GUTTER / 2}
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={11}
+        fontSize={14}
         fontFamily="system-ui, sans-serif"
         fill={theme.label}
         pointerEvents="none"
@@ -129,7 +130,7 @@ export default function Board({
         y={ORIGIN_Y + row * CELL + CELL / 2}
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={11}
+        fontSize={14}
         fontFamily="system-ui, sans-serif"
         fill={theme.label}
         pointerEvents="none"
@@ -232,28 +233,162 @@ export default function Board({
     );
   });
 
-  const markerEls = markers.map((m) => {
-    const style = MARKER_STYLE[m.kind];
-    return (
-      <text
-        key={`m-${m.row}-${m.col}-${m.symbol}`}
-        x={ORIGIN_X + m.col * CELL + CELL / 2}
-        y={ORIGIN_Y + m.row * CELL + CELL / 2}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={CELL * 0.6}
-        fontFamily="system-ui, sans-serif"
-        fill={style.fill}
-        stroke={style.stroke}
-        strokeWidth={style.strokeWidth}
-        paintOrder="stroke"
-        pointerEvents="none"
-        style={{ userSelect: 'none' }}
-      >
-        {m.symbol}
-      </text>
-    );
-  });
+  // Lifts get a custom translucent raised-box treatment instead of plain
+  // text glyphs — a clearer visual hint that the cell connects layers.
+  const liftEls = markers
+    .filter((m) => m.kind === 'lift')
+    .map((m) => {
+      const inset = 8;
+      const x = ORIGIN_X + m.col * CELL + inset;
+      const y = ORIGIN_Y + m.row * CELL + inset;
+      const size = CELL - inset * 2;
+      const cx = ORIGIN_X + m.col * CELL + CELL / 2;
+      const cy = ORIGIN_Y + m.row * CELL + CELL / 2;
+      return (
+        <g key={`lift-${m.row}-${m.col}`} pointerEvents="none">
+          <rect
+            x={x}
+            y={y}
+            width={size}
+            height={size}
+            rx={4}
+            fill="rgba(255, 255, 255, 0.10)"
+            stroke="rgba(255, 255, 255, 0.45)"
+            strokeWidth={1}
+          />
+          {/* Top edge highlight for a raised 3D feel */}
+          <line
+            x1={x + 2}
+            y1={y + 1.5}
+            x2={x + size - 2}
+            y2={y + 1.5}
+            stroke="rgba(255, 255, 255, 0.7)"
+            strokeWidth={0.8}
+          />
+          {/* Bottom edge shadow to match */}
+          <line
+            x1={x + 2}
+            y1={y + size - 1.5}
+            x2={x + size - 2}
+            y2={y + size - 1.5}
+            stroke="rgba(0, 0, 0, 0.45)"
+            strokeWidth={0.8}
+          />
+          <text
+            x={cx}
+            y={cy}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize={CELL * 0.5}
+            fontFamily="system-ui, sans-serif"
+            fill="rgba(255, 255, 255, 0.9)"
+            stroke="rgba(0, 0, 0, 0.55)"
+            strokeWidth={0.4}
+            paintOrder="stroke"
+            style={{ userSelect: 'none' }}
+          >
+            ↕
+          </text>
+        </g>
+      );
+    });
+
+  // Nexus (the final objective on Space, cell 3,3) gets a custom rendering
+  // — pulsing gold halo, mid-ring, four compass spikes, and an inner disc
+  // — to make it visually distinct from a regular flag.
+  const nexusEls = markers
+    .filter((m) => m.kind === 'nexus')
+    .map((m) => {
+      const cx = ORIGIN_X + m.col * CELL + CELL / 2;
+      const cy = ORIGIN_Y + m.row * CELL + CELL / 2;
+      const innerR = CELL * 0.16;
+      const ringR = CELL * 0.28;
+      const haloR = CELL * 0.42;
+      const spikeAngles = [0, 90, 180, 270];
+      return (
+        <g key={`nexus-${m.row}-${m.col}`} pointerEvents="none">
+          {/* Outer halo — slowly pulsing gold glow */}
+          <circle cx={cx} cy={cy} r={haloR} fill="rgba(245, 195, 67, 0.20)">
+            <animate
+              attributeName="r"
+              values={`${haloR};${haloR * 1.18};${haloR}`}
+              dur="2.6s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.22;0.06;0.22"
+              dur="2.6s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          {/* Compass spikes — four short rays at the cardinal directions */}
+          {spikeAngles.map((deg) => {
+            const rad = (deg * Math.PI) / 180;
+            const x1 = cx + Math.cos(rad) * (ringR + 1.5);
+            const y1 = cy + Math.sin(rad) * (ringR + 1.5);
+            const x2 = cx + Math.cos(rad) * (ringR + 6);
+            const y2 = cy + Math.sin(rad) * (ringR + 6);
+            return (
+              <line
+                key={`spike-${deg}`}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="rgba(245, 195, 67, 0.9)"
+                strokeWidth={1.4}
+                strokeLinecap="round"
+              />
+            );
+          })}
+          {/* Mid-ring */}
+          <circle
+            cx={cx}
+            cy={cy}
+            r={ringR}
+            fill="none"
+            stroke="rgba(245, 195, 67, 0.9)"
+            strokeWidth={1.5}
+          />
+          {/* Inner gold disc */}
+          <circle
+            cx={cx}
+            cy={cy}
+            r={innerR}
+            fill="#f5c343"
+            stroke="#1a1a1a"
+            strokeWidth={0.6}
+          />
+        </g>
+      );
+    });
+
+  const markerEls = markers
+    .filter((m) => m.kind !== 'lift' && m.kind !== 'nexus')
+    .map((m) => {
+      const style = MARKER_STYLE[m.kind];
+      return (
+        <text
+          key={m.id ?? `m-${m.row}-${m.col}-${m.symbol}`}
+          className={m.id ? 'piece-marker' : undefined}
+          x={ORIGIN_X + m.col * CELL + CELL / 2}
+          y={ORIGIN_Y + m.row * CELL + CELL / 2}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={CELL * 0.75}
+          fontFamily="system-ui, sans-serif"
+          fill={style.fill}
+          stroke={style.stroke}
+          strokeWidth={style.strokeWidth}
+          paintOrder="stroke"
+          pointerEvents="none"
+          style={{ userSelect: 'none' }}
+        >
+          {m.symbol}
+        </text>
+      );
+    });
 
   const badgeEls = markers
     .filter((m) => m.badge)
@@ -283,14 +418,10 @@ export default function Board({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 8,
         width: '100%',
         maxWidth: SVG_WIDTH,
       }}
     >
-      <h2 style={{ margin: 0, fontFamily: 'system-ui, sans-serif', fontSize: '1.05rem' }}>
-        {name}
-      </h2>
       <svg
         width="100%"
         viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
@@ -307,6 +438,8 @@ export default function Board({
         {rowLabels}
         {deployEls}
         {selectionEl}
+        {liftEls}
+        {nexusEls}
         {markerEls}
         {badgeEls}
         {targetEls}

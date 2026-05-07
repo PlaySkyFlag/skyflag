@@ -1,9 +1,11 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import Help from './Help';
+import Multiplayer, { type RoomState } from './Multiplayer';
 import PieceTray from './PieceTray';
 import StatusBar from './StatusBar';
 import { chooseAction } from './game/ai';
+import { supabase } from './game/supabase';
 import {
   DEPLOY_COORDS,
   FLAG_COORDS,
@@ -65,7 +67,7 @@ const PIECE_SYMBOL: Record<PieceKind, string> = {
   pilot:   '♝', // ♝ bishop
 };
 
-const flagSymbol = (layer: Layer): string => (layer === 'space' ? '★' : '⚑');
+const flagSymbol = (_layer: Layer): string => '⚑';
 
 function markersForLayer(layer: Layer, state: GameState): Marker[] {
   const markers: Marker[] = [];
@@ -95,6 +97,9 @@ function markersForLayer(layer: Layer, state: GameState): Marker[] {
       symbol: PIECE_SYMBOL[bp.piece.kind],
       kind: bp.piece.owner,
       badge,
+      // Stable id lets React keep the same DOM element across moves so
+      // CSS can animate the x/y transition rather than teleporting.
+      id: bp.piece.id,
     });
   }
 
@@ -128,12 +133,103 @@ export default function App() {
   const [aiPlayer, setAiPlayer] = useState<Player | null>(
     INITIAL_SESSION?.aiPlayer ?? 'p2',
   );
+  const [room, setRoom] = useState<RoomState | null>(null);
+  // Tracks whether a state change came from a remote sync, so the local
+  // "push to Supabase" effect doesn't echo it back into a feedback loop.
+  const remoteSyncInFlight = useRef(false);
 
   // Auto-save on any state or AI-mode change. Selection state is transient
   // and intentionally not persisted.
   useEffect(() => {
     saveSession({ game: state, aiPlayer });
   }, [state, aiPlayer]);
+
+  // Multiplayer: when entering a room, hydrate local state from the row
+  // in Supabase, then subscribe to realtime UPDATE events so the opponent's
+  // moves arrive as state replacements. On unmount or leave, unsubscribe.
+  useEffect(() => {
+    if (!room) return;
+    if (!supabase) return;
+
+    // Capture a non-null reference so the cleanup closure still type-checks
+    // after TypeScript loses narrowing.
+    const sb = supabase;
+    let mounted = true;
+
+    sb
+      .from('games')
+      .select('state, p2_id')
+      .eq('room_code', room.code)
+      .single()
+      .then(({ data, error }) => {
+        if (!mounted || error || !data) return;
+        remoteSyncInFlight.current = true;
+        dispatch({ type: 'remote-sync', state: data.state as GameState });
+        // If P2 has already joined by the time we hydrate, flip status.
+        setRoom((prev) =>
+          prev && data.p2_id && prev.status === 'waiting'
+            ? { ...prev, status: 'playing' }
+            : prev,
+        );
+        // Clear the flag on the next tick so the push effect (which runs
+        // after this dispatch's re-render) doesn't echo this state back.
+        setTimeout(() => {
+          remoteSyncInFlight.current = false;
+        }, 50);
+      });
+
+    const channel = sb
+      .channel(`room:${room.code}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'games',
+          filter: `room_code=eq.${room.code}`,
+        },
+        (payload) => {
+          const newRow = payload.new as {
+            state: GameState;
+            p2_id: string | null;
+          };
+          remoteSyncInFlight.current = true;
+          dispatch({ type: 'remote-sync', state: newRow.state });
+          // P2 joining flips the room from 'waiting' to 'playing' for P1.
+          setRoom((prev) =>
+            prev && newRow.p2_id && prev.status === 'waiting'
+              ? { ...prev, status: 'playing' }
+              : prev,
+          );
+          setTimeout(() => {
+            remoteSyncInFlight.current = false;
+          }, 50);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      mounted = false;
+      sb.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room?.code]);
+
+  // Multiplayer: push local state changes up to Supabase whenever they
+  // originate locally (not from a remote sync). The `remoteSyncInFlight`
+  // flag is set just before a remote-sync dispatch, so the immediately-
+  // following push effect skips, breaking the loop.
+  useEffect(() => {
+    if (!room) return;
+    if (!supabase) return;
+    if (remoteSyncInFlight.current) return;
+    supabase
+      .from('games')
+      .update({ state })
+      .eq('room_code', room.code)
+      .then();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, room?.code]);
 
   // Drop selection whenever the active player or game status changes.
   useEffect(() => {
@@ -146,6 +242,7 @@ export default function App() {
   // AI activation. When the turn passes back to the human, currentPlayer
   // no longer matches aiPlayer and the loop stops.
   useEffect(() => {
+    if (room) return;
     if (!aiPlayer) return;
     if (state.status.kind !== 'in-progress') return;
     if (state.currentPlayer !== aiPlayer) return;
@@ -156,10 +253,16 @@ export default function App() {
     }, AI_THINK_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, [aiPlayer, state]);
+  }, [aiPlayer, state, room]);
 
   const inProgress = state.status.kind === 'in-progress';
   const isAiTurn = aiPlayer === state.currentPlayer && inProgress;
+  // In multiplayer, only allow input when (a) the room is in 'playing'
+  // state (both seats filled) and (b) it's our role's turn.
+  const isMpBlocking =
+    room !== null &&
+    (room.status !== 'playing' || state.currentPlayer !== room.role);
+  const isInputBlocked = isAiTurn || isMpBlocking;
 
   const selectedBoardPiece =
     selection?.kind === 'board'
@@ -185,12 +288,12 @@ export default function App() {
   }
 
   const handleSelectHandPiece = (id: PieceId) => {
-    if (isAiTurn) return;
+    if (isInputBlocked) return;
     setSelection((prev) => (prev?.kind === 'hand' && prev.pieceId === id ? null : { kind: 'hand', pieceId: id }));
   };
 
   const handleDeployClick = (player: Player) => {
-    if (!inProgress || isAiTurn) return;
+    if (!inProgress || isInputBlocked) return;
     if (player !== state.currentPlayer) return;
     if (selection?.kind !== 'hand') return;
     dispatch({ type: 'deploy', pieceId: selection.pieceId });
@@ -198,7 +301,7 @@ export default function App() {
   };
 
   const handleCellClick = (layer: Layer, row: number, col: number) => {
-    if (!inProgress || isAiTurn) return;
+    if (!inProgress || isInputBlocked) return;
     const target: Coord = { layer, row, col };
 
     // 1. If a board piece is selected and the click is a legal target → move.
@@ -233,7 +336,6 @@ export default function App() {
     return (
       <Board
         key={layer}
-        name={LAYER_NAMES[layer]}
         theme={LAYER_THEMES[layer]}
         markers={markersForLayer(layer, state)}
         deployCells={deployCellsForLayer(layer)}
@@ -253,28 +355,129 @@ export default function App() {
         state={state}
         aiPlayer={aiPlayer}
         onSetMode={setAiPlayer}
-        onEndTurn={() => dispatch({ type: 'end-turn' })}
+        onEndTurn={() => {
+          if (isInputBlocked) return;
+          dispatch({ type: 'end-turn' });
+        }}
         onNewGame={() => dispatch({ type: 'new-game' })}
       />
-      <Help />
-      {renderBoard('space')}
-      {renderBoard('sky')}
+      <div className="help-row">
+        <Help />
+        <Multiplayer
+          room={room}
+          onRoomEntered={setRoom}
+          onLeave={() => setRoom(null)}
+        />
+      </div>
       <PieceTray
         player="p1"
         pieces={state.inHand.p1}
         capturedPieces={state.captured.p1}
-        isInteractive={inProgress && state.currentPlayer === 'p1' && aiPlayer !== 'p1'}
+        isInteractive={
+          inProgress &&
+          state.currentPlayer === 'p1' &&
+          aiPlayer !== 'p1' &&
+          (room === null || (room.status === 'playing' && room.role === 'p1'))
+        }
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
       />
-      {renderBoard('ground')}
+      <div className="board-stack">
+        {/* Flow design element FIRST in DOM so it paints behind the boards.
+            Two subtle gradient curves: Ground↔Sky transitions green→blue,
+            Sky↔Space transitions blue→purple. Bidirectional arrowheads
+            indicate that lifts can travel in either direction. */}
+        <svg
+          className="layer-flow"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient
+              id="flow-ground-sky"
+              gradientUnits="userSpaceOnUse"
+              x1="66"
+              y1="72"
+              x2="78"
+              y2="64"
+            >
+              <stop offset="0%" stopColor="#7ba868" />
+              <stop offset="100%" stopColor="#7eb3d4" />
+            </linearGradient>
+            <linearGradient
+              id="flow-sky-space"
+              gradientUnits="userSpaceOnUse"
+              x1="68"
+              y1="16"
+              x2="32"
+              y2="16"
+            >
+              <stop offset="0%" stopColor="#7eb3d4" />
+              <stop offset="100%" stopColor="#7d7eb8" />
+            </linearGradient>
+            <marker
+              id="flow-arrow"
+              viewBox="0 0 10 10"
+              refX="9"
+              refY="5"
+              markerWidth="3.5"
+              markerHeight="3.5"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(160, 180, 210, 0.6)" />
+            </marker>
+          </defs>
+          <g
+            fill="none"
+            strokeWidth={1.8}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            opacity={0.55}
+          >
+            <path
+              d="M 66,72 Q 78,72 78,64"
+              stroke="url(#flow-ground-sky)"
+              markerStart="url(#flow-arrow)"
+              markerEnd="url(#flow-arrow)"
+            />
+            <path
+              d="M 68,16 Q 50,2 32,16"
+              stroke="url(#flow-sky-space)"
+              markerStart="url(#flow-arrow)"
+              markerEnd="url(#flow-arrow)"
+            />
+          </g>
+        </svg>
+        {LAYER_ORDER.map((layer) => (
+          <div className={`board-stack-item board-stack-item--${layer}`} key={layer}>
+            <span className="board-stack-label">{LAYER_NAMES[layer]}</span>
+            <div className="board-stack-tile">{renderBoard(layer)}</div>
+          </div>
+        ))}
+      </div>
       <PieceTray
         player="p2"
         pieces={state.inHand.p2}
         capturedPieces={state.captured.p2}
-        isInteractive={inProgress && state.currentPlayer === 'p2' && aiPlayer !== 'p2'}
+        isInteractive={
+          inProgress &&
+          state.currentPlayer === 'p2' &&
+          aiPlayer !== 'p2' &&
+          (room === null || (room.status === 'playing' && room.role === 'p2'))
+        }
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
+      />
+      {/* Concept reference: small translucent thumbnail of the FAN SPREAD
+          ARRAY render in the bottom-right corner. Reminds the viewer of
+          the ideal 3D vision while the actual playing surface above is
+          optimized for tappable cells on a phone. */}
+      <img
+        src="/fan-spread-array.png"
+        alt="Fan Spread Array — ideal 3D vision (playing surface above is optimized for playability)"
+        className="layout-reference"
+        aria-hidden="true"
       />
     </main>
   );
