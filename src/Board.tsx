@@ -38,6 +38,12 @@ export type DeployCell = {
   player: Player;
 };
 
+// Hex values mirror the player palette in App.css (:root section):
+//   p1.fill      = --slate-fill      (#1a2540)
+//   p2.fill      = --ivory-fill      (#f5e8d0)
+//   p1 deploy    = --slate-accent    (#a8b8d8 / rgba(168,184,216,…))
+//   p2 deploy    = --ivory-fill      (#f5e8d0 / rgba(245,232,208,…))
+// Keep the two sources in sync if either side changes.
 const MARKER_STYLE: Record<MarkerKind, { fill: string; stroke: string; strokeWidth: number }> = {
   lift:  { fill: '#e8e8e8', stroke: '#1a1a1a', strokeWidth: 0.6 },
   nexus: { fill: '#f5c343', stroke: '#1a1a1a', strokeWidth: 0.8 },

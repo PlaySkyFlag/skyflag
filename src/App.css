@@ -1,3 +1,21 @@
+/* === Player palette =====================================================
+   Single source of truth for the two-player color schemes. SVG-side hex
+   values in Board.tsx (MARKER_STYLE, DEPLOY_STYLE) mirror these:
+     Slate fill    #1a2540  ↔  --slate-fill
+     Slate accent  #a8b8d8  ↔  --slate-accent  (= rgba(168,184,216,…))
+     Ivory fill    #f5e8d0  ↔  --ivory-fill    (= rgba(245,232,208,…))
+   Keep them in sync if either side changes. */
+:root {
+  --slate-fill: #1a2540;
+  --slate-border: #2a3858;
+  --slate-accent: #a8b8d8;
+  --slate-text: #c8d2e8;
+
+  --ivory-fill: #f5e8d0;
+  --ivory-border: #ddd0b8;
+  --ivory-dark-text: #1a1a1a;
+}
+
 .app {
   position: relative;
   min-height: 100vh;
@@ -57,11 +75,11 @@
 }
 
 .hud-pip-p1 {
-  background: #1a2540;
+  background: var(--slate-fill);
 }
 
 .hud-pip-p2 {
-  background: #f5e8d0;
+  background: var(--ivory-fill);
 }
 
 .hud-finished {
@@ -288,11 +306,13 @@
 }
 
 .move-history-p1 .move-history-text {
-  color: #c8d2e8;
+  color: var(--slate-text);
 }
 
 .move-history-p2 .move-history-text {
-  color: #f1e5cf;
+  /* Was #f1e5cf — unified to the canonical Ivory fill (the difference was
+     unnoticeable but inconsistent with every other Ivory accent use). */
+  color: var(--ivory-fill);
 }
 
 .help-glyph {
@@ -522,15 +542,15 @@ button.tray-piece:hover {
 }
 
 .tray-p1 .tray-piece {
-  background: #1a2540;
+  background: var(--slate-fill);
   color: #e8e8e8;
-  border: 1px solid #2a3858;
+  border: 1px solid var(--slate-border);
 }
 
 .tray-p2 .tray-piece {
-  background: #f5e8d0;
-  color: #1a1a1a;
-  border: 1px solid #ddd0b8;
+  background: var(--ivory-fill);
+  color: var(--ivory-dark-text);
+  border: 1px solid var(--ivory-border);
 }
 
 .tray-piece-letter {
