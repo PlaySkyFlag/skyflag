@@ -35,15 +35,17 @@ export default function Tutorial({ state, open, onClose }: Props) {
   const [stage, setStage] = useState(0);
 
   // Track how many history entries we've already considered so we don't
-  // reapply old advances when state churns. Reset whenever the tutorial
-  // re-opens so every fresh launch starts from the current history len.
+  // reapply old advances when state churns. Reset only when the tutorial
+  // OPENS (not on every history change — otherwise each move re-runs this
+  // effect and resets stage back to 0, which is the bug we just fixed).
   const seenLen = useRef(state.history.length);
   useEffect(() => {
     if (open) {
       setStage(0);
       seenLen.current = state.history.length;
     }
-  }, [open, state.history.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   // Advance stages by watching history. Auto-advance only fires from the
   // gameplay stages (2-4) — the info stages (0, 1) and the final tips
