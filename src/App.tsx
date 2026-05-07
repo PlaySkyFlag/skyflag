@@ -59,10 +59,10 @@ const LAYER_NAMES: Record<Layer, string> = {
 const PLAYERS: Player[] = ['p1', 'p2'];
 
 const PIECE_SYMBOL: Record<PieceKind, string> = {
-  captain: 'C',
-  soldier: 'S',
-  rover: 'R',
-  pilot: 'P',
+  captain: '♚', // ♚ king
+  soldier: '♟', // ♟ pawn
+  rover:   '♜', // ♜ rook
+  pilot:   '♝', // ♝ bishop
 };
 
 const flagSymbol = (layer: Layer): string => (layer === 'space' ? '★' : '⚑');

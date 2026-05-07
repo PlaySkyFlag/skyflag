@@ -7,11 +7,11 @@ const KIND_LABEL: Record<PieceKind, string> = {
   pilot: 'Pilot',
 };
 
-const KIND_LETTER: Record<PieceKind, string> = {
-  captain: 'C',
-  soldier: 'S',
-  rover: 'R',
-  pilot: 'P',
+const KIND_GLYPH: Record<PieceKind, string> = {
+  captain: '♚',
+  soldier: '♟',
+  rover:   '♜',
+  pilot:   '♝',
 };
 
 const PLAYER_LABEL: Record<Player, string> = {
@@ -59,14 +59,14 @@ export default function PieceTray({
                   aria-pressed={isSelected}
                   onClick={() => onSelect(p.id)}
                 >
-                  <span className="tray-piece-letter">{KIND_LETTER[p.kind]}</span>
+                  <span className="tray-piece-letter">{KIND_GLYPH[p.kind]}</span>
                   <span className="tray-piece-name">{KIND_LABEL[p.kind]}</span>
                 </button>
               );
             }
             return (
               <div key={p.id} className={className} title={KIND_LABEL[p.kind]}>
-                <span className="tray-piece-letter">{KIND_LETTER[p.kind]}</span>
+                <span className="tray-piece-letter">{KIND_GLYPH[p.kind]}</span>
                 <span className="tray-piece-name">{KIND_LABEL[p.kind]}</span>
               </div>
             );
@@ -87,7 +87,7 @@ export default function PieceTray({
                   title={`${KIND_LABEL[p.kind]}${wasPromoted ? ' (promoted from Soldier)' : ''} — lost`}
                 >
                   <span className="tray-piece-letter">
-                    {KIND_LETTER[p.kind]}
+                    {KIND_GLYPH[p.kind]}
                     {wasPromoted && <sup className="tray-piece-promoted-mark">★</sup>}
                   </span>
                   <span className="tray-piece-name">{KIND_LABEL[p.kind]}</span>
