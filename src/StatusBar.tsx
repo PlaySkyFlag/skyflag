@@ -19,38 +19,27 @@ type Props = {
   onNewGame: () => void;
 };
 
-const MODE_OPTIONS: ReadonlyArray<{
-  mode: Mode;
-  label: string;
-  pip: 'p1' | 'p2' | null;
-  title: string;
-}> = [
-  { mode: 'p2', label: '1P · Slate',  pip: 'p1', title: 'You play Slate. AI plays Ivory.' },
-  { mode: 'p1', label: '1P · Ivory',  pip: 'p2', title: 'You play Ivory. AI plays Slate.' },
-  { mode: null, label: '2P',          pip: null, title: 'Two humans on one machine (hot-seat).' },
-];
+// Dropdown value strings map cleanly to/from the aiPlayer slot. Keeping
+// the same Slate/Ivory/2P labels the segmented control had.
+const SELECT_TO_MODE: Record<string, Mode> = {
+  'p2': 'p2',   // 1P · Slate — you are Slate, AI plays Ivory (p2)
+  'p1': 'p1',   // 1P · Ivory — you are Ivory, AI plays Slate (p1)
+  'none': null, // 2P hot-seat — no AI
+};
 
 export default function StatusBar({ state, aiPlayer, onSetMode, onEndTurn, onNewGame }: Props) {
   const modeControl = (
-    <div className="hud-mode" role="radiogroup" aria-label="Players">
-      {MODE_OPTIONS.map((opt) => {
-        const active = opt.mode === aiPlayer;
-        return (
-          <button
-            key={opt.label}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            className={`hud-mode-btn${active ? ' is-active' : ''}`}
-            onClick={() => onSetMode(opt.mode)}
-            title={opt.title}
-          >
-            {opt.pip && <span className={`hud-pip hud-pip-${opt.pip}`} aria-hidden />}
-            <span>{opt.label}</span>
-          </button>
-        );
-      })}
-    </div>
+    <select
+      className="hud-mode-select"
+      value={aiPlayer ?? 'none'}
+      onChange={(e) => onSetMode(SELECT_TO_MODE[e.target.value])}
+      aria-label="Players"
+      title="Choose 1-player or 2-player mode"
+    >
+      <option value="p2">1P · Slate</option>
+      <option value="p1">1P · Ivory</option>
+      <option value="none">2P</option>
+    </select>
   );
 
   if (state.status.kind === 'won') {

@@ -46,8 +46,8 @@ const MARKER_STYLE: Record<MarkerKind, { fill: string; stroke: string; strokeWid
 };
 
 const DEPLOY_STYLE: Record<Player, { stroke: string; fill: string; activeFill: string }> = {
-  p1: { stroke: '#a8b8d8', fill: 'rgba(168,184,216,0.14)', activeFill: 'rgba(168,184,216,0.32)' },
-  p2: { stroke: '#f5e8d0', fill: 'rgba(245,232,208,0.14)', activeFill: 'rgba(245,232,208,0.32)' },
+  p1: { stroke: '#a8b8d8', fill: 'rgba(168,184,216,0.30)', activeFill: 'rgba(168,184,216,0.55)' },
+  p2: { stroke: '#f5e8d0', fill: 'rgba(245,232,208,0.30)', activeFill: 'rgba(245,232,208,0.55)' },
 };
 
 type CellRef = {
@@ -201,11 +201,13 @@ export default function Board({
     );
   });
 
-  const deployEls = deployCells.map((d) => {
+  const deployEls = deployCells.flatMap((d) => {
     const style = DEPLOY_STYLE[d.player];
     const isActive = activeDeployPlayer === d.player;
     const inset = 4;
-    return (
+    const cx = ORIGIN_X + d.col * CELL + CELL / 2;
+    const cy = ORIGIN_Y + d.row * CELL + CELL / 2;
+    return [
       <rect
         key={`d-${d.player}-${d.row}-${d.col}`}
         x={ORIGIN_X + d.col * CELL + inset}
@@ -215,8 +217,8 @@ export default function Board({
         rx={6}
         fill={isActive ? style.activeFill : style.fill}
         stroke={style.stroke}
-        strokeWidth={isActive ? 2.5 : 1.5}
-        strokeDasharray={isActive ? undefined : '4 3'}
+        strokeWidth={isActive ? 3 : 2}
+        strokeDasharray={isActive ? undefined : '5 3'}
         onClick={isActive && onDeployCellClick ? () => onDeployCellClick(d.player) : undefined}
         pointerEvents={isActive && onDeployCellClick ? 'auto' : 'none'}
         style={{ cursor: isActive && onDeployCellClick ? 'pointer' : 'default' }}
@@ -229,8 +231,26 @@ export default function Board({
             repeatCount="indefinite"
           />
         )}
-      </rect>
-    );
+      </rect>,
+      <text
+        key={`d-label-${d.player}-${d.row}-${d.col}`}
+        x={cx}
+        y={cy}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={CELL * 0.18}
+        fontWeight={700}
+        fontFamily="system-ui, sans-serif"
+        fill={style.stroke}
+        stroke="rgba(0, 0, 0, 0.55)"
+        strokeWidth={0.5}
+        paintOrder="stroke"
+        pointerEvents="none"
+        style={{ userSelect: 'none', letterSpacing: '0.12em' }}
+      >
+        DEPLOY
+      </text>,
+    ];
   });
 
   // Lifts get a custom translucent raised-box treatment instead of plain

@@ -26,6 +26,9 @@ type Props = {
   isInteractive: boolean;
   selectedId: PieceId | null;
   onSelect: (id: PieceId) => void;
+  // Short status text shown next to the tray label — e.g. activations
+  // remaining, "waiting", "AI moving…", or end-game outcome.
+  note: string;
 };
 
 export default function PieceTray({
@@ -35,13 +38,17 @@ export default function PieceTray({
   isInteractive,
   selectedId,
   onSelect,
+  note,
 }: Props) {
   return (
     <section
       className={`tray tray-${player}${isInteractive ? '' : ' tray-inactive'}`}
       aria-label={`${PLAYER_LABEL[player]} hand`}
     >
-      <h3 className="tray-label">{PLAYER_LABEL[player]} · in hand</h3>
+      <h3 className="tray-label">
+        {PLAYER_LABEL[player]} · in hand
+        <span className="tray-note">{note}</span>
+      </h3>
       <div className="tray-pieces">
         {pieces.length === 0 ? (
           <span className="tray-empty">no pieces in hand</span>

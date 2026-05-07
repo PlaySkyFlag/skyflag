@@ -1,48 +1,59 @@
 export default function Help() {
   return (
     <details className="help">
-      <summary className="help-summary">How to play</summary>
+      <summary className="help-summary">Getting started</summary>
       <div className="help-body">
+        <ol>
+          <li>
+            <strong>Choose a mode</strong> from the dropdown in the HUD —
+            <em> 1P · Slate</em> (you're Slate, AI plays Ivory),{' '}
+            <em>1P · Ivory</em> (the reverse), or <em>2P</em> (two humans
+            on one device).
+          </li>
+          <li>
+            <strong>Click "New game"</strong> in the HUD to begin. Slate
+            moves first.
+          </li>
+          <li>
+            <strong>Each turn you have 2 activations.</strong> An
+            activation is either deploying a new piece from your tray or
+            moving a piece already on the board.
+          </li>
+          <li>
+            <strong>Deploy.</strong> Tap a piece in your tray (Captain
+            ♚, Soldier ♟, Rover ♜, or Pilot ♝). The dashed pad on
+            Ground will glow — tap it to drop your piece there.
+          </li>
+          <li>
+            <strong>Move.</strong> Tap any of your pieces already on the
+            board. Gold dots will appear on every legal destination —
+            tap a dot to move there.
+          </li>
+          <li>
+            <strong>Lifts</strong> let pieces travel between layers. Move
+            onto a lift cell (↕ at r1/c1, r1/c4, r4/c1, r4/c4). On your
+            next activation, tap the matching cell on the layer above or
+            below to ascend / descend.
+          </li>
+          <li>
+            <strong>End the turn</strong> by clicking <em>End turn</em> in
+            the HUD. Unused activations are forfeited.
+          </li>
+          <li>
+            <strong>Win:</strong> capture all three of your opponent's
+            flags (<span className="help-glyph">⚑</span> on each layer)
+            with your Captain (or a promoted Soldier), then land a
+            Captain on the Nexus{' '}
+            <span className="help-glyph">◎</span> at Space (r3, c3).
+          </li>
+        </ol>
         <p>
-          <strong>Goal.</strong> Capture all three of your opponent's flags
-          (<span className="help-glyph">⚑</span> on Ground & Sky,{' '}
-          <span className="help-glyph">★</span> on Space) by landing your{' '}
-          <strong>Captain</strong> (or a promoted Soldier) on each one. Then land a
-          Captain on the <strong>Nexus</strong>{' '}
-          <span className="help-glyph">◎</span> at Space&nbsp;(r3,&nbsp;c3) to win.
-        </p>
-        <p>
-          <strong>Each turn.</strong> You have 2 activations. Spend each one to
-          either <em>deploy</em> a piece from your tray onto the dashed pad on
-          Ground, or <em>move</em> a piece you've already deployed. Click <em>End
-          turn</em> to forfeit any unused activations.
-        </p>
-        <p>
-          <strong>Selecting and moving.</strong> Click a tray tile or an on-board
-          piece to select it — gold dots appear on every legal target.
-          Click any dot to move there. Click empty space or another piece to
-          change your selection.
-        </p>
-        <p>
-          <strong>Pieces.</strong>{' '}
-          <strong>C</strong>aptain — 1 square in any of 8 directions.{' '}
-          <strong>S</strong>oldier — forward only; first move ≤2&nbsp;sq, captures
-          diagonal-forward, promotes to Captain on the far Ground row.{' '}
-          <strong>R</strong>over — orthogonal ≤2&nbsp;sq.{' '}
-          <strong>P</strong>ilot — diagonal ≤2&nbsp;sq. None may jump. Capture by
-          landing on an opponent.
-        </p>
-        <p>
-          <strong>Lifts.</strong> Move a piece onto a lift cell{' '}
-          <span className="help-glyph">⬆</span> at (1,1)/(1,4)/(4,1)/(4,4); on a
-          later activation click the same cell on the adjacent board to ascend or
-          descend. Destination on the new layer must be empty — lifts can't
-          capture.
-        </p>
-        <p>
-          <strong>Single-player vs hot-seat.</strong> AI plays Ivory (P2) by
-          default. Click the <em>AI: Ivory</em> button in the HUD to switch to
-          hot-seat for two humans on one machine.
+          <strong>Piece moves.</strong> Captain — 1 square in any of 8
+          directions. Soldier — forward only; first move up to 2 squares;
+          captures diagonal-forward; promotes to Captain on the far
+          Ground row. Rover — orthogonal up to 2 squares. Pilot — diagonal
+          up to 2 squares. None may jump. Capture by landing on an
+          opponent.
         </p>
       </div>
     </details>

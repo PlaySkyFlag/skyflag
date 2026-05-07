@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
+import EndGameOverlay from './EndGameOverlay';
 import Help from './Help';
 import Multiplayer, { type RoomState } from './Multiplayer';
 import PieceTray from './PieceTray';
@@ -328,6 +329,22 @@ export default function App() {
   const activeDeployPlayer: Player | null =
     selection?.kind === 'hand' && inProgress ? state.currentPlayer : null;
 
+  // Per-player move note shown next to each tray label so each side has an
+  // at-a-glance status ("2 activations left", "waiting", "AI moving…",
+  // win/lose) without scrolling up to the HUD.
+  const moveNote = (player: Player): string => {
+    if (state.status.kind === 'won') {
+      return state.status.winner === player ? 'won!' : 'lost';
+    }
+    if (state.status.kind === 'draw') {
+      return 'draw';
+    }
+    if (state.currentPlayer !== player) return 'waiting';
+    if (aiPlayer === player) return 'AI moving…';
+    const acts = state.activationsRemaining;
+    return `${acts} activation${acts === 1 ? '' : 's'} left`;
+  };
+
   const renderBoard = (layer: Layer) => {
     const selectedCell =
       selectedBoardPiece && selectedBoardPiece.coord.layer === layer
@@ -381,6 +398,7 @@ export default function App() {
         }
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
+        note={moveNote('p1')}
       />
       <div className="board-stack">
         {/* Flow design element FIRST in DOM so it paints behind the boards.
@@ -468,16 +486,11 @@ export default function App() {
         }
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
+        note={moveNote('p2')}
       />
-      {/* Concept reference: small translucent thumbnail of the FAN SPREAD
-          ARRAY render in the bottom-right corner. Reminds the viewer of
-          the ideal 3D vision while the actual playing surface above is
-          optimized for tappable cells on a phone. */}
-      <img
-        src="/fan-spread-array.png"
-        alt="Fan Spread Array — ideal 3D vision (playing surface above is optimized for playability)"
-        className="layout-reference"
-        aria-hidden="true"
+      <EndGameOverlay
+        state={state}
+        onPlayAgain={() => dispatch({ type: 'new-game' })}
       />
     </main>
   );
