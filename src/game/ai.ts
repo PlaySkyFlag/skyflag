@@ -206,6 +206,14 @@ function minimax(
 }
 
 export function chooseAction(state: GameState): Action | null {
+  // History isn't read by the search and the reducer clones the array on
+  // every action. Stripping it on entry removes that growing per-clone
+  // cost, which is the main reason the AI was getting laggy mid-game now
+  // that the move history feature ships entries with every action.
+  if (state.history.length > 0) {
+    state = { ...state, history: [] };
+  }
+
   const actions = legalActions(state);
   if (actions.length === 0) return null;
 
