@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { createInitialGameState } from './game/constants';
 import { getUserId } from './game/identity';
 import { isMultiplayerAvailable, supabase } from './game/supabase';
-import type { Player } from './game/types';
+import type { RoomState } from './game/types';
 
-export type RoomState = {
-  code: string;
-  role: Player;
-  status: 'waiting' | 'playing';
-};
+export type { RoomState };
+
+// Reject room codes that look "expired" — the Supabase row exists but is
+// older than this threshold. Stops a forgotten week-old code from being
+// accidentally re-joined by someone with the same userId.
+const ROOM_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 type Props = {
   room: RoomState | null;
@@ -97,6 +98,14 @@ export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
       if (fetchErr) throw fetchErr;
       if (!existing) {
         throw new Error(`No room ${cleaned} — check the code`);
+      }
+      // Reject rooms older than the max age — abandoned rows shouldn't be
+      // reusable. created_at is set by the table default on insert.
+      if (existing.created_at) {
+        const ageMs = Date.now() - new Date(existing.created_at).getTime();
+        if (ageMs > ROOM_MAX_AGE_MS) {
+          throw new Error(`Room ${cleaned} expired — ask for a fresh code`);
+        }
       }
       // Reconnecting as P1 (same device, same userId).
       if (existing.p1_id === userId) {

@@ -98,6 +98,17 @@ export type HistoryEntry =
       player: Player;
     };
 
+// ─── Multiplayer room ──────────────────────────────────────────────────────
+
+// Per-device snapshot of which Supabase room the user is in. Persisted to
+// localStorage so a refresh restores the room (the Supabase row is the
+// authoritative source of truth — this just remembers our seat).
+export type RoomState = {
+  code: string;
+  role: Player;
+  status: 'waiting' | 'playing';
+};
+
 // ─── Whole game state ──────────────────────────────────────────────────────
 
 export type GameState = {

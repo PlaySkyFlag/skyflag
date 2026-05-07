@@ -18,6 +18,20 @@ function generateUserId(): string {
 }
 
 export function getUserId(): string {
+  // Dev/test override: ?u=<anything> in the URL forces that value as the
+  // userId for this tab without touching localStorage. Lets two browser
+  // tabs in the same profile pretend to be different players (?u=alice
+  // vs ?u=bob) for solo multiplayer testing.
+  if (typeof window !== 'undefined') {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const override = params.get('u');
+      if (override) return `override:${override}`;
+    } catch {
+      // URL parsing shouldn't fail, but fall through if it does.
+    }
+  }
+
   try {
     const existing = localStorage.getItem(STORAGE_KEY);
     if (existing) return existing;

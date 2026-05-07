@@ -3,7 +3,7 @@ import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import EndGameOverlay from './EndGameOverlay';
 import Help from './Help';
 import MoveHistory from './MoveHistory';
-import Multiplayer, { type RoomState } from './Multiplayer';
+import Multiplayer from './Multiplayer';
 import PieceTray from './PieceTray';
 import StatusBar from './StatusBar';
 import { chooseAction } from './game/ai';
@@ -19,7 +19,7 @@ import {
 import { legalMovesFor, pieceAt, sameCoord } from './game/moves';
 import { reduce } from './game/reducer';
 import { loadSession, saveSession } from './game/storage';
-import type { Coord, GameState, Layer, PieceId, PieceKind, Player } from './game/types';
+import type { Coord, GameState, Layer, PieceId, PieceKind, Player, RoomState } from './game/types';
 import './App.css';
 
 const AI_THINK_DELAY_MS = 600;
@@ -135,16 +135,18 @@ export default function App() {
   const [aiPlayer, setAiPlayer] = useState<Player | null>(
     INITIAL_SESSION?.aiPlayer ?? 'p2',
   );
-  const [room, setRoom] = useState<RoomState | null>(null);
+  const [room, setRoom] = useState<RoomState | null>(
+    INITIAL_SESSION?.room ?? null,
+  );
   // Tracks whether a state change came from a remote sync, so the local
   // "push to Supabase" effect doesn't echo it back into a feedback loop.
   const remoteSyncInFlight = useRef(false);
 
-  // Auto-save on any state or AI-mode change. Selection state is transient
-  // and intentionally not persisted.
+  // Auto-save game state, AI mode, and room (so a refresh keeps you in
+  // the same Supabase room). Selection state is transient and not persisted.
   useEffect(() => {
-    saveSession({ game: state, aiPlayer });
-  }, [state, aiPlayer]);
+    saveSession({ game: state, aiPlayer, room });
+  }, [state, aiPlayer, room]);
 
   // Multiplayer: when entering a room, hydrate local state from the row
   // in Supabase, then subscribe to realtime UPDATE events so the opponent's

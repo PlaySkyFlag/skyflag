@@ -1,10 +1,12 @@
-import type { GameState, Player } from './types';
+import type { GameState, Player, RoomState } from './types';
 
 const STORAGE_KEY = 'skyflag.session.v1';
 
 export type Session = {
   game: GameState;
   aiPlayer: Player | null;
+  // Optional so legacy saves without it still parse cleanly.
+  room?: RoomState | null;
 };
 
 // Load a saved session if present and parseable. Returns null if there is
