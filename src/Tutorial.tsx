@@ -158,9 +158,27 @@ export default function Tutorial({ state, open, onClose }: Props) {
       <h3 className="tutorial-title">{STAGE_TITLES[stage]}</h3>
       <div className="tutorial-body">{body}</div>
       <div className="tutorial-actions">
+        {stage > 0 && stage < 4 && (
+          <button
+            type="button"
+            className="end-game-btn end-game-btn--subtle"
+            onClick={() => setStage((s) => Math.max(0, s - 1))}
+          >
+            Back
+          </button>
+        )}
         {stage === 0 && (
           <button type="button" className="end-game-btn" onClick={() => setStage(1)}>
             Begin
+          </button>
+        )}
+        {stage > 0 && stage < 4 && (
+          <button
+            type="button"
+            className="end-game-btn"
+            onClick={() => setStage((s) => Math.min(4, s + 1))}
+          >
+            Next
           </button>
         )}
         {stage === 4 && (
