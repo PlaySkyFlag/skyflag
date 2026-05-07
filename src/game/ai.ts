@@ -1,12 +1,82 @@
 import { DEPLOY_COORDS, FLAG_COORDS, NEXUS_COORD } from './constants';
 import { legalMovesFor } from './moves';
 import { reduce, type Action } from './reducer';
-import type { Coord, GameState, Layer, PieceKind, Player } from './types';
+import type {
+  CaptainPiece,
+  Coord,
+  GameState,
+  Layer,
+  PieceKind,
+  Player,
+  SoldierPiece,
+} from './types';
 import { opponentOf } from './types';
 
-// Search depth in plies (one ply = one activation). 3 plies ≈ 1.5 turns of
-// foresight. Tunable; raising it makes the AI stronger but slower.
-const SEARCH_DEPTH = 3;
+// Search depth in plies (one ply = one activation). 4 plies = exactly two
+// full turns of foresight (you + opponent), the qualitative jump where the
+// AI starts seeing trades and counter-attacks. Runs on the Web Worker so
+// UI stays smooth even when search takes longer.
+const SEARCH_DEPTH = 4;
+
+// ─── Transposition table ───────────────────────────────────────────────────
+// Caches search results so the same position reached via different move
+// orders doesn't get re-searched. Bound on size — Map iteration order is
+// insertion order, so we evict the oldest entries when the cap is hit.
+type TTEntry = {
+  depth: number;
+  score: number;
+  // 'exact' = score is the true minimax value at this depth.
+  // 'lower' = score is a lower bound (failed high — true value ≥ score).
+  // 'upper' = score is an upper bound (failed low — true value ≤ score).
+  flag: 'exact' | 'lower' | 'upper';
+  // Best action found at this node, used for move ordering on revisit.
+  bestAction?: Action;
+};
+
+const TT_MAX_SIZE = 60_000;
+const transTable = new Map<string, TTEntry>();
+
+function ttSet(key: string, entry: TTEntry): void {
+  if (transTable.size >= TT_MAX_SIZE) {
+    const oldestKey = transTable.keys().next().value;
+    if (oldestKey !== undefined) transTable.delete(oldestKey);
+  }
+  transTable.set(key, entry);
+}
+
+// Compact string hash of every state attribute that influences future
+// search. History/captured/status are not included — they don't change
+// future play (status is checked separately). Pieces are sorted by id so
+// equivalent states with different array orderings hash to the same key.
+function hashState(s: GameState): string {
+  const board = [...s.onBoard]
+    .sort((a, b) => (a.piece.id < b.piece.id ? -1 : 1))
+    .map((bp) => {
+      const p = bp.piece;
+      const kind = p.kind[0];
+      const owner = p.owner === 'p1' ? '1' : '2';
+      let meta = '';
+      if (p.kind === 'captain' && (p as CaptainPiece).promotedFromSoldier) meta = 'P';
+      else if (p.kind === 'soldier' && (p as SoldierPiece).hasMoved) meta = 'M';
+      return `${p.id}@${bp.coord.layer[0]}${bp.coord.row}${bp.coord.col}${kind}${owner}${meta}`;
+    })
+    .join('|');
+  const handP1 = [...s.inHand.p1].map((p) => p.id).sort().join(',');
+  const handP2 = [...s.inHand.p2].map((p) => p.id).sort().join(',');
+  const flags =
+    (s.flags.ground.p1 ? '1' : '0') +
+    (s.flags.ground.p2 ? '1' : '0') +
+    (s.flags.sky.p1 ? '1' : '0') +
+    (s.flags.sky.p2 ? '1' : '0') +
+    (s.flags.space.p1 ? '1' : '0') +
+    (s.flags.space.p2 ? '1' : '0');
+  return `${s.currentPlayer}:${s.activationsRemaining}:${s.turnNumber}:${flags}|B${board}|h1${handP1}|h2${handP2}`;
+}
+
+// Quiescence search extends beyond SEARCH_DEPTH but only follows capture
+// moves, so the AI can't be tricked by the "horizon effect" — walking into
+// a capture because the regular search stopped one ply before the trap.
+const QUIESCENCE_DEPTH = 4;
 
 const WIN_SCORE = 1_000_000;
 const LAYER_INDEX: Record<Layer, number> = { ground: 0, sky: 1, space: 2 };
@@ -87,6 +157,24 @@ function closestDistToTarget(state: GameState, p: Player): number {
   return best;
 }
 
+// Computes both the "attack set" (squares the player could move a piece
+// onto, i.e. capture targets) and the raw mobility count in one pass.
+// Used together inside evaluate() so we don't iterate pieces twice.
+function attackInfo(
+  state: GameState,
+  player: Player,
+): { squares: Set<string>; mobility: number } {
+  const squares = new Set<string>();
+  let mobility = 0;
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner !== player) continue;
+    const moves = legalMovesFor(bp, state);
+    mobility += moves.length;
+    for (const t of moves) squares.add(`${t.layer}:${t.row}:${t.col}`);
+  }
+  return { squares, mobility };
+}
+
 // Static evaluation of `state` from `aiPlayer`'s perspective. Higher = better
 // for aiPlayer. Deterministic — minimax requires same input → same output.
 function evaluate(state: GameState, aiPlayer: Player): number {
@@ -118,6 +206,32 @@ function evaluate(state: GameState, aiPlayer: Player): number {
   const oppDist = closestDistToTarget(state, opp);
   if (myDist  !== Infinity) score -= myDist * 3;
   if (oppDist !== Infinity) score += oppDist * 3;
+
+  // Threats and mobility — computed in one sweep per side.
+  const myInfo  = attackInfo(state, aiPlayer);
+  const oppInfo = attackInfo(state, opp);
+
+  // Mobility: each legal move is worth ~1 point. More options = better
+  // position. Helps the AI prefer flexible setups over cornered ones.
+  score += myInfo.mobility  * 1.2;
+  score -= oppInfo.mobility * 1.2;
+
+  // Threat detection — for every piece, check whether the opponent can
+  // capture it next ply. Threatened pieces lose ~25% of their value as
+  // pressure penalty (proxy for "we'll trade material if not careful").
+  // Captain threats are extra-bad because losing the Captain ends the game.
+  for (const bp of state.onBoard) {
+    const key = `${bp.coord.layer}:${bp.coord.row}:${bp.coord.col}`;
+    const owner = bp.piece.owner;
+    const value = pieceValue(bp.piece.kind);
+    if (owner === aiPlayer && oppInfo.squares.has(key)) {
+      score -= value * 0.25;
+      if (bp.piece.kind === 'captain') score -= 80;
+    } else if (owner === opp && myInfo.squares.has(key)) {
+      score += value * 0.25;
+      if (bp.piece.kind === 'captain') score += 80;
+    }
+  }
 
   return score;
 }
@@ -159,6 +273,104 @@ function orderActions(state: GameState, actions: Action[]): Action[] {
     .map((s) => s.a);
 }
 
+// Same as `orderActions` but boosts the priority of `priority` to first
+// position. Used when the transposition table tells us a move was best
+// at a previous (shallower) search — trying it first usually produces
+// the strongest alpha-beta cuts on this revisit.
+function orderActionsWithPriority(
+  state: GameState,
+  actions: Action[],
+  priority: Action | undefined,
+): Action[] {
+  const ordered = orderActions(state, actions);
+  if (!priority) return ordered;
+  const idx = ordered.findIndex((a) => actionsEqual(a, priority));
+  if (idx <= 0) return ordered;
+  const [picked] = ordered.splice(idx, 1);
+  ordered.unshift(picked);
+  return ordered;
+}
+
+function actionsEqual(a: Action, b: Action): boolean {
+  if (a.type !== b.type) return false;
+  if (a.type === 'deploy' && b.type === 'deploy') return a.pieceId === b.pieceId;
+  if (a.type === 'move' && b.type === 'move')
+    return (
+      a.pieceId === b.pieceId &&
+      a.to.layer === b.to.layer &&
+      a.to.row === b.to.row &&
+      a.to.col === b.to.col
+    );
+  return false;
+}
+
+// Detects whether `action` lands on an opponent piece — i.e. is a capture.
+// Used by quiescence to follow only captures past the regular search depth.
+function isCapture(state: GameState, action: Action): boolean {
+  if (action.type !== 'move') return false;
+  return state.onBoard.some(
+    (bp) =>
+      bp.coord.layer === action.to.layer &&
+      bp.coord.row === action.to.row &&
+      bp.coord.col === action.to.col &&
+      bp.piece.owner !== state.currentPlayer,
+  );
+}
+
+// Quiescence search: when minimax hits depth 0, instead of returning
+// evaluate() blindly, keep going as long as captures are pending. The
+// "stand pat" pattern lets a side decline to capture if doing so would
+// worsen its position (the standing eval is treated as a lower bound for
+// the maximiser, upper bound for the minimiser). Bounded by a small extra
+// depth to prevent runaway recursion in capture-rich positions.
+function quiescence(
+  state: GameState,
+  alpha: number,
+  beta: number,
+  aiPlayer: Player,
+  depth: number,
+): number {
+  if (depth === 0 || state.status.kind !== 'in-progress') {
+    return evaluate(state, aiPlayer);
+  }
+
+  const standPat = evaluate(state, aiPlayer);
+  const isMax = state.currentPlayer === aiPlayer;
+
+  if (isMax) {
+    if (standPat >= beta) return beta;
+    if (standPat > alpha) alpha = standPat;
+  } else {
+    if (standPat <= alpha) return alpha;
+    if (standPat < beta) beta = standPat;
+  }
+
+  const captures = legalActions(state).filter((a) => isCapture(state, a));
+  if (captures.length === 0) return standPat;
+
+  const ordered = orderActions(state, captures);
+
+  if (isMax) {
+    let value = standPat;
+    for (const action of ordered) {
+      const next = reduce(state, action);
+      value = Math.max(value, quiescence(next, alpha, beta, aiPlayer, depth - 1));
+      alpha = Math.max(alpha, value);
+      if (alpha >= beta) break;
+    }
+    return value;
+  }
+
+  let value = standPat;
+  for (const action of ordered) {
+    const next = reduce(state, action);
+    value = Math.min(value, quiescence(next, alpha, beta, aiPlayer, depth - 1));
+    beta = Math.min(beta, value);
+    if (alpha >= beta) break;
+  }
+  return value;
+}
+
 // Minimax with alpha-beta. `aiPlayer` is fixed throughout the search (the side
 // we're optimising for). Whether a node is a max- or min-node depends on
 // whether state.currentPlayer matches `aiPlayer`.
@@ -169,8 +381,27 @@ function minimax(
   beta: number,
   aiPlayer: Player,
 ): number {
-  if (depth === 0 || state.status.kind !== 'in-progress') {
+  if (state.status.kind !== 'in-progress') {
     return evaluate(state, aiPlayer);
+  }
+  if (depth === 0) {
+    return quiescence(state, alpha, beta, aiPlayer, QUIESCENCE_DEPTH);
+  }
+
+  // Save originals — needed below to know whether the final score is an
+  // exact value or a bound, which determines the TT entry flag.
+  const alphaOrig = alpha;
+  const betaOrig = beta;
+
+  // Transposition-table probe: if we already searched this exact position
+  // to at least the depth we need, reuse the cached result (or tighten
+  // alpha/beta from the cached bound).
+  const ttKey = hashState(state);
+  const ttHit = transTable.get(ttKey);
+  if (ttHit && ttHit.depth >= depth) {
+    if (ttHit.flag === 'exact') return ttHit.score;
+    if (ttHit.flag === 'lower' && ttHit.score >= beta) return ttHit.score;
+    if (ttHit.flag === 'upper' && ttHit.score <= alpha) return ttHit.score;
   }
 
   const actions = legalActions(state);
@@ -181,27 +412,40 @@ function minimax(
     return minimax(next, depth - 1, alpha, beta, aiPlayer);
   }
 
-  const ordered = orderActions(state, actions);
+  const ordered = orderActionsWithPriority(state, actions, ttHit?.bestAction);
   const isMax = state.currentPlayer === aiPlayer;
 
-  if (isMax) {
-    let value = -Infinity;
-    for (const action of ordered) {
-      const next = reduce(state, action);
-      value = Math.max(value, minimax(next, depth - 1, alpha, beta, aiPlayer));
-      alpha = Math.max(alpha, value);
-      if (alpha >= beta) break;
-    }
-    return value;
-  }
+  let value = isMax ? -Infinity : Infinity;
+  let bestAction: Action | undefined;
 
-  let value = Infinity;
   for (const action of ordered) {
     const next = reduce(state, action);
-    value = Math.min(value, minimax(next, depth - 1, alpha, beta, aiPlayer));
-    beta = Math.min(beta, value);
+    const childValue = minimax(next, depth - 1, alpha, beta, aiPlayer);
+    if (isMax) {
+      if (childValue > value) {
+        value = childValue;
+        bestAction = action;
+      }
+      alpha = Math.max(alpha, value);
+    } else {
+      if (childValue < value) {
+        value = childValue;
+        bestAction = action;
+      }
+      beta = Math.min(beta, value);
+    }
     if (alpha >= beta) break;
   }
+
+  // Determine the TT entry flag from how the score relates to the original
+  // window. Exact means we explored the full window without cutoff;
+  // lower/upper means we hit a beta/alpha cutoff and the score is a bound.
+  let flag: TTEntry['flag'] = 'exact';
+  if (value <= alphaOrig) flag = 'upper';
+  else if (value >= betaOrig) flag = 'lower';
+
+  ttSet(ttKey, { depth, score: value, flag, bestAction });
+
   return value;
 }
 
@@ -218,23 +462,41 @@ export function chooseAction(state: GameState): Action | null {
   if (actions.length === 0) return null;
 
   const aiPlayer = state.currentPlayer;
-  const ordered = orderActions(state, actions);
 
-  // Top-level: evaluate each candidate fully (no top-level pruning since
-  // we want the actual best score for tiebreaking).
-  let bestValue = -Infinity;
-  const scored: Array<{ action: Action; value: number }> = [];
-  let alpha = -Infinity;
+  // Iterative deepening: search depth 1, 2, ..., SEARCH_DEPTH. At each
+  // iteration the best action found so far is moved to the front of the
+  // ordering for the next iteration, which gives alpha-beta much better
+  // cuts (the strongest move tried first → pruning happens immediately
+  // instead of after most of the tree has been explored). The cost of
+  // the shallow searches is negligible compared to the savings.
+  // Transposition table carries cached scores between iterations.
+  let lastBestAction: Action | undefined;
+  let scored: Array<{ action: Action; value: number }> = [];
 
-  for (const action of ordered) {
-    const next = reduce(state, action);
-    const value = minimax(next, SEARCH_DEPTH - 1, alpha, Infinity, aiPlayer);
-    scored.push({ action, value });
-    if (value > bestValue) bestValue = value;
-    alpha = Math.max(alpha, value);
+  for (let depth = 1; depth <= SEARCH_DEPTH; depth++) {
+    const ordered = orderActionsWithPriority(state, actions, lastBestAction);
+    let bestValue = -Infinity;
+    let alpha = -Infinity;
+    const iterScored: Array<{ action: Action; value: number }> = [];
+
+    for (const action of ordered) {
+      const next = reduce(state, action);
+      const value = minimax(next, depth - 1, alpha, Infinity, aiPlayer);
+      iterScored.push({ action, value });
+      if (value > bestValue) {
+        bestValue = value;
+        lastBestAction = action;
+      }
+      alpha = Math.max(alpha, value);
+    }
+
+    scored = iterScored;
   }
 
+  if (scored.length === 0) return null;
+
   // Random tiebreak among top-scoring actions.
+  const bestValue = Math.max(...scored.map((s) => s.value));
   const top = scored.filter((s) => s.value === bestValue);
   return top[Math.floor(Math.random() * top.length)].action;
 }
