@@ -9,9 +9,8 @@ import type { GameState } from './game/types';
 //   0 Welcome             — manual "Begin" button
 //   1 How to win          — manual Next button (info-only)
 //   2 First activation    — player records any deploy/move (history grows)
-//   3 Second activation   — another deploy/move
-//   4 End your turn       — an end-turn entry appears
-//   5 Last tips           — manual "Got it" button to finish
+//   3 Second activation   — another deploy/move (turn auto-ends after this)
+//   4 Last tips           — manual "Got it" button to finish
 
 type Props = {
   state: GameState;
@@ -19,7 +18,7 @@ type Props = {
   onClose: () => void;
 };
 
-const TOTAL_STAGES = 6;
+const TOTAL_STAGES = 5;
 const FINAL_STAGE = TOTAL_STAGES - 1;
 
 const STAGE_TITLES: Record<number, string> = {
@@ -27,8 +26,7 @@ const STAGE_TITLES: Record<number, string> = {
   1: 'How to win',
   2: 'Try your first activation',
   3: 'Now your second activation',
-  4: 'End your turn',
-  5: 'You’re playing!',
+  4: 'You’re playing!',
 };
 
 export default function Tutorial({ state, open, onClose }: Props) {
@@ -36,8 +34,7 @@ export default function Tutorial({ state, open, onClose }: Props) {
 
   // Track how many history entries we've already considered so we don't
   // reapply old advances when state churns. Reset only when the tutorial
-  // OPENS (not on every history change — otherwise each move re-runs this
-  // effect and resets stage back to 0, which is the bug we just fixed).
+  // OPENS (not on every history change).
   const seenLen = useRef(state.history.length);
   useEffect(() => {
     if (open) {
@@ -48,8 +45,7 @@ export default function Tutorial({ state, open, onClose }: Props) {
   }, [open]);
 
   // Advance stages by watching history. Auto-advance only fires from the
-  // gameplay stages (2-4) — the info stages (0, 1) and the final tips
-  // stage (5) require manual Next/Got it.
+  // gameplay stages (2-3). Final tips stage (4) requires manual Got it.
   useEffect(() => {
     if (!open) return;
     if (stage < 2 || stage >= FINAL_STAGE) return;
@@ -62,8 +58,6 @@ export default function Tutorial({ state, open, onClose }: Props) {
         nextStage = 3;
       } else if (nextStage === 3 && (entry.kind === 'deploy' || entry.kind === 'move')) {
         nextStage = 4;
-      } else if (nextStage === 4 && entry.kind === 'end-turn') {
-        nextStage = 5;
       }
     }
     seenLen.current = len;
@@ -104,12 +98,15 @@ export default function Tutorial({ state, open, onClose }: Props) {
               </li>
             </ul>
             <p>
-              The game ends in a draw if turn 30 is reached without a winner.
+              <strong>Promotion:</strong> a Soldier (<span className="tut-glyph">♟</span>) that
+              reaches the far row of <em>Terran</em> (the opponent's back rank,
+              where their flag started) immediately promotes to a Captain
+              (<span className="tut-glyph">♚</span>). Promoted Captains move
+              and capture flags exactly like your starting Captain — a great
+              way to add more flag-runners or replace a fallen Captain.
             </p>
             <p className="tut-aside">
-              You'll start with a fresh tray of pieces — deploy them onto
-              Terran, then push toward the enemy's territory. Lifts let you
-              cross between layers (more on those soon).
+              The game ends in a draw if turn 30 is reached without a winner.
             </p>
           </>
         );
@@ -128,6 +125,10 @@ export default function Tutorial({ state, open, onClose }: Props) {
               <strong>Move:</strong> tap a piece on the board, then tap a gold
               dot to move there.
             </p>
+            <p className="tut-aside">
+              Your turn ends automatically once both activations are spent —
+              no End Turn button needed.
+            </p>
           </>
         );
       case 3:
@@ -139,19 +140,13 @@ export default function Tutorial({ state, open, onClose }: Props) {
               piece this time, or deploy another, or move the one you just
               placed.
             </p>
-          </>
-        );
-      case 4:
-        return (
-          <>
-            <p>You've spent both activations.</p>
-            <p>
-              Click <strong>"End turn"</strong> in the HUD to pass play to your
-              opponent. (Unused activations are forfeited.)
+            <p className="tut-aside">
+              Once you spend it, your turn passes to your opponent
+              automatically.
             </p>
           </>
         );
-      case 5:
+      case 4:
         return (
           <>
             <p>

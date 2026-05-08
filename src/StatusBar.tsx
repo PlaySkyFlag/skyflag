@@ -20,7 +20,6 @@ type Props = {
   onSetMode: (mode: Mode) => void;
   difficulty: Difficulty;
   onSetDifficulty: (d: Difficulty) => void;
-  onEndTurn: () => void;
   onNewGame: () => void;
 };
 
@@ -38,7 +37,6 @@ export default function StatusBar({
   onSetMode,
   difficulty,
   onSetDifficulty,
-  onEndTurn,
   onNewGame,
 }: Props) {
   const [mutedNow, setMutedNow] = useState(isMuted());
@@ -134,7 +132,6 @@ export default function StatusBar({
           Turn {state.turnNumber} / {TURN_LIMIT}
         </span>
         <span className="hud-divider">·</span>
-        <button type="button" className="hud-btn" onClick={onEndTurn} disabled={isAiTurn}>End turn</button>
         <button type="button" className="hud-btn hud-btn-subtle" onClick={onNewGame}>New game</button>
         {modeControl}
         {difficultyControl}

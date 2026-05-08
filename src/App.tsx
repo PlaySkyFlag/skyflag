@@ -12,6 +12,7 @@ import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { loadProfile, type Profile } from './game/profile';
 import { recordGame, type StatsMode } from './game/stats';
+import { legalActions } from './game/ai';
 import AiWorker from './game/aiWorker?worker';
 import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
 import { supabase } from './game/supabase';
@@ -542,6 +543,25 @@ export default function App() {
     (room.status !== 'playing' || state.currentPlayer !== room.role);
   const isInputBlocked = isAiTurn || isMpBlocking;
 
+  // End-of-turn is automatic — the End Turn button was removed from the
+  // HUD. We dispatch `end-turn` after a short visible delay whenever the
+  // human side has used both activations OR has no legal action left
+  // (covering #6: a stuck player with no deploys/moves still ends turn
+  // cleanly instead of locking the UI). The AI's loop handles its own
+  // end-of-turn separately, so guard on !isAiTurn to avoid duplicates.
+  useEffect(() => {
+    if (!inProgress) return;
+    if (isAiTurn) return;
+    if (isMpBlocking) return;
+    const noActsLeft = state.activationsRemaining <= 0;
+    const noLegal = !noActsLeft && legalActions(state).length === 0;
+    if (!noActsLeft && !noLegal) return;
+    const timer = setTimeout(() => {
+      dispatch({ type: 'end-turn' });
+    }, 380);
+    return () => clearTimeout(timer);
+  }, [state, inProgress, isAiTurn, isMpBlocking]);
+
   const selectedBoardPiece =
     selection?.kind === 'board'
       ? state.onBoard.find((bp) => bp.piece.id === selection.pieceId)
@@ -699,10 +719,6 @@ export default function App() {
         onSetMode={setAiPlayer}
         difficulty={difficulty}
         onSetDifficulty={setDifficulty}
-        onEndTurn={() => {
-          if (isInputBlocked) return;
-          dispatch({ type: 'end-turn' });
-        }}
         onNewGame={() => dispatch({ type: 'new-game' })}
       />
       <div className="help-row">
@@ -717,6 +733,10 @@ export default function App() {
         </button>
         <Multiplayer
           room={room}
+          // 2P mode (no AI) auto-expands the Multiplayer panel so the
+          // lobby + room-code controls are immediately visible — the
+          // player can pick hot-seat (just play here) or online.
+          forceOpen={aiPlayer === null}
           onRoomEntered={setRoom}
           onLeave={() => setRoom(null)}
         />

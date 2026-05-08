@@ -24,6 +24,10 @@ const ROOM_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 type Props = {
   room: RoomState | null;
+  // When true, the Multiplayer panel is forced open even outside a room.
+  // Used so picking "2P" mode auto-expands the panel and shows the lobby
+  // / room-code controls (the user can either play hot-seat OR online).
+  forceOpen?: boolean;
   onRoomEntered: (room: RoomState) => void;
   onLeave: () => void;
 };
@@ -164,7 +168,7 @@ function NotificationsControl() {
   );
 }
 
-export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
+export default function Multiplayer({ room, forceOpen = false, onRoomEntered, onLeave }: Props) {
   const { user: authUser } = useAuthUser();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [code, setCode] = useState('');
@@ -294,7 +298,7 @@ export default function Multiplayer({ room, onRoomEntered, onLeave }: Props) {
   };
 
   return (
-    <details className="help" open={inRoom}>
+    <details className="help" open={inRoom || forceOpen}>
       <summary className="help-summary">Multiplayer</summary>
       <div className="help-body">
         {!inRoom && authUser && (

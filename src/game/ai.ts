@@ -84,7 +84,12 @@ const LAYER_INDEX: Record<Layer, number> = { ground: 0, sky: 1, space: 2 };
 
 function pieceValue(kind: PieceKind): number {
   switch (kind) {
-    case 'captain': return 100;
+    // Captain bumped 100 → 350 — losing your last Captain ends the game,
+    // so the AI should treat Captain material as fundamentally different
+    // from minor pieces. The previous 100 was too close to a Soldier
+    // and let the search trade Captain-for-Soldier swaps as if they
+    // were near-equal exchanges.
+    case 'captain': return 350;
     case 'soldier': return 60;
     case 'rover':   return 30;
     case 'pilot':   return 30;
@@ -218,21 +223,40 @@ function evaluate(state: GameState, aiPlayer: Player): number {
   score -= oppInfo.mobility * 1.2;
 
   // Threat detection — for every piece, check whether the opponent can
-  // capture it next ply. Threatened pieces lose ~25% of their value as
-  // pressure penalty (proxy for "we'll trade material if not careful").
-  // Captain threats are extra-bad because losing the Captain ends the game.
+  // capture it next ply. Threatened pieces lose 40% of their value as a
+  // pressure penalty (was 25% — bumped because mid-game observation
+  // showed the AI was happy to leave pieces hanging). Captain threats
+  // get an additional fixed penalty since losing your last Captain ends
+  // the game outright. We also count the AI's own Captains and apply
+  // an extra "exposed Captain" multiplier when the threat is from a
+  // capable attacker, so the AI strongly prefers to retreat or defend.
+  let myCaptainsThreatened = 0;
+  let oppCaptainsThreatened = 0;
   for (const bp of state.onBoard) {
     const key = `${bp.coord.layer}:${bp.coord.row}:${bp.coord.col}`;
     const owner = bp.piece.owner;
     const value = pieceValue(bp.piece.kind);
     if (owner === aiPlayer && oppInfo.squares.has(key)) {
-      score -= value * 0.25;
-      if (bp.piece.kind === 'captain') score -= 80;
+      score -= value * 0.40;
+      if (bp.piece.kind === 'captain') {
+        score -= 250;
+        myCaptainsThreatened++;
+      }
     } else if (owner === opp && myInfo.squares.has(key)) {
-      score += value * 0.25;
-      if (bp.piece.kind === 'captain') score += 80;
+      score += value * 0.40;
+      if (bp.piece.kind === 'captain') {
+        score += 250;
+        oppCaptainsThreatened++;
+      }
     }
   }
+
+  // Multi-Captain hazards: if the AI has any Captain threatened AND
+  // can't defend or retreat both, the situation compounds. Apply an
+  // extra fork-style penalty per threatened Captain past the first
+  // (the first one already lost 250 above).
+  if (myCaptainsThreatened > 1) score -= 200 * (myCaptainsThreatened - 1);
+  if (oppCaptainsThreatened > 1) score += 200 * (oppCaptainsThreatened - 1);
 
   return score;
 }
