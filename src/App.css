@@ -1148,6 +1148,35 @@ button.tray-piece:hover {
   margin-top: 4px;
 }
 
+/* Flash toast — short-lived hint shown when a click silently failed
+   (stuck piece selected, deploy pad blocked, etc.). Pinned to the
+   bottom-center so it's visible without obscuring play. */
+.flash-toast {
+  position: fixed;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(8, 14, 28, 0.94);
+  border: 1px solid rgba(255, 216, 132, 0.55);
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  max-width: min(560px, calc(100vw - 32px));
+  text-align: center;
+  z-index: 80;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  animation: flash-rise 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@keyframes flash-rise {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
 /* Account modal — sign-in / profile-edit form. Same dark navy treatment
    as the end-game overlay so the visual language stays consistent. */
 .account-overlay {

@@ -585,15 +585,45 @@ export default function App() {
     }
   }
 
+  // Flash toast — short-lived hint shown when an action would silently
+  // fail. Used to explain why a click "did nothing" instead of leaving
+  // the player staring at the board (the #7 frustration: stuck pieces
+  // and blocked deploy pads with no feedback).
+  const [flashMsg, setFlashMsg] = useState<string | null>(null);
+  useEffect(() => {
+    if (!flashMsg) return;
+    const t = setTimeout(() => setFlashMsg(null), 3200);
+    return () => clearTimeout(t);
+  }, [flashMsg]);
+  const flash = (msg: string) => setFlashMsg(msg);
+
+  // Is the current player's deploy pad occupied (by any piece)? Used to
+  // gate the pad's "drop me here" highlight and to flash a hint when the
+  // player tries to deploy onto a blocked pad.
+  const myDeployBlocked = inProgress
+    ? pieceAt(state, DEPLOY_COORDS[state.currentPlayer]) !== undefined
+    : false;
+
   const handleSelectHandPiece = (id: PieceId) => {
     if (isInputBlocked) return;
-    setSelection((prev) => (prev?.kind === 'hand' && prev.pieceId === id ? null : { kind: 'hand', pieceId: id }));
+    setSelection((prev) =>
+      prev?.kind === 'hand' && prev.pieceId === id ? null : { kind: 'hand', pieceId: id },
+    );
+    if (myDeployBlocked) {
+      flash(
+        'Your deploy pad is occupied — move that piece off the pad before deploying a new one.',
+      );
+    }
   };
 
   const handleDeployClick = (player: Player) => {
     if (!inProgress || isInputBlocked) return;
     if (player !== state.currentPlayer) return;
     if (selection?.kind !== 'hand') return;
+    if (myDeployBlocked) {
+      flash('Deploy pad is occupied. Move the piece off the pad first.');
+      return;
+    }
     dispatch({ type: 'deploy', pieceId: selection.pieceId });
     setSelection(null);
   };
@@ -613,9 +643,17 @@ export default function App() {
     }
 
     // 2. If the clicked cell holds the current player's piece → select it.
+    //    Flash a hint if the piece has no legal destinations so the user
+    //    knows their click registered but the piece is genuinely stuck.
     const occupant = pieceAt(state, target);
     if (occupant && occupant.piece.owner === state.currentPlayer) {
       setSelection({ kind: 'board', pieceId: occupant.piece.id });
+      const moves = legalMovesFor(occupant, state);
+      if (moves.length === 0) {
+        flash(
+          "That piece has no legal moves from here — try a different one, or use a lift.",
+        );
+      }
       return;
     }
 
@@ -623,8 +661,13 @@ export default function App() {
     setSelection(null);
   };
 
+  // Pad lights up only when (a) a hand piece is selected AND (b) the pad
+  // is actually free. Avoids the silent-fail trap where the pad glows but
+  // tapping it does nothing because something is sitting on it.
   const activeDeployPlayer: Player | null =
-    selection?.kind === 'hand' && inProgress ? state.currentPlayer : null;
+    selection?.kind === 'hand' && inProgress && !myDeployBlocked
+      ? state.currentPlayer
+      : null;
 
   // Per-player move note shown next to each tray label so each side has an
   // at-a-glance status (activations left, "waiting", win/lose) without
@@ -869,6 +912,11 @@ export default function App() {
         state={state}
         onPlayAgain={() => dispatch({ type: 'new-game' })}
       />
+      {flashMsg && (
+        <div className="flash-toast" role="status" aria-live="polite">
+          {flashMsg}
+        </div>
+      )}
       <Tutorial state={state} open={tutorialOpen} onClose={closeTutorial} />
       <AccountModal
         user={authUser}
