@@ -290,6 +290,23 @@ function applyEndTurn(state: GameState): GameState {
   });
 }
 
+// True if `player` has at least one legal action available right now —
+// either a deploy (hand piece + free pad) or any movable on-board piece.
+// Used by passInitiative for the stalemate / no-progress checks.
+function canActAt(state: GameState, player: Player): boolean {
+  if (
+    state.inHand[player].length > 0 &&
+    !isOccupied(state, DEPLOY_COORDS[player])
+  ) {
+    return true;
+  }
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner !== player) continue;
+    if (legalMovesFor(bp, state).length > 0) return true;
+  }
+  return false;
+}
+
 function passInitiative(state: GameState): GameState {
   const nextTurn = state.turnNumber + 1;
   // Turn-limit draw: 180 turns without a win → game ends. Tiebreakers from
@@ -302,10 +319,31 @@ function passInitiative(state: GameState): GameState {
       status: { kind: 'draw', reason: 'turn-limit' },
     };
   }
-  return {
+  const next: GameState = {
     ...state,
     currentPlayer: opponentOf(state.currentPlayer),
     activationsRemaining: ACTIVATIONS_PER_TURN,
     turnNumber: nextTurn,
   };
+  // Elimination: opponent (the side whose turn just started) has no
+  // Captain-capable pieces anywhere — neither in hand nor on board. This
+  // covers the user's case B ("no pieces can enter board, game over") for
+  // anyone whose hand is empty AND whose remaining on-board pieces are
+  // all rovers/pilots (no Captain to win, no Soldier to promote).
+  if (isEliminated(next, next.currentPlayer)) {
+    return {
+      ...next,
+      status: { kind: 'won', winner: state.currentPlayer, reason: 'elimination' },
+    };
+  }
+  // Stalemate: neither side can take any action. Without this the auto-
+  // end-turn loop would just bounce the (empty) turn back and forth
+  // forever until the turn-limit timed out. Detect it eagerly and draw.
+  if (!canActAt(next, 'p1') && !canActAt(next, 'p2')) {
+    return {
+      ...next,
+      status: { kind: 'draw', reason: 'stalemate' },
+    };
+  }
+  return next;
 }

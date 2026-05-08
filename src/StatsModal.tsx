@@ -6,10 +6,11 @@ type Props = {
   onClose: () => void;
 };
 
-const REASON_GLYPH: Record<'nexus' | 'elimination' | 'turn-limit', string> = {
+const REASON_GLYPH: Record<'nexus' | 'elimination' | 'turn-limit' | 'stalemate', string> = {
   nexus: '◎',
   elimination: '×',
   'turn-limit': '⏱',
+  stalemate: '∅',
 };
 
 export default function StatsModal({ open, onClose }: Props) {

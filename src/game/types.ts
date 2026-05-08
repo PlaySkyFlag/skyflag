@@ -66,7 +66,7 @@ export type FlagsState = {
 export type GameStatus =
   | { kind: 'in-progress' }
   | { kind: 'won'; winner: Player; reason: 'nexus' | 'elimination' }
-  | { kind: 'draw'; reason: 'turn-limit' };
+  | { kind: 'draw'; reason: 'turn-limit' | 'stalemate' };
 
 // ─── Move history ──────────────────────────────────────────────────────────
 

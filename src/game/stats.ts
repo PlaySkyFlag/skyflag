@@ -14,7 +14,7 @@ export type GameRecord = {
   when: string;
   mode: StatsMode;
   result: 'win' | 'loss' | 'draw';
-  reason: 'nexus' | 'elimination' | 'turn-limit';
+  reason: 'nexus' | 'elimination' | 'turn-limit' | 'stalemate';
   turns: number;
 };
 

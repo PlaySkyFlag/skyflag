@@ -286,8 +286,8 @@ export default function App() {
             : state.status.winner === mySide
               ? 'win'
               : 'loss';
-        const reason: 'nexus' | 'elimination' | 'turn-limit' =
-          state.status.kind === 'draw' ? 'turn-limit' : state.status.reason;
+        const reason: 'nexus' | 'elimination' | 'turn-limit' | 'stalemate' =
+          state.status.reason;
         recordGame({
           when: new Date().toISOString(),
           mode,

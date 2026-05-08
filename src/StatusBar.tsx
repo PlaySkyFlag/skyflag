@@ -6,10 +6,11 @@ import type { GameState, Player } from './game/types';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
-const REASON_LABEL: Record<'nexus' | 'elimination' | 'turn-limit', string> = {
+const REASON_LABEL: Record<'nexus' | 'elimination' | 'turn-limit' | 'stalemate', string> = {
   nexus: 'Nexus',
   elimination: 'elimination',
   'turn-limit': 'turn-limit',
+  stalemate: 'stalemate',
 };
 
 type Mode = Player | null;
