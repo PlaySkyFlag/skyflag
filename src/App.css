@@ -1298,6 +1298,36 @@ button.tray-piece:hover {
   line-height: 1.4;
 }
 
+.account-rating {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 8px 0 14px;
+}
+
+.account-rating-cell {
+  background: #050a16;
+  border: 1px solid rgba(255, 216, 132, 0.35);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.account-rating-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffd884;
+  letter-spacing: 0.02em;
+}
+
+.account-rating-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
 /* Lobby — embedded in the Multiplayer panel above the code-based create
    /join controls when the user is signed in and not yet in a room. */
 .lobby {

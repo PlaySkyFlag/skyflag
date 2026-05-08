@@ -257,6 +257,39 @@ export default function App() {
 
   const [statsOpen, setStatsOpen] = useState(false);
 
+  // ELO: when an online MP game finishes, fire-and-forget the
+  // apply-rating Edge Function. The function is idempotent (uses a
+  // PRIMARY KEY on game_results) so both clients calling it is safe;
+  // localStorage flag prevents redundant calls from the same client.
+  useEffect(() => {
+    if (!room) return;
+    if (!supabase) return;
+    if (state.status.kind === 'in-progress') return;
+    const flag = `skyflag.rating-applied.${room.code}`;
+    try {
+      if (localStorage.getItem(flag)) return;
+    } catch {
+      /* fall through */
+    }
+    const sb = supabase;
+    sb.functions
+      .invoke('apply-rating', { body: { room_code: room.code } })
+      .then(() => {
+        try {
+          localStorage.setItem(flag, '1');
+        } catch {
+          /* ignore */
+        }
+        // Refresh local profile so the new rating shows up immediately.
+        if (authUser) {
+          loadProfile(authUser.id).then((p) => p && setProfile(p));
+        }
+      })
+      .catch(() => {
+        // Non-blocking — rating is a polish feature, never break gameplay.
+      });
+  }, [state.status.kind, room, authUser]);
+
   // Record a stats row exactly once per game completion. Compare the
   // previous status kind against the current — if it just transitioned
   // from in-progress to won/draw, we have a fresh result to log.

@@ -130,6 +130,18 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
             ? 'Pick a nickname so opponents know who they\'re playing.'
             : 'Update your profile or sign out below.'}
         </p>
+        {profile && (
+          <div className="account-rating">
+            <div className="account-rating-cell">
+              <div className="account-rating-num">{profile.rating}</div>
+              <div className="account-rating-label">Rating</div>
+            </div>
+            <div className="account-rating-cell">
+              <div className="account-rating-num">{profile.games_played}</div>
+              <div className="account-rating-label">Online games</div>
+            </div>
+          </div>
+        )}
         {loadingProfile ? (
           <p className="account-message">Loading profile…</p>
         ) : (

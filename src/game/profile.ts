@@ -11,6 +11,8 @@ export type Profile = {
   full_name: string | null;
   age: number | null;
   gender: Gender | null;
+  rating: number;
+  games_played: number;
   created_at: string;
   updated_at: string;
 };
