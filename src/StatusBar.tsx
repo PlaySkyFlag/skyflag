@@ -28,6 +28,7 @@ type Props = {
   onSetDifficulty: (d: Difficulty) => void;
   onNewGame: () => void;
   onResign: () => void;
+  onOfferDraw: () => void;
 };
 
 // Dropdown value strings map cleanly to/from the aiPlayer slot. The
@@ -46,6 +47,7 @@ export default function StatusBar({
   onSetDifficulty,
   onNewGame,
   onResign,
+  onOfferDraw,
 }: Props) {
   const [mutedNow, setMutedNow] = useState(isMuted());
   const muteControl = (
@@ -140,6 +142,14 @@ export default function StatusBar({
           Turn {state.turnNumber} / {TURN_LIMIT}
         </span>
         <span className="hud-divider">·</span>
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle"
+          onClick={onOfferDraw}
+          title="Offer a draw"
+        >
+          Offer draw
+        </button>
         <button
           type="button"
           className="hud-btn hud-btn-subtle hud-btn-warn"

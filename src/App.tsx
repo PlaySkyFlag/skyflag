@@ -20,7 +20,7 @@ import {
   THEMES,
   type ThemeId,
 } from './game/themes';
-import { legalActions } from './game/ai';
+import { evaluate, legalActions } from './game/ai';
 import AiWorker from './game/aiWorker?worker';
 import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
 import { supabase } from './game/supabase';
@@ -631,6 +631,46 @@ export default function App() {
   }, [flashMsg]);
   const flash = (msg: string) => setFlashMsg(msg);
 
+  // Draw offer state. `outgoingDraw` is true while we're waiting for the
+  // opponent to respond to a draw we sent (only used in MP). `incomingDraw`
+  // is set when the opponent has offered a draw and we need to accept or
+  // decline. Both clear automatically on any history change (a played
+  // move implicitly declines a pending offer).
+  const [outgoingDraw, setOutgoingDraw] = useState(false);
+  const [incomingDraw, setIncomingDraw] = useState(false);
+  useEffect(() => {
+    setOutgoingDraw(false);
+    setIncomingDraw(false);
+  }, [state.history.length, state.status.kind]);
+
+  // Per-room broadcast channel for draw offers (and future room-scoped
+  // events: chat, takeback requests, etc.). Separate from the postgres-
+  // changes subscription that syncs game state.
+  const drawChannelRef = useRef<ReturnType<NonNullable<typeof supabase>['channel']> | null>(null);
+  useEffect(() => {
+    if (!supabase || !room) return;
+    const sb = supabase;
+    const channel = sb.channel(`room:${room.code}`);
+    drawChannelRef.current = channel;
+    channel
+      .on('broadcast', { event: 'draw-offer' }, ({ payload }) => {
+        const from = (payload as { from?: Player } | undefined)?.from;
+        if (from && from !== room.role) setIncomingDraw(true);
+      })
+      .on('broadcast', { event: 'draw-decline' }, ({ payload }) => {
+        const from = (payload as { from?: Player } | undefined)?.from;
+        if (from && from !== room.role) {
+          setOutgoingDraw(false);
+          flash('Opponent declined the draw offer.');
+        }
+      })
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+      drawChannelRef.current = null;
+    };
+  }, [room]);
+
   // Is the current player's deploy pad occupied (by any piece)? Used to
   // gate the pad's "drop me here" highlight and to flash a hint when the
   // player tries to deploy onto a blocked pad.
@@ -816,6 +856,47 @@ export default function App() {
             room?.role ?? (aiPlayer ? (aiPlayer === 'p1' ? 'p2' : 'p1') : state.currentPlayer);
           dispatch({ type: 'resign', player: resigner });
         }}
+        onOfferDraw={() => {
+          // Mode-aware:
+          //   2P hot-seat: instant draw on confirm (both sides are the
+          //     same human, no negotiation).
+          //   1P: ask the AI's evaluator. AI accepts unless it thinks
+          //     it's clearly winning.
+          //   MP: broadcast the offer to the opponent and wait for
+          //     accept/decline.
+          if (room && drawChannelRef.current) {
+            if (outgoingDraw) {
+              flash('Already waiting for opponent to respond.');
+              return;
+            }
+            setOutgoingDraw(true);
+            drawChannelRef.current
+              .send({
+                type: 'broadcast',
+                event: 'draw-offer',
+                payload: { from: room.role },
+              })
+              .catch(() => undefined);
+            flash('Draw offered — waiting for opponent.');
+            return;
+          }
+          if (aiPlayer) {
+            if (!confirm('Offer the AI a draw?')) return;
+            // evaluate() returns score from the AI's perspective. AI
+            // declines only when it sees the position as clearly
+            // winning for itself; otherwise it agrees.
+            const score = evaluate(state, aiPlayer);
+            if (score > 100) {
+              flash('The AI declines — it sees the position as winning for itself.');
+            } else {
+              dispatch({ type: 'agree-draw' });
+            }
+            return;
+          }
+          // 2P hot-seat — both sides are the same human.
+          if (!confirm('Agree to a draw? The game ends with no winner.')) return;
+          dispatch({ type: 'agree-draw' });
+        }}
       />
       <div className="help-row">
         <Help />
@@ -969,6 +1050,45 @@ export default function App() {
       {flashMsg && (
         <div className="flash-toast" role="status" aria-live="polite">
           {flashMsg}
+        </div>
+      )}
+      {incomingDraw && room && (
+        <div className="account-overlay" role="dialog" aria-modal="true">
+          <div className="account-card">
+            <h2 className="account-title">Draw offer</h2>
+            <p className="account-intro">
+              Your opponent is offering a draw. Accept and the game ends with
+              no winner; decline and play continues.
+            </p>
+            <div className="account-actions">
+              <button
+                type="button"
+                className="end-game-btn"
+                onClick={() => {
+                  dispatch({ type: 'agree-draw' });
+                  setIncomingDraw(false);
+                }}
+              >
+                Accept draw
+              </button>
+              <button
+                type="button"
+                className="end-game-btn end-game-btn--subtle"
+                onClick={() => {
+                  drawChannelRef.current
+                    ?.send({
+                      type: 'broadcast',
+                      event: 'draw-decline',
+                      payload: { from: room.role },
+                    })
+                    .catch(() => undefined);
+                  setIncomingDraw(false);
+                }}
+              >
+                Decline
+              </button>
+            </div>
+          </div>
         </div>
       )}
       <Tutorial state={state} open={tutorialOpen} onClose={closeTutorial} />

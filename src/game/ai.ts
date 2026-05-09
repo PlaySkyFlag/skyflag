@@ -183,7 +183,7 @@ function attackInfo(
 
 // Static evaluation of `state` from `aiPlayer`'s perspective. Higher = better
 // for aiPlayer. Deterministic — minimax requires same input → same output.
-function evaluate(state: GameState, aiPlayer: Player): number {
+export function evaluate(state: GameState, aiPlayer: Player): number {
   if (state.status.kind === 'won') {
     return state.status.winner === aiPlayer ? WIN_SCORE : -WIN_SCORE;
   }
