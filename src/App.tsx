@@ -873,7 +873,21 @@ export default function App() {
         onSetMode={setAiPlayer}
         difficulty={difficulty}
         onSetDifficulty={setDifficulty}
-        onNewGame={() => dispatch({ type: 'new-game' })}
+        onNewGame={() => {
+          // If we're in (or waiting in) a multiplayer room, warn first
+          // and tear it down on confirm — otherwise the local board
+          // resets but the MP "not your turn" guard keeps input frozen,
+          // which strands the user with no way to play.
+          if (room) {
+            const msg =
+              room.status === 'waiting'
+                ? `Leave room ${room.code} and start a new local game?`
+                : `Starting a new game will leave room ${room.code}. Continue?`;
+            if (!confirm(msg)) return;
+            setRoom(null);
+          }
+          dispatch({ type: 'new-game' });
+        }}
         onResign={() => {
           // The resigner is whichever local human is on the clock.
           // In MP, that's the room.role; in 1P, the opposite of the AI's
@@ -1114,7 +1128,20 @@ export default function App() {
         state={state}
         user={authUser}
         room={room}
-        onPlayAgain={() => dispatch({ type: 'new-game' })}
+        onPlayAgain={() => {
+          // Same trap-avoidance as the HUD's New game — confirm and
+          // drop the room when the player clicks Play again from the
+          // end-of-game overlay.
+          if (room) {
+            const msg =
+              room.status === 'waiting'
+                ? `Leave room ${room.code} and start a new local game?`
+                : `Starting a new game will leave room ${room.code}. Continue?`;
+            if (!confirm(msg)) return;
+            setRoom(null);
+          }
+          dispatch({ type: 'new-game' });
+        }}
       />
       {flashMsg && (
         <div className="flash-toast" role="status" aria-live="polite">
