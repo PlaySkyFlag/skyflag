@@ -408,6 +408,85 @@
   width: 100%;
 }
 
+/* ─── Demo (live mini-board + optional GIF/MP4 asset) ──────────── */
+
+.landing-demo-section {
+  /* Slightly tighter top padding because the hero already framed
+     a "what is this" beat — the demo continues that story. */
+  padding-top: 50px;
+}
+
+.landing-demo-lead {
+  text-align: center;
+  color: var(--landing-text-muted);
+  margin: -16px auto 32px;
+  font-size: 1.0rem;
+  max-width: 620px;
+  line-height: 1.6;
+}
+
+/* Optional GIF/MP4 — empty when the file isn't present (onError hides
+   the element). When present, shows above the live SVG mini-board. */
+.landing-demo-asset {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.landing-demo-video,
+.landing-demo-gif {
+  width: 100%;
+  max-width: 720px;
+  border-radius: var(--landing-radius);
+  border: 1px solid var(--landing-gold-line);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  display: block;
+}
+
+/* Live SVG mini-board — three layers in a row on desktop, stacked
+   on narrower screens. */
+.landing-demo-boards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  justify-items: center;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+@media (min-width: 720px) {
+  .landing-demo-boards {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+}
+
+.landing-demo-board-wrap {
+  width: 100%;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing-demo-board-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--landing-gold);
+  opacity: 0.85;
+  font-weight: 600;
+}
+
+/* Override the default Board wrapper's max-width inline style so it
+   shrinks to the 280px column on the landing without modifying the
+   shared Board component. */
+.landing-demo-board-wrap > div {
+  max-width: 280px !important;
+  width: 100% !important;
+}
+
 /* ─── Footer ───────────────────────────────────────────────────── */
 
 .landing-footer {

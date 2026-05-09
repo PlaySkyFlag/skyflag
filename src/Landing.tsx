@@ -12,7 +12,82 @@
 //     what exists today.
 
 import { useEffect } from 'react';
+import Board, { type Marker } from './Board';
+import {
+  FLAG_COORDS,
+  LIFT_CELLS,
+  LAYER_ORDER,
+  NEXUS_COORD,
+} from './game/constants';
+import { THEMES, type ThemeId } from './game/themes';
+import type { Layer, PieceKind, Player } from './game/types';
 import './Landing.css';
+
+// Mid-game snapshot rendered in the demo section. Hand-curated for
+// visual balance: both sides have committed soldiers + captains on
+// Ground, transports have lifted to Sky, the position has tension.
+// Static — no clicks, no animation.
+type DemoPiece = {
+  owner: Player;
+  kind: PieceKind;
+  layer: Layer;
+  row: number;
+  col: number;
+  id: string;
+};
+
+const DEMO_PIECES: ReadonlyArray<DemoPiece> = [
+  // Ground — both sides advancing toward the opponent's flag corner
+  { owner: 'p1', kind: 'soldier', layer: 'ground', row: 2, col: 3, id: 'demo-p1-soldier' },
+  { owner: 'p1', kind: 'captain', layer: 'ground', row: 3, col: 4, id: 'demo-p1-captain' },
+  { owner: 'p2', kind: 'captain', layer: 'ground', row: 3, col: 1, id: 'demo-p2-captain' },
+  { owner: 'p2', kind: 'soldier', layer: 'ground', row: 4, col: 2, id: 'demo-p2-soldier' },
+  // Sky — Pilots / Rovers lifted up to support layer transitions
+  { owner: 'p1', kind: 'pilot',   layer: 'sky', row: 1, col: 4, id: 'demo-p1-pilot'  },
+  { owner: 'p2', kind: 'rover',   layer: 'sky', row: 4, col: 1, id: 'demo-p2-rover'  },
+  // Space — empty in this snapshot; pieces haven't reached the upper layer yet
+];
+
+const PIECE_SYMBOL: Record<PieceKind, string> = {
+  captain: '♚',
+  soldier: '♟',
+  rover: '♜',
+  pilot: '♝',
+};
+
+function demoMarkers(layer: Layer): Marker[] {
+  const markers: Marker[] = [];
+  // Lifts on every layer
+  for (const cell of LIFT_CELLS) {
+    markers.push({ row: cell.row, col: cell.col, symbol: '⬆', kind: 'lift' });
+  }
+  // Both flags shown (none captured in the demo)
+  for (const player of ['p1', 'p2'] as Player[]) {
+    const pos = FLAG_COORDS[player][layer];
+    markers.push({ row: pos.row, col: pos.col, symbol: '⚑', kind: player });
+  }
+  // Nexus on Space
+  if (layer === 'space') {
+    markers.push({
+      row: NEXUS_COORD.row,
+      col: NEXUS_COORD.col,
+      symbol: '◎',
+      kind: 'nexus',
+    });
+  }
+  // Pieces
+  for (const p of DEMO_PIECES) {
+    if (p.layer !== layer) continue;
+    markers.push({
+      row: p.row,
+      col: p.col,
+      symbol: PIECE_SYMBOL[p.kind],
+      kind: p.owner,
+      id: p.id,
+    });
+  }
+  return markers;
+}
 
 export default function Landing() {
   // Nudge the browser to scroll to the top whenever the landing
@@ -26,6 +101,7 @@ export default function Landing() {
     <div className="landing">
       <Header />
       <Hero />
+      <DemoSection />
       <FeaturesSection />
       <HowItWorksSection />
       <PricingSection />
@@ -216,6 +292,90 @@ function PricingSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+function DemoSection() {
+  // Use whatever theme is first in the registry. THEMES is a record so
+  // ordering is insertion-order; the project's "default" theme is
+  // always the first entry. If a future theme refactor changes that,
+  // pick a specific theme id explicitly.
+  const themeId = Object.keys(THEMES)[0] as ThemeId;
+  const layerThemes = THEMES[themeId].layers;
+
+  return (
+    <section className="landing-section landing-section-alt landing-demo-section">
+      <div className="landing-section-inner">
+        <h2 className="landing-section-title">A live snapshot</h2>
+        <p className="landing-demo-lead">
+          Three boards in play — Ground, Sky, Space. Pieces lift between
+          layers; flags sit in opposite corners. This is a real mid-game
+          position rendered by the same engine that runs your matches.
+        </p>
+
+        {/* Optional asset slot — gameplay GIF or short MP4. Drop a file
+            into /public/demo.gif (or .mp4) and it'll appear here.
+            Falls back to the live SVG demo below when absent. */}
+        <DemoAsset />
+
+        <div className="landing-demo-boards">
+          {LAYER_ORDER.map((layer) => (
+            <div key={layer} className="landing-demo-board-wrap">
+              <div className="landing-demo-board-label">
+                {layer === 'ground' ? 'Ground' : layer === 'sky' ? 'Sky' : 'Space'}
+              </div>
+              <Board
+                theme={{ ...layerThemes[layer], kind: layer }}
+                markers={demoMarkers(layer)}
+                deployCells={[]}
+                activeDeployPlayer={null}
+                selectedCell={null}
+                legalTargets={[]}
+                onCellClick={() => {}}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Optional gameplay GIF / MP4 placed at /public/demo.gif or
+// /public/demo.mp4. Renders nothing if the file isn't present (the
+// browser shows a broken image, so we use onError to hide). Saves a
+// re-deploy when the user wants to add or update the demo asset.
+function DemoAsset() {
+  return (
+    <div className="landing-demo-asset">
+      <video
+        className="landing-demo-video"
+        src="/demo.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        onError={(e) => {
+          // No demo.mp4 — try demo.gif via image, hide if also absent.
+          const v = e.currentTarget;
+          v.style.display = 'none';
+          const fallback = v.nextElementSibling as HTMLImageElement | null;
+          if (fallback) fallback.style.display = 'block';
+        }}
+      />
+      <img
+        className="landing-demo-gif"
+        src="/demo.gif"
+        alt="SkyFlag gameplay demo"
+        style={{ display: 'none' }}
+        onError={(e) => {
+          // No demo.gif either — hide entirely, leaving just the live
+          // SVG demo below.
+          (e.currentTarget as HTMLImageElement).style.display = 'none';
+        }}
+      />
+    </div>
   );
 }
 
