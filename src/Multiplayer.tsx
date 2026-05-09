@@ -33,6 +33,9 @@ type Props = {
   // Forwards lobby presence sync up to App so the Friends panel can show
   // an online dot without needing its own subscription.
   onPresenceChange?: (ids: Set<string>) => void;
+  // Render without the <details>/<summary> chrome — Sidebar uses this
+  // when this panel is the active tab.
+  inline?: boolean;
 };
 
 // Glyphs that read clearly on a phone — no I/O/0/1 ambiguity.
@@ -187,7 +190,7 @@ function NotificationsControl() {
   );
 }
 
-export default function Multiplayer({ room, forceOpen = false, onRoomEntered, onLeave, onPresenceChange }: Props) {
+export default function Multiplayer({ room, forceOpen = false, onRoomEntered, onLeave, onPresenceChange, inline = false }: Props) {
   const { user: authUser } = useAuthUser();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [code, setCode] = useState('');
@@ -211,14 +214,18 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
   }, [authUser]);
 
   if (!isMultiplayerAvailable) {
+    const unavailableBody = (
+      <div className="help-body">
+        Online play requires Supabase credentials. Add{' '}
+        <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_KEY</code> to{' '}
+        <code>.env.local</code>.
+      </div>
+    );
+    if (inline) return unavailableBody;
     return (
       <details className="help">
         <summary className="help-summary">Multiplayer</summary>
-        <div className="help-body">
-          Online play requires Supabase credentials. Add{' '}
-          <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_KEY</code> to{' '}
-          <code>.env.local</code>.
-        </div>
+        {unavailableBody}
       </details>
     );
   }
@@ -316,10 +323,8 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
     }
   };
 
-  return (
-    <details className="help" open={inRoom || forceOpen}>
-      <summary className="help-summary">Multiplayer</summary>
-      <div className="help-body">
+  const body = (
+    <div className="help-body">
         {!inRoom && authUser && (
           <Lobby
             user={authUser}
@@ -386,6 +391,12 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
         )}
         {error && <p className="mp-error">⚠ {error}</p>}
       </div>
+  );
+  if (inline) return body;
+  return (
+    <details className="help" open={inRoom || forceOpen}>
+      <summary className="help-summary">Multiplayer</summary>
+      {body}
     </details>
   );
 }

@@ -1,8 +1,13 @@
-export default function Help() {
-  return (
-    <details className="help">
-      <summary className="help-summary">Getting started</summary>
-      <div className="help-body">
+type Props = {
+  // When true, skip the <details>/<summary> chrome and render just the
+  // body — used by Sidebar tab panels which own their own open/close
+  // state via tab selection.
+  inline?: boolean;
+};
+
+export default function Help({ inline = false }: Props) {
+  const body = (
+    <div className="help-body">
         <ol>
           <li>
             <strong>Choose a mode</strong> from the dropdown in the HUD —
@@ -68,6 +73,12 @@ export default function Help() {
           .
         </p>
       </div>
+  );
+  if (inline) return body;
+  return (
+    <details className="help">
+      <summary className="help-summary">Getting started</summary>
+      {body}
     </details>
   );
 }

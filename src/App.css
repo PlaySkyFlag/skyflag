@@ -1753,3 +1753,82 @@ button.tray-piece:hover {
 .settings-popover .hud-btn:hover {
   background: rgba(36, 50, 80, 0.95);
 }
+
+/* Sidebar — tabbed drawer that holds Rules, Multiplayer, History,
+   Tournaments, Friends. Tab strip on top, single panel below.
+   Solid dark backgrounds so white text stays readable. */
+.sidebar {
+  width: 100%;
+  max-width: 1100px;
+  margin: 12px auto 0;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.sidebar-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 8px;
+  background: rgba(6, 12, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+}
+
+.sidebar-tab {
+  font: inherit;
+  font-size: 0.86rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #d6dcef;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.sidebar-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.sidebar-tab-active {
+  background: rgba(255, 216, 132, 0.18);
+  border-color: rgba(255, 216, 132, 0.55);
+  color: #ffd884;
+}
+
+.sidebar-tab-active:hover {
+  background: rgba(255, 216, 132, 0.25);
+}
+
+.sidebar-tab-close {
+  margin-left: auto;
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+
+.sidebar-tab-close:hover {
+  opacity: 1;
+}
+
+.sidebar-panel {
+  background: rgba(6, 12, 26, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 12px 14px;
+  /* Keep panels from getting absurdly tall on long content (e.g. a
+     game with 80 history entries). The panel scrolls internally. */
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/* Inline (no-disclosure) panel bodies should fill the drawer cleanly
+   instead of inheriting the cramped help-body padding. */
+.sidebar-panel > .help-body {
+  padding: 0;
+}

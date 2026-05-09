@@ -1,17 +1,13 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import EndGameOverlay from './EndGameOverlay';
-import Friends from './Friends';
 import GameToolbar from './GameToolbar';
-import Help from './Help';
-import MoveHistory from './MoveHistory';
-import Multiplayer from './Multiplayer';
 import PieceTray from './PieceTray';
 import AccountModal from './AccountModal';
 import SettingsMenu from './SettingsMenu';
+import Sidebar from './Sidebar';
 import StatsModal from './StatsModal';
 import StatusBar from './StatusBar';
-import Tournaments from './Tournaments';
 import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { loadProfile, type Profile } from './game/profile';
@@ -949,35 +945,18 @@ export default function App() {
           dispatch({ type: 'new-game' });
         }}
       />
-      <div className="help-row">
-        <Help />
-        <button
-          type="button"
-          className="hud-btn hud-btn-subtle help-tutorial-btn"
-          onClick={() => setTutorialOpen(true)}
-          title="Start the interactive guided tutorial"
-        >
-          Tutorial
-        </button>
-        <Multiplayer
-          room={room}
-          // 2P mode (no AI) auto-expands the Multiplayer panel so the
-          // lobby + room-code controls are immediately visible — the
-          // player can pick hot-seat (just play here) or online.
-          forceOpen={aiPlayer === null}
-          onRoomEntered={setRoom}
-          onLeave={() => setRoom(null)}
-          onPresenceChange={setLobbyOnlineIds}
-        />
-        <MoveHistory history={state.history} />
-        <Tournaments user={authUser} profile={profile} />
-        <Friends
-          user={authUser}
-          profile={profile}
-          inRoom={room !== null}
-          onlineIds={lobbyOnlineIds}
-        />
-      </div>
+      <Sidebar
+        authUser={authUser}
+        profile={profile}
+        room={room}
+        history={state.history}
+        onlineIds={lobbyOnlineIds}
+        aiPlayer={aiPlayer}
+        onRoomEntered={setRoom}
+        onLeaveRoom={() => setRoom(null)}
+        onPresenceChange={setLobbyOnlineIds}
+        onOpenTutorial={() => setTutorialOpen(true)}
+      />
       <PieceTray
         player="p1"
         pieces={state.inHand.p1}

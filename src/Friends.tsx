@@ -40,9 +40,10 @@ type Props = {
   profile: Profile | null;
   inRoom: boolean;
   onlineIds: Set<string>;
+  inline?: boolean;
 };
 
-export default function Friends({ user, profile, inRoom, onlineIds }: Props) {
+export default function Friends({ user, profile, inRoom, onlineIds, inline = false }: Props) {
   const [entries, setEntries] = useState<FriendEntry[]>([]);
   const [addInput, setAddInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -168,12 +169,16 @@ export default function Friends({ user, profile, inRoom, onlineIds }: Props) {
   if (!supabase) return null;
 
   if (!user || !profile) {
+    const signedOutBody = (
+      <div className="help-body">
+        <p className="lobby-hint">Sign in and create a profile to add friends.</p>
+      </div>
+    );
+    if (inline) return signedOutBody;
     return (
       <details className="help">
         <summary className="help-summary">Friends</summary>
-        <div className="help-body">
-          <p className="lobby-hint">Sign in and create a profile to add friends.</p>
-        </div>
+        {signedOutBody}
       </details>
     );
   }
@@ -182,17 +187,8 @@ export default function Friends({ user, profile, inRoom, onlineIds }: Props) {
   const incoming = entries.filter((e) => e.direction === 'pending-in');
   const outgoingList = entries.filter((e) => e.direction === 'pending-out');
 
-  return (
-    <details className="help">
-      <summary className="help-summary">
-        Friends{' '}
-        {incoming.length > 0 && (
-          <span className="friends-badge" title={`${incoming.length} pending request(s)`}>
-            {incoming.length}
-          </span>
-        )}
-      </summary>
-      <div className="help-body">
+  const body = (
+    <div className="help-body">
         <div className="friends-add-row">
           <input
             type="text"
@@ -312,6 +308,19 @@ export default function Friends({ user, profile, inRoom, onlineIds }: Props) {
           </ul>
         )}
       </div>
+  );
+  if (inline) return body;
+  return (
+    <details className="help">
+      <summary className="help-summary">
+        Friends{' '}
+        {incoming.length > 0 && (
+          <span className="friends-badge" title={`${incoming.length} pending request(s)`}>
+            {incoming.length}
+          </span>
+        )}
+      </summary>
+      {body}
     </details>
   );
 }

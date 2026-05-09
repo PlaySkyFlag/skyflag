@@ -36,9 +36,10 @@ type LeaderboardRow = TournamentEntry & {
 type Props = {
   user: User | null;
   profile: Profile | null;
+  inline?: boolean;
 };
 
-export default function Tournaments({ user, profile }: Props) {
+export default function Tournaments({ user, profile, inline = false }: Props) {
   const [open, setOpen] = useState<Tournament[]>([]);
   const [myEntries, setMyEntries] = useState<Set<string>>(new Set());
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardRow[]>>({});
@@ -132,10 +133,8 @@ export default function Tournaments({ user, profile }: Props) {
 
   if (!supabase) return null;
 
-  return (
-    <details className="help">
-      <summary className="help-summary">Tournaments</summary>
-      <div className="help-body">
+  const body = (
+    <div className="help-body">
         {open.length === 0 && (
           <p className="lobby-hint">
             No open arenas right now — check back later, or stay tuned for
@@ -229,6 +228,12 @@ export default function Tournaments({ user, profile }: Props) {
         })}
         {error && <p className="mp-error">⚠ {error}</p>}
       </div>
+  );
+  if (inline) return body;
+  return (
+    <details className="help">
+      <summary className="help-summary">Tournaments</summary>
+      {body}
     </details>
   );
 }

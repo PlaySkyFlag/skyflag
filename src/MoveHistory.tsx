@@ -22,9 +22,10 @@ const cellNotation = (c: Coord): string =>
 
 type Props = {
   history: HistoryEntry[];
+  inline?: boolean;
 };
 
-export default function MoveHistory({ history }: Props) {
+export default function MoveHistory({ history, inline = false }: Props) {
   // Auto-scroll the list to the latest entry whenever a move is appended,
   // so the most recent action is always visible without manual scrolling.
   const listRef = useRef<HTMLOListElement>(null);
@@ -33,29 +34,33 @@ export default function MoveHistory({ history }: Props) {
     if (el) el.scrollTop = el.scrollHeight;
   }, [history.length]);
 
+  const body = (
+    <div className="help-body">
+      {history.length === 0 ? (
+        <p className="move-history-empty">No moves yet.</p>
+      ) : (
+        <ol className="move-history-list" ref={listRef}>
+          {history.map((entry, i) => (
+            <li
+              key={i}
+              className={`move-history-entry move-history-${entry.player}`}
+            >
+              <span className="move-history-turn">T{entry.turn}</span>
+              <span className={`hud-pip hud-pip-${entry.player}`} aria-hidden />
+              <span className="move-history-text">{describe(entry)}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+  if (inline) return body;
   return (
     <details className="help">
       <summary className="help-summary">
         Move history{history.length > 0 ? ` (${history.length})` : ''}
       </summary>
-      <div className="help-body">
-        {history.length === 0 ? (
-          <p className="move-history-empty">No moves yet.</p>
-        ) : (
-          <ol className="move-history-list" ref={listRef}>
-            {history.map((entry, i) => (
-              <li
-                key={i}
-                className={`move-history-entry move-history-${entry.player}`}
-              >
-                <span className="move-history-turn">T{entry.turn}</span>
-                <span className={`hud-pip hud-pip-${entry.player}`} aria-hidden />
-                <span className="move-history-text">{describe(entry)}</span>
-              </li>
-            ))}
-          </ol>
-        )}
-      </div>
+      {body}
     </details>
   );
 }
