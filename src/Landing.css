@@ -8,11 +8,16 @@
   --landing-bg-section: #0a0e16;
   --landing-bg-alt:     #0d121d;
   --landing-text:       #f5f7fb;
-  --landing-text-muted: rgba(245, 247, 251, 0.72);
-  --landing-text-faint: rgba(245, 247, 251, 0.55);
+  /* Bumped from 0.72 / 0.55 to 0.82 / 0.65 — the lower values were
+     readable but felt washed out next to the gold accents. The
+     stronger contrast makes body text and footer/hint text feel
+     intentional rather than vestigial. */
+  --landing-text-muted: rgba(245, 247, 251, 0.82);
+  --landing-text-faint: rgba(245, 247, 251, 0.65);
   --landing-gold:       #ffd884;
-  --landing-gold-soft:  rgba(255, 216, 132, 0.18);
-  --landing-gold-line:  rgba(255, 216, 132, 0.35);
+  --landing-gold-hover: #ffe4a3;
+  --landing-gold-soft:  rgba(255, 216, 132, 0.20);
+  --landing-gold-line:  rgba(255, 216, 132, 0.45);
   --landing-radius:     12px;
 }
 
@@ -106,47 +111,70 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 22px;
+  padding: 13px 24px;
   border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.005em;
   text-decoration: none;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: transform 0.06s ease, filter 0.12s ease, background 0.15s ease;
+  transition:
+    transform 0.08s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.18s ease,
+    color 0.15s ease;
   white-space: nowrap;
 }
 
-.landing-cta-button:hover {
-  filter: brightness(1.08);
-  opacity: 1;
-}
-
+/* brightness() filters dim more than they brighten — for gold on dark
+   that reads as "the button got washed out on hover". Using a lighter
+   gold hue + a soft glow shadow gives a clearer "this is interactive,
+   you're hovering it" cue without the washed look. */
 .landing-cta-button:active {
   transform: translateY(1px);
 }
 
 .landing-cta-primary {
   background: var(--landing-gold);
-  color: #1a1c18;
+  color: #15171b;
   border-color: var(--landing-gold);
+  box-shadow: 0 0 0 0 rgba(255, 216, 132, 0);
+}
+
+.landing-cta-primary:hover {
+  background: var(--landing-gold-hover);
+  border-color: var(--landing-gold-hover);
+  box-shadow: 0 6px 22px rgba(255, 216, 132, 0.28);
+  color: #15171b;
+  opacity: 1;
 }
 
 .landing-cta-secondary {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--landing-text);
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .landing-cta-secondary:hover {
+  background: rgba(255, 216, 132, 0.08);
   border-color: var(--landing-gold-line);
   color: var(--landing-gold);
+  opacity: 1;
 }
 
 .landing-cta-small {
-  padding: 7px 14px;
-  font-size: 0.86rem;
+  padding: 8px 16px;
+  font-size: 0.88rem;
+}
+
+/* Visible keyboard focus — required for accessibility, often missing
+   on dark sites where outlines disappear. Uses gold to match brand. */
+.landing-cta-button:focus-visible,
+.landing a:focus-visible {
+  outline: 2px solid var(--landing-gold);
+  outline-offset: 3px;
 }
 
 /* ─── Hero ─────────────────────────────────────────────────────── */
@@ -166,9 +194,11 @@
 
 .landing-hero-title {
   font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 800;
   color: var(--landing-gold);
   margin-bottom: 16px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  text-shadow: 0 4px 30px rgba(255, 216, 132, 0.18);
 }
 
 .landing-hero-subtitle {
@@ -223,10 +253,12 @@
 }
 
 .landing-section-title {
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  font-weight: 800;
   color: var(--landing-text);
   margin-bottom: 32px;
   text-align: center;
+  letter-spacing: -0.015em;
 }
 
 @media (max-width: 540px) {
@@ -244,16 +276,22 @@
 }
 
 .landing-feature {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 216, 132, 0.18);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 216, 132, 0.28);
   border-radius: var(--landing-radius);
-  padding: 22px 20px;
-  transition: border-color 0.18s ease, transform 0.18s ease;
+  padding: 24px 22px;
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .landing-feature:hover {
-  border-color: var(--landing-gold-line);
-  transform: translateY(-2px);
+  border-color: var(--landing-gold);
+  background: rgba(255, 216, 132, 0.06);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
 }
 
 .landing-feature-icon {
@@ -270,10 +308,10 @@
 }
 
 .landing-feature-body {
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   color: var(--landing-text-muted);
   margin: 0;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 /* ─── How it works list ────────────────────────────────────────── */
@@ -324,18 +362,30 @@
 }
 
 .landing-pricing-tier {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--landing-radius);
-  padding: 26px 24px;
+  padding: 28px 26px;
   position: relative;
   display: flex;
   flex-direction: column;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.landing-pricing-tier:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+  transform: translateY(-2px);
 }
 
 .landing-pricing-featured {
-  border-color: var(--landing-gold-line);
-  background: linear-gradient(160deg, rgba(255, 216, 132, 0.10), rgba(255, 216, 132, 0.02));
+  border-color: var(--landing-gold);
+  background: linear-gradient(160deg, rgba(255, 216, 132, 0.12), rgba(255, 216, 132, 0.03));
+  box-shadow: 0 4px 24px rgba(255, 216, 132, 0.10);
+}
+
+.landing-pricing-featured:hover {
+  border-color: var(--landing-gold-hover);
+  box-shadow: 0 8px 32px rgba(255, 216, 132, 0.18);
 }
 
 .landing-tier-badge {
@@ -386,11 +436,11 @@
 }
 
 .landing-tier-features li {
-  padding: 6px 0 6px 20px;
+  padding: 7px 0 7px 22px;
   position: relative;
-  font-size: 0.93rem;
+  font-size: 0.95rem;
   color: var(--landing-text-muted);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .landing-tier-features li::before {
