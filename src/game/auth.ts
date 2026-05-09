@@ -57,3 +57,27 @@ export async function signOut(): Promise<void> {
   if (!supabase) return;
   await supabase.auth.signOut();
 }
+
+// Instantly sign in as a fresh anonymous user. Returned session has a
+// real auth.uid() (so all our RLS policies pass) but no email; the
+// account exists only on this device until / unless the user later
+// adds an email via supabase.auth.updateUser({ email }).
+//
+// Requires the project's "Anonymous Sign-Ins" toggle to be On in the
+// Supabase dashboard (Auth → Providers). Returns a friendly error if
+// the project hasn't enabled it.
+export async function signInAnonymously(): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
+  const { error } = await supabase.auth.signInAnonymously();
+  if (error) {
+    if (/anonymous/i.test(error.message)) {
+      return {
+        ok: false,
+        message:
+          'Anonymous sign-in is disabled on this project. Enable it in Supabase → Auth → Providers.',
+      };
+    }
+    return { ok: false, message: error.message };
+  }
+  return { ok: true };
+}

@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { sendMagicLink, signOut } from './game/auth';
+import { sendMagicLink, signInAnonymously, signOut } from './game/auth';
 import { loadProfile, saveProfile, type Gender, type Profile } from './game/profile';
 
 type Props = {
@@ -106,6 +106,29 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               {busy ? 'Sending…' : 'Send magic link'}
             </button>
           </form>
+          <div className="account-divider"><span>or</span></div>
+          <button
+            type="button"
+            className="end-game-btn end-game-btn--subtle"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              setMessage(null);
+              const r = await signInAnonymously();
+              setBusy(false);
+              if (!r.ok) setMessage(r.message);
+              // Success: onAuthStateChange in useAuthUser fires, re-renders this
+              // modal in its signed-in profile-form state automatically.
+            }}
+            title="Skip the email step — instant guest account on this device"
+          >
+            {busy ? 'Signing in…' : 'Continue as guest'}
+          </button>
+          <p className="account-fineprint">
+            Guest accounts work everywhere a normal account does, but only on
+            this device — clear your browser data and you'll lose them. You
+            can add an email later from this menu to make it permanent.
+          </p>
           {message && <p className="account-message">{message}</p>}
         </div>
       </div>
@@ -125,7 +148,11 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
           <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
         </div>
         <p className="account-intro">
-          Signed in as <strong>{user.email}</strong>.{' '}
+          {user.email ? (
+            <>Signed in as <strong>{user.email}</strong>.</>
+          ) : (
+            <>Signed in as a <strong>guest</strong> on this device.</>
+          )}{' '}
           {isFirstTime
             ? 'Pick a nickname so opponents know who they\'re playing.'
             : 'Update your profile or sign out below.'}

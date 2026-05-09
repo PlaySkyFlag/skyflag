@@ -1401,6 +1401,35 @@ button.tray-piece:hover {
   line-height: 1.4;
 }
 
+/* "or" divider between magic-link form and "Continue as guest" — a
+   thin rule with the word floated on top so the two paths read as
+   alternatives rather than steps. */
+.account-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 12px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.account-divider::before,
+.account-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.account-fineprint {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
 .account-rating {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
