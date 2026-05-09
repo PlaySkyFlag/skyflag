@@ -1560,6 +1560,56 @@ button.tray-piece:hover {
   }
 }
 
+/* SkyFlag Plus subscription panel — gold-accented because this is the
+   primary monetization surface in the modal. Active state (user has
+   the entitlement) shows a calmer confirmation; inactive state is the
+   sales pitch with the subscribe button. */
+.account-plus-panel {
+  background: linear-gradient(135deg, rgba(255, 216, 132, 0.16), rgba(255, 216, 132, 0.04));
+  border: 1px solid rgba(255, 216, 132, 0.55);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 10px 0 14px;
+}
+
+.account-plus-active {
+  background: rgba(111, 255, 138, 0.08);
+  border-color: rgba(111, 255, 138, 0.45);
+}
+
+.account-plus-active strong {
+  color: #6fff8a;
+  font-size: 0.92rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.account-plus-active p {
+  margin: 0;
+  font-size: 0.84rem;
+  opacity: 0.85;
+}
+
+.account-plus-title {
+  display: block;
+  font-size: 1rem;
+  color: #ffd884;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.account-plus-body {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  opacity: 0.92;
+}
+
+.account-plus-cta {
+  width: 100%;
+  font-size: 0.95rem;
+}
+
 /* Upgrade panel — shown to signed-in guests, prompts them to link an
    email so their rating/profile is portable across devices. */
 .account-upgrade-panel {

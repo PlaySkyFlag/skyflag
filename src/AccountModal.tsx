@@ -2,6 +2,7 @@
 // first-time profile form, and signed-in profile editing. Three internal
 // modes drive which form is shown; the modal is closable from any state.
 
+import { Capacitor } from '@capacitor/core';
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import {
@@ -11,7 +12,16 @@ import {
   signInWithOAuth,
   signOut,
 } from './game/auth';
+import { useEntitlement } from './game/entitlements';
 import { loadProfile, saveProfile, type Gender, type Profile } from './game/profile';
+import { supabase } from './game/supabase';
+
+// Stripe price ID for the Plus subscription tier. Set via env so the
+// price can change (annual vs monthly, promotion windows, region-
+// specific prices) without a code deploy. When unset, the upgrade
+// panel hides itself entirely — useful during pre-launch.
+const STRIPE_PRICE_PLUS = import.meta.env.VITE_STRIPE_PRICE_PLUS as string | undefined;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 
 type Props = {
   user: User | null;
@@ -216,6 +226,8 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
           </div>
         )}
 
+        <PlusPanel />
+
         {/* Guest upgrade prompt — shown only when the signed-in user has
             no email, i.e. they're an anonymous account. Lets them link
             an email to make their rating + profile portable across
@@ -351,6 +363,93 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
         )}
         {message && <p className="account-message">{message}</p>}
       </div>
+    </div>
+  );
+}
+
+// SkyFlag Plus subscription panel — shown to signed-in users on web who
+// don't yet have the entitlement. Hidden on iOS native builds because
+// Apple's App Store policy requires in-app digital subscriptions to use
+// IAP, not external payment processors. iOS support is a separate
+// integration via StoreKit / RevenueCat — this panel is web-only.
+function PlusPanel() {
+  const { hasIt: hasPlus, loading } = useEntitlement('feature.plus');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  // Hide entirely if:
+  //   - Running on native iOS (App Store policy)
+  //   - No price ID configured (pre-launch / staging without Stripe)
+  //   - Loading the entitlement state (avoid flash of upgrade then "active")
+  if (Capacitor.isNativePlatform()) return null;
+  if (!STRIPE_PRICE_PLUS) return null;
+  if (loading) return null;
+
+  if (hasPlus) {
+    return (
+      <div className="account-plus-panel account-plus-active">
+        <strong>★ SkyFlag Plus active</strong>
+        <p>Thanks for supporting SkyFlag. All Plus features unlocked.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="account-plus-panel">
+      <strong className="account-plus-title">SkyFlag Plus</strong>
+      <p className="account-plus-body">
+        Unlock advanced AI difficulty, puzzle archive with analysis,
+        custom themes, ad-free play, and unlimited tournaments.
+      </p>
+      <button
+        type="button"
+        className="end-game-btn account-plus-cta"
+        disabled={busy}
+        onClick={async () => {
+          if (!supabase) return;
+          setBusy(true);
+          setErr(null);
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+              setErr('Sign in to subscribe.');
+              setBusy(false);
+              return;
+            }
+            const response = await fetch(
+              `${SUPABASE_URL}/functions/v1/create-checkout-session`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({
+                  price_id: STRIPE_PRICE_PLUS,
+                  success_url: `${window.location.origin}?plus=ok`,
+                  cancel_url: window.location.origin,
+                }),
+              },
+            );
+            const body = await response.json();
+            if (!response.ok || !body.url) {
+              setErr(body.error ?? 'Failed to start checkout.');
+              setBusy(false);
+              return;
+            }
+            // Redirect to Stripe-hosted checkout. The user comes back
+            // to ?plus=ok on success; the webhook handler will have
+            // already granted the entitlement by then via realtime.
+            window.location.href = body.url;
+          } catch (e) {
+            setErr(e instanceof Error ? e.message : 'Checkout failed.');
+            setBusy(false);
+          }
+        }}
+      >
+        {busy ? 'Loading…' : 'Subscribe — $4.99/mo'}
+      </button>
+      {err && <p className="account-message">{err}</p>}
     </div>
   );
 }
