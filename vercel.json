@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "skyflag.vercel.app" }],
+      "destination": "https://playskyflag.com/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/((?!api|assets|.*\\..*).*)", "destination": "/index.html" }
   ]
