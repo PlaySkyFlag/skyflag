@@ -1461,6 +1461,129 @@ button.tray-piece:hover {
   margin-top: 2px;
 }
 
+/* Primary "Continue as guest" button — visually dominant since this is
+   the lowest-friction sign-in path and we want users to take it. */
+.account-primary {
+  width: 100%;
+  font-size: 1.05rem;
+  padding: 14px 16px;
+  margin-top: 4px;
+}
+
+.account-primary-sub {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  text-align: center;
+  opacity: 0.65;
+}
+
+/* OAuth row — Apple + Google sign-in buttons, side by side on wide
+   screens, stacked on narrow ones. Visual weight sits between the
+   primary guest button (bigger) and the email form (smaller). */
+.account-oauth-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+
+@media (min-width: 480px) {
+  .account-oauth-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.account-oauth-btn {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: filter 0.12s ease, transform 0.06s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.account-oauth-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.account-oauth-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.account-oauth-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.account-oauth-apple {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+}
+
+.account-oauth-google {
+  background: #fff;
+  color: #1f1f1f;
+  border: 1px solid #dadce0;
+}
+
+.account-oauth-google-glyph {
+  display: inline-block;
+  font-family: 'Product Sans', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  background: linear-gradient(45deg, #4285f4 0% 25%, #ea4335 25% 50%, #fbbc04 50% 75%, #34a853 75% 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Email magic-link form — secondary path, more compact than the old layout */
+.account-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@media (min-width: 480px) {
+  .account-email-form {
+    flex-direction: row;
+  }
+  .account-email-form .account-input {
+    flex: 1;
+  }
+}
+
+/* Upgrade panel — shown to signed-in guests, prompts them to link an
+   email so their rating/profile is portable across devices. */
+.account-upgrade-panel {
+  background: rgba(255, 216, 132, 0.08);
+  border: 1px solid rgba(255, 216, 132, 0.4);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 10px 0 14px;
+}
+
+.account-upgrade-title {
+  display: block;
+  font-size: 0.92rem;
+  color: #ffd884;
+  margin-bottom: 4px;
+}
+
+.account-upgrade-body {
+  margin: 0 0 10px;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
 /* Lobby — embedded in the Multiplayer panel above the code-based create
    /join controls when the user is signed in and not yet in a room. */
 .lobby {

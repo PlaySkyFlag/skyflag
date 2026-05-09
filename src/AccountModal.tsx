@@ -4,7 +4,13 @@
 
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { sendMagicLink, signInAnonymously, signOut } from './game/auth';
+import {
+  linkEmailToAnonymous,
+  sendMagicLink,
+  signInAnonymously,
+  signInWithOAuth,
+  signOut,
+} from './game/auth';
 import { loadProfile, saveProfile, type Gender, type Profile } from './game/profile';
 
 type Props = {
@@ -62,21 +68,84 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
 
   if (!open) return null;
 
-  // ── Signed-out state — magic-link form ───────────────────────────────
+  // ── Signed-out state — guest-first, then OAuth, then email ──────────
   if (!user) {
     return (
       <div className="account-overlay" role="dialog" aria-modal="true">
         <div className="account-card">
           <div className="account-header">
-            <h2 className="account-title">Sign in to SkyFlag</h2>
+            <h2 className="account-title">Welcome to SkyFlag</h2>
             <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
           </div>
           <p className="account-intro">
-            Use a magic link to your inbox — no password to remember. Required
-            only for online play; offline single-player and 2P hot-seat work
-            without an account.
+            Pick how you want to play. Online play, ratings, and tournaments
+            work with any of these — guest accounts can be saved permanently
+            later.
           </p>
+
+          {/* Primary: instant guest sign-in. The dominant button because
+              this is the lowest-friction path and converts best. */}
+          <button
+            type="button"
+            className="end-game-btn account-primary"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              setMessage(null);
+              const r = await signInAnonymously();
+              setBusy(false);
+              if (!r.ok) setMessage(r.message);
+            }}
+            title="Start playing instantly — guest account on this device"
+          >
+            {busy ? 'Signing in…' : '▶ Continue as guest'}
+          </button>
+          <p className="account-primary-sub">
+            No email, no password. You can save your account later.
+          </p>
+
+          <div className="account-divider"><span>or save progress across devices</span></div>
+
+          {/* OAuth row — Apple per Apple's iOS sign-in policy + Google for
+              the rest. Standard provider button styling. */}
+          <div className="account-oauth-row">
+            <button
+              type="button"
+              className="account-oauth-btn account-oauth-apple"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setMessage(null);
+                const r = await signInWithOAuth('apple');
+                setBusy(false);
+                if (!r.ok) setMessage(r.message);
+              }}
+            >
+               Sign in with Apple
+            </button>
+            <button
+              type="button"
+              className="account-oauth-btn account-oauth-google"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setMessage(null);
+                const r = await signInWithOAuth('google');
+                setBusy(false);
+                if (!r.ok) setMessage(r.message);
+              }}
+            >
+              <span className="account-oauth-google-glyph">G</span> Sign in with Google
+            </button>
+          </div>
+
+          <div className="account-divider"><span>or use email</span></div>
+
+          {/* Email magic-link form — kept for users without Apple/Google
+              accounts and as a fallback if the OAuth providers are
+              misconfigured. Visually de-emphasized. */}
           <form
+            className="account-email-form"
             onSubmit={async (e) => {
               e.preventDefault();
               if (!email.trim()) return;
@@ -91,7 +160,6 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               }
             }}
           >
-            <label className="account-label" htmlFor="account-email">Email address</label>
             <input
               id="account-email"
               className="account-input"
@@ -102,33 +170,11 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
             />
-            <button type="submit" className="end-game-btn" disabled={busy}>
+            <button type="submit" className="end-game-btn end-game-btn--subtle" disabled={busy}>
               {busy ? 'Sending…' : 'Send magic link'}
             </button>
           </form>
-          <div className="account-divider"><span>or</span></div>
-          <button
-            type="button"
-            className="end-game-btn end-game-btn--subtle"
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              setMessage(null);
-              const r = await signInAnonymously();
-              setBusy(false);
-              if (!r.ok) setMessage(r.message);
-              // Success: onAuthStateChange in useAuthUser fires, re-renders this
-              // modal in its signed-in profile-form state automatically.
-            }}
-            title="Skip the email step — instant guest account on this device"
-          >
-            {busy ? 'Signing in…' : 'Continue as guest'}
-          </button>
-          <p className="account-fineprint">
-            Guest accounts work everywhere a normal account does, but only on
-            this device — clear your browser data and you'll lose them. You
-            can add an email later from this menu to make it permanent.
-          </p>
+
           {message && <p className="account-message">{message}</p>}
         </div>
       </div>
@@ -167,6 +213,51 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               <div className="account-rating-num">{profile.games_played}</div>
               <div className="account-rating-label">Online games</div>
             </div>
+          </div>
+        )}
+
+        {/* Guest upgrade prompt — shown only when the signed-in user has
+            no email, i.e. they're an anonymous account. Lets them link
+            an email to make their rating + profile portable across
+            devices without losing what they've earned. */}
+        {!user.email && (
+          <div className="account-upgrade-panel">
+            <strong className="account-upgrade-title">Save this account</strong>
+            <p className="account-upgrade-body">
+              Guest accounts only live on this device — clear your browser data
+              and your rating is gone. Link an email to keep your profile,
+              rating, and friends across any device you sign in on.
+            </p>
+            <form
+              className="account-email-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!email.trim()) return;
+                setBusy(true);
+                setMessage(null);
+                const r = await linkEmailToAnonymous(email.trim());
+                setBusy(false);
+                if (r.ok) {
+                  setMessage(`✓ Confirmation email sent to ${email.trim()}. Click the link to save your account.`);
+                } else {
+                  setMessage(`Couldn't link email: ${r.message}`);
+                }
+              }}
+            >
+              <input
+                id="account-upgrade-email"
+                className="account-input"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+              <button type="submit" className="end-game-btn" disabled={busy}>
+                {busy ? 'Sending…' : 'Save with email'}
+              </button>
+            </form>
           </div>
         )}
         {loadingProfile ? (

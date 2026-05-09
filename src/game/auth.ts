@@ -81,3 +81,46 @@ export async function signInAnonymously(): Promise<{ ok: true } | { ok: false; m
   }
   return { ok: true };
 }
+
+// OAuth sign-in via Apple or Google. Both bounce the user out to the
+// provider's auth page and redirect back to the app origin with a
+// session token that Supabase exchanges automatically — no extra
+// callback handling needed in our code.
+//
+// Requires the matching provider to be enabled in the Supabase dashboard
+// (Auth → Providers → Apple / Google) with valid client credentials.
+// Returns a friendly error if it's not configured.
+export type OAuthProvider = 'google' | 'apple';
+
+export async function signInWithOAuth(
+  provider: OAuthProvider,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: window.location.origin },
+  });
+  if (error) {
+    if (/provider is not enabled/i.test(error.message)) {
+      return {
+        ok: false,
+        message: `${provider === 'apple' ? 'Apple' : 'Google'} sign-in isn't enabled on this project. Enable it in Supabase → Auth → Providers.`,
+      };
+    }
+    return { ok: false, message: error.message };
+  }
+  return { ok: true };
+}
+
+// Upgrade an anonymous (guest) user into a permanent account by linking
+// an email. Supabase sends a confirmation link to the email; clicking
+// it merges the existing anon user-id with the new email-based identity,
+// so the user's profile, rating, friends, and games all carry over.
+export async function linkEmailToAnonymous(
+  email: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
+  const { error } = await supabase.auth.updateUser({ email });
+  if (error) return { ok: false, message: error.message };
+  return { ok: true };
+}
