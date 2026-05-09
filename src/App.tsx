@@ -1113,91 +1113,52 @@ export default function App() {
           aria-hidden="true"
         >
           <defs>
-            {/* Gradient for the Ground↔Sky ribbon — green at the
-                Ground end, blue at the Sky end. Routed in
-                user-space units so the gradient axis aligns with
-                the curve's actual direction in viewBox coords. */}
-            <linearGradient
-              id="flow-ground-sky"
-              gradientUnits="userSpaceOnUse"
-              x1="50"
-              y1="36"
-              x2="84"
-              y2="64"
-            >
-              <stop offset="0%"   stopColor="#9bcf7f" />
-              <stop offset="100%" stopColor="#8ec8e0" />
-            </linearGradient>
-            <linearGradient
-              id="flow-sky-space"
-              gradientUnits="userSpaceOnUse"
-              x1="70"
-              y1="0"
-              x2="30"
-              y2="0"
-            >
-              <stop offset="0%"   stopColor="#8ec8e0" />
-              <stop offset="100%" stopColor="#a899d6" />
-            </linearGradient>
+            {/* Burnished-bronze marker — a simple triangular tip,
+                same color on both ends so the lift reads as
+                bidirectional without the double-marker noise. */}
             <marker
               id="flow-arrow"
               viewBox="0 0 10 10"
-              refX="6"
+              refX="7"
               refY="5"
-              markerWidth="4"
-              markerHeight="4"
+              markerWidth="3.2"
+              markerHeight="3.2"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" fill="rgba(220, 235, 255, 0.95)" />
+              <path d="M 0 1 L 9 5 L 0 9 Z" fill="#c89868" />
             </marker>
           </defs>
-          {/* Wide soft glow under the main stroke — gives each arrow a
-              ribbon-of-light feel without overpainting the boards. */}
-          <g
+          {/* Ground ↔ Sky — anchored at Ground's top-right corner and
+              Sky's bottom-left corner; the curve bulges OUT into the
+              empty right wedge so it fills that corner instead of
+              overpainting the boards. Single weighty bronze stroke,
+              no gradient, no animation — reads as carved relief. */}
+          <path
+            d="M 66 36 C 88 40, 96 50, 68 64"
             fill="none"
-            strokeWidth={6}
-            strokeLinecap="round"
-            stroke="rgba(180, 210, 240, 0.22)"
-            vectorEffect="non-scaling-stroke"
-          >
-            <path d="M 50 36 C 64 26, 78 30, 84 64" />
-            <path d="M 70 4 Q 50 -8 30 4" />
-          </g>
-          {/* Main colored stroke — solid for color presence. */}
-          <g
-            fill="none"
-            strokeWidth={2.4}
+            stroke="#a0613f"
+            strokeWidth={2}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            opacity={0.92}
-          >
-            <path
-              d="M 50 36 C 64 26, 78 30, 84 64"
-              stroke="url(#flow-ground-sky)"
-              markerStart="url(#flow-arrow)"
-              markerEnd="url(#flow-arrow)"
-            />
-            <path
-              d="M 70 4 Q 50 -8 30 4"
-              stroke="url(#flow-sky-space)"
-              markerStart="url(#flow-arrow)"
-              markerEnd="url(#flow-arrow)"
-            />
-          </g>
-          {/* Animated dashes on top of the colored stroke — march along
-              each curve to suggest lift travel between layers. The
-              animation is a CSS keyframe on the .flow-march class. */}
-          <g
-            className="flow-march"
+            opacity={0.85}
+            markerStart="url(#flow-arrow)"
+            markerEnd="url(#flow-arrow)"
+          />
+          {/* Sky ↔ Space — anchored at Sky's top-left corner and
+              Space's top-right corner; arcs OVER the top of both
+              boards. Slightly cooler bronze (faded indigo undertone)
+              to suggest the higher / cosmic layer. */}
+          <path
+            d="M 68 0 Q 50 -10 32 0"
             fill="none"
-            strokeWidth={2.4}
+            stroke="#7a5a8a"
+            strokeWidth={2}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            stroke="rgba(255, 255, 255, 0.85)"
-          >
-            <path d="M 50 36 C 64 26, 78 30, 84 64" />
-            <path d="M 70 4 Q 50 -8 30 4" />
-          </g>
+            opacity={0.85}
+            markerStart="url(#flow-arrow)"
+            markerEnd="url(#flow-arrow)"
+          />
         </svg>
         {LAYER_ORDER.map((layer) => (
           <div className={`board-stack-item board-stack-item--${layer}`} key={layer}>
