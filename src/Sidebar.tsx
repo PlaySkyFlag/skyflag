@@ -12,9 +12,10 @@ import Help from './Help';
 import MoveHistory from './MoveHistory';
 import Multiplayer from './Multiplayer';
 import Tournaments from './Tournaments';
+import { listFriends } from './game/friends';
 import type { Profile } from './game/profile';
 import type { HistoryEntry, RoomState } from './game/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type TabId = 'rules' | 'multiplayer' | 'history' | 'tournaments' | 'friends';
 
@@ -49,6 +50,28 @@ export default function Sidebar({
   const [active, setActive] = useState<TabId | null>(
     aiPlayer === null ? 'multiplayer' : null,
   );
+
+  // Count of pending incoming friend requests — drives a small red
+  // badge on the Friends tab so the user notices new requests without
+  // opening the tab. Refreshed on sign-in and whenever the Friends
+  // tab closes (after the user has presumably accepted/declined).
+  const [pendingCount, setPendingCount] = useState(0);
+  const refreshKey = active === 'friends' ? 'open' : 'closed';
+  useEffect(() => {
+    if (!authUser) {
+      setPendingCount(0);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const list = await listFriends(authUser.id);
+      if (cancelled) return;
+      setPendingCount(list.filter((f) => f.direction === 'pending-in').length);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser, refreshKey]);
 
   // Build the panel for the active tab. Each panel renders the existing
   // component with inline=true, so it draws just its body without the
@@ -87,15 +110,7 @@ export default function Sidebar({
     }
   })();
 
-  // Pending-request count drives a small red badge on the Friends tab,
-  // mirroring the badge that used to live on the Friends disclosure
-  // summary — gives the user a glanceable nudge to handle requests.
-  // Computed lazily via the same listFriends path; here we just rely on
-  // the embedded component's own state since this badge would otherwise
-  // require lifting it up. For now the badge is omitted (Friends body
-  // shows the same Requests section prominently).
-
-  const tab = (id: TabId, label: string) => {
+  const tab = (id: TabId, label: string, badge?: number) => {
     const isActive = active === id;
     return (
       <button
@@ -106,6 +121,11 @@ export default function Sidebar({
         onClick={() => setActive(isActive ? null : id)}
       >
         {label}
+        {badge !== undefined && badge > 0 && (
+          <span className="sidebar-tab-badge" aria-label={`${badge} pending`}>
+            {badge}
+          </span>
+        )}
       </button>
     );
   };
@@ -125,7 +145,7 @@ export default function Sidebar({
         {tab('multiplayer', '👥 Multiplayer')}
         {tab('history', `📜 History${history.length > 0 ? ` (${history.length})` : ''}`)}
         {tab('tournaments', '🏆 Tournaments')}
-        {tab('friends', '🤝 Friends')}
+        {tab('friends', '🤝 Friends', pendingCount)}
         {active && (
           <button
             type="button"

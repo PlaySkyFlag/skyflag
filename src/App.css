@@ -1805,6 +1805,21 @@ button.tray-piece:hover {
   background: rgba(255, 216, 132, 0.25);
 }
 
+.sidebar-tab-badge {
+  display: inline-block;
+  margin-left: 6px;
+  min-width: 18px;
+  padding: 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 18px;
+  border-radius: 999px;
+  background: #ff8a6f;
+  color: #1a0a08;
+  vertical-align: 1px;
+}
+
 .sidebar-tab-close {
   margin-left: auto;
   font-size: 0.95rem;
