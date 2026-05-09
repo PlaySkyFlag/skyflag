@@ -46,6 +46,60 @@ function ttSet(key: string, entry: TTEntry): void {
   transTable.set(key, entry);
 }
 
+// ─── Killer-move + history heuristic state ─────────────────────────────────
+// Both are forms of "remember which moves have been useful" that improve
+// move ordering and therefore alpha-beta cuts. Captures already get high
+// priority via the static heuristic; killer/history slots are reserved
+// for QUIET moves (non-captures) that surprised us by causing a cutoff.
+//
+// Killer moves: per-ply, two slots. When a quiet move at ply N caused a
+// beta cutoff, store it. On the next visit to ply N (different branch
+// of the tree), try those moves before generic quiet moves — the same
+// move often refutes sibling positions with similar tactical themes.
+//
+// History heuristic: a per-(piece, destination) counter that accumulates
+// across the whole search. Moves that have caused cutoffs anywhere build
+// up a history score, used as a tiebreaker for quiet moves. Weighted by
+// depth² so deeper cutoffs (which prove more about a move's strength)
+// count more than shallow ones.
+//
+// Both are reset at the start of each chooseAction() call — accumulating
+// across iterative-deepening iterations is the whole point, but bleeding
+// state between AI turns would mis-prioritize moves for a stale position.
+
+type KillerSlot = [Action | undefined, Action | undefined];
+const killers: KillerSlot[] = [];
+const historyTable = new Map<string, number>();
+// Cap history scores so they can't grow unbounded and outrank killers
+// or flag-capture priorities. ~300 leaves quiet moves comfortably below
+// the 400/500 killer scores and the 900-1300 capture scores.
+const HISTORY_CAP = 300;
+
+function historyKey(action: Action): string {
+  if (action.type === 'move') {
+    return `m:${action.pieceId}:${action.to.layer}:${action.to.row}:${action.to.col}`;
+  }
+  return `d:${action.pieceId}`;
+}
+
+function recordCutoff(action: Action, ply: number, depth: number, state: GameState): void {
+  // Captures already top the move ordering via the capture-victim heuristic.
+  // Recording them as killers would just push out actually-useful quiet
+  // killers, so skip.
+  if (isCapture(state, action)) return;
+
+  const slot = killers[ply] ?? (killers[ply] = [undefined, undefined]);
+  // Don't double-store the same move in both slots.
+  if (!slot[0] || !actionsEqual(slot[0], action)) {
+    slot[1] = slot[0];
+    slot[0] = action;
+  }
+
+  const key = historyKey(action);
+  const cur = historyTable.get(key) ?? 0;
+  historyTable.set(key, Math.min(cur + depth * depth, HISTORY_CAP));
+}
+
 // Compact string hash of every state attribute that influences future
 // search. History/captured/status are not included — they don't change
 // future play (status is checked separately). Pieces are sorted by id so
@@ -267,39 +321,53 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   return score;
 }
 
-// Cheap heuristic for move ordering — captures and flag-captures get tried
-// first, which makes alpha-beta cuts much more effective.
-function orderingHeuristic(state: GameState, action: Action): number {
-  if (action.type !== 'move') return 0;
+// Move-ordering heuristic. Score hierarchy (higher = tried first):
+//   1000 + victim value  → capture  (1030 to 1350 across piece kinds)
+//   900                   → captain landing on opponent's uncaptured flag
+//   500 / 400             → killer-move slots 0 and 1 (quiet moves that
+//                           caused cutoffs at this ply earlier in search)
+//    0..300                → quiet moves, sorted by history-heuristic count
+// Captures and flag-captures stay top-priority regardless of killer/history
+// — those are tactical, the heuristics only refine quiet-move ordering.
+function orderingHeuristic(state: GameState, action: Action, ply: number): number {
+  if (action.type === 'move') {
+    const target = state.onBoard.find(
+      (bp) =>
+        bp.coord.layer === action.to.layer &&
+        bp.coord.row === action.to.row &&
+        bp.coord.col === action.to.col &&
+        bp.piece.owner !== state.currentPlayer,
+    );
+    if (target) return 1000 + pieceValue(target.piece.kind);
 
-  const target = state.onBoard.find(
-    (bp) =>
-      bp.coord.layer === action.to.layer &&
-      bp.coord.row === action.to.row &&
-      bp.coord.col === action.to.col &&
-      bp.piece.owner !== state.currentPlayer,
-  );
-  if (target) return 200 + pieceValue(target.piece.kind);
-
-  const piece = state.onBoard.find((bp) => bp.piece.id === action.pieceId)?.piece;
-  if (piece?.kind === 'captain') {
-    const opp = opponentOf(state.currentPlayer);
-    const flag = FLAG_COORDS[opp][action.to.layer];
-    if (
-      action.to.row === flag.row &&
-      action.to.col === flag.col &&
-      !state.flags[action.to.layer][opp]
-    ) {
-      return 400;
+    const piece = state.onBoard.find((bp) => bp.piece.id === action.pieceId)?.piece;
+    if (piece?.kind === 'captain') {
+      const opp = opponentOf(state.currentPlayer);
+      const flag = FLAG_COORDS[opp][action.to.layer];
+      if (
+        action.to.row === flag.row &&
+        action.to.col === flag.col &&
+        !state.flags[action.to.layer][opp]
+      ) {
+        return 900;
+      }
     }
   }
 
-  return 0;
+  // Killer slots — quiet moves that recently caused beta cutoffs at this ply.
+  const slot = killers[ply];
+  if (slot) {
+    if (slot[0] && actionsEqual(slot[0], action)) return 500;
+    if (slot[1] && actionsEqual(slot[1], action)) return 400;
+  }
+
+  // History tiebreaker for everything else.
+  return historyTable.get(historyKey(action)) ?? 0;
 }
 
-function orderActions(state: GameState, actions: Action[]): Action[] {
+function orderActions(state: GameState, actions: Action[], ply: number): Action[] {
   return actions
-    .map((a) => ({ a, h: orderingHeuristic(state, a) }))
+    .map((a) => ({ a, h: orderingHeuristic(state, a, ply) }))
     .sort((x, y) => y.h - x.h)
     .map((s) => s.a);
 }
@@ -312,8 +380,9 @@ function orderActionsWithPriority(
   state: GameState,
   actions: Action[],
   priority: Action | undefined,
+  ply: number,
 ): Action[] {
-  const ordered = orderActions(state, actions);
+  const ordered = orderActions(state, actions, ply);
   if (!priority) return ordered;
   const idx = ordered.findIndex((a) => actionsEqual(a, priority));
   if (idx <= 0) return ordered;
@@ -379,7 +448,10 @@ function quiescence(
   const captures = legalActions(state).filter((a) => isCapture(state, a));
   if (captures.length === 0) return standPat;
 
-  const ordered = orderActions(state, captures);
+  // Quiescence orders by capture-victim value only — killer/history slots
+  // don't apply here (qsearch only follows captures, never quiet moves).
+  // Pass ply=0 as a no-op since killer/history won't match captures anyway.
+  const ordered = orderActions(state, captures, 0);
 
   if (isMax) {
     let value = standPat;
@@ -404,10 +476,12 @@ function quiescence(
 
 // Minimax with alpha-beta. `aiPlayer` is fixed throughout the search (the side
 // we're optimising for). Whether a node is a max- or min-node depends on
-// whether state.currentPlayer matches `aiPlayer`.
+// whether state.currentPlayer matches `aiPlayer`. `ply` counts half-moves
+// from the root — used by the killer-move heuristic to index per-ply slots.
 function minimax(
   state: GameState,
   depth: number,
+  ply: number,
   alpha: number,
   beta: number,
   aiPlayer: Player,
@@ -440,10 +514,10 @@ function minimax(
     // No legal action — the player must end-turn. Recurse on the resulting
     // state (turn passes to opponent).
     const next = reduce(state, { type: 'end-turn' });
-    return minimax(next, depth - 1, alpha, beta, aiPlayer);
+    return minimax(next, depth - 1, ply + 1, alpha, beta, aiPlayer);
   }
 
-  const ordered = orderActionsWithPriority(state, actions, ttHit?.bestAction);
+  const ordered = orderActionsWithPriority(state, actions, ttHit?.bestAction, ply);
   const isMax = state.currentPlayer === aiPlayer;
 
   let value = isMax ? -Infinity : Infinity;
@@ -451,7 +525,7 @@ function minimax(
 
   for (const action of ordered) {
     const next = reduce(state, action);
-    const childValue = minimax(next, depth - 1, alpha, beta, aiPlayer);
+    const childValue = minimax(next, depth - 1, ply + 1, alpha, beta, aiPlayer);
     if (isMax) {
       if (childValue > value) {
         value = childValue;
@@ -465,7 +539,12 @@ function minimax(
       }
       beta = Math.min(beta, value);
     }
-    if (alpha >= beta) break;
+    if (alpha >= beta) {
+      // Beta cutoff — record this move as a killer + bump its history score
+      // so future visits to similar positions try it earlier in the ordering.
+      recordCutoff(action, ply, depth, state);
+      break;
+    }
   }
 
   // Determine the TT entry flag from how the score relates to the original
@@ -489,6 +568,14 @@ export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEA
     state = { ...state, history: [] };
   }
 
+  // Reset the move-ordering heuristic state at the top of each search.
+  // Killers and history accumulate across iterative-deepening iterations
+  // (the whole point — depth-1 cutoffs guide depth-2 ordering, and so on).
+  // But the position changes between AI turns, so carrying these across
+  // chooseAction calls would mis-prioritize moves for a stale board.
+  killers.length = 0;
+  historyTable.clear();
+
   const actions = legalActions(state);
   if (actions.length === 0) return null;
 
@@ -505,14 +592,15 @@ export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEA
   let scored: Array<{ action: Action; value: number }> = [];
 
   for (let depth = 1; depth <= searchDepth; depth++) {
-    const ordered = orderActionsWithPriority(state, actions, lastBestAction);
+    const ordered = orderActionsWithPriority(state, actions, lastBestAction, 0);
     let bestValue = -Infinity;
     let alpha = -Infinity;
     const iterScored: Array<{ action: Action; value: number }> = [];
 
     for (const action of ordered) {
       const next = reduce(state, action);
-      const value = minimax(next, depth - 1, alpha, Infinity, aiPlayer);
+      // Root actions are at ply 0; the resulting state for minimax is ply 1.
+      const value = minimax(next, depth - 1, 1, alpha, Infinity, aiPlayer);
       iterScored.push({ action, value });
       if (value > bestValue) {
         bestValue = value;
