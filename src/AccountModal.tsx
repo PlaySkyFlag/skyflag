@@ -210,16 +210,6 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               placeholder="e.g. RavenCaptain"
             />
 
-            <label className="account-label" htmlFor="account-fullname">Full name (optional)</label>
-            <input
-              id="account-fullname"
-              className="account-input"
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Nelson Jatel"
-            />
-
             <div className="account-row">
               <div className="account-col">
                 <label className="account-label" htmlFor="account-age">Age (optional)</label>
