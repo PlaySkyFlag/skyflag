@@ -1,4 +1,4 @@
-import type { Piece, PieceId, PieceKind, Player } from './game/types';
+import type { FlagsState, Layer, Piece, PieceId, PieceKind, Player } from './game/types';
 
 const KIND_LABEL: Record<PieceKind, string> = {
   captain: 'Captain',
@@ -36,6 +36,10 @@ type Props = {
   // drives the `tray-clock-active` style so the running clock reads
   // brighter than the paused one.
   clockActive?: boolean;
+  // Full flags state — the tray derives THIS player's captured-flag
+  // count (the opponent's flags they've taken) for the captured-flag
+  // row. Win condition is all 3 captured + Captain on Nexus.
+  flagsState?: FlagsState;
 };
 
 function formatClock(ms: number): string {
@@ -55,7 +59,13 @@ export default function PieceTray({
   note,
   clockMs,
   clockActive,
+  flagsState,
 }: Props) {
+  const opponent: Player = player === 'p1' ? 'p2' : 'p1';
+  const layers: Layer[] = ['ground', 'sky', 'space'];
+  const flagsCaptured = flagsState
+    ? layers.filter((l) => flagsState[l][opponent])
+    : [];
   return (
     <section
       className={`tray tray-${player}${isInteractive ? '' : ' tray-inactive'}`}
@@ -106,6 +116,27 @@ export default function PieceTray({
           })
         )}
       </div>
+
+      {flagsState && (
+        <div className="tray-flags" aria-label={`${PLAYER_LABEL[player]} captured flags`}>
+          <span className="tray-flags-label">flags captured</span>
+          <span className="tray-flags-row">
+            {layers.map((layer) => {
+              const taken = flagsState[layer][opponent];
+              return (
+                <span
+                  key={layer}
+                  className={`tray-flag-slot${taken ? ' tray-flag-slot-taken' : ''}`}
+                  title={`${layer} — ${taken ? 'captured' : 'not captured'}`}
+                >
+                  ⚑<span className="tray-flag-layer">{layer[0].toUpperCase()}</span>
+                </span>
+              );
+            })}
+          </span>
+          <span className="tray-flags-count">{flagsCaptured.length} / 3</span>
+        </div>
+      )}
 
       {capturedPieces.length > 0 && (
         <>

@@ -1017,6 +1017,7 @@ export default function App() {
           inProgress &&
           state.currentPlayer === 'p1'
         }
+        flagsState={state.flags}
       />
       <div className="board-stack">
         {/* Flow design element FIRST in DOM so it paints behind the boards.
@@ -1132,6 +1133,7 @@ export default function App() {
           inProgress &&
           state.currentPlayer === 'p2'
         }
+        flagsState={state.flags}
       />
       <EndGameOverlay
         state={state}
