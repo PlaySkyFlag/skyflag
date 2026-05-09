@@ -23,33 +23,35 @@ allows; nothing here is blocking gameplay.
 
 ## Should fix
 
-- [ ] **Add a "Disable notifications" toggle.** `getExistingSubscription`
-      and `disablePush` in `src/game/push.ts` are exported but unused —
-      a user who taps Enable can't turn it off in-app.
-- [ ] **`ROOM_MAX_AGE_MS` is enforced on join but rooms are never
-      deleted** (`src/Multiplayer.tsx:23`). Rows accumulate forever.
-      Add a scheduled cleanup (pg_cron) that deletes rooms older than
-      a few days.
+- [x] ~~Add a "Disable notifications" toggle.~~ NotificationsControl
+      now queries push_subscriptions on mount and shows Disable when a
+      row exists; click → server delete + (web) local unsubscribe.
+- [x] ~~ROOM_MAX_AGE_MS cleanup.~~ Migration 008 adds a
+      `prune_old_games()` SECURITY DEFINER function and conditionally
+      schedules it via pg_cron at 03:17 UTC daily. (If pg_cron isn't
+      enabled in Supabase Database → Extensions, the schedule is a
+      no-op and you can run `select public.prune_old_games();`
+      manually from the SQL editor.)
 - [x] ~~Re-read `Tutorial.tsx` start-to-finish before launch.~~
       Found one stale reference ("Tutorial button in the help row") —
       updated to point to the sidebar tab. Rest checked clean.
 - [x] ~~CSS orphans in `src/App.css`:~~
       `.hud-mute-btn`, `.help-row`, `.help-row > .help`,
       `.help-tutorial-btn` removed; Tournaments comment refreshed.
-- [ ] **`apply-rating` Edge Function** reads `state.status.winner` and
-      relies on short-circuit evaluation against `status.kind === 'won'`.
-      Correct today, but a refactor of `GameStatus` could regress
-      silently. Add an explicit narrow.
+- [x] ~~apply-rating type narrow.~~ Local `WonStatus | DrawStatus |
+      InProgressStatus` shape with explicit `winner: 'p1' | 'p2'`
+      narrow at line 90; future GameStatus refactors will trip a
+      type error here instead of silently degrading.
 
 ## Nice to have
 
-- [ ] **Add a React error boundary** around `<App />` in `src/main.tsx`.
-      Today any crash in the SVG board / AI worker / Supabase callback
-      brings down the whole UI to a blank page.
-- [ ] **Supabase-down resilience.** State is pushed on every dispatch
-      with no retry/queue. A network blip mid-game loses the move from
-      the server's view but keeps it locally. A "last push failed"
-      indicator + manual retry button would close the gap.
+- [x] ~~React error boundary around `<App />`.~~ ErrorBoundary class
+      wrapped at main.tsx; renders a card with the message + Reload /
+      Try-again-without-reload buttons instead of a blank page.
+- [x] ~~Supabase-down resilience.~~ A failed games.state push now
+      flips a `pushFailed` flag; sync-banner pinned bottom-right with
+      a Retry button bumps a nonce that re-runs the push effect with
+      the current state. Successful retry clears the banner.
 - [ ] **`StatusBar.tsx` REASON_LABEL duplicates the `GameStatus` union.**
       Hand-kept in sync. Derive via `keyof` or co-locate.
 - [ ] **Stats credit for 2P hot-seat is silently dropped.** Mention this

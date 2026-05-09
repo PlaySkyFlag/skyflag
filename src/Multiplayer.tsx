@@ -5,6 +5,7 @@ import { createInitialGameState } from './game/constants';
 import { getEffectiveUserId } from './game/identity';
 import { loadProfile, type Profile } from './game/profile';
 import {
+  disablePush,
   enableIosPush,
   enablePush,
   getPermissionState,
@@ -69,7 +70,9 @@ function formatError(err: unknown): string {
 // Dispatches by platform: Web Push (browser) or APNs via Capacitor (iOS).
 // Both paths upsert into public.push_subscriptions keyed by
 // (user_id, platform), so a user with both web and iOS gets pings on
-// either device.
+// either device. Disable removes the server row (so the Edge Function
+// stops dispatching) and, on web, also unsubscribes the local
+// PushSubscription.
 function NotificationsControl() {
   const { user: authUser } = useAuthUser();
   const platform = getPushPlatform();
@@ -78,10 +81,64 @@ function NotificationsControl() {
   );
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // Subscribed = there's a row in push_subscriptions for this user on
+  // this platform. Drives the toggle between Enable and Disable.
+  const [subscribed, setSubscribed] = useState<boolean>(false);
 
   useEffect(() => {
     if (platform === 'web') setPermission(getPermissionState());
   }, [platform]);
+
+  // Look up whether the server already has a row for this user on this
+  // platform — that's the source of truth for whether dispatch will
+  // actually happen, and it survives logout/login on the same device.
+  useEffect(() => {
+    if (!authUser || !supabase || (platform !== 'web' && platform !== 'ios')) {
+      setSubscribed(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('push_subscriptions')
+        .select('user_id')
+        .eq('user_id', authUser.id)
+        .eq('platform', platform)
+        .maybeSingle();
+      if (!cancelled) setSubscribed(!!data);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser, platform]);
+
+  const onDisable = async () => {
+    if (!authUser || !supabase) return;
+    setBusy(true);
+    setMessage(null);
+    const { error: delErr } = await supabase
+      .from('push_subscriptions')
+      .delete()
+      .eq('user_id', authUser.id)
+      .eq('platform', platform);
+    // On web also tear down the local PushSubscription so the browser
+    // stops holding a stale endpoint. On iOS the OS-level token sticks
+    // around — only the server row matters for dispatch.
+    if (platform === 'web') {
+      try {
+        await disablePush();
+      } catch {
+        // ignore — server row removal is the binding action.
+      }
+    }
+    setBusy(false);
+    if (delErr) {
+      setMessage(`Couldn't disable: ${delErr.message}`);
+      return;
+    }
+    setSubscribed(false);
+    setMessage('Notifications disabled.');
+  };
 
   if (platform === 'unsupported') {
     return <p className="mp-note">Notifications aren't supported on this device.</p>;
@@ -89,19 +146,30 @@ function NotificationsControl() {
   if (platform === 'web' && !isPushSupported()) {
     return <p className="mp-note">Browser notifications aren't supported on this device.</p>;
   }
-  if (platform === 'web' && permission === 'granted') {
-    return (
-      <p className="mp-note">
-        ✓ Notifications enabled. You'll be pinged when it's your turn.
-      </p>
-    );
-  }
   if (platform === 'web' && permission === 'denied') {
     return (
       <p className="mp-note">
         Notifications were blocked. Allow them from your browser's site
         settings, then reload to try again.
       </p>
+    );
+  }
+  if (subscribed) {
+    return (
+      <div className="mp-notify">
+        <p className="mp-note">
+          ✓ Notifications enabled. You'll be pinged when it's your turn.
+        </p>
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle"
+          disabled={busy}
+          onClick={onDisable}
+        >
+          {busy ? 'Disabling…' : 'Disable notifications'}
+        </button>
+        {message && <p className="mp-note">{message}</p>}
+      </div>
     );
   }
 
@@ -137,11 +205,12 @@ function NotificationsControl() {
                   },
                   { onConflict: 'user_id,platform' },
                 );
-              setMessage(
-                saveErr
-                  ? `Subscribed locally, but couldn't save: ${saveErr.message}`
-                  : "✓ Subscribed. You'll be pinged when it's your turn.",
-              );
+              if (saveErr) {
+                setMessage(`Subscribed locally, but couldn't save: ${saveErr.message}`);
+              } else {
+                setSubscribed(true);
+                setMessage("✓ Subscribed. You'll be pinged when it's your turn.");
+              }
             } else {
               setMessage('Sign in to enable server-side delivery.');
             }
@@ -169,6 +238,7 @@ function NotificationsControl() {
               if (saveErr) {
                 setMessage(`Subscribed locally, but couldn't save: ${saveErr.message}`);
               } else {
+                setSubscribed(true);
                 setMessage("✓ Subscribed. You'll be pinged when it's your turn.");
               }
             } else {

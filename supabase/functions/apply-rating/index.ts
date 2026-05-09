@@ -82,12 +82,19 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, error: 'not-a-participant' }, 403);
   }
 
-  const status = (game.state as { status?: { kind?: string; winner?: string } })?.status;
+  // Narrow each branch off `kind` so that future GameStatus refactors
+  // (renaming a field, adding a new terminal state) trip a type error
+  // here instead of silently degrading. `winner` only exists on the
+  // 'won' shape; reading it under any other kind is a bug.
+  type WonStatus = { kind: 'won'; winner: 'p1' | 'p2' };
+  type DrawStatus = { kind: 'draw' };
+  type StatusShape = WonStatus | DrawStatus | { kind: 'in-progress' };
+  const status = (game.state as { status?: StatusShape })?.status;
   if (!status || status.kind === 'in-progress') {
     return json({ ok: true, reason: 'game-not-finished' });
   }
   const isDraw = status.kind === 'draw';
-  const winnerSlot = status.kind === 'won' ? status.winner : null;
+  const winnerSlot: 'p1' | 'p2' | null = status.kind === 'won' ? status.winner : null;
 
   let winnerId: string;
   let loserId: string;

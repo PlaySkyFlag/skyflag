@@ -226,6 +226,12 @@ export default function App() {
   // automatically when history advances (so it disappears the moment
   // they actually move, deploy, or end-turn).
   const [hint, setHint] = useState<{ from: Coord; to: Coord } | null>(null);
+  // Multiplayer state-push status. `pushFailed` flips on whenever the
+  // games.state update errors (network down, RLS hiccup, …); the UI
+  // surfaces a banner with a manual retry. `pushNonce` is bumped by
+  // Retry to force the push effect to re-run with the current state.
+  const [pushFailed, setPushFailed] = useState(false);
+  const [pushNonce, setPushNonce] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>(
     INITIAL_SESSION?.difficulty ?? 'hard',
   );
@@ -480,7 +486,15 @@ export default function App() {
       .update({ state })
       .eq('room_code', room.code)
       .then(({ error }) => {
-        if (error) return;
+        if (error) {
+          // Network or RLS hiccup — surface a banner so the user knows
+          // their move didn't reach the server. Without this they'd see
+          // their local board update normally and only realize the
+          // opponent never moved when they got stuck.
+          setPushFailed(true);
+          return;
+        }
+        setPushFailed(false);
         // Fire push only when the *current player after the local change*
         // is the opponent (i.e., my move ended my turn). Without this guard
         // we'd notify the opponent on every activation, including ones
@@ -515,7 +529,7 @@ export default function App() {
         lastSyncedTurnPlayer.current = currentTurnPlayer;
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, room?.code]);
+  }, [state, room?.code, pushNonce]);
 
   // Drop selection whenever the active player or game status changes.
   useEffect(() => {
@@ -1102,6 +1116,18 @@ export default function App() {
       {flashMsg && (
         <div className="flash-toast" role="status" aria-live="polite">
           {flashMsg}
+        </div>
+      )}
+      {pushFailed && room && (
+        <div className="sync-banner" role="status" aria-live="polite">
+          <span>⚠ Couldn't sync your last move to the server.</span>
+          <button
+            type="button"
+            className="hud-btn hud-btn-subtle"
+            onClick={() => setPushNonce((n) => n + 1)}
+          >
+            Retry
+          </button>
         </div>
       )}
       {incomingDraw && room && (

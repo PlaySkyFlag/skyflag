@@ -1726,6 +1726,82 @@ button.tray-piece:hover {
   background: rgba(36, 50, 80, 0.95);
 }
 
+/* MP sync banner — pinned to the bottom-right when a games.state push
+   failed, so the user knows their move didn't reach the server. Click
+   Retry to re-attempt with the current state. */
+.sync-banner {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: rgba(20, 30, 52, 0.96);
+  border: 1px solid rgba(255, 138, 138, 0.55);
+  border-radius: 10px;
+  color: #ffb0b0;
+  font-size: 0.88rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+
+/* Top-level error boundary — fills the viewport when React's tree
+   crashed, replacing what would otherwise be a blank page. Solid
+   dark backdrop matches the rest of the dark UI. */
+.error-boundary {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 12, 26, 0.96);
+  padding: 24px;
+  z-index: 1000;
+}
+
+.error-boundary-card {
+  max-width: 520px;
+  background: rgba(20, 30, 52, 0.95);
+  border: 1px solid rgba(255, 138, 138, 0.45);
+  border-radius: 14px;
+  padding: 22px 26px;
+  color: #f5f7fb;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+}
+
+.error-boundary-title {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  color: #ff9a9a;
+}
+
+.error-boundary-msg {
+  margin: 0 0 12px;
+  line-height: 1.45;
+  opacity: 0.9;
+}
+
+.error-boundary-trace {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 30vh;
+  overflow: auto;
+}
+
+.error-boundary-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 /* Sidebar — tabbed drawer that holds Rules, Multiplayer, History,
    Tournaments, Friends. Tab strip on top, single panel below.
    Solid dark backgrounds so white text stays readable. */
