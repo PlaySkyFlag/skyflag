@@ -29,6 +29,13 @@ type Props = {
   onNewGame: () => void;
   onResign: () => void;
   onOfferDraw: () => void;
+  // Asks App to compute the AI's suggested move and highlight it on
+  // the board. App owns hint state because it spans across all three
+  // boards via the per-layer Board props.
+  onRequestHint: () => void;
+  // Disables the Hint button when it's the AI's turn or the local user
+  // isn't the side to move (MP).
+  hintEnabled: boolean;
 };
 
 // Dropdown value strings map cleanly to/from the aiPlayer slot. The
@@ -48,6 +55,8 @@ export default function StatusBar({
   onNewGame,
   onResign,
   onOfferDraw,
+  onRequestHint,
+  hintEnabled,
 }: Props) {
   const [mutedNow, setMutedNow] = useState(isMuted());
   const muteControl = (
@@ -142,6 +151,15 @@ export default function StatusBar({
           Turn {state.turnNumber} / {TURN_LIMIT}
         </span>
         <span className="hud-divider">·</span>
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle"
+          onClick={onRequestHint}
+          disabled={!hintEnabled}
+          title={hintEnabled ? 'Show the AI\'s suggested move' : 'Wait for your turn'}
+        >
+          Hint
+        </button>
         <button
           type="button"
           className="hud-btn hud-btn-subtle"

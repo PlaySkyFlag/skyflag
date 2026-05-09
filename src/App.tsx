@@ -21,7 +21,7 @@ import {
   THEMES,
   type ThemeId,
 } from './game/themes';
-import { evaluate, legalActions } from './game/ai';
+import { chooseAction, evaluate, legalActions } from './game/ai';
 import AiWorker from './game/aiWorker?worker';
 import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
 import { supabase } from './game/supabase';
@@ -224,6 +224,10 @@ export default function App() {
   // by Friends so its online dots reflect the same channel without
   // spinning up a duplicate subscription.
   const [lobbyOnlineIds, setLobbyOnlineIds] = useState<Set<string>>(new Set());
+  // AI-suggested move shown when the user clicks Hint. Cleared
+  // automatically when history advances (so it disappears the moment
+  // they actually move, deploy, or end-turn).
+  const [hint, setHint] = useState<{ from: Coord; to: Coord } | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>(
     INITIAL_SESSION?.difficulty ?? 'hard',
   );
@@ -381,6 +385,13 @@ export default function App() {
   useEffect(() => {
     if (state.status.kind === 'won') sounds.win();
   }, [state.status.kind]);
+
+  // Drop any stale hint as soon as the player acts (history advances) or
+  // a new game starts. Otherwise the gold arrow would linger over the
+  // wrong position.
+  useEffect(() => {
+    setHint(null);
+  }, [state.history.length, state.status.kind]);
 
   // Multiplayer: when entering a room, hydrate local state from the row
   // in Supabase, then subscribe to realtime UPDATE events so the opponent's
@@ -786,6 +797,14 @@ export default function App() {
       lastMove && lastMove.fromLayer === layer ? lastMove.from : null;
     const lastMoveTo =
       lastMove && lastMove.toLayer === layer ? lastMove.to : null;
+    const hintFrom =
+      hint && hint.from.layer === layer
+        ? { row: hint.from.row, col: hint.from.col }
+        : null;
+    const hintTo =
+      hint && hint.to.layer === layer
+        ? { row: hint.to.row, col: hint.to.col }
+        : null;
     return (
       <Board
         key={layer}
@@ -800,6 +819,8 @@ export default function App() {
         lastMoveFrom={lastMoveFrom}
         lastMoveTo={lastMoveTo}
         threatenedCells={threats[layer]}
+        hintFrom={hintFrom}
+        hintTo={hintTo}
       />
     );
   };
@@ -901,6 +922,40 @@ export default function App() {
           // 2P hot-seat — both sides are the same human.
           if (!confirm('Agree to a draw? The game ends with no winner.')) return;
           dispatch({ type: 'agree-draw' });
+        }}
+        hintEnabled={
+          state.status.kind === 'in-progress' &&
+          aiPlayer !== state.currentPlayer &&
+          (room === null ||
+            (room.status === 'playing' && room.role === state.currentPlayer))
+        }
+        onRequestHint={() => {
+          // Run a quick depth-2 search — deep enough to surface a
+          // sensible idea, shallow enough to feel instant. Use the
+          // same chooseAction the AI uses; whatever it picks is "the
+          // best move it sees right now."
+          const action = chooseAction(state, 2);
+          if (!action) {
+            flash('No legal moves available.');
+            return;
+          }
+          if (action.type === 'end-turn') {
+            flash('Suggestion: end your turn — no useful action found.');
+            return;
+          }
+          if (action.type === 'deploy') {
+            // Deploy lands on the player's pad; from == to so the
+            // arrow logic skips and you just see the gold cell.
+            const pad = DEPLOY_COORDS[state.currentPlayer];
+            setHint({ from: pad, to: pad });
+            return;
+          }
+          if (action.type === 'move') {
+            // Find the piece's current coord on the board.
+            const bp = state.onBoard.find((b) => b.piece.id === action.pieceId);
+            if (!bp) return;
+            setHint({ from: bp.coord, to: action.to });
+          }
         }}
       />
       <div className="help-row">

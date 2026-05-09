@@ -123,6 +123,11 @@ type BoardProps = {
   // Cells where a friendly piece is in opponent's attack range — get
   // a pulsing red threat ring so the player notices before blundering.
   threatenedCells?: ReadonlyArray<{ row: number; col: number }>;
+  // Optional AI hint highlight — same from/to shape as lastMove but
+  // rendered in gold so it reads as "the suggested move" without being
+  // confused with the just-played-move arrow.
+  hintFrom?: { row: number; col: number } | null;
+  hintTo?: { row: number; col: number } | null;
 };
 
 export default function Board({
@@ -137,6 +142,8 @@ export default function Board({
   lastMoveFrom = null,
   lastMoveTo = null,
   threatenedCells = [],
+  hintFrom = null,
+  hintTo = null,
 }: BoardProps) {
   // Layer-specific atmosphere: gradient/nebula painted before the cells,
   // and a starfield overlay for Space that floats above the cells at low
@@ -574,6 +581,93 @@ export default function Board({
     return els;
   })();
 
+  // Hint highlight — same from/to shape as the last-move arrow but in
+  // gold, with a dashed stroke so it reads as "suggestion" rather than
+  // "what just happened." Drawn on top of last-move so a fresh hint is
+  // clearly visible after the player moved.
+  const hintEls = (() => {
+    const els: ReactElement[] = [];
+    if (hintFrom) {
+      els.push(
+        <rect
+          key="hint-from"
+          x={ORIGIN_X + hintFrom.col * CELL + 2}
+          y={ORIGIN_Y + hintFrom.row * CELL + 2}
+          width={CELL - 4}
+          height={CELL - 4}
+          rx={4}
+          fill="rgba(255, 216, 132, 0.15)"
+          stroke="rgba(255, 216, 132, 0.85)"
+          strokeWidth={2}
+          strokeDasharray="5 3"
+          pointerEvents="none"
+        />,
+      );
+    }
+    if (hintTo) {
+      els.push(
+        <rect
+          key="hint-to"
+          x={ORIGIN_X + hintTo.col * CELL + 2}
+          y={ORIGIN_Y + hintTo.row * CELL + 2}
+          width={CELL - 4}
+          height={CELL - 4}
+          rx={4}
+          fill="rgba(255, 216, 132, 0.32)"
+          stroke="rgba(255, 216, 132, 0.95)"
+          strokeWidth={2.4}
+          strokeDasharray="5 3"
+          pointerEvents="none"
+        />,
+      );
+    }
+    if (
+      hintFrom &&
+      hintTo &&
+      (hintFrom.row !== hintTo.row || hintFrom.col !== hintTo.col)
+    ) {
+      const fx = ORIGIN_X + hintFrom.col * CELL + CELL / 2;
+      const fy = ORIGIN_Y + hintFrom.row * CELL + CELL / 2;
+      const tx = ORIGIN_X + hintTo.col * CELL + CELL / 2;
+      const ty = ORIGIN_Y + hintTo.row * CELL + CELL / 2;
+      const dx = tx - fx;
+      const dy = ty - fy;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const inset = CELL * 0.32;
+      els.push(
+        <g key="hint-arrow" pointerEvents="none">
+          <defs>
+            <marker
+              id="hint-arrowhead"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="5"
+              markerHeight="5"
+              orient="auto"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" fill="rgba(255, 216, 132, 0.95)" />
+            </marker>
+          </defs>
+          <line
+            x1={fx + ux * inset}
+            y1={fy + uy * inset}
+            x2={tx - ux * inset}
+            y2={ty - uy * inset}
+            stroke="rgba(255, 216, 132, 0.9)"
+            strokeWidth={3}
+            strokeLinecap="round"
+            strokeDasharray="6 4"
+            markerEnd="url(#hint-arrowhead)"
+          />
+        </g>,
+      );
+    }
+    return els;
+  })();
+
   // Threat rings — pulsing red ring under any of the current player's
   // pieces sitting on a square the opponent could move onto next ply.
   // Painted before the marker so the piece reads on top of the warning.
@@ -963,6 +1057,7 @@ export default function Board({
         {atmosphereBack}
         {cells}
         {lastMoveEls}
+        {hintEls}
         {colLabels}
         {rowLabels}
         {atmosphereFront}
