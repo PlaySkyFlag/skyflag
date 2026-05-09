@@ -1,8 +1,12 @@
-// Supabase Auth wrapper. Email magic-link is the only sign-in method —
-// simplest UX for tester/casual players (no passwords to forget) and
-// no extra provider config (works out of the box with default Supabase
-// project email).
+// Supabase Auth wrapper. Three sign-in methods supported:
+//   - Email magic link (works everywhere, no extra config)
+//   - Anonymous (instant guest, requires the Supabase anon-sign-in toggle)
+//   - OAuth (Apple/Google) — web flow via Supabase's built-in OAuth on
+//     browsers; native flow via @capacitor-community/apple-sign-in on
+//     iOS so we satisfy Apple's "must use native sign-in for native apps"
+//     App Store requirement.
 
+import { Capacitor } from '@capacitor/core';
 import type { Session, User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabase';
@@ -82,20 +86,31 @@ export async function signInAnonymously(): Promise<{ ok: true } | { ok: false; m
   return { ok: true };
 }
 
-// OAuth sign-in via Apple or Google. Both bounce the user out to the
-// provider's auth page and redirect back to the app origin with a
-// session token that Supabase exchanges automatically — no extra
-// callback handling needed in our code.
+// OAuth sign-in via Apple or Google. Routes to the right flow:
+//   - Native iOS + provider=apple → @capacitor-community/apple-sign-in
+//     plugin (Apple's policy requires native sign-in on native apps).
+//   - Everything else → Supabase's web OAuth flow (browser redirect to
+//     provider, redirect back to app origin, session token exchanged
+//     automatically).
 //
-// Requires the matching provider to be enabled in the Supabase dashboard
-// (Auth → Providers → Apple / Google) with valid client credentials.
-// Returns a friendly error if it's not configured.
+// Both providers must be enabled in the Supabase dashboard (Auth →
+// Providers) with valid client credentials before they work.
+// signInWithOAuth returns a friendly error pointing the user there if
+// the provider isn't configured.
 export type OAuthProvider = 'google' | 'apple';
 
 export async function signInWithOAuth(
   provider: OAuthProvider,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
+
+  // iOS native app + Apple → use the native plugin so we get the system
+  // sign-in sheet, biometric/passcode prompt, and Apple's full UX.
+  if (provider === 'apple' && Capacitor.isNativePlatform()) {
+    return signInWithAppleNative();
+  }
+
+  // Everything else: web OAuth flow.
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
     options: { redirectTo: window.location.origin },
@@ -110,6 +125,50 @@ export async function signInWithOAuth(
     return { ok: false, message: error.message };
   }
   return { ok: true };
+}
+
+// Native iOS Sign in with Apple — uses the @capacitor-community plugin
+// to surface Apple's system sign-in sheet, then trades the resulting
+// identity token for a Supabase session via signInWithIdToken.
+//
+// The plugin is lazy-imported so the web bundle doesn't pull in
+// native-only code paths it would never use.
+async function signInWithAppleNative(): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
+
+  try {
+    const { SignInWithApple } = await import('@capacitor-community/apple-sign-in');
+
+    const result = await SignInWithApple.authorize({
+      // Bundle identifier of the iOS app. Apple uses this to bind the
+      // sign-in to the app on their side.
+      clientId: 'com.limnology.skyflag',
+      // Required by the plugin's API even for native flow (where it's
+      // unused). Set to the Supabase callback for consistency.
+      redirectURI: 'https://oeychcbxvuozkvfjcwlr.supabase.co/auth/v1/callback',
+      scopes: 'email name',
+    });
+
+    const idToken = result.response.identityToken;
+    if (!idToken) {
+      return { ok: false, message: 'Apple did not return an identity token.' };
+    }
+
+    const { error } = await supabase.auth.signInWithIdToken({
+      provider: 'apple',
+      token: idToken,
+    });
+    if (error) return { ok: false, message: error.message };
+    return { ok: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Sign in with Apple failed.';
+    // User-cancel is the most common "error" — surface as a no-op
+    // rather than an alarming error message.
+    if (/canceled|cancelled/i.test(msg)) {
+      return { ok: false, message: 'Cancelled.' };
+    }
+    return { ok: false, message: msg };
+  }
 }
 
 // Upgrade an anonymous (guest) user into a permanent account by linking
