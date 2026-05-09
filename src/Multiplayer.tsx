@@ -46,6 +46,22 @@ function generateRoomCode(): string {
   return out;
 }
 
+// Supabase errors aren't Error instances — they're plain objects with
+// { code, message, details, hint }. Pull a useful string out of whatever
+// shape we got so the UI never shows "[object Object]" again.
+function formatError(err: unknown): string {
+  if (!err) return 'Unknown error';
+  if (typeof err === 'string') return err;
+  if (err instanceof Error) return err.message;
+  const e = err as { message?: string; details?: string; hint?: string; code?: string };
+  const parts: string[] = [];
+  if (e.message) parts.push(e.message);
+  if (e.details && e.details !== e.message) parts.push(e.details);
+  if (e.hint) parts.push(`(${e.hint})`);
+  if (e.code) parts.push(`[${e.code}]`);
+  return parts.length > 0 ? parts.join(' — ') : JSON.stringify(err);
+}
+
 // Inline control for the in-room "Enable turn notifications" flow.
 // Dispatches by platform: Web Push (browser) or APNs via Capacitor (iOS).
 // Both paths upsert into public.push_subscriptions keyed by
@@ -237,7 +253,7 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
       }
       throw new Error('Could not allocate a room code after 5 attempts');
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(formatError(err));
     } finally {
       setBusy(false);
     }
@@ -294,7 +310,7 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
       if (updateErr) throw updateErr;
       onRoomEntered({ code: cleaned, role: 'p2', status: 'playing' });
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(formatError(err));
     } finally {
       setBusy(false);
     }
