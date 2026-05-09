@@ -1,10 +1,16 @@
 // Friends panel — accepted friends, pending requests in/out, and an
-// "add by nickname" form. Friends shown as online when they're currently
-// tracked on the lobby:global presence channel get a Challenge button
-// that creates a room and broadcasts a challenge envelope (same path the
-// Lobby uses).
+// "add by nickname" form. Online status is read from the lobby presence
+// state owned by the Lobby component (passed down via `onlineIds`),
+// because Supabase realtime returns the same channel instance per topic
+// and we can't add a second presence subscriber after Lobby subscribes.
+//
+// To send a challenge we look up the existing lobby channel and call
+// .send() on it — broadcasts work fine post-subscribe. The recipient's
+// existing Lobby challenge listener handles the Accept/Decline modal,
+// and Lobby's challenge-accept listener drives the room transition for
+// both sides, so Friends doesn't need to track outgoing state itself.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import {
   acceptRequest,
@@ -17,7 +23,6 @@ import {
 import { createInitialGameState } from './game/constants';
 import type { Profile } from './game/profile';
 import { supabase } from './game/supabase';
-import type { RoomState } from './game/types';
 
 const LOBBY_CHANNEL = 'lobby:global';
 const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -34,29 +39,15 @@ type Props = {
   user: User | null;
   profile: Profile | null;
   inRoom: boolean;
-  onEnterRoom: (room: RoomState) => void;
+  onlineIds: Set<string>;
 };
 
-type Outgoing = {
-  to_user_id: string;
-  to_nickname: string;
-  room_code: string;
-};
-
-export default function Friends({ user, profile, inRoom, onEnterRoom }: Props) {
+export default function Friends({ user, profile, inRoom, onlineIds }: Props) {
   const [entries, setEntries] = useState<FriendEntry[]>([]);
-  const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set());
   const [addInput, setAddInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
-  const [outgoing, setOutgoing] = useState<Outgoing | null>(null);
-
-  // Read-only subscription to the lobby presence channel so we can show
-  // a green dot beside friends who are currently online. We never call
-  // track() here — that's Lobby's job, owned by the user's "I'm looking
-  // for a game" toggle.
-  const channelRef = useRef<ReturnType<NonNullable<typeof supabase>['channel']> | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user) {
@@ -70,46 +61,6 @@ export default function Friends({ user, profile, inRoom, onEnterRoom }: Props) {
   useEffect(() => {
     refresh();
   }, [refresh]);
-
-  useEffect(() => {
-    if (!supabase || !user) return;
-    const channel = supabase.channel(LOBBY_CHANNEL, {
-      config: { presence: { key: user.id } },
-    });
-    channelRef.current = channel;
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const raw = channel.presenceState() as Record<string, { user_id: string }[]>;
-        const ids = new Set<string>();
-        for (const arr of Object.values(raw)) {
-          for (const meta of arr) ids.add(meta.user_id);
-        }
-        setOnlineIds(ids);
-      })
-      .on('broadcast', { event: 'challenge-accept' }, ({ payload }) => {
-        // If we initiated a challenge from here and they accept, App's
-        // Lobby listener also fires — but Friends owns the outgoing
-        // state in this panel, so clear it ourselves too. The
-        // onEnterRoom call in Lobby handles the actual room transition.
-        const c = payload as { from_user_id: string; to_user_id: string; room_code: string };
-        if (c.from_user_id !== user.id) return;
-        setOutgoing((prev) => (prev && prev.room_code === c.room_code ? null : prev));
-      })
-      .on('broadcast', { event: 'challenge-decline' }, ({ payload }) => {
-        const c = payload as { from_user_id: string; to_user_id: string };
-        if (c.from_user_id !== user.id) return;
-        setOutgoing((prev) => (prev && prev.to_user_id === c.to_user_id ? null : prev));
-        setError('Challenge declined.');
-        setTimeout(() => setError(null), 3000);
-      })
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-      channelRef.current = null;
-    };
-  }, [user]);
 
   const onAdd = useCallback(async () => {
     if (!user || !profile) return;
@@ -175,8 +126,6 @@ export default function Friends({ user, profile, inRoom, onEnterRoom }: Props) {
         setError("You're already in a room — leave it first.");
         return;
       }
-      const channel = channelRef.current;
-      if (!channel) return;
       setBusy(true);
       setError(null);
       const code = generateRoomCode();
@@ -195,50 +144,26 @@ export default function Friends({ user, profile, inRoom, onEnterRoom }: Props) {
         setError(`Couldn't create room: ${insertResult.error.message}`);
         return;
       }
-      const out: Outgoing = {
-        to_user_id: other.other_id,
-        to_nickname: other.other_nickname,
-        room_code: code,
-      };
-      setOutgoing(out);
-      // Same envelope shape Lobby uses, so the recipient's existing
-      // Lobby challenge listener pops up the Accept/Decline modal.
-      await channel.send({
-        type: 'broadcast',
-        event: 'challenge',
-        payload: {
-          from_user_id: user.id,
-          from_nickname: profile.nickname,
-          to_user_id: other.other_id,
-          room_code: code,
-        },
-      });
-      // The actual room transition (when they accept) is driven by the
-      // Lobby's challenge-accept listener which calls onEnterRoom. Pass
-      // the same callback through here in case Lobby is unmounted at
-      // the moment of acceptance — belt-and-suspenders.
-      void onEnterRoom;
+      // Reuse the lobby channel that Lobby has already subscribed to —
+      // .send() works post-subscribe, and Lobby's existing listeners on
+      // both sides will handle the accept/decline + room transition.
+      await supabase
+        .channel(LOBBY_CHANNEL)
+        .send({
+          type: 'broadcast',
+          event: 'challenge',
+          payload: {
+            from_user_id: user.id,
+            from_nickname: profile.nickname,
+            to_user_id: other.other_id,
+            room_code: code,
+          },
+        });
+      setInfo(`Challenge sent to ${other.other_nickname}.`);
+      setTimeout(() => setInfo(null), 4000);
     },
-    [user, profile, inRoom, onEnterRoom],
+    [user, profile, inRoom],
   );
-
-  const onCancelOutgoing = useCallback(async () => {
-    if (!supabase || !outgoing) return;
-    const channel = channelRef.current;
-    if (channel) {
-      await channel.send({
-        type: 'broadcast',
-        event: 'challenge-cancel',
-        payload: {
-          from_user_id: user?.id,
-          to_user_id: outgoing.to_user_id,
-          room_code: outgoing.room_code,
-        },
-      });
-    }
-    await supabase.from('games').delete().eq('room_code', outgoing.room_code);
-    setOutgoing(null);
-  }, [outgoing, user]);
 
   if (!supabase) return null;
 
@@ -367,8 +292,8 @@ export default function Friends({ user, profile, inRoom, onEnterRoom }: Props) {
                     <button
                       type="button"
                       className="hud-btn"
-                      disabled={!online || inRoom || busy || outgoing !== null}
-                      title={online ? 'Send a challenge' : 'Friend is offline'}
+                      disabled={!online || inRoom || busy}
+                      title={online ? 'Send a challenge' : 'Friend is offline (toggle "Looking for a game" on their end)'}
                       onClick={() => onChallenge(f)}
                     >
                       Challenge
@@ -387,27 +312,6 @@ export default function Friends({ user, profile, inRoom, onEnterRoom }: Props) {
           </ul>
         )}
       </div>
-
-      {outgoing && (
-        <div className="account-overlay" role="dialog" aria-modal="true">
-          <div className="account-card">
-            <h2 className="account-title">Challenging {outgoing.to_nickname}…</h2>
-            <p className="account-intro">
-              Waiting for them to accept. Room code:{' '}
-              <strong className="mp-code">{outgoing.room_code}</strong>
-            </p>
-            <div className="account-actions">
-              <button
-                type="button"
-                className="end-game-btn end-game-btn--subtle"
-                onClick={onCancelOutgoing}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </details>
   );
 }

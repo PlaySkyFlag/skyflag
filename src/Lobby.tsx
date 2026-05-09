@@ -46,9 +46,14 @@ type Props = {
   // Called when a challenge is accepted (either side) and the room is ready
   // to enter. The parent App switches to the room state.
   onEnterRoom: (room: RoomState) => void;
+  // Bubbles up the set of currently-online user ids so other panels
+  // (Friends) can show online status without subscribing to the same
+  // channel themselves — Supabase reuses one channel per topic, so a
+  // second subscriber would fail to attach presence listeners.
+  onPresenceChange?: (ids: Set<string>) => void;
 };
 
-export default function Lobby({ user, profile, inRoom, onEnterRoom }: Props) {
+export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceChange }: Props) {
   const [available, setAvailable] = useState(false);
   const [online, setOnline] = useState<Presence[]>([]);
   const [incoming, setIncoming] = useState<Challenge | null>(null);
@@ -85,6 +90,11 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom }: Props) {
           }
         }
         setOnline(list);
+        // Mirror the presence set up to App so siblings (Friends panel)
+        // can show an online dot without spinning up their own channel.
+        if (onPresenceChange) {
+          onPresenceChange(new Set(list.map((p) => p.user_id)));
+        }
       })
       .on('broadcast', { event: 'challenge' }, ({ payload }) => {
         const c = payload as Challenge;

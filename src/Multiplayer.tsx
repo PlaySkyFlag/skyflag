@@ -30,6 +30,9 @@ type Props = {
   forceOpen?: boolean;
   onRoomEntered: (room: RoomState) => void;
   onLeave: () => void;
+  // Forwards lobby presence sync up to App so the Friends panel can show
+  // an online dot without needing its own subscription.
+  onPresenceChange?: (ids: Set<string>) => void;
 };
 
 // Glyphs that read clearly on a phone — no I/O/0/1 ambiguity.
@@ -168,7 +171,7 @@ function NotificationsControl() {
   );
 }
 
-export default function Multiplayer({ room, forceOpen = false, onRoomEntered, onLeave }: Props) {
+export default function Multiplayer({ room, forceOpen = false, onRoomEntered, onLeave, onPresenceChange }: Props) {
   const { user: authUser } = useAuthUser();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [code, setCode] = useState('');
@@ -307,6 +310,7 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
             profile={profile}
             inRoom={inRoom}
             onEnterRoom={onRoomEntered}
+            onPresenceChange={onPresenceChange}
           />
         )}
         {!inRoom && !authUser && (

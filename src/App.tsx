@@ -220,6 +220,10 @@ export default function App() {
   const [room, setRoom] = useState<RoomState | null>(
     INITIAL_SESSION?.room ?? null,
   );
+  // Mirror of the lobby:global presence set, populated by Lobby and read
+  // by Friends so its online dots reflect the same channel without
+  // spinning up a duplicate subscription.
+  const [lobbyOnlineIds, setLobbyOnlineIds] = useState<Set<string>>(new Set());
   const [difficulty, setDifficulty] = useState<Difficulty>(
     INITIAL_SESSION?.difficulty ?? 'hard',
   );
@@ -917,6 +921,7 @@ export default function App() {
           forceOpen={aiPlayer === null}
           onRoomEntered={setRoom}
           onLeave={() => setRoom(null)}
+          onPresenceChange={setLobbyOnlineIds}
         />
         <MoveHistory history={state.history} />
         <Tournaments user={authUser} profile={profile} />
@@ -924,7 +929,7 @@ export default function App() {
           user={authUser}
           profile={profile}
           inRoom={room !== null}
-          onEnterRoom={setRoom}
+          onlineIds={lobbyOnlineIds}
         />
       </div>
       <PieceTray
