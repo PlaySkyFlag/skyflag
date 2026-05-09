@@ -364,14 +364,6 @@
   letter-spacing: 0.02em;
 }
 
-/* Mute toggle — emoji icon, no text. Slightly larger to make the
-   speaker glyph readable. */
-.hud-mute-btn {
-  font-size: 1rem;
-  line-height: 1;
-  padding: 4px 10px;
-}
-
 /* Mode selector: a single pill-shaped dropdown replacing the previous
    3-button segmented control. Saves horizontal space in the HUD. */
 .hud-mode-select {
@@ -411,18 +403,10 @@
   color: #e8e8e8;
 }
 
-/* "How to play" + "Multiplayer" side by side, sharing horizontal space.
-   On narrow screens they wrap back to a stacked column. */
-.help-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  width: 100%;
-  max-width: 1100px;
-  align-items: flex-start;
-  justify-content: center;
-}
-
+/* The .help class still styles standalone <details> (e.g., the legacy
+   non-inline path each panel can take when not rendered inside the
+   Sidebar). Sidebar panels render the same components with inline=true,
+   which skips this wrapper entirely. */
 .help {
   max-width: 540px;
   width: 100%;
@@ -430,13 +414,6 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
-}
-
-/* Inside the help-row, share width equally with a sensible min-basis so
-   each card stays readable on phones until the row gets too narrow. */
-.help-row > .help {
-  flex: 1 1 280px;
-  max-width: none;
 }
 
 .help[open] {
@@ -1154,11 +1131,6 @@ button.tray-piece:hover {
   font-style: italic;
 }
 
-.help-tutorial-btn {
-  align-self: flex-start;
-  margin-top: 4px;
-}
-
 /* Flash toast — short-lived hint shown when a click silently failed
    (stuck piece selected, deploy pad blocked, etc.). Pinned to the
    bottom-center so it's visible without obscuring play. */
@@ -1412,7 +1384,7 @@ button.tray-piece:hover {
   letter-spacing: 0.02em;
 }
 
-/* Tournaments — listed inside an existing help-row disclosure. Each
+/* Tournaments — listed inside the Sidebar tab panel. Each
    tournament is a card with name + countdown + Join button + a
    collapsible leaderboard. */
 .tournament {

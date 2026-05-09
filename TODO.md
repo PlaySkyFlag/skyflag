@@ -30,15 +30,12 @@ allows; nothing here is blocking gameplay.
       deleted** (`src/Multiplayer.tsx:23`). Rows accumulate forever.
       Add a scheduled cleanup (pg_cron) that deletes rooms older than
       a few days.
-- [ ] **Re-read `Tutorial.tsx` start-to-finish before launch.** Some
-      mentions are current, but the file is ~220 lines and may still
-      reference removed UI in less obvious spots.
-- [ ] **CSS orphans in `src/App.css`:**
-      - `.hud-mute-btn` (mute moved to SettingsMenu)
-      - `.help-row` and `.help-row > .help` (replaced by Sidebar)
-      - `.help-tutorial-btn` (Tutorial is a sidebar tab now)
-      - Tournaments comment "inside an existing help-row disclosure"
-        is stale.
+- [x] ~~Re-read `Tutorial.tsx` start-to-finish before launch.~~
+      Found one stale reference ("Tutorial button in the help row") —
+      updated to point to the sidebar tab. Rest checked clean.
+- [x] ~~CSS orphans in `src/App.css`:~~
+      `.hud-mute-btn`, `.help-row`, `.help-row > .help`,
+      `.help-tutorial-btn` removed; Tournaments comment refreshed.
 - [ ] **`apply-rating` Edge Function** reads `state.status.winner` and
       relies on short-circuit evaluation against `status.kind === 'won'`.
       Correct today, but a refactor of `GameStatus` could regress

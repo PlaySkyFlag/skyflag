@@ -160,8 +160,8 @@ export default function Tutorial({ state, open, onClose }: Props) {
               activation tap the same cell on a different layer.
             </p>
             <p>
-              Re-open this tutorial any time from the <em>Tutorial</em> button
-              in the help row.
+              Re-open this tutorial any time from the <em>🎓 Tutorial</em>
+              tab in the panel strip below the boards.
             </p>
           </>
         );
