@@ -1626,3 +1626,130 @@ button.tray-piece:hover {
   text-align: center;
   opacity: 0.85;
 }
+
+/* Game-context toolbar — thin row of in-game actions (Hint / Draw /
+   Resign / New game) pinned just above the boards. Uses a solid dark
+   panel so white-on-rgba buttons stay readable against any theme. */
+.game-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  margin: 8px auto 6px;
+  max-width: 720px;
+  background: rgba(6, 12, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Toolbar buttons get a darker fill than the page-level .hud-btn so
+   the white label reads cleanly against the toolbar's dark panel. */
+.game-toolbar .hud-btn {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.28);
+  opacity: 1;
+  color: #f5f7fb;
+}
+
+.game-toolbar .hud-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.game-toolbar .hud-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* The first un-spaced button in the bar gets primary emphasis (it's
+   currently New game, anchored on the right). */
+.game-toolbar .hud-btn:not(.hud-btn-subtle):not(.hud-btn-warn) {
+  background: rgba(255, 216, 132, 0.16);
+  border-color: rgba(255, 216, 132, 0.55);
+  color: #ffd884;
+}
+
+.game-toolbar .hud-btn:not(.hud-btn-subtle):not(.hud-btn-warn):hover {
+  background: rgba(255, 216, 132, 0.26);
+  border-color: rgba(255, 216, 132, 0.8);
+}
+
+.game-toolbar-spacer {
+  flex: 1;
+}
+
+/* Settings popover — gear icon in the header that drops a small panel
+   of app-level pickers (mode, difficulty, theme, sound). Positioned
+   absolute under the gear so it doesn't push surrounding elements. */
+.settings-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.settings-trigger {
+  font-size: 1.05rem;
+  padding: 4px 10px;
+  background: rgba(8, 14, 28, 0.85);
+  border-color: rgba(255, 255, 255, 0.30);
+  color: #ffffff;
+  opacity: 1;
+}
+
+.settings-trigger:hover {
+  background: rgba(20, 32, 56, 0.95);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.settings-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  min-width: 240px;
+  padding: 12px 14px;
+  background: rgba(6, 12, 26, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.88rem;
+}
+
+.settings-label {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #f5f7fb;
+}
+
+/* Selects inside the popover get a darker fill so the white text stays
+   readable on top of the popover's near-black background. */
+.settings-popover .hud-mode-select {
+  background: rgba(20, 30, 52, 0.95);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+}
+
+.settings-popover .hud-mode-select:disabled {
+  opacity: 0.45;
+}
+
+.settings-popover .hud-btn {
+  background: rgba(20, 30, 52, 0.95);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  opacity: 1;
+}
+
+.settings-popover .hud-btn:hover {
+  background: rgba(36, 50, 80, 0.95);
+}

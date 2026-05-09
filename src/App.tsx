@@ -2,11 +2,13 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import EndGameOverlay from './EndGameOverlay';
 import Friends from './Friends';
+import GameToolbar from './GameToolbar';
 import Help from './Help';
 import MoveHistory from './MoveHistory';
 import Multiplayer from './Multiplayer';
 import PieceTray from './PieceTray';
 import AccountModal from './AccountModal';
+import SettingsMenu from './SettingsMenu';
 import StatsModal from './StatsModal';
 import StatusBar from './StatusBar';
 import Tournaments from './Tournaments';
@@ -854,56 +856,51 @@ export default function App() {
           >
             Stats
           </button>
-          <select
-            className="hud-mode-select app-header-theme"
-            value={themeId}
-            onChange={(e) => setThemeId(e.target.value as ThemeId)}
-            aria-label="Visual theme"
-            title="Pick a visual theme"
-          >
-            {(Object.values(THEMES)).map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </select>
+          <SettingsMenu
+            aiPlayer={aiPlayer}
+            onSetMode={setAiPlayer}
+            difficulty={difficulty}
+            onSetDifficulty={setDifficulty}
+            themeId={themeId}
+            onSetTheme={setThemeId}
+          />
         </div>
       </header>
-      <StatusBar
-        state={state}
-        aiPlayer={aiPlayer}
-        onSetMode={setAiPlayer}
-        difficulty={difficulty}
-        onSetDifficulty={setDifficulty}
-        onNewGame={() => {
-          // If we're in (or waiting in) a multiplayer room, warn first
-          // and tear it down on confirm — otherwise the local board
-          // resets but the MP "not your turn" guard keeps input frozen,
-          // which strands the user with no way to play.
-          if (room) {
-            const msg =
-              room.status === 'waiting'
-                ? `Leave room ${room.code} and start a new local game?`
-                : `Starting a new game will leave room ${room.code}. Continue?`;
-            if (!confirm(msg)) return;
-            setRoom(null);
+      <StatusBar state={state} aiPlayer={aiPlayer} />
+      <GameToolbar
+        gameOver={state.status.kind !== 'in-progress'}
+        hintEnabled={
+          state.status.kind === 'in-progress' &&
+          aiPlayer !== state.currentPlayer &&
+          (room === null ||
+            (room.status === 'playing' && room.role === state.currentPlayer))
+        }
+        onRequestHint={() => {
+          // Quick depth-2 search — deep enough to surface a sensible
+          // idea, shallow enough to feel instant.
+          const action = chooseAction(state, 2);
+          if (!action) {
+            flash('No legal moves available.');
+            return;
           }
-          dispatch({ type: 'new-game' });
-        }}
-        onResign={() => {
-          // The resigner is whichever local human is on the clock.
-          // In MP, that's the room.role; in 1P, the opposite of the AI's
-          // slot; in 2P hot-seat, the current player.
-          const resigner: Player =
-            room?.role ?? (aiPlayer ? (aiPlayer === 'p1' ? 'p2' : 'p1') : state.currentPlayer);
-          dispatch({ type: 'resign', player: resigner });
+          if (action.type === 'end-turn') {
+            flash('Suggestion: end your turn — no useful action found.');
+            return;
+          }
+          if (action.type === 'deploy') {
+            const pad = DEPLOY_COORDS[state.currentPlayer];
+            setHint({ from: pad, to: pad });
+            return;
+          }
+          if (action.type === 'move') {
+            const bp = state.onBoard.find((b) => b.piece.id === action.pieceId);
+            if (!bp) return;
+            setHint({ from: bp.coord, to: action.to });
+          }
         }}
         onOfferDraw={() => {
-          // Mode-aware:
-          //   2P hot-seat: instant draw on confirm (both sides are the
-          //     same human, no negotiation).
-          //   1P: ask the AI's evaluator. AI accepts unless it thinks
-          //     it's clearly winning.
-          //   MP: broadcast the offer to the opponent and wait for
-          //     accept/decline.
+          // Mode-aware: MP broadcasts; 1P asks the AI's evaluator;
+          // 2P hot-seat agrees instantly on confirm.
           if (room && drawChannelRef.current) {
             if (outgoingDraw) {
               flash('Already waiting for opponent to respond.');
@@ -922,9 +919,6 @@ export default function App() {
           }
           if (aiPlayer) {
             if (!confirm('Offer the AI a draw?')) return;
-            // evaluate() returns score from the AI's perspective. AI
-            // declines only when it sees the position as clearly
-            // winning for itself; otherwise it agrees.
             const score = evaluate(state, aiPlayer);
             if (score > 100) {
               flash('The AI declines — it sees the position as winning for itself.');
@@ -933,43 +927,26 @@ export default function App() {
             }
             return;
           }
-          // 2P hot-seat — both sides are the same human.
           if (!confirm('Agree to a draw? The game ends with no winner.')) return;
           dispatch({ type: 'agree-draw' });
         }}
-        hintEnabled={
-          state.status.kind === 'in-progress' &&
-          aiPlayer !== state.currentPlayer &&
-          (room === null ||
-            (room.status === 'playing' && room.role === state.currentPlayer))
-        }
-        onRequestHint={() => {
-          // Run a quick depth-2 search — deep enough to surface a
-          // sensible idea, shallow enough to feel instant. Use the
-          // same chooseAction the AI uses; whatever it picks is "the
-          // best move it sees right now."
-          const action = chooseAction(state, 2);
-          if (!action) {
-            flash('No legal moves available.');
-            return;
+        onResign={() => {
+          // Resigner is the local human on the clock — room.role in MP,
+          // opposite-of-AI in 1P, current player in 2P hot-seat.
+          const resigner: Player =
+            room?.role ?? (aiPlayer ? (aiPlayer === 'p1' ? 'p2' : 'p1') : state.currentPlayer);
+          dispatch({ type: 'resign', player: resigner });
+        }}
+        onNewGame={() => {
+          if (room) {
+            const msg =
+              room.status === 'waiting'
+                ? `Leave room ${room.code} and start a new local game?`
+                : `Starting a new game will leave room ${room.code}. Continue?`;
+            if (!confirm(msg)) return;
+            setRoom(null);
           }
-          if (action.type === 'end-turn') {
-            flash('Suggestion: end your turn — no useful action found.');
-            return;
-          }
-          if (action.type === 'deploy') {
-            // Deploy lands on the player's pad; from == to so the
-            // arrow logic skips and you just see the gold cell.
-            const pad = DEPLOY_COORDS[state.currentPlayer];
-            setHint({ from: pad, to: pad });
-            return;
-          }
-          if (action.type === 'move') {
-            // Find the piece's current coord on the board.
-            const bp = state.onBoard.find((b) => b.piece.id === action.pieceId);
-            if (!bp) return;
-            setHint({ from: bp.coord, to: action.to });
-          }
+          dispatch({ type: 'new-game' });
         }}
       />
       <div className="help-row">
