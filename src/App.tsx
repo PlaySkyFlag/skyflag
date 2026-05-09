@@ -1036,6 +1036,19 @@ export default function App() {
         }}
         onNewGame={() => {
           if (room) {
+            // Three cases in MP:
+            //   (a) game already over → "play again in this room" — keep
+            //       the room, reset state. Push effect updates games.state
+            //       so the opponent's board flips to fresh too.
+            //   (b) game in-progress → confirm leave (this is effectively
+            //       a resign-and-leave from the user's POV).
+            //   (c) waiting room with no opponent → confirm leave.
+            const gameOver = state.status.kind !== 'in-progress';
+            if (gameOver) {
+              if (!confirm(`Start a new game in room ${room.code}?`)) return;
+              dispatch({ type: 'new-game', clockMs: clockMsForOption(clockOption) });
+              return;
+            }
             const msg =
               room.status === 'waiting'
                 ? `Leave room ${room.code} and start a new local game?`
@@ -1128,13 +1141,16 @@ export default function App() {
               <path d="M 0 1 L 9 5 L 0 9 Z" fill="#c89868" />
             </marker>
           </defs>
-          {/* Ground ↔ Sky — anchored at Ground's top-right corner and
-              Sky's bottom-left corner; the curve bulges OUT into the
-              empty right wedge so it fills that corner instead of
-              overpainting the boards. Single weighty bronze stroke,
-              no gradient, no animation — reads as carved relief. */}
+          {/* Ground ↔ Sky — anchored on the r5,c5 cell of each board
+              (Terran's bottom-right cell ↔ Sky's bottom-right cell).
+              The curve bulges OUT to the right to fill the empty
+              wedge between Ground's right edge and Sky's bottom edge,
+              never crossing through any board. Cell positions in the
+              board-stack viewBox:
+                Ground r5,c5 inner corner ≈ (65, 88)
+                Sky    r5,c5 inner corner ≈ (94, 62) */}
           <path
-            d="M 66 36 C 88 40, 96 50, 68 64"
+            d="M 65 88 C 92 92, 102 76, 94 62"
             fill="none"
             stroke="#a0613f"
             strokeWidth={2}
@@ -1144,12 +1160,12 @@ export default function App() {
             markerStart="url(#flow-arrow)"
             markerEnd="url(#flow-arrow)"
           />
-          {/* Sky ↔ Space — anchored at Sky's top-left corner and
-              Space's top-right corner; arcs OVER the top of both
-              boards. Slightly cooler bronze (faded indigo undertone)
-              to suggest the higher / cosmic layer. */}
+          {/* Sky ↔ Space — anchored on the closest top corners of each
+              board (Sky's r0,c0 ↔ Space's r0,c5) so the arc rides
+              over the top without crossing Ground. Slightly cooler
+              bronze (indigo undertone) for the higher / cosmic layer. */}
           <path
-            d="M 68 0 Q 50 -10 32 0"
+            d="M 68 2 Q 50 -10 32 2"
             fill="none"
             stroke="#7a5a8a"
             strokeWidth={2}
@@ -1193,10 +1209,16 @@ export default function App() {
         user={authUser}
         room={room}
         onPlayAgain={() => {
-          // Same trap-avoidance as the HUD's New game — confirm and
-          // drop the room when the player clicks Play again from the
-          // end-of-game overlay.
+          // From the end-of-game overlay: in MP, default to a fresh
+          // game IN THE SAME ROOM (the natural "play again with same
+          // opponent" flow); locally the state resets and the push
+          // effect propagates to Supabase so the opponent's board
+          // also flips to fresh.
           if (room) {
+            if (state.status.kind !== 'in-progress') {
+              dispatch({ type: 'new-game', clockMs: clockMsForOption(clockOption) });
+              return;
+            }
             const msg =
               room.status === 'waiting'
                 ? `Leave room ${room.code} and start a new local game?`
