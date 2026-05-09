@@ -160,25 +160,28 @@
   transform: translateY(1px);
 }
 
-/* Primary: subtle vertical gradient for depth + soft inner highlight
-   instead of a flat fill. Removes the "stamped sticker" look that
-   pure-flat gold rectangles get on dark backgrounds. */
+/* Primary: solid gold fill — flatter than a gradient so text always
+   sits on the same colour and stays crisp. The previous gradient
+   (#ffe1a0 → #ffd884 → #f5cb6f) made letters land on different
+   tonal values, which softened type. Depth comes from the drop-
+   shadow + a faint dark border instead of an internal highlight. */
 .landing-cta-primary {
-  background: linear-gradient(180deg, #ffe1a0 0%, var(--landing-gold) 50%, #f5cb6f 100%);
-  color: #15171b;
-  border: none;
+  background: var(--landing-gold);
+  color: #0d0f13;
+  font-weight: 800;
+  border: 1px solid rgba(0, 0, 0, 0.15);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 2px 8px rgba(0, 0, 0, 0.35),
-    0 0 0 0 rgba(255, 216, 132, 0);
+    0 1px 0 rgba(255, 255, 255, 0.30) inset,
+    0 4px 14px rgba(0, 0, 0, 0.40);
 }
 
 .landing-cta-primary:hover {
-  background: linear-gradient(180deg, #ffe9b8 0%, var(--landing-gold-hover) 50%, #ffd273 100%);
+  background: var(--landing-gold-hover);
+  border-color: rgba(0, 0, 0, 0.18);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 6px 22px rgba(255, 216, 132, 0.32);
-  color: #15171b;
+    0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 8px 22px rgba(255, 216, 132, 0.32);
+  color: #0d0f13;
   opacity: 1;
   transform: translateY(-1px);
 }
@@ -186,8 +189,8 @@
 .landing-cta-primary:active {
   transform: translateY(0);
   box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.2),
-    0 1px 4px rgba(0, 0, 0, 0.3);
+    inset 0 1px 2px rgba(0, 0, 0, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
 .landing-cta-secondary {
