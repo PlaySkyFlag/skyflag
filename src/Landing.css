@@ -68,11 +68,35 @@
 }
 
 .landing-logo {
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: var(--landing-gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   text-decoration: none;
+  /* Slight saturate boost compensates for raster logo files that
+     can render slightly muted against dark backgrounds. */
+  filter: saturate(1.05);
+}
+
+.landing-logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.landing-logo-text {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--landing-gold);
+}
+
+@media (max-width: 540px) {
+  .landing-logo-img {
+    height: 28px;
+  }
+  .landing-logo-text {
+    font-size: 1.05rem;
+  }
 }
 
 .landing-nav {
@@ -136,19 +160,34 @@
   transform: translateY(1px);
 }
 
+/* Primary: subtle vertical gradient for depth + soft inner highlight
+   instead of a flat fill. Removes the "stamped sticker" look that
+   pure-flat gold rectangles get on dark backgrounds. */
 .landing-cta-primary {
-  background: var(--landing-gold);
+  background: linear-gradient(180deg, #ffe1a0 0%, var(--landing-gold) 50%, #f5cb6f 100%);
   color: #15171b;
-  border-color: var(--landing-gold);
-  box-shadow: 0 0 0 0 rgba(255, 216, 132, 0);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.35),
+    0 0 0 0 rgba(255, 216, 132, 0);
 }
 
 .landing-cta-primary:hover {
-  background: var(--landing-gold-hover);
-  border-color: var(--landing-gold-hover);
-  box-shadow: 0 6px 22px rgba(255, 216, 132, 0.28);
+  background: linear-gradient(180deg, #ffe9b8 0%, var(--landing-gold-hover) 50%, #ffd273 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 6px 22px rgba(255, 216, 132, 0.32);
   color: #15171b;
   opacity: 1;
+  transform: translateY(-1px);
+}
+
+.landing-cta-primary:active {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.2),
+    0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .landing-cta-secondary {
@@ -165,8 +204,30 @@
 }
 
 .landing-cta-small {
-  padding: 8px 16px;
+  padding: 8px 18px;
   font-size: 0.88rem;
+}
+
+/* Text-link CTA — for paired-with-primary actions (e.g. "How it works")
+   that should support the primary button without competing with it.
+   Modern landing pages frequently use button + text-link instead of
+   two equal-weight buttons. */
+.landing-cta-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 8px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--landing-text-muted);
+  text-decoration: none;
+  letter-spacing: 0.005em;
+  transition: color 0.15s ease, transform 0.12s ease;
+}
+
+.landing-cta-link:hover {
+  color: var(--landing-gold);
+  transform: translateX(2px);
+  opacity: 1;
 }
 
 /* Visible keyboard focus — required for accessibility, often missing
@@ -180,33 +241,63 @@
 /* ─── Hero ─────────────────────────────────────────────────────── */
 
 .landing-hero {
-  padding: 80px 24px 100px;
+  padding: 70px 24px 100px;
   background:
-    radial-gradient(ellipse at top, rgba(255, 216, 132, 0.10), transparent 60%),
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 216, 132, 0.12), transparent 70%),
+    radial-gradient(ellipse 60% 80% at 50% 100%, rgba(120, 80, 200, 0.06), transparent 70%),
     var(--landing-bg-base);
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle decorative grid line that fades from the centre outward —
+   nods at the game's grid structure without being literal. */
+.landing-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 216, 132, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 216, 132, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center;
+  -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .landing-hero-inner {
   max-width: 760px;
   margin: 0 auto;
+  position: relative;
+}
+
+.landing-hero-logo {
+  width: clamp(110px, 20vw, 160px);
+  height: auto;
+  display: block;
+  margin: 0 auto 18px;
+  filter: drop-shadow(0 8px 32px rgba(255, 216, 132, 0.22));
 }
 
 .landing-hero-title {
   font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 800;
   color: var(--landing-gold);
-  margin-bottom: 16px;
-  letter-spacing: -0.025em;
+  margin: 0 0 14px;
+  letter-spacing: -0.03em;
+  line-height: 1;
   text-shadow: 0 4px 30px rgba(255, 216, 132, 0.18);
 }
 
 .landing-hero-subtitle {
-  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-size: clamp(1.15rem, 2.5vw, 1.4rem);
   color: var(--landing-text);
   margin: 0 0 22px;
   line-height: 1.4;
   font-weight: 500;
+  letter-spacing: -0.005em;
 }
 
 .landing-hero-pitch {
@@ -218,8 +309,9 @@
 
 .landing-hero-actions {
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 6px;
   flex-wrap: wrap;
   margin-bottom: 18px;
 }

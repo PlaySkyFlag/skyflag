@@ -114,7 +114,14 @@ function Header() {
   return (
     <header className="landing-header">
       <div className="landing-header-inner">
-        <a href="/" className="landing-logo">SkyFlag</a>
+        <a href="/" className="landing-logo" aria-label="SkyFlag — home">
+          <img
+            src="/skyflag-logo.png"
+            alt=""
+            className="landing-logo-img"
+          />
+          <span className="landing-logo-text">SkyFlag</span>
+        </a>
         <nav className="landing-nav">
           <a href="#features" className="landing-nav-link">Features</a>
           <a href="#pricing" className="landing-nav-link">Pricing</a>
@@ -129,26 +136,33 @@ function Hero() {
   return (
     <section className="landing-hero">
       <div className="landing-hero-inner">
+        <img
+          src="/skyflag-logo.png"
+          alt=""
+          className="landing-hero-logo"
+          aria-hidden="true"
+        />
         <h1 className="landing-hero-title">SkyFlag</h1>
         <p className="landing-hero-subtitle">
-          Strategy across three skies. Capture the flags or seize the Nexus.
+          Strategy across three skies.
         </p>
         <p className="landing-hero-pitch">
           A turn-based strategy game played simultaneously on three boards —
-          ground, sky, and space. Four piece types, two paths to victory,
-          and an AI that's been tuned to think like a chess engine.
+          ground, sky, and space. Capture all three flags, or seize the
+          Nexus. Four piece types, an AI tuned to think like a chess
+          engine, free to play in any browser.
         </p>
         <div className="landing-hero-actions">
           <a href="/play" className="landing-cta-button landing-cta-primary">
-            ▶ Play free
+            Play free
           </a>
-          <a href="#how-it-works" className="landing-cta-button landing-cta-secondary">
-            How it works
+          <a href="#how-it-works" className="landing-cta-link">
+            How it works →
           </a>
         </div>
         <p className="landing-hero-fineprint">
-          No account required. Solo vs AI, hot-seat 2P, and online play
-          all work in the browser.
+          No account required to start. Solo vs AI, 2P hot-seat, and online
+          multiplayer all work in the browser.
         </p>
       </div>
     </section>
