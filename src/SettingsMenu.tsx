@@ -28,6 +28,8 @@ type Props = {
   onSetTheme: (id: ThemeId) => void;
   clockOption: ClockOptionId;
   onSetClockOption: (id: ClockOptionId) => void;
+  showThreats: boolean;
+  onSetShowThreats: (v: boolean) => void;
 };
 
 export default function SettingsMenu({
@@ -39,6 +41,8 @@ export default function SettingsMenu({
   onSetTheme,
   clockOption,
   onSetClockOption,
+  showThreats,
+  onSetShowThreats,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [mutedNow, setMutedNow] = useState(isMuted());
@@ -140,6 +144,17 @@ export default function SettingsMenu({
               }}
             >
               {mutedNow ? '🔇 Muted' : '🔊 On'}
+            </button>
+          </label>
+          <label className="settings-row">
+            <span className="settings-label">Threat warnings</span>
+            <button
+              type="button"
+              className="hud-btn hud-btn-subtle"
+              onClick={() => onSetShowThreats(!showThreats)}
+              title="Red ring + ! badge under pieces in opponent's capture range"
+            >
+              {showThreats ? '✓ On' : 'Off'}
             </button>
           </label>
         </div>

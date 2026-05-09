@@ -9,6 +9,7 @@ import Sidebar from './Sidebar';
 import StatsModal from './StatsModal';
 import StatusBar from './StatusBar';
 import Daily from './Daily';
+import type { ChatMessage } from './Chat';
 import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { loadProfile, type Profile } from './game/profile';
@@ -243,6 +244,23 @@ export default function App() {
   const [clockOption, setClockOption] = useState<ClockOptionId>(
     INITIAL_SESSION?.clockOption ?? 'off',
   );
+  // Whether to draw the red threat ring under pieces in capture range.
+  // On by default — strong learning aid, especially for new players.
+  // Persisted in localStorage so the choice survives refresh.
+  const [showThreats, setShowThreats] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('skyflag.showThreats.v1') !== '0';
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('skyflag.showThreats.v1', showThreats ? '1' : '0');
+    } catch {
+      // no-op — storage may be unavailable in private mode
+    }
+  }, [showThreats]);
   // Auth + profile state. The AccountModal handles sign-in (magic link)
   // and the first-time profile form; this component just keeps a local
   // copy of the loaded profile for the footer label and downstream use.
@@ -365,6 +383,12 @@ export default function App() {
     }
   });
   const [dailyOpen, setDailyOpen] = useState(false);
+  // Per-room chat messages. Ephemeral — no DB persistence — so a
+  // refresh wipes the log. Cleared whenever the user enters a new room.
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  useEffect(() => {
+    setChatMessages([]);
+  }, [room?.code]);
   const closeTutorial = () => {
     setTutorialOpen(false);
     try {
@@ -716,6 +740,12 @@ export default function App() {
           flash('Opponent declined the draw offer.');
         }
       })
+      .on('broadcast', { event: 'chat' }, ({ payload }) => {
+        const m = payload as ChatMessage | undefined;
+        if (!m || typeof m.text !== 'string') return;
+        // Append; both sides see the same broadcast so messages line up.
+        setChatMessages((prev) => [...prev, m]);
+      })
       .subscribe();
     return () => {
       channel.unsubscribe();
@@ -823,7 +853,9 @@ export default function App() {
   };
 
   const lastMove = findLastMove(state);
-  const threats = computeThreats(state);
+  const threats = showThreats
+    ? computeThreats(state)
+    : { space: [], sky: [], ground: [] };
   const renderBoard = (layer: Layer) => {
     const selectedCell =
       selectedBoardPiece && selectedBoardPiece.coord.layer === layer
@@ -899,6 +931,8 @@ export default function App() {
             onSetTheme={setThemeId}
             clockOption={clockOption}
             onSetClockOption={setClockOption}
+            showThreats={showThreats}
+            onSetShowThreats={setShowThreats}
           />
         </div>
       </header>
@@ -997,6 +1031,27 @@ export default function App() {
         onPresenceChange={setLobbyOnlineIds}
         onOpenTutorial={() => setTutorialOpen(true)}
         onOpenDaily={() => setDailyOpen(true)}
+        chatMessages={chatMessages}
+        onSendChat={(text: string) => {
+          if (!room || !drawChannelRef.current) return false;
+          const msg: ChatMessage = {
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            from: room.role,
+            nickname: profile?.nickname ?? 'You',
+            text,
+            ts: Date.now(),
+          };
+          // Optimistic append so the sender sees their message
+          // immediately; the broadcast echo for the OTHER side does
+          // the same on their end. Self-echoes are dedup'd by id.
+          setChatMessages((prev) =>
+            prev.some((m) => m.id === msg.id) ? prev : [...prev, msg],
+          );
+          drawChannelRef.current
+            .send({ type: 'broadcast', event: 'chat', payload: msg })
+            .catch(() => undefined);
+          return true;
+        }}
       />
       <PieceTray
         player="p1"

@@ -7,6 +7,7 @@
 // ever open at a time, so the page stays calm.
 
 import type { User } from '@supabase/supabase-js';
+import Chat, { type ChatMessage } from './Chat';
 import Friends from './Friends';
 import Help from './Help';
 import MoveHistory from './MoveHistory';
@@ -17,7 +18,7 @@ import type { Profile } from './game/profile';
 import type { HistoryEntry, RoomState } from './game/types';
 import { useEffect, useState } from 'react';
 
-type TabId = 'rules' | 'multiplayer' | 'history' | 'tournaments' | 'friends';
+type TabId = 'rules' | 'multiplayer' | 'history' | 'tournaments' | 'friends' | 'chat';
 
 type Props = {
   authUser: User | null;
@@ -31,6 +32,8 @@ type Props = {
   onPresenceChange: (ids: Set<string>) => void;
   onOpenTutorial: () => void;
   onOpenDaily: () => void;
+  chatMessages: ChatMessage[];
+  onSendChat: (text: string) => boolean;
 };
 
 export default function Sidebar({
@@ -45,6 +48,8 @@ export default function Sidebar({
   onPresenceChange,
   onOpenTutorial,
   onOpenDaily,
+  chatMessages,
+  onSendChat,
 }: Props) {
   // Default to Multiplayer auto-open when the user picks 2P (matches the
   // old forceOpen behavior on the Multiplayer disclosure). Otherwise the
@@ -107,6 +112,15 @@ export default function Sidebar({
             onlineIds={onlineIds}
           />
         );
+      case 'chat':
+        return (
+          <Chat
+            messages={chatMessages}
+            myRole={room?.role ?? null}
+            onSend={onSendChat}
+            active={room !== null}
+          />
+        );
       default:
         return null;
     }
@@ -156,6 +170,7 @@ export default function Sidebar({
         {tab('history', `📜 History${history.length > 0 ? ` (${history.length})` : ''}`)}
         {tab('tournaments', '🏆 Tournaments')}
         {tab('friends', '🤝 Friends', pendingCount)}
+        {tab('chat', '💬 Chat')}
         {active && (
           <button
             type="button"

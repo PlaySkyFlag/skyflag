@@ -1846,6 +1846,83 @@ button.tray-piece:hover {
   background: rgba(36, 50, 80, 0.95);
 }
 
+/* MP chat — fits in a Sidebar tab. Scrolling list of messages above
+   a fixed input row. Own-messages right-align in gold; opponent's
+   left-align. Ephemeral (no persistence) — refresh wipes the log. */
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 200px;
+}
+
+.chat-list {
+  flex: 1;
+  max-height: 360px;
+  min-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 2px;
+}
+
+.chat-msg {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  max-width: 80%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.chat-msg-mine {
+  align-self: flex-end;
+  background: rgba(255, 216, 132, 0.16);
+  border-color: rgba(255, 216, 132, 0.55);
+}
+
+.chat-msg-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.chat-msg-body {
+  word-break: break-word;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: inherit;
+  font: inherit;
+}
+
+.chat-input:focus {
+  outline: 2px solid rgba(255, 216, 132, 0.5);
+  border-color: rgba(255, 216, 132, 0.6);
+}
+
+.chat-input:disabled {
+  opacity: 0.45;
+}
+
 /* Daily puzzle modal — full-screen overlay that holds the puzzle's
    own 3-board view, a prompt, and the result feedback. Independent
    of the main game state: closing it returns to whatever round was
