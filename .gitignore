@@ -25,3 +25,24 @@ dist-ssr
 
 # Claude Code local (machine-specific) settings
 .claude/settings.local.json
+
+# Environment files. .env.production and .env.example are intentionally
+# tracked (publishable Supabase + VAPID keys for the build pipeline; the
+# template). Everything else is local-only and must never be committed —
+# private dev creds, service-role keys, etc.
+.env
+.env.development
+.env.test
+.env.staging
+
+# Apple credentials and code-signing artifacts. APNs auth keys (.p8),
+# distribution certs (.p12 / .cer), provisioning profiles, and any raw
+# private keys belong only on machines / Supabase secrets / Xcode Cloud
+# secrets — never in the repo. Catches accidental "stash this here for
+# a sec" commits.
+*.p8
+*.p12
+*.pem
+*.key
+*.cer
+*.mobileprovision
