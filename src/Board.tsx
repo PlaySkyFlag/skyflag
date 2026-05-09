@@ -389,27 +389,33 @@ export default function Board({
           <circle  cx={cx - s * 0.1}  cy={cy - s * 0.20} r={s * 0.95} />
         </g>
       );
+      // Lower opacities — clouds were overpainting the cyan last-move
+      // and gold hint arrows enough that those signals could read as
+      // muted/half-erased on Sky. Now they're ambient mist instead.
       return (
         <g pointerEvents="none">
-          {cloud(75,  60,  16, 0.55, 'cl-1')}
-          {cloud(305, 110, 19, 0.45, 'cl-2')}
-          {cloud(145, 295, 17, 0.40, 'cl-3')}
-          {cloud(330, 350, 14, 0.42, 'cl-4')}
-          {cloud(215, 188, 13, 0.32, 'cl-5')}
+          {cloud(75,  60,  16, 0.22, 'cl-1')}
+          {cloud(305, 110, 19, 0.18, 'cl-2')}
+          {cloud(145, 295, 17, 0.16, 'cl-3')}
+          {cloud(330, 350, 14, 0.18, 'cl-4')}
+          {cloud(215, 188, 13, 0.14, 'cl-5')}
         </g>
       );
     }
     if (theme.kind === 'space') {
+      // Knocked stars back ~50% so they read as backdrop instead of
+      // foreground noise; bright stars over a piece used to fight the
+      // glyph for attention. Smaller radius too (1.0 multiplier vs 1.35).
       return (
-        <g pointerEvents="none">
+        <g pointerEvents="none" opacity={0.55}>
           {SPACE_STARS.map((s, i) => (
             <circle
               key={`star-${i}`}
               cx={s.x}
               cy={s.y}
-              r={s.r * 1.35}
+              r={s.r}
               fill="rgba(255, 250, 230, 1)"
-              opacity={Math.min(1, s.o * 1.15)}
+              opacity={s.o}
             />
           ))}
           {/* A few brighter stars with a faint glow */}
@@ -418,8 +424,8 @@ export default function Board({
               key={`glow-${i}`}
               cx={s.x}
               cy={s.y}
-              r={s.r * 3.2}
-              fill="rgba(255, 245, 220, 0.18)"
+              r={s.r * 2.4}
+              fill="rgba(255, 245, 220, 0.12)"
             />
           ))}
         </g>
