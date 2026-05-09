@@ -1,14 +1,13 @@
+/* SkyFlag's whole visual design assumes a dark page (board atmospheres,
+   panels, HUD all painted on dark fills). We used to follow the OS
+   prefers-color-scheme, but that left users on light-mode systems
+   reading black text on dark panels — most visible in the Rules tab
+   which is mostly body text. Pin both background and color to the
+   dark palette so the look is consistent regardless of OS preference. */
 :root {
-  color-scheme: light dark;
-  background: #f5f3ee;
-  color: #1a1a1a;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    background: #1a1c18;
-    color: #f5f3ee;
-  }
+  color-scheme: dark;
+  background: #1a1c18;
+  color: #f5f3ee;
 }
 
 * {
