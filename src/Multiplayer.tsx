@@ -173,6 +173,18 @@ function NotificationsControl() {
     );
   }
 
+  // Push needs a server-side row to be useful — without sign-in we'd
+  // pop the OS permission prompt for nothing, since notify-turn looks
+  // up subscriptions by user_id. Hide the button entirely until they
+  // sign in instead of letting them tap it and then telling them so.
+  if (!authUser) {
+    return (
+      <p className="mp-note">
+        Sign in (button at the top) to enable turn notifications.
+      </p>
+    );
+  }
+
   return (
     <div className="mp-notify">
       <button

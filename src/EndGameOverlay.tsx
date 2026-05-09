@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { sendRequest } from './game/friends';
 import { supabase } from './game/supabase';
-import type { GameState, Player, RoomState } from './game/types';
+import type { GameState, GameStatus, Player, RoomState } from './game/types';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
-const REASON_LABEL: Record<
-  'nexus' | 'elimination' | 'resignation' | 'turn-limit' | 'stalemate' | 'agreement',
-  string
-> = {
+// See StatusBar.tsx for why we derive these from GameStatus rather
+// than spelling the union out by hand.
+type WonReason = Extract<GameStatus, { kind: 'won' }>['reason'];
+type DrawReason = Extract<GameStatus, { kind: 'draw' }>['reason'];
+
+const REASON_LABEL: Record<WonReason | DrawReason, string> = {
   nexus: 'Nexus capture',
   elimination: 'elimination',
   resignation: 'resignation',

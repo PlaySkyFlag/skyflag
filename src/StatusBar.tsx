@@ -1,12 +1,15 @@
 import { TURN_LIMIT } from './game/constants';
-import type { GameState, Player } from './game/types';
+import type { GameState, GameStatus, Player } from './game/types';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
-const REASON_LABEL: Record<
-  'nexus' | 'elimination' | 'resignation' | 'turn-limit' | 'stalemate' | 'agreement',
-  string
-> = {
+// Derive reason keys directly from GameStatus so adding a new terminal
+// reason in types.ts trips a type error here instead of silently
+// rendering as undefined.
+type WonReason = Extract<GameStatus, { kind: 'won' }>['reason'];
+type DrawReason = Extract<GameStatus, { kind: 'draw' }>['reason'];
+
+const REASON_LABEL: Record<WonReason | DrawReason, string> = {
   nexus: 'Nexus',
   elimination: 'elimination',
   resignation: 'resignation',

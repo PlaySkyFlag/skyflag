@@ -5,21 +5,15 @@ allows; nothing here is blocking gameplay.
 
 ## Must fix
 
-- [ ] **`Help.tsx` references removed UI.** Steps still tell users to
-      "choose a mode from the dropdown in the HUD", "click New game in
-      the HUD", and "End the turn by clicking End turn in the HUD". Mode
-      moved to the gear menu, end-turn is automatic. Misleads first-time
-      players exactly when they need orientation.
-- [ ] **`getEffectiveUserId` falls back to a localStorage UUID that
-      cannot pass RLS.** Anonymous users clicking Create room or Join
-      will fail RLS silently with a confusing 42501 error. Either remove
-      the fallback or disable Create/Join when `authUser === null` in
-      `Multiplayer.tsx`.
-- [ ] **No migration for the `games` table.** Migrations 001–007 all
-      reference `public.games` but the table itself was created in the
-      Supabase dashboard. Anyone re-bootstrapping the project from
-      migrations alone will fail at 007. Owe a `000_games.sql` (or fold
-      into 007).
+- [x] ~~Help.tsx references removed UI.~~ Steps rewritten to point to
+      the gear menu and the in-game toolbar, end-turn note clarifies
+      it's automatic, plus a Hint pointer was added.
+- [x] ~~getEffectiveUserId fallback can't pass RLS.~~ Multiplayer's
+      Create room / Join now hide for anonymous users with a "Sign in
+      to play online" prompt.
+- [x] ~~No migration for the games table.~~ Added `000_games.sql`
+      (idempotent against the existing remote thanks to
+      `if not exists`).
 
 ## Should fix
 
@@ -52,14 +46,16 @@ allows; nothing here is blocking gameplay.
       flips a `pushFailed` flag; sync-banner pinned bottom-right with
       a Retry button bumps a nonce that re-runs the push effect with
       the current state. Successful retry clears the banner.
-- [ ] **`StatusBar.tsx` REASON_LABEL duplicates the `GameStatus` union.**
-      Hand-kept in sync. Derive via `keyof` or co-locate.
-- [ ] **Stats credit for 2P hot-seat is silently dropped.** Mention this
-      in StatsModal so users aren't confused why "Total games" lags
-      actual play.
-- [ ] **iOS push only saves the APNs token if `authUser && supabase`**
-      (`src/Multiplayer.tsx:128`). Anonymous users get permission prompts
-      they can't actually use. Gate the button on `authUser` upfront.
+- [x] ~~StatusBar REASON_LABEL duplicates the GameStatus union.~~
+      Both StatusBar and EndGameOverlay now derive `WonReason` /
+      `DrawReason` via `Extract<GameStatus, …>['reason']`; adding a
+      new reason to the type now trips a type error in both places.
+- [x] ~~Stats credit for 2P hot-seat is silently dropped.~~ StatsModal
+      now shows a small disclaimer explaining the omission.
+- [x] ~~iOS push prompts anonymous users.~~ NotificationsControl now
+      shows a "Sign in to enable turn notifications" hint when
+      `authUser === null`, hiding the Enable button entirely until
+      sign-in instead of letting them tap it for nothing.
 
 ## Already-on-roadmap (not part of cleanup)
 

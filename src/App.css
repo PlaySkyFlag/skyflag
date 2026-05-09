@@ -83,6 +83,13 @@
   width: min(560px, calc(100vw - 32px));
 }
 
+.stats-disclaimer {
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  opacity: 0.65;
+  line-height: 1.4;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

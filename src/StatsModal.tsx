@@ -46,6 +46,10 @@ export default function StatsModal({ open, onClose }: Props) {
           <p className="account-intro">No games recorded yet — finish one to see stats here.</p>
         ) : (
           <>
+            <p className="stats-disclaimer">
+              2-player hot-seat games aren't counted here (both sides
+              are you), so this total may lag your actual play.
+            </p>
             <div className="stats-grid">
               <div className="stats-cell">
                 <div className="stats-num">{stats.totalGames}</div>
