@@ -315,8 +315,13 @@ export default function App() {
             : state.status.winner === mySide
               ? 'win'
               : 'loss';
-        const reason: 'nexus' | 'elimination' | 'turn-limit' | 'stalemate' =
-          state.status.reason;
+        const reason:
+          | 'nexus'
+          | 'elimination'
+          | 'resignation'
+          | 'turn-limit'
+          | 'stalemate'
+          | 'agreement' = state.status.reason;
         recordGame({
           when: new Date().toISOString(),
           mode,
@@ -803,6 +808,14 @@ export default function App() {
         difficulty={difficulty}
         onSetDifficulty={setDifficulty}
         onNewGame={() => dispatch({ type: 'new-game' })}
+        onResign={() => {
+          // The resigner is whichever local human is on the clock.
+          // In MP, that's the room.role; in 1P, the opposite of the AI's
+          // slot; in 2P hot-seat, the current player.
+          const resigner: Player =
+            room?.role ?? (aiPlayer ? (aiPlayer === 'p1' ? 'p2' : 'p1') : state.currentPlayer);
+          dispatch({ type: 'resign', player: resigner });
+        }}
       />
       <div className="help-row">
         <Help />

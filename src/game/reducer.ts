@@ -24,6 +24,15 @@ export type Action =
   | { type: 'move'; pieceId: PieceId; to: Coord }
   | { type: 'end-turn' }
   | { type: 'new-game' }
+  // Resign: ends the game with the resigner's opponent winning by
+  // resignation. Always dispatched by the resigning side (current
+  // player) for the local hot-seat / 1P case; in MP either side can
+  // resign at any time.
+  | { type: 'resign'; player: Player }
+  // Both players have agreed to a draw — end the game with reason
+  // 'agreement'. Caller is responsible for the agreement-handshake
+  // (1P/2P: confirm dialog; MP: offer + accept broadcast).
+  | { type: 'agree-draw' }
   // Replace the entire state — used by the multiplayer realtime sync to
   // adopt an opponent's authoritative state without re-running rules.
   | { type: 'remote-sync'; state: GameState };
@@ -38,6 +47,10 @@ export function reduce(state: GameState, action: Action): GameState {
       return applyMove(state, action.pieceId, action.to);
     case 'end-turn':
       return applyEndTurn(state);
+    case 'resign':
+      return applyResign(state, action.player);
+    case 'agree-draw':
+      return applyDrawAgreement(state);
     case 'remote-sync':
       return action.state;
   }
@@ -274,6 +287,22 @@ function maybeCaptureFlag(
   return {
     ...flags,
     [to.layer]: { ...flags[to.layer], [opponent]: true },
+  };
+}
+
+function applyResign(state: GameState, resigner: Player): GameState {
+  if (state.status.kind !== 'in-progress') return state;
+  return {
+    ...state,
+    status: { kind: 'won', winner: opponentOf(resigner), reason: 'resignation' },
+  };
+}
+
+function applyDrawAgreement(state: GameState): GameState {
+  if (state.status.kind !== 'in-progress') return state;
+  return {
+    ...state,
+    status: { kind: 'draw', reason: 'agreement' },
   };
 }
 

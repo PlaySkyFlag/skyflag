@@ -319,6 +319,17 @@
   transform: translateY(1px);
 }
 
+.hud-btn-warn {
+  border-color: rgba(255, 138, 138, 0.45);
+  color: #ff9a9a;
+}
+
+.hud-btn-warn:hover {
+  background: rgba(255, 138, 138, 0.10);
+  border-color: rgba(255, 138, 138, 0.7);
+  color: #ffb0b0;
+}
+
 .hud-btn-subtle {
   opacity: 0.75;
 }

@@ -6,11 +6,16 @@ import type { GameState, Player } from './game/types';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
-const REASON_LABEL: Record<'nexus' | 'elimination' | 'turn-limit' | 'stalemate', string> = {
+const REASON_LABEL: Record<
+  'nexus' | 'elimination' | 'resignation' | 'turn-limit' | 'stalemate' | 'agreement',
+  string
+> = {
   nexus: 'Nexus',
   elimination: 'elimination',
+  resignation: 'resignation',
   'turn-limit': 'turn-limit',
   stalemate: 'stalemate',
+  agreement: 'agreement',
 };
 
 type Mode = Player | null;
@@ -22,6 +27,7 @@ type Props = {
   difficulty: Difficulty;
   onSetDifficulty: (d: Difficulty) => void;
   onNewGame: () => void;
+  onResign: () => void;
 };
 
 // Dropdown value strings map cleanly to/from the aiPlayer slot. The
@@ -39,6 +45,7 @@ export default function StatusBar({
   difficulty,
   onSetDifficulty,
   onNewGame,
+  onResign,
 }: Props) {
   const [mutedNow, setMutedNow] = useState(isMuted());
   const muteControl = (
@@ -133,6 +140,16 @@ export default function StatusBar({
           Turn {state.turnNumber} / {TURN_LIMIT}
         </span>
         <span className="hud-divider">·</span>
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle hud-btn-warn"
+          onClick={() => {
+            if (confirm('Resign this game? Your opponent wins.')) onResign();
+          }}
+          title="Concede the game — opponent wins by resignation"
+        >
+          Resign
+        </button>
         <button type="button" className="hud-btn hud-btn-subtle" onClick={onNewGame}>New game</button>
         {modeControl}
         {difficultyControl}
