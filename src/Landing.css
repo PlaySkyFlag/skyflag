@@ -31,13 +31,19 @@
   line-height: 1.5;
 }
 
-.landing a {
+/* :where() forces specificity to 0,0,0 on this rule. Without that, the
+   descendant selector .landing a (0,1,1) was beating button-class
+   selectors like .landing-cta-primary (0,1,0) and the buttons inherited
+   the link gold colour — making "Play free" gold-on-gold (invisible)
+   until hover, where :hover bumped specificity past .landing a.
+   Now any class on a button or link can set its own colour cleanly. */
+:where(.landing a) {
   color: var(--landing-gold);
   text-decoration: none;
   transition: opacity 0.15s ease;
 }
 
-.landing a:hover {
+:where(.landing a):hover {
   opacity: 0.85;
 }
 
