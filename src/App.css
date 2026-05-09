@@ -846,11 +846,27 @@ button.tray-piece:hover {
 /* Smooth animation for piece moves: when a piece's coord changes, React
    reuses the same DOM element (because the key is the stable piece id),
    and the SVG x/y attributes transition instead of jumping. Modern Safari
-   and iOS Safari both support transitioning SVG positional attributes. */
+   and iOS Safari both support transitioning SVG positional attributes.
+   Kept short (110ms) so a quick second tap on another piece doesn't land
+   on the still-animating glyph's old visual position. */
 .piece-marker {
   transition:
-    x 0.18s cubic-bezier(0.2, 0.7, 0.3, 1),
-    y 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+    x 0.11s cubic-bezier(0.2, 0.7, 0.3, 1),
+    y 0.11s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* Board cells — explicit touch-action so iOS doesn't insert tap delays
+   or treat a small finger-drag as a swipe (which silently discards
+   onClick). Brief active-state flash gives the user immediate "your
+   tap registered" feedback even when nothing else changes (e.g.,
+   tapping an empty cell with no selection). */
+.board-cell {
+  touch-action: manipulation;
+  transition: fill 0.10s ease;
+}
+
+.board-cell:active {
+  fill: rgba(255, 216, 132, 0.45) !important;
 }
 
 /* Multiplayer lobby controls — sit inside the Multiplayer disclosure

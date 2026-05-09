@@ -442,6 +442,7 @@ export default function Board({
       cells.push(
         <rect
           key={`${row}-${col}`}
+          className={clickable ? 'board-cell' : undefined}
           x={ORIGIN_X + col * CELL}
           y={ORIGIN_Y + row * CELL}
           width={CELL}
@@ -449,7 +450,20 @@ export default function Board({
           fill={isDark ? theme.darkFill : theme.lightFill}
           stroke={theme.stroke}
           strokeWidth={1}
-          onClick={clickable ? () => onCellClick(row, col) : undefined}
+          // Use onPointerUp instead of onClick — iOS Safari interprets
+          // any tiny finger-drag during a tap as a swipe and silently
+          // discards the click, but pointer events fire reliably. All
+          // modern browsers (incl. Safari/iOS Safari) support pointer
+          // events, so this is safe across the board.
+          onPointerUp={
+            clickable
+              ? (e) => {
+                  // Mouse: only primary button. Touch/pen: always.
+                  if (e.pointerType === 'mouse' && e.button !== 0) return;
+                  onCellClick(row, col);
+                }
+              : undefined
+          }
           style={{ cursor: clickable ? 'pointer' : 'default' }}
         />
       );
@@ -815,8 +829,18 @@ export default function Board({
         stroke={style.stroke}
         strokeWidth={isActive ? 3 : 2}
         strokeDasharray={isActive ? undefined : '5 3'}
-        onClick={isActive && onDeployCellClick ? () => onDeployCellClick(d.player) : undefined}
+        // Match the cell tap path — pointerup is more reliable than
+        // click on iOS SVG.
+        onPointerUp={
+          isActive && onDeployCellClick
+            ? (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                onDeployCellClick(d.player);
+              }
+            : undefined
+        }
         pointerEvents={isActive && onDeployCellClick ? 'auto' : 'none'}
+        className={isActive && onDeployCellClick ? 'board-cell' : undefined}
         style={{ cursor: isActive && onDeployCellClick ? 'pointer' : 'default' }}
       >
         {isActive && (
