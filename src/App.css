@@ -661,12 +661,13 @@
   color: rgb(185, 220, 160);
 }
 
-/* Forward tilt — boards angle up like lecterns, exposing their playing
-   surface to a viewer at table-level. The drop-shadow chain is overridden
-   per layer so each board glows in its theme color. */
+/* Boards used to be tilted with rotateX(50deg) for a 3D-lectern look,
+   but the perspective compression made bottom-row cells (r5) hard to
+   tap reliably — your finger landed where you SAW the cell, but the
+   transformed hit target was a few cells off. Playability beat the
+   aesthetic; boards now sit flat. The drop-shadow chain stays so
+   each layer still reads with its theme color. */
 .board-stack-tile {
-  transform: rotateX(50deg);
-  transform-origin: 50% 50%;
   border-radius: 8px;
 }
 
