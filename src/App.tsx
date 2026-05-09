@@ -226,6 +226,13 @@ export default function App() {
   // by Friends so its online dots reflect the same channel without
   // spinning up a duplicate subscription.
   const [lobbyOnlineIds, setLobbyOnlineIds] = useState<Set<string>>(new Set());
+  // Multiplayer is always two human players — auto-clear AI as soon as
+  // a room becomes active so AI vs. opponent can't accidentally fight
+  // for the same seat. The SettingsMenu also disables the mode picker
+  // while in a room as a belt-and-suspenders.
+  useEffect(() => {
+    if (room && aiPlayer !== null) setAiPlayer(null);
+  }, [room, aiPlayer]);
   // AI-suggested move shown when the user clicks Hint. Cleared
   // automatically when history advances (so it disappears the moment
   // they actually move, deploy, or end-turn).
@@ -933,6 +940,7 @@ export default function App() {
             onSetClockOption={setClockOption}
             showThreats={showThreats}
             onSetShowThreats={setShowThreats}
+            inMpRoom={room !== null}
           />
         </div>
       </header>

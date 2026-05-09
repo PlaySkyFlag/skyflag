@@ -30,6 +30,10 @@ type Props = {
   onSetClockOption: (id: ClockOptionId) => void;
   showThreats: boolean;
   onSetShowThreats: (v: boolean) => void;
+  // True while the user is in a multiplayer room — locks the
+  // Players + AI difficulty pickers so AI can't be re-introduced
+  // into a 2-human game by accident.
+  inMpRoom: boolean;
 };
 
 export default function SettingsMenu({
@@ -43,6 +47,7 @@ export default function SettingsMenu({
   onSetClockOption,
   showThreats,
   onSetShowThreats,
+  inMpRoom,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [mutedNow, setMutedNow] = useState(isMuted());
@@ -85,12 +90,17 @@ export default function SettingsMenu({
             <span className="settings-label">Players</span>
             <select
               className="hud-mode-select"
-              value={aiPlayer ?? 'none'}
+              value={inMpRoom ? 'mp' : (aiPlayer ?? 'none')}
               onChange={(e) => onSetMode(SELECT_TO_MODE[e.target.value])}
+              disabled={inMpRoom}
+              title={inMpRoom ? 'Online multiplayer — leave the room to change mode' : ''}
             >
               <option value="p2">1P · Ravens (you)</option>
               <option value="p1">1P · Stags (you)</option>
               <option value="none">2P hot-seat</option>
+              {inMpRoom && (
+                <option value="mp">Online — vs. opponent</option>
+              )}
             </select>
           </label>
           <label className="settings-row">
@@ -99,8 +109,14 @@ export default function SettingsMenu({
               className="hud-mode-select"
               value={difficulty}
               onChange={(e) => onSetDifficulty(e.target.value as Difficulty)}
-              disabled={aiPlayer === null}
-              title={aiPlayer === null ? 'Only used in 1-player modes' : ''}
+              disabled={inMpRoom || aiPlayer === null}
+              title={
+                inMpRoom
+                  ? 'No AI in multiplayer'
+                  : aiPlayer === null
+                    ? 'Only used in 1-player modes'
+                    : ''
+              }
             >
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
