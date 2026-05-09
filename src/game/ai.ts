@@ -1,5 +1,6 @@
 import { DEPLOY_COORDS, FLAG_COORDS, NEXUS_COORD } from './constants';
 import { legalMovesFor } from './moves';
+import { pstScore } from './pst';
 import { reduce, type Action } from './reducer';
 import type {
   CaptainPiece,
@@ -192,10 +193,15 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   const opp = opponentOf(aiPlayer);
   let score = 0;
 
-  // Material — board pieces are worth full value, in-hand discounted (they
-  // can still be captured before deploy via elimination win, but not directly).
+  // Material + positional — board pieces score for material AND for where
+  // they're standing. The PST lookup encodes "where pieces want to be"
+  // (center control, lift proximity, advanced rows for soldiers, Nexus
+  // for captains on Space) that isn't already captured by distance-to-
+  // target or mobility. In-hand pieces are discounted material only.
   for (const bp of state.onBoard) {
-    score += pieceValue(bp.piece.kind) * (bp.piece.owner === aiPlayer ? 1 : -1);
+    const sign = bp.piece.owner === aiPlayer ? 1 : -1;
+    score += pieceValue(bp.piece.kind) * sign;
+    score += pstScore(bp.piece, bp.coord) * sign;
   }
   for (const piece of state.inHand[aiPlayer]) score += pieceValue(piece.kind) * 0.7;
   for (const piece of state.inHand[opp])      score -= pieceValue(piece.kind) * 0.7;
