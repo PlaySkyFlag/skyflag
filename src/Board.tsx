@@ -389,16 +389,18 @@ export default function Board({
           <circle  cx={cx - s * 0.1}  cy={cy - s * 0.20} r={s * 0.95} />
         </g>
       );
-      // Lower opacities — clouds were overpainting the cyan last-move
-      // and gold hint arrows enough that those signals could read as
-      // muted/half-erased on Sky. Now they're ambient mist instead.
+      // Cloud positions tuned to AVOID the play surface. The 6×6 grid
+      // sits at x∈[34,370], y∈[34,370]; clouds are now placed in the
+      // gutters/corners so they read as scenery without parking a
+      // white blob over a cell the player needs to tap. Opacities are
+      // also kept low so they're ambient mist, not foreground.
       return (
         <g pointerEvents="none">
-          {cloud(75,  60,  16, 0.22, 'cl-1')}
-          {cloud(305, 110, 19, 0.18, 'cl-2')}
-          {cloud(145, 295, 17, 0.16, 'cl-3')}
-          {cloud(330, 350, 14, 0.18, 'cl-4')}
-          {cloud(215, 188, 13, 0.14, 'cl-5')}
+          {cloud(28,   18,  10, 0.22, 'cl-1')}
+          {cloud(360,  16,  11, 0.20, 'cl-2')}
+          {cloud(18,  280,  9,  0.16, 'cl-3')}
+          {cloud(372, 200,  9,  0.18, 'cl-4')}
+          {cloud(370, 384,  10, 0.18, 'cl-5')}
         </g>
       );
     }
@@ -1084,13 +1086,29 @@ export default function Board({
           display: 'block',
         }}
       >
-        {atmosphereBack}
+        {/* Clip atmosphere (mountains, clouds, stars, planet, rocks,
+            gradient overlays) to the outer FRAME only — never paint
+            decorative shapes over the play surface where they could
+            visually obscure cell boundaries or fight pieces for
+            attention. evenodd fill rule cuts a hole the size of the
+            cell grid out of the SVG-sized rectangle. */}
+        <defs>
+          <clipPath id="atmo-frame" clipPathUnits="userSpaceOnUse">
+            <path
+              clipRule="evenodd"
+              d={`M0 0H${SVG_WIDTH}V${SVG_HEIGHT}H0Z M${ORIGIN_X} ${ORIGIN_Y}H${
+                ORIGIN_X + BOARD_SIZE * CELL
+              }V${ORIGIN_Y + BOARD_SIZE * CELL}H${ORIGIN_X}Z`}
+            />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#atmo-frame)">{atmosphereBack}</g>
         {cells}
         {lastMoveEls}
         {hintEls}
         {colLabels}
         {rowLabels}
-        {atmosphereFront}
+        <g clipPath="url(#atmo-frame)">{atmosphereFront}</g>
         {deployEls}
         {selectionEl}
         {liftEls}
