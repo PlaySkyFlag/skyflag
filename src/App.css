@@ -1972,12 +1972,75 @@ button.tray-piece:hover {
 .daily-card {
   width: 100%;
   max-width: 520px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
   background: rgba(20, 30, 52, 0.96);
   border: 1px solid rgba(255, 216, 132, 0.45);
   border-radius: 14px;
   padding: 18px 20px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
   color: #f5f7fb;
+}
+
+/* Briefing phase — shown before the user begins the puzzle. Gives them
+   the objective + a quick rules reminder before showing the position,
+   so the daily feels like a deliberate attempt rather than a surprise. */
+.daily-briefing {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.daily-briefing-lead {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.daily-briefing-tips {
+  background: rgba(255, 216, 132, 0.06);
+  border: 1px solid rgba(255, 216, 132, 0.18);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.daily-briefing-tips h3 {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffd884;
+  opacity: 0.85;
+}
+
+.daily-briefing-tips ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba(245, 247, 251, 0.88);
+}
+
+.daily-briefing-tips li {
+  margin: 2px 0;
+}
+
+.daily-briefing-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Constrain the Board renders inside the daily so all three layers fit
+   inside one viewport without scrolling. Each Board's wrapper has an
+   inline max-width matching SVG_WIDTH (~380px); we cap that to 280px
+   here so three boards stack within ~900px of vertical space. The
+   boards stay fully clickable; only their visual footprint shrinks. */
+.daily-boards > div {
+  max-width: 280px !important;
 }
 
 .daily-header {

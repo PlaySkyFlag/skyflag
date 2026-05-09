@@ -128,14 +128,22 @@ export default function Daily({ open, onClose, themeId }: Props) {
     | { kind: 'wrong'; bestAction: Action }
     | null
   >(null);
+  // Two-phase modal: 'briefing' shows the objective + a quick rules
+  // recap before revealing the position; 'playing' is the actual puzzle
+  // interaction. Mirrors the chess.com / Lichess pattern of giving the
+  // user a deliberate "I'm ready" beat — especially helpful in SkyFlag
+  // since the rules are less universal than chess.
+  const [phase, setPhase] = useState<'briefing' | 'playing'>('briefing');
 
   // Whenever the puzzle key changes (open/close cycles or rare
-  // mid-day rollover), reset to the puzzle's starting position.
+  // mid-day rollover), reset to the puzzle's starting position and
+  // back to the briefing phase.
   useEffect(() => {
     if (!puzzle) return;
     dispatch({ type: 'remote-sync', state: puzzle.state });
     setSelection(null);
     setFeedback(null);
+    setPhase('briefing');
   }, [puzzle]);
 
   if (!open || !puzzle) return null;
@@ -258,58 +266,96 @@ export default function Daily({ open, onClose, themeId }: Props) {
           </button>
         </div>
 
-        <p className="daily-prompt">
-          Find the best move for{' '}
-          <strong>{PLAYER_NAME[state.currentPlayer]}</strong>.
-          {state.inHand[state.currentPlayer].length > 0 &&
-            ' (Or the best deploy.)'}
-        </p>
-
-        <div className="daily-boards">
-          {LAYER_ORDER.map((layer) => (
-            <Board
-              key={layer}
-              theme={layerThemes[layer]}
-              markers={markersForLayer(layer, state)}
-              deployCells={deployCellsForLayer(layer)}
-              activeDeployPlayer={layer === 'ground' ? activeDeployPlayer : null}
-              onDeployCellClick={layer === 'ground' ? handleDeployClick : undefined}
-              selectedCell={
-                selectedBoardPiece && selectedBoardPiece.coord.layer === layer
-                  ? {
-                      row: selectedBoardPiece.coord.row,
-                      col: selectedBoardPiece.coord.col,
-                    }
-                  : null
-              }
-              legalTargets={legalTargetsByLayer[layer]}
-              onCellClick={(row, col) => handleCellClick(layer, row, col)}
-            />
-          ))}
-        </div>
-
-        {feedback && (
-          <div
-            className={`daily-result daily-result-${feedback.kind === 'solved' ? 'good' : 'bad'}`}
-          >
-            {feedback.kind === 'solved' ? (
-              <>
-                <strong>★ Solved!</strong> You found today's best move.
-              </>
-            ) : (
-              <>
-                <strong>Not the best move.</strong> The AI's pick:{' '}
-                <em>{describeAction(feedback.bestAction)}</em>
-              </>
-            )}
+        {phase === 'briefing' ? (
+          <div className="daily-briefing">
+            <p className="daily-briefing-lead">
+              Today's puzzle is set on a real mid-game position. Find the
+              best move for{' '}
+              <strong>{PLAYER_NAME[state.currentPlayer]}</strong>. One
+              attempt — make it count.
+            </p>
+            <div className="daily-briefing-tips">
+              <h3>Quick reminders</h3>
+              <ul>
+                <li>Captains capture flags by landing on the flag square.</li>
+                <li>Soldiers promote to Captains on the opponent's back row.</li>
+                <li>Lifts (corner squares on each layer) move pieces between layers — costs 2 activations.</li>
+                <li>Pilots can leap diagonally and capture jumped opponents.</li>
+              </ul>
+            </div>
+            <div className="daily-briefing-actions">
+              <button
+                type="button"
+                className="end-game-btn end-game-btn--subtle"
+                onClick={onClose}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="end-game-btn"
+                onClick={() => setPhase('playing')}
+              >
+                Begin puzzle
+              </button>
+            </div>
           </div>
-        )}
+        ) : (
+          <>
+            <p className="daily-prompt">
+              Find the best move for{' '}
+              <strong>{PLAYER_NAME[state.currentPlayer]}</strong>.
+              {state.inHand[state.currentPlayer].length > 0 &&
+                ' (Or the best deploy.)'}
+            </p>
 
-        <div className="daily-actions">
-          <button type="button" className="end-game-btn" onClick={onClose}>
-            {feedback ? 'Done' : 'Close'}
-          </button>
-        </div>
+            <div className="daily-boards">
+              {LAYER_ORDER.map((layer) => (
+                <Board
+                  key={layer}
+                  theme={layerThemes[layer]}
+                  markers={markersForLayer(layer, state)}
+                  deployCells={deployCellsForLayer(layer)}
+                  activeDeployPlayer={layer === 'ground' ? activeDeployPlayer : null}
+                  onDeployCellClick={layer === 'ground' ? handleDeployClick : undefined}
+                  selectedCell={
+                    selectedBoardPiece && selectedBoardPiece.coord.layer === layer
+                      ? {
+                          row: selectedBoardPiece.coord.row,
+                          col: selectedBoardPiece.coord.col,
+                        }
+                      : null
+                  }
+                  legalTargets={legalTargetsByLayer[layer]}
+                  onCellClick={(row, col) => handleCellClick(layer, row, col)}
+                />
+              ))}
+            </div>
+
+            {feedback && (
+              <div
+                className={`daily-result daily-result-${feedback.kind === 'solved' ? 'good' : 'bad'}`}
+              >
+                {feedback.kind === 'solved' ? (
+                  <>
+                    <strong>★ Solved!</strong> You found today's best move.
+                  </>
+                ) : (
+                  <>
+                    <strong>Not the best move.</strong> The AI's pick:{' '}
+                    <em>{describeAction(feedback.bestAction)}</em>
+                  </>
+                )}
+              </div>
+            )}
+
+            <div className="daily-actions">
+              <button type="button" className="end-game-btn" onClick={onClose}>
+                {feedback ? 'Done' : 'Close'}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
