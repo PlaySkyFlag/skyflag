@@ -80,7 +80,14 @@ function historyKey(action: Action): string {
   if (action.type === 'move') {
     return `m:${action.pieceId}:${action.to.layer}:${action.to.row}:${action.to.col}`;
   }
-  return `d:${action.pieceId}`;
+  if (action.type === 'deploy') {
+    return `d:${action.pieceId}`;
+  }
+  // Never reached at runtime — historyKey is only called from
+  // recordCutoff, which only runs on actions from legalActions
+  // (move/deploy only). Fallback keeps TypeScript happy without an
+  // unsafe cast.
+  return `o:${action.type}`;
 }
 
 function recordCutoff(action: Action, ply: number, depth: number, state: GameState): void {
