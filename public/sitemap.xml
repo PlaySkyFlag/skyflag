@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Marketing landing — primary entry point for new visitors and SEO. -->
+  <url>
+    <loc>https://playskyflag.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- The game itself. Lower priority because most search traffic should
+       land on the marketing page first; /play is a destination after
+       click-through, not a search target. -->
+  <url>
+    <loc>https://playskyflag.com/play</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>

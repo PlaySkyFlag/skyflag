@@ -1,0 +1,22 @@
+# SkyFlag — robots.txt
+#
+# Default: allow all well-behaved crawlers everywhere except a few paths
+# that have no SEO value or could waste crawl budget.
+
+User-agent: *
+Allow: /
+
+# Block crawlers from indexing the service-worker file (it's not a page,
+# just JS that's only meaningful when loaded by the app) and the raw
+# rulebook PDF (we'd rather they index the marketing page that links
+# to it, if/when we make one, than serve users a PDF download as their
+# first-touch result).
+Disallow: /sw.js
+Disallow: /skyflag-rulebook.pdf
+
+# The Vite dist/assets/ directory has hashed filenames that change every
+# build — no point indexing them; their content is rendered into pages.
+Disallow: /assets/
+
+# Sitemap pointer — Google + Bing read this automatically to find URLs.
+Sitemap: https://playskyflag.com/sitemap.xml
