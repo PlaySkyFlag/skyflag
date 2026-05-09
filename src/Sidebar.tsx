@@ -30,6 +30,7 @@ type Props = {
   onLeaveRoom: () => void;
   onPresenceChange: (ids: Set<string>) => void;
   onOpenTutorial: () => void;
+  onOpenDaily: () => void;
 };
 
 export default function Sidebar({
@@ -43,6 +44,7 @@ export default function Sidebar({
   onLeaveRoom,
   onPresenceChange,
   onOpenTutorial,
+  onOpenDaily,
 }: Props) {
   // Default to Multiplayer auto-open when the user picks 2P (matches the
   // old forceOpen behavior on the Multiplayer disclosure). Otherwise the
@@ -141,6 +143,14 @@ export default function Sidebar({
           title="Open the interactive tutorial"
         >
           🎓 Tutorial
+        </button>
+        <button
+          type="button"
+          className="sidebar-tab"
+          onClick={onOpenDaily}
+          title="Today's puzzle — find the best move"
+        >
+          🧩 Daily
         </button>
         {tab('multiplayer', '👥 Multiplayer')}
         {tab('history', `📜 History${history.length > 0 ? ` (${history.length})` : ''}`)}

@@ -8,6 +8,7 @@ import SettingsMenu from './SettingsMenu';
 import Sidebar from './Sidebar';
 import StatsModal from './StatsModal';
 import StatusBar from './StatusBar';
+import Daily from './Daily';
 import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { loadProfile, type Profile } from './game/profile';
@@ -363,6 +364,7 @@ export default function App() {
       return false;
     }
   });
+  const [dailyOpen, setDailyOpen] = useState(false);
   const closeTutorial = () => {
     setTutorialOpen(false);
     try {
@@ -994,6 +996,7 @@ export default function App() {
         onLeaveRoom={() => setRoom(null)}
         onPresenceChange={setLobbyOnlineIds}
         onOpenTutorial={() => setTutorialOpen(true)}
+        onOpenDaily={() => setDailyOpen(true)}
       />
       <PieceTray
         player="p1"
@@ -1206,6 +1209,7 @@ export default function App() {
         </div>
       )}
       <Tutorial state={state} open={tutorialOpen} onClose={closeTutorial} />
+      <Daily open={dailyOpen} onClose={() => setDailyOpen(false)} themeId={themeId} />
       <AccountModal
         user={authUser}
         open={accountOpen}

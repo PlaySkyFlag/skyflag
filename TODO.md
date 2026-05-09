@@ -60,8 +60,9 @@ allows; nothing here is blocking gameplay.
 ## Already-on-roadmap (not part of cleanup)
 
 These are deferred features tracked separately:
-- Daily puzzle
-- Time controls (in progress 2026-05-08)
+- ~~Daily puzzle~~ (shipped 2026-05-08, MVP — AI-generated position +
+  AI's depth-3 pick as the answer; not curated for tactical sharpness)
+- ~~Time controls~~ (shipped 2026-05-08, MVP — 5/10/30 min options)
 - Async multiplayer push notifications (iOS APNs cert + Supabase secrets
   are user-side manual setup)
 - **Stronger AI** — match what modern chess apps do. Practical wins for
