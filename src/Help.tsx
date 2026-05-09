@@ -10,14 +10,14 @@ export default function Help({ inline = false }: Props) {
     <div className="help-body">
         <ol>
           <li>
-            <strong>Choose a mode</strong> from the dropdown in the HUD —
-            <em> 1P · Ravens</em> (you're the Grey Ravens, AI plays the
-            White Stags), <em>1P · Stags</em> (the reverse), or{' '}
-            <em>2P</em> (two humans on one device).
+            <strong>Pick a mode</strong> from the gear menu (⚙) in the
+            top-right corner — <em>1P · Ravens</em> (you're the Grey
+            Ravens, AI plays the White Stags), <em>1P · Stags</em> (the
+            reverse), or <em>2P</em> (two humans on one device).
           </li>
           <li>
-            <strong>Click "New game"</strong> in the HUD to begin. The
-            Grey Ravens move first.
+            <strong>Click "New game"</strong> in the toolbar above the
+            boards to begin. The Grey Ravens move first.
           </li>
           <li>
             <strong>Each turn you have 2 activations.</strong> An
@@ -41,8 +41,13 @@ export default function Help({ inline = false }: Props) {
             below to ascend / descend.
           </li>
           <li>
-            <strong>End the turn</strong> by clicking <em>End turn</em> in
-            the HUD. Unused activations are forfeited.
+            <strong>Turns end automatically</strong> once you've used both
+            activations or have no legal action left — you don't need to
+            press anything.
+          </li>
+          <li>
+            <strong>Stuck?</strong> Tap <em>💡 Hint</em> in the toolbar
+            and the AI will suggest a move with a gold arrow.
           </li>
           <li>
             <strong>Win:</strong> capture all three of your opponent's

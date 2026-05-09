@@ -336,11 +336,12 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
         )}
         {!inRoom && !authUser && (
           <p className="lobby-hint">
-            Sign in (button at the top of the page) to see other players online
-            and challenge them. You can still play by code below.
+            <strong>Sign in to play online.</strong> Use the Sign in button at
+            the top of the page to create a profile, then come back here to
+            create a room or challenge a friend.
           </p>
         )}
-        {!inRoom && (
+        {!inRoom && authUser && (
           <>
             <p>
               Play online against another human. Create a room and share the
