@@ -8,6 +8,7 @@ import PieceTray from './PieceTray';
 import AccountModal from './AccountModal';
 import StatsModal from './StatsModal';
 import StatusBar from './StatusBar';
+import Tournaments from './Tournaments';
 import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { loadProfile, type Profile } from './game/profile';
@@ -823,6 +824,7 @@ export default function App() {
           onLeave={() => setRoom(null)}
         />
         <MoveHistory history={state.history} />
+        <Tournaments user={authUser} profile={profile} />
       </div>
       <PieceTray
         player="p1"

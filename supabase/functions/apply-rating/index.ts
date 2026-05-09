@@ -166,6 +166,54 @@ Deno.serve(async (req: Request) => {
     });
   if (insertErr) return json({ ok: false, error: insertErr.message }, 500);
 
+  // Tournament score updates: if both players are co-entered in any
+  // currently-active tournament, bump both their entries. Wins are
+  // worth 2 points, draws 1, losses 0. Multiple tournaments may apply
+  // simultaneously. Best-effort — never block the rating update.
+  try {
+    const nowIso = new Date().toISOString();
+    const { data: openTournaments } = await supabase
+      .from('tournaments')
+      .select('id')
+      .lte('starts_at', nowIso)
+      .gte('ends_at', nowIso);
+    const tournamentIds = (openTournaments ?? []).map((t) => t.id as string);
+    if (tournamentIds.length > 0) {
+      const { data: entries } = await supabase
+        .from('tournament_entries')
+        .select('tournament_id, user_id, wins, losses, draws, score')
+        .in('tournament_id', tournamentIds)
+        .in('user_id', [winnerId, loserId]);
+      if (entries) {
+        // Group by tournament: only count if BOTH players are entered.
+        const byTournament = new Map<string, typeof entries>();
+        for (const e of entries) {
+          const arr = byTournament.get(e.tournament_id) ?? [];
+          arr.push(e);
+          byTournament.set(e.tournament_id, arr);
+        }
+        for (const [tid, pair] of byTournament) {
+          if (pair.length !== 2) continue;
+          for (const e of pair) {
+            const isWinnerSide = e.user_id === winnerId;
+            const wins   = (e.wins   ?? 0) + (isDraw ? 0 : isWinnerSide ? 1 : 0);
+            const losses = (e.losses ?? 0) + (isDraw ? 0 : isWinnerSide ? 0 : 1);
+            const draws  = (e.draws  ?? 0) + (isDraw ? 1 : 0);
+            const score  = (e.score  ?? 0) + (isDraw ? 1 : isWinnerSide ? 2 : 0);
+            await supabase
+              .from('tournament_entries')
+              .update({ wins, losses, draws, score })
+              .eq('tournament_id', tid)
+              .eq('user_id', e.user_id);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[apply-rating] tournament update failed', err);
+    // Continue — rating result still goes back as ok.
+  }
+
   return json({
     ok: true,
     is_draw: isDraw,

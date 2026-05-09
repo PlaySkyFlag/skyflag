@@ -1400,3 +1400,90 @@ button.tray-piece:hover {
   font-weight: 600;
   letter-spacing: 0.02em;
 }
+
+/* Tournaments — listed inside an existing help-row disclosure. Each
+   tournament is a card with name + countdown + Join button + a
+   collapsible leaderboard. */
+.tournament {
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.tournament:last-child {
+  margin-bottom: 0;
+}
+
+.tournament-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tournament-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.tournament-fee,
+.tournament-free {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.tournament-free {
+  background: rgba(111, 255, 138, 0.15);
+  color: #6fff8a;
+  border: 1px solid rgba(111, 255, 138, 0.4);
+}
+
+.tournament-fee {
+  background: rgba(255, 216, 132, 0.15);
+  color: #ffd884;
+  border: 1px solid rgba(255, 216, 132, 0.4);
+}
+
+.tournament-meta {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.tournament-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tournament-joined {
+  color: #6fff8a;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.tournament-desc {
+  margin: 6px 0 8px;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.tournament-board {
+  margin-top: 8px;
+}
+
+.tournament-self td {
+  background: rgba(255, 216, 132, 0.10);
+  font-weight: 700;
+}
