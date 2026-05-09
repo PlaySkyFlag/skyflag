@@ -1,5 +1,6 @@
 import { DEPLOY_COORDS, FLAG_COORDS, NEXUS_COORD } from './constants';
 import { legalMovesFor } from './moves';
+import { bookActionFor } from './openingBook';
 import { pstScore } from './pst';
 import { reduce, type Action } from './reducer';
 import type {
@@ -560,6 +561,13 @@ function minimax(
 }
 
 export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEARCH_DEPTH): Action | null {
+  // Opening book: hand back a known-strong move for the first 1–2 deploys
+  // without burning search time on positions whose answer is the same
+  // every game. Falls through to search past move 2, where position-
+  // specific judgment matters too much to hardcode.
+  const book = bookActionFor(state);
+  if (book) return book;
+
   // History isn't read by the search and the reducer clones the array on
   // every action. Stripping it on entry removes that growing per-clone
   // cost, which is the main reason the AI was getting laggy mid-game now
