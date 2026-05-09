@@ -405,6 +405,7 @@ function Footer() {
         </div>
         <div className="landing-footer-links">
           <a href="/play">Play</a>
+          <a href="/story">The Story</a>
           <a href="#pricing">Pricing</a>
           <a href="https://github.com/PlaySkyFlag/skyflag" target="_blank" rel="noopener noreferrer">
             GitHub

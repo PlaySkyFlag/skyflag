@@ -1,0 +1,729 @@
+/* The Three Seals of Kaleo — storybook page styles.
+   Cinematic scroll-driven narrative on dark gold-on-black, designed
+   to be read rather than skimmed. Serif body type signals "this is a
+   story." Generous vertical rhythm, pull-quotes, drop caps on lead
+   paragraphs, atmospheric section dividers. */
+
+:root {
+  --story-bg-base:    #060911;
+  --story-bg-section: #0a0e18;
+  --story-bg-alt:     #0d1220;
+  --story-text:       #f0eddc;
+  --story-text-muted: rgba(240, 237, 220, 0.78);
+  --story-text-faint: rgba(240, 237, 220, 0.55);
+  --story-gold:       #ffd884;
+  --story-gold-soft:  rgba(255, 216, 132, 0.18);
+  --story-gold-line:  rgba(255, 216, 132, 0.40);
+  --story-raven:      #7a8aa0;
+  --story-stag:       #f5e8c0;
+  --story-radius:     12px;
+  /* Body type — serif for prose, sans for chrome. The Crimson Pro
+     fallback chain favours readable serifs across platforms. */
+  --story-serif:
+    'Crimson Pro', 'Crimson Text', 'Lora', 'Iowan Old Style',
+    'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --story-sans:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.story {
+  min-height: 100vh;
+  background: var(--story-bg-base);
+  color: var(--story-text);
+  font-family: var(--story-serif);
+  line-height: 1.65;
+  font-size: 1.05rem;
+}
+
+.story :where(a) {
+  color: var(--story-gold);
+  text-decoration: none;
+}
+
+/* ─── Header ────────────────────────────────────────────────────── */
+
+.story-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6, 9, 17, 0.88);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 216, 132, 0.12);
+  font-family: var(--story-sans);
+}
+
+.story-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.story-back {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--story-gold);
+}
+
+.story-header-meta {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--story-text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.story-cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  background: var(--story-gold);
+  color: #0d0f13;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  transition: filter 0.15s ease, transform 0.08s ease, box-shadow 0.18s ease;
+}
+
+.story-cta-button:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 4px 14px rgba(255, 216, 132, 0.25);
+}
+
+.story-cta-large {
+  font-size: 1rem;
+  padding: 14px 28px;
+}
+
+@media (max-width: 540px) {
+  .story-header-meta {
+    display: none;
+  }
+}
+
+/* ─── Cover ─────────────────────────────────────────────────────── */
+
+.story-cover {
+  padding: 100px 24px 120px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 216, 132, 0.10), transparent 70%),
+    var(--story-bg-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.story-cover-glyph {
+  width: 240px;
+  margin: 0 auto 32px;
+  opacity: 0.7;
+}
+
+.story-cover-glyph svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.story-cover-eyebrow {
+  font-family: var(--story-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--story-text-faint);
+  margin: 0 0 18px;
+}
+
+.story-cover-title {
+  font-family: var(--story-serif);
+  font-size: clamp(2.6rem, 7vw, 4.8rem);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--story-gold);
+  margin: 0 0 22px;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-shadow: 0 4px 30px rgba(255, 216, 132, 0.15);
+}
+
+.story-cover-subtitle {
+  font-size: 1.15rem;
+  color: var(--story-text);
+  margin: 0 0 32px;
+  font-style: italic;
+}
+
+.story-cover-divider {
+  font-family: var(--story-serif);
+  letter-spacing: 0.6em;
+  color: var(--story-gold);
+  opacity: 0.5;
+  margin: 0 0 28px;
+}
+
+.story-cover-fineprint {
+  max-width: 480px;
+  margin: 0 auto;
+  color: var(--story-text-muted);
+  font-style: italic;
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+/* ─── Section frame (intro sections, not chapters) ────────────── */
+
+.story-section {
+  padding: 80px 24px;
+}
+
+.story-section-alt {
+  background: var(--story-bg-alt);
+}
+
+.story-section-header {
+  max-width: 720px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.story-section-eyebrow {
+  font-family: var(--story-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  color: var(--story-gold);
+  margin-bottom: 14px;
+  opacity: 0.85;
+}
+
+.story-section-title {
+  font-family: var(--story-serif);
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--story-text);
+  margin: 0 0 12px;
+  letter-spacing: -0.005em;
+}
+
+.story-section-subtitle {
+  font-family: var(--story-serif);
+  color: var(--story-text-muted);
+  font-style: italic;
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 540px) {
+  .story-section {
+    padding: 60px 18px;
+  }
+}
+
+/* ─── Prose blocks ──────────────────────────────────────────────── */
+
+.story-prose {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.story-prose p {
+  margin: 0 0 1.2em;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+.story-prose-lead {
+  font-size: 1.18rem;
+  line-height: 1.55;
+  color: var(--story-text);
+}
+
+/* Drop cap on the first letter of a lead paragraph */
+.story-prose-lead::first-letter,
+.story-chapter-body > .story-prose-lead:first-child::first-letter {
+  font-size: 3.6rem;
+  line-height: 1;
+  float: left;
+  padding: 0.05em 0.12em 0 0;
+  color: var(--story-gold);
+  font-weight: 700;
+  font-style: italic;
+}
+
+.story-prose-emphasis {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--story-gold);
+  text-align: center !important;
+  margin: 1.6em 0 !important;
+}
+
+.story-prose-coda {
+  font-style: italic;
+  text-align: center !important;
+  color: var(--story-text-muted);
+  font-size: 1.1rem;
+  margin-top: 2em !important;
+}
+
+.story-pause {
+  text-align: center;
+  margin: 2.4em 0;
+  letter-spacing: 0.6em;
+  color: var(--story-gold);
+  opacity: 0.45;
+  font-size: 1.2rem;
+}
+
+.story-term {
+  color: var(--story-gold);
+  font-style: normal;
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ─── The Two Clans grid ────────────────────────────────────────── */
+
+.story-clans-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 26px;
+  max-width: 980px;
+  margin: 50px auto 40px;
+}
+
+@media (min-width: 760px) {
+  .story-clans-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+.story-clan {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 216, 132, 0.20);
+  border-radius: var(--story-radius);
+  padding: 28px 26px;
+}
+
+.story-clan-ravens {
+  background: linear-gradient(160deg, rgba(122, 138, 160, 0.08), rgba(122, 138, 160, 0.02));
+  border-color: rgba(122, 138, 160, 0.45);
+}
+
+.story-clan-stags {
+  background: linear-gradient(160deg, rgba(245, 232, 192, 0.08), rgba(245, 232, 192, 0.02));
+  border-color: rgba(245, 232, 192, 0.45);
+}
+
+.story-clan-totem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  font-family: var(--story-sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--story-text-faint);
+}
+
+.story-clan-totem svg {
+  margin: 0 16px;
+}
+
+.story-clan-name {
+  font-family: var(--story-serif);
+  font-size: 1.6rem;
+  font-style: italic;
+  color: var(--story-text);
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.story-clan-tagline {
+  text-align: center;
+  font-style: italic;
+  color: var(--story-gold);
+  margin: 0 0 18px;
+  font-size: 0.98rem;
+}
+
+.story-clan-body {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--story-text-muted);
+  margin: 0 0 18px;
+}
+
+/* ─── Templates grid ────────────────────────────────────────────── */
+
+.story-templates-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  max-width: 880px;
+  margin: 36px auto 28px;
+}
+
+@media (min-width: 640px) {
+  .story-templates-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.story-template {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 216, 132, 0.22);
+  border-radius: var(--story-radius);
+  padding: 22px 22px;
+}
+
+.story-template-name {
+  font-family: var(--story-sans);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  color: var(--story-gold);
+  margin-bottom: 4px;
+}
+
+.story-template-role {
+  font-family: var(--story-serif);
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--story-text);
+  margin-bottom: 12px;
+}
+
+.story-template-body {
+  font-size: 0.95rem;
+  color: var(--story-text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── Cast — character cards by clan ────────────────────────────── */
+
+.story-cast-clan {
+  max-width: 1000px;
+  margin: 0 auto 50px;
+}
+
+.story-cast-clan-title {
+  font-family: var(--story-serif);
+  font-size: 1.5rem;
+  font-style: italic;
+  color: var(--story-text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  margin: 30px 0 24px;
+}
+
+.story-cast-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (min-width: 720px) {
+  .story-cast-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.story-character {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 216, 132, 0.18);
+  border-radius: var(--story-radius);
+  padding: 22px 22px 18px;
+}
+
+.story-character-name {
+  font-family: var(--story-serif);
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--story-gold);
+  margin: 0 0 4px;
+}
+
+.story-character-role {
+  font-family: var(--story-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--story-text-faint);
+  margin-bottom: 14px;
+}
+
+.story-character-bio {
+  font-size: 0.95rem;
+  color: var(--story-text-muted);
+  line-height: 1.55;
+  margin: 0 0 14px;
+}
+
+.story-character-quote {
+  font-style: italic;
+  color: var(--story-gold);
+  border-left: 2px solid var(--story-gold-line);
+  padding-left: 12px;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.92;
+}
+
+/* ─── Chapter divider ───────────────────────────────────────────── */
+
+.story-divider {
+  text-align: center;
+  padding: 60px 24px 30px;
+  background: var(--story-bg-base);
+}
+
+.story-divider-rule {
+  letter-spacing: 0.8em;
+  font-size: 1.4rem;
+  color: var(--story-gold);
+  opacity: 0.5;
+  margin-bottom: 26px;
+}
+
+.story-divider-title {
+  font-family: var(--story-serif);
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  color: var(--story-gold);
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.story-divider-subtitle {
+  font-family: var(--story-serif);
+  font-style: italic;
+  color: var(--story-text-muted);
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+/* ─── Chapters ──────────────────────────────────────────────────── */
+
+.story-chapter {
+  padding: 70px 24px;
+  border-top: 1px solid rgba(255, 216, 132, 0.10);
+}
+
+.story-chapter:nth-of-type(even) {
+  background: var(--story-bg-section);
+}
+
+.story-chapter-header {
+  max-width: 640px;
+  margin: 0 auto 36px;
+  text-align: center;
+}
+
+.story-chapter-num {
+  font-family: var(--story-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--story-gold);
+  margin-bottom: 14px;
+  opacity: 0.85;
+}
+
+.story-chapter-title {
+  font-family: var(--story-serif);
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  color: var(--story-text);
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+
+.story-chapter-body {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.story-chapter-body p {
+  margin: 0 0 1.2em;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+@media (max-width: 540px) {
+  .story-chapter {
+    padding: 50px 18px;
+  }
+}
+
+/* ─── Pull-quote ────────────────────────────────────────────────── */
+
+.story-pullquote {
+  margin: 2em auto;
+  max-width: 540px;
+  padding: 22px 24px;
+  border-left: 3px solid var(--story-gold);
+  background: var(--story-gold-soft);
+  border-radius: 0 8px 8px 0;
+  font-family: var(--story-serif);
+  font-style: italic;
+}
+
+.story-pullquote p {
+  margin: 0;
+  font-size: 1.18rem;
+  line-height: 1.5;
+  color: var(--story-text);
+  text-align: left !important;
+  hyphens: none;
+}
+
+.story-pullquote cite {
+  display: block;
+  margin-top: 12px;
+  font-size: 0.88rem;
+  font-style: normal;
+  color: var(--story-text-faint);
+  letter-spacing: 0.04em;
+}
+
+.story-pullquote-large {
+  border-left: none;
+  border-top: 1px solid var(--story-gold-line);
+  border-bottom: 1px solid var(--story-gold-line);
+  background: transparent;
+  text-align: center;
+  padding: 32px 24px;
+  border-radius: 0;
+  max-width: 720px;
+}
+
+.story-pullquote-large p {
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+  text-align: center !important;
+  line-height: 1.5;
+  color: var(--story-gold);
+}
+
+.story-pullquote-large cite {
+  text-align: center;
+}
+
+.story-pullquote-muted {
+  background: rgba(255, 255, 255, 0.025);
+  border-left-color: var(--story-gold-line);
+}
+
+.story-pullquote-muted p {
+  color: var(--story-text-muted);
+  font-size: 1.05rem;
+}
+
+/* ─── Nexus glyph (Chapter 8) ──────────────────────────────────── */
+
+.story-nexus-glyph {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 30px;
+  width: 140px;
+}
+
+.story-nexus-glyph svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 24px rgba(255, 216, 132, 0.35));
+  animation: nexus-pulse 6s ease-in-out infinite;
+}
+
+@keyframes nexus-pulse {
+  0%, 100% { filter: drop-shadow(0 0 24px rgba(255, 216, 132, 0.35)); }
+  50%      { filter: drop-shadow(0 0 36px rgba(255, 216, 132, 0.55)); }
+}
+
+/* ─── Closing ───────────────────────────────────────────────────── */
+
+.story-closing {
+  padding: 80px 24px 100px;
+  text-align: center;
+  background: var(--story-bg-base);
+  border-top: 1px solid rgba(255, 216, 132, 0.10);
+}
+
+.story-closing-divider {
+  letter-spacing: 0.8em;
+  font-size: 1.4rem;
+  color: var(--story-gold);
+  opacity: 0.5;
+  margin-bottom: 30px;
+}
+
+.story-closing-prose {
+  max-width: 600px;
+  margin: 0 auto 1.2em;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--story-text-muted);
+  line-height: 1.6;
+}
+
+.story-closing-cta {
+  margin-top: 40px;
+}
+
+/* ─── Footer ────────────────────────────────────────────────────── */
+
+.story-footer {
+  background: var(--story-bg-base);
+  padding: 36px 24px;
+  border-top: 1px solid rgba(255, 216, 132, 0.10);
+  font-family: var(--story-sans);
+  font-size: 0.88rem;
+}
+
+.story-footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.story-footer-mark {
+  color: var(--story-gold);
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.story-footer-meta {
+  color: var(--story-text-faint);
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+}
+
+.story-footer-links {
+  margin: 0;
+  color: var(--story-text-muted);
+}
+
+.story-footer-links a {
+  color: var(--story-gold);
+}
