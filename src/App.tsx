@@ -233,6 +233,25 @@ export default function App() {
   useEffect(() => {
     if (room && aiPlayer !== null) setAiPlayer(null);
   }, [room, aiPlayer]);
+
+  // Strip any "residual" local state on transition into a multiplayer
+  // room. Without this, the previous solo / 2P game's pieces and turn
+  // counter are visible for the 100–500ms it takes the server-state
+  // fetch to replace the board — confusing to the user. Tracks the
+  // previous room with a ref so we only reset on the *transition*,
+  // not every render while in a room.
+  const prevRoomRef = useRef<RoomState | null>(null);
+  useEffect(() => {
+    const prev = prevRoomRef.current;
+    if (!prev && room) {
+      // Just entered a room. The fetch effect below will overwrite
+      // this with the actual server state in a moment, but in the
+      // meantime show a clean board instead of yesterday's game.
+      dispatch({ type: 'new-game' });
+      setSelection(null);
+    }
+    prevRoomRef.current = room;
+  }, [room]);
   // AI-suggested move shown when the user clicks Hint. Cleared
   // automatically when history advances (so it disappears the moment
   // they actually move, deploy, or end-turn).
@@ -1094,13 +1113,17 @@ export default function App() {
           aria-hidden="true"
         >
           <defs>
+            {/* Gradient for the Ground↔Sky ribbon — green at the
+                Ground end, blue at the Sky end. Routed in
+                user-space units so the gradient axis aligns with
+                the curve's actual direction in viewBox coords. */}
             <linearGradient
               id="flow-ground-sky"
               gradientUnits="userSpaceOnUse"
               x1="50"
-              y1="68"
-              x2="68"
-              y2="32"
+              y1="36"
+              x2="84"
+              y2="64"
             >
               <stop offset="0%"   stopColor="#9bcf7f" />
               <stop offset="100%" stopColor="#8ec8e0" />
@@ -1108,20 +1131,13 @@ export default function App() {
             <linearGradient
               id="flow-sky-space"
               gradientUnits="userSpaceOnUse"
-              x1="68"
-              y1="16"
-              x2="32"
-              y2="16"
+              x1="70"
+              y1="0"
+              x2="30"
+              y2="0"
             >
               <stop offset="0%"   stopColor="#8ec8e0" />
               <stop offset="100%" stopColor="#a899d6" />
-            </linearGradient>
-            {/* Soft "halo" gradient painted under the main strokes for a
-                ribbon-like glow that ties the design element together. */}
-            <linearGradient id="flow-halo" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
-              <stop offset="0%"   stopColor="rgba(150, 200, 220, 0)" />
-              <stop offset="50%"  stopColor="rgba(170, 200, 230, 0.35)" />
-              <stop offset="100%" stopColor="rgba(150, 200, 220, 0)" />
             </linearGradient>
             <marker
               id="flow-arrow"
@@ -1132,42 +1148,55 @@ export default function App() {
               markerHeight="4"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" fill="rgba(200, 215, 235, 0.85)" />
+              <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" fill="rgba(220, 235, 255, 0.95)" />
             </marker>
           </defs>
-          {/* Halo pass — wider, softer, painted first so the colored strokes
-              sit on top. Gives each arrow a glowing ribbon feel. */}
+          {/* Wide soft glow under the main stroke — gives each arrow a
+              ribbon-of-light feel without overpainting the boards. */}
           <g
             fill="none"
-            strokeWidth={5}
+            strokeWidth={6}
             strokeLinecap="round"
-            stroke="rgba(170, 200, 230, 0.18)"
+            stroke="rgba(180, 210, 240, 0.22)"
             vectorEffect="non-scaling-stroke"
           >
-            <path d="M 50 67 C 70 67, 78 50, 70 33" />
-            <path d="M 70 16 Q 50 -2 30 16" />
+            <path d="M 50 36 C 64 26, 78 30, 84 64" />
+            <path d="M 70 4 Q 50 -8 30 4" />
           </g>
-          {/* Main pass — colored gradient strokes with arrowheads at both
-              ends to indicate that lifts travel up and down. */}
+          {/* Main colored stroke — solid for color presence. */}
           <g
             fill="none"
             strokeWidth={2.4}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            opacity={0.85}
+            opacity={0.92}
           >
             <path
-              d="M 50 67 C 70 67, 78 50, 70 33"
+              d="M 50 36 C 64 26, 78 30, 84 64"
               stroke="url(#flow-ground-sky)"
               markerStart="url(#flow-arrow)"
               markerEnd="url(#flow-arrow)"
             />
             <path
-              d="M 70 16 Q 50 -2 30 16"
+              d="M 70 4 Q 50 -8 30 4"
               stroke="url(#flow-sky-space)"
               markerStart="url(#flow-arrow)"
               markerEnd="url(#flow-arrow)"
             />
+          </g>
+          {/* Animated dashes on top of the colored stroke — march along
+              each curve to suggest lift travel between layers. The
+              animation is a CSS keyframe on the .flow-march class. */}
+          <g
+            className="flow-march"
+            fill="none"
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            stroke="rgba(255, 255, 255, 0.85)"
+          >
+            <path d="M 50 36 C 64 26, 78 30, 84 64" />
+            <path d="M 70 4 Q 50 -8 30 4" />
           </g>
         </svg>
         {LAYER_ORDER.map((layer) => (

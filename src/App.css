@@ -1045,6 +1045,21 @@ button.tray-piece:hover {
   overflow: visible;
 }
 
+/* Marching dashes along the lift-flow curves — gives a sense of pieces
+   actually traveling between layers. Two paths per curve: the solid
+   colored stroke beneath, and this dashed white overlay scrolling on
+   top via stroke-dashoffset. */
+.flow-march path {
+  stroke-dasharray: 5 9;
+  animation: flow-march 1.6s linear infinite;
+}
+
+@keyframes flow-march {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
 /* End-game celebration overlay — full-page modal with a centered card,
    colored glow per winner, and a quick "Play again / View board" choice. */
 .end-game-overlay {
