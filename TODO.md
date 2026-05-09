@@ -61,6 +61,16 @@ allows; nothing here is blocking gameplay.
 
 These are deferred features tracked separately:
 - Daily puzzle
-- Time controls
+- Time controls (in progress 2026-05-08)
 - Async multiplayer push notifications (iOS APNs cert + Supabase secrets
   are user-side manual setup)
+- **Stronger AI** — match what modern chess apps do. Practical wins for
+  SkyFlag: (a) richer evaluation (king safety, piece coordination,
+  flag-runner threat tempo, control of lifts/Nexus rather than just
+  material), (b) killer-move + history heuristic move ordering on top
+  of the existing iterative-deepening transposition table, (c) null-move
+  pruning, late-move reduction, (d) a small opening book of strong
+  early deploy patterns, (e) time management — spend more search
+  budget on critical positions instead of fixed depth. (NNUE neural
+  evaluation is the chess-app gold standard but probably overkill
+  unless we generate training games at scale.)

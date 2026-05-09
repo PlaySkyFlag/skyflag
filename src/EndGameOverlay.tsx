@@ -15,6 +15,7 @@ const REASON_LABEL: Record<WonReason | DrawReason, string> = {
   nexus: 'Nexus capture',
   elimination: 'elimination',
   resignation: 'resignation',
+  'time-out': 'time-out — opponent ran out of time',
   'turn-limit': 'turn limit reached',
   stalemate: 'stalemate — no legal moves left',
   agreement: 'mutual agreement',

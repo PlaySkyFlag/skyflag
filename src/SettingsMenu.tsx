@@ -4,6 +4,7 @@
 // state + game-context actions.
 
 import { useEffect, useRef, useState } from 'react';
+import { CLOCK_OPTIONS, type ClockOptionId } from './game/constants';
 import { isMuted, setMuted } from './game/sound';
 import type { Difficulty } from './game/storage';
 import type { ThemeId } from './game/themes';
@@ -25,6 +26,8 @@ type Props = {
   onSetDifficulty: (d: Difficulty) => void;
   themeId: ThemeId;
   onSetTheme: (id: ThemeId) => void;
+  clockOption: ClockOptionId;
+  onSetClockOption: (id: ClockOptionId) => void;
 };
 
 export default function SettingsMenu({
@@ -34,6 +37,8 @@ export default function SettingsMenu({
   onSetDifficulty,
   themeId,
   onSetTheme,
+  clockOption,
+  onSetClockOption,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [mutedNow, setMutedNow] = useState(isMuted());
@@ -96,6 +101,19 @@ export default function SettingsMenu({
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
+            </select>
+          </label>
+          <label className="settings-row">
+            <span className="settings-label">Clock</span>
+            <select
+              className="hud-mode-select"
+              value={clockOption}
+              onChange={(e) => onSetClockOption(e.target.value as ClockOptionId)}
+              title="Time control — applied to the next new game"
+            >
+              {CLOCK_OPTIONS.map((o) => (
+                <option key={o.id} value={o.id}>{o.label}</option>
+              ))}
             </select>
           </label>
           <label className="settings-row">

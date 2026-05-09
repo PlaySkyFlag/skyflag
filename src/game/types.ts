@@ -65,8 +65,21 @@ export type FlagsState = {
 
 export type GameStatus =
   | { kind: 'in-progress' }
-  | { kind: 'won'; winner: Player; reason: 'nexus' | 'elimination' | 'resignation' }
+  | { kind: 'won'; winner: Player; reason: 'nexus' | 'elimination' | 'resignation' | 'time-out' }
   | { kind: 'draw'; reason: 'turn-limit' | 'stalemate' | 'agreement' };
+
+// Optional per-game chess-style clock. Ticks for whoever's turn it is.
+// When a side's remaining ms reaches zero, the game ends with the
+// opponent winning by reason 'time-out'.
+export type ClockState = {
+  p1Ms: number;
+  p2Ms: number;
+  // Wall-clock timestamp (Date.now()) of the most recent tick. Used by
+  // App's setInterval to compute real elapsed time so the clock keeps
+  // running accurately even if the tab was backgrounded for a while.
+  // null until the first tick after a new game / turn change.
+  lastTickAt: number | null;
+};
 
 // ─── Move history ──────────────────────────────────────────────────────────
 
@@ -123,4 +136,7 @@ export type GameState = {
   status: GameStatus;
   // Append-only running log of every player action, oldest first.
   history: HistoryEntry[];
+  // Optional clock — present iff the player started the game with a
+  // time control. Absent on legacy games and on "No clock" rounds.
+  clock?: ClockState;
 };

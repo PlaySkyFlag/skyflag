@@ -29,7 +29,9 @@ import {
   LAYER_ORDER,
   LIFT_CELLS,
   NEXUS_COORD,
+  clockMsForOption,
   createInitialGameState,
+  type ClockOptionId,
 } from './game/constants';
 import { legalMovesFor, pieceAt, sameCoord } from './game/moves';
 import { reduce } from './game/reducer';
@@ -235,6 +237,11 @@ export default function App() {
   const [difficulty, setDifficulty] = useState<Difficulty>(
     INITIAL_SESSION?.difficulty ?? 'hard',
   );
+  // Time control selection — persisted in session. `'off'` means no
+  // clock; `'5'` / `'10'` / `'30'` are minutes per side per game.
+  const [clockOption, setClockOption] = useState<ClockOptionId>(
+    INITIAL_SESSION?.clockOption ?? 'off',
+  );
   // Auth + profile state. The AccountModal handles sign-in (magic link)
   // and the first-time profile form; this component just keeps a local
   // copy of the loaded profile for the footer label and downstream use.
@@ -332,6 +339,7 @@ export default function App() {
           | 'nexus'
           | 'elimination'
           | 'resignation'
+          | 'time-out'
           | 'turn-limit'
           | 'stalemate'
           | 'agreement' = state.status.reason;
@@ -370,8 +378,22 @@ export default function App() {
   // Auto-save game state, AI mode, room, and difficulty (so a refresh
   // keeps everything intact). Selection state is transient and not persisted.
   useEffect(() => {
-    saveSession({ game: state, aiPlayer, room, difficulty });
-  }, [state, aiPlayer, room, difficulty]);
+    saveSession({ game: state, aiPlayer, room, difficulty, clockOption });
+  }, [state, aiPlayer, room, difficulty, clockOption]);
+
+  // Clock tick — when a game has a clock and is in-progress, fire a
+  // tick-clock action every 100ms with the current wall-clock time so
+  // the reducer can charge the active player real elapsed time. The
+  // first tick after a new game / turn change just anchors lastTickAt
+  // without charging anything (see applyTick).
+  useEffect(() => {
+    if (!state.clock) return;
+    if (state.status.kind !== 'in-progress') return;
+    const id = window.setInterval(() => {
+      dispatch({ type: 'tick-clock', now: Date.now() });
+    }, 100);
+    return () => window.clearInterval(id);
+  }, [state.clock, state.status.kind]);
 
   // Sound: when the history grows by exactly one entry, play the cue for
   // the latest action. Bulk increases (a multiplayer remote-sync that
@@ -873,6 +895,8 @@ export default function App() {
             onSetDifficulty={setDifficulty}
             themeId={themeId}
             onSetTheme={setThemeId}
+            clockOption={clockOption}
+            onSetClockOption={setClockOption}
           />
         </div>
       </header>
@@ -956,7 +980,7 @@ export default function App() {
             if (!confirm(msg)) return;
             setRoom(null);
           }
-          dispatch({ type: 'new-game' });
+          dispatch({ type: 'new-game', clockMs: clockMsForOption(clockOption) });
         }}
       />
       <Sidebar
@@ -984,6 +1008,12 @@ export default function App() {
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
         note={moveNote('p1')}
+        clockMs={state.clock?.p1Ms}
+        clockActive={
+          state.clock !== undefined &&
+          inProgress &&
+          state.currentPlayer === 'p1'
+        }
       />
       <div className="board-stack">
         {/* Flow design element FIRST in DOM so it paints behind the boards.
@@ -1093,6 +1123,12 @@ export default function App() {
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
         note={moveNote('p2')}
+        clockMs={state.clock?.p2Ms}
+        clockActive={
+          state.clock !== undefined &&
+          inProgress &&
+          state.currentPlayer === 'p2'
+        }
       />
       <EndGameOverlay
         state={state}
@@ -1110,7 +1146,7 @@ export default function App() {
             if (!confirm(msg)) return;
             setRoom(null);
           }
-          dispatch({ type: 'new-game' });
+          dispatch({ type: 'new-game', clockMs: clockMsForOption(clockOption) });
         }}
       />
       {flashMsg && (

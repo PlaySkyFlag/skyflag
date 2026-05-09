@@ -9,6 +9,7 @@ import {
 import { legalMovesFor, pieceAt, sameCoord } from './moves';
 import type {
   BoardPiece,
+  ClockState,
   Coord,
   FlagsState,
   GameState,
@@ -23,7 +24,10 @@ export type Action =
   | { type: 'deploy'; pieceId: PieceId }
   | { type: 'move'; pieceId: PieceId; to: Coord }
   | { type: 'end-turn' }
-  | { type: 'new-game' }
+  // new-game can carry an optional clock duration in ms — when > 0 the
+  // initial state ships with `clock` populated and the App-level
+  // tick effect will start running it on first turn.
+  | { type: 'new-game'; clockMs?: number }
   // Resign: ends the game with the resigner's opponent winning by
   // resignation. Always dispatched by the resigning side (current
   // player) for the local hot-seat / 1P case; in MP either side can
@@ -33,6 +37,11 @@ export type Action =
   // 'agreement'. Caller is responsible for the agreement-handshake
   // (1P/2P: confirm dialog; MP: offer + accept broadcast).
   | { type: 'agree-draw' }
+  // Charge the active player real elapsed wall-clock time since the
+  // last tick. App passes Date.now(); reducer subtracts the lag from
+  // the player's remaining ms. Transitions to 'won' with reason
+  // 'time-out' if the active player's clock hits zero.
+  | { type: 'tick-clock'; now: number }
   // Replace the entire state — used by the multiplayer realtime sync to
   // adopt an opponent's authoritative state without re-running rules.
   | { type: 'remote-sync'; state: GameState };
@@ -40,7 +49,7 @@ export type Action =
 export function reduce(state: GameState, action: Action): GameState {
   switch (action.type) {
     case 'new-game':
-      return createInitialGameState();
+      return createInitialGameState(action.clockMs);
     case 'deploy':
       return applyDeploy(state, action.pieceId);
     case 'move':
@@ -51,6 +60,8 @@ export function reduce(state: GameState, action: Action): GameState {
       return applyResign(state, action.player);
     case 'agree-draw':
       return applyDrawAgreement(state);
+    case 'tick-clock':
+      return applyTick(state, action.now);
     case 'remote-sync':
       return action.state;
   }
@@ -273,6 +284,48 @@ function isPromotionRow(owner: Player, row: number): boolean {
   return (owner === 'p1' && row === 5) || (owner === 'p2' && row === 0);
 }
 
+// Charge the active player real wall-clock time since the previous
+// tick. First tick after a new game / turn change just records `now`
+// without charging (lastTickAt was null). If the active player's clock
+// hits zero, the OPPONENT wins by 'time-out'. No-op when no clock is
+// configured or the game has already ended.
+function applyTick(state: GameState, now: number): GameState {
+  if (!state.clock) return state;
+  if (state.status.kind !== 'in-progress') return state;
+
+  const cur = state.currentPlayer;
+  const lastTickAt = state.clock.lastTickAt;
+
+  // First tick after start / turn change — no charge yet, just anchor
+  // the timestamp so subsequent ticks have a baseline.
+  if (lastTickAt === null) {
+    return { ...state, clock: { ...state.clock, lastTickAt: now } };
+  }
+
+  const delta = Math.max(0, now - lastTickAt);
+  const remaining = (cur === 'p1' ? state.clock.p1Ms : state.clock.p2Ms) - delta;
+
+  if (remaining <= 0) {
+    const newClock: ClockState = { ...state.clock, lastTickAt: null };
+    if (cur === 'p1') newClock.p1Ms = 0;
+    else newClock.p2Ms = 0;
+    return {
+      ...state,
+      clock: newClock,
+      status: {
+        kind: 'won',
+        winner: cur === 'p1' ? 'p2' : 'p1',
+        reason: 'time-out',
+      },
+    };
+  }
+
+  const newClock: ClockState = { ...state.clock, lastTickAt: now };
+  if (cur === 'p1') newClock.p1Ms = remaining;
+  else newClock.p2Ms = remaining;
+  return { ...state, clock: newClock };
+}
+
 function maybeCaptureFlag(
   flags: FlagsState,
   movingKind: BoardPiece['piece']['kind'],
@@ -353,6 +406,11 @@ function passInitiative(state: GameState): GameState {
     currentPlayer: opponentOf(state.currentPlayer),
     activationsRemaining: ACTIVATIONS_PER_TURN,
     turnNumber: nextTurn,
+    // Re-anchor the clock for the new active player so the next tick
+    // charges only time spent on THEIR turn — without this, the slice
+    // of time between the previous player's last tick and the
+    // turn-change action would get wrongly billed to the new side.
+    ...(state.clock ? { clock: { ...state.clock, lastTickAt: null } } : {}),
   };
   // Elimination: opponent (the side whose turn just started) has no
   // Captain-capable pieces anywhere — neither in hand nor on board. This

@@ -1,3 +1,4 @@
+import type { ClockOptionId } from './constants';
 import type { GameState, Player, RoomState } from './types';
 
 const STORAGE_KEY = 'skyflag.session.v1';
@@ -10,6 +11,7 @@ export type Session = {
   // Optional so legacy saves without it still parse cleanly.
   room?: RoomState | null;
   difficulty?: Difficulty;
+  clockOption?: ClockOptionId;
 };
 
 // Load a saved session if present and parseable. Returns null if there is

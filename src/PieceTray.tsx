@@ -29,7 +29,21 @@ type Props = {
   // Short status text shown next to the tray label — e.g. activations
   // remaining, "waiting", "AI moving…", or end-game outcome.
   note: string;
+  // Optional remaining-time display for chess-style time controls.
+  // Pass undefined to omit the clock entirely (no-clock games).
+  clockMs?: number;
+  // True when this tray's player is the side currently on the clock —
+  // drives the `tray-clock-active` style so the running clock reads
+  // brighter than the paused one.
+  clockActive?: boolean;
 };
+
+function formatClock(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
 
 export default function PieceTray({
   player,
@@ -39,6 +53,8 @@ export default function PieceTray({
   selectedId,
   onSelect,
   note,
+  clockMs,
+  clockActive,
 }: Props) {
   return (
     <section
@@ -48,6 +64,16 @@ export default function PieceTray({
       <h3 className="tray-label">
         {PLAYER_LABEL[player]} · in hand
         <span className="tray-note">{note}</span>
+        {clockMs !== undefined && (
+          <span
+            className={`tray-clock${clockActive ? ' tray-clock-active' : ''}${
+              clockMs <= 30_000 ? ' tray-clock-low' : ''
+            }`}
+            aria-label={`${player} clock — ${formatClock(clockMs)} remaining`}
+          >
+            ⏱ {formatClock(clockMs)}
+          </span>
+        )}
       </h3>
       <div className="tray-pieces">
         {pieces.length === 0 ? (

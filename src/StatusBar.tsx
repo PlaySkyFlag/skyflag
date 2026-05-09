@@ -13,6 +13,7 @@ const REASON_LABEL: Record<WonReason | DrawReason, string> = {
   nexus: 'Nexus',
   elimination: 'elimination',
   resignation: 'resignation',
+  'time-out': 'time-out',
   'turn-limit': 'turn-limit',
   stalemate: 'stalemate',
   agreement: 'agreement',

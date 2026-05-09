@@ -59,7 +59,23 @@ const buildPiecesFor = (owner: Player): Piece[] => [
   { id: `${owner}-pilot`,   owner, kind: 'pilot' },
 ];
 
-export function createInitialGameState(): GameState {
+// Pre-baked time control options shown in the gear menu. `minutes: 0`
+// means no clock at all. Total per side, decremented while their turn
+// is active; running out hands the win to the opponent by 'time-out'.
+export const CLOCK_OPTIONS = [
+  { id: 'off',  label: 'No clock',    minutes: 0  },
+  { id: '5',    label: '5 min',       minutes: 5  },
+  { id: '10',   label: '10 min',      minutes: 10 },
+  { id: '30',   label: '30 min',      minutes: 30 },
+] as const;
+export type ClockOptionId = (typeof CLOCK_OPTIONS)[number]['id'];
+
+export function clockMsForOption(id: ClockOptionId): number {
+  const opt = CLOCK_OPTIONS.find((o) => o.id === id);
+  return (opt?.minutes ?? 0) * 60_000;
+}
+
+export function createInitialGameState(clockMs?: number): GameState {
   const flags: FlagsState = {
     ground: { p1: false, p2: false },
     sky:    { p1: false, p2: false },
@@ -79,5 +95,8 @@ export function createInitialGameState(): GameState {
     turnNumber: 1,
     status: { kind: 'in-progress' },
     history: [],
+    ...(clockMs && clockMs > 0
+      ? { clock: { p1Ms: clockMs, p2Ms: clockMs, lastTickAt: null } }
+      : {}),
   };
 }

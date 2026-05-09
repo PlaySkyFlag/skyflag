@@ -7,13 +7,14 @@ type Props = {
 };
 
 const REASON_GLYPH: Record<
-  'nexus' | 'elimination' | 'resignation' | 'turn-limit' | 'stalemate' | 'agreement',
+  'nexus' | 'elimination' | 'resignation' | 'time-out' | 'turn-limit' | 'stalemate' | 'agreement',
   string
 > = {
   nexus: '◎',
   elimination: '×',
   resignation: '⚐',
-  'turn-limit': '⏱',
+  'time-out': '⏱',
+  'turn-limit': '⌛',
   stalemate: '∅',
   agreement: '🤝',
 };
