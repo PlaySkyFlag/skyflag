@@ -1498,3 +1498,131 @@ button.tray-piece:hover {
   background: rgba(255, 216, 132, 0.10);
   font-weight: 700;
 }
+
+/* Friends panel — same card-in-disclosure pattern as Tournaments. The
+   row layout reuses the lobby-row look so online players feel familiar. */
+.friends-add-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.friends-input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: inherit;
+  font: inherit;
+}
+
+.friends-input:focus {
+  outline: 2px solid rgba(255, 216, 132, 0.5);
+  border-color: rgba(255, 216, 132, 0.6);
+}
+
+.friends-section-title {
+  margin: 12px 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.friends-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.friends-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 8px;
+}
+
+.friends-nickname {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  min-width: 0;
+}
+
+.friends-rating {
+  font-weight: 500;
+  font-size: 0.78rem;
+  opacity: 0.65;
+}
+
+.friends-pending-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 216, 132, 0.12);
+  color: #ffd884;
+  border: 1px solid rgba(255, 216, 132, 0.3);
+}
+
+.friends-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.friends-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.friends-dot-online {
+  background: #6fff8a;
+  border-color: #6fff8a;
+  box-shadow: 0 0 6px rgba(111, 255, 138, 0.6);
+}
+
+.friends-badge {
+  display: inline-block;
+  margin-left: 6px;
+  min-width: 18px;
+  padding: 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 18px;
+  border-radius: 999px;
+  background: #ff8a6f;
+  color: #1a0a08;
+}
+
+.friends-info {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: #6fff8a;
+}
+
+.end-game-friend-note {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  text-align: center;
+  opacity: 0.85;
+}

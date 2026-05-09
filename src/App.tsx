@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import EndGameOverlay from './EndGameOverlay';
+import Friends from './Friends';
 import Help from './Help';
 import MoveHistory from './MoveHistory';
 import Multiplayer from './Multiplayer';
@@ -919,6 +920,12 @@ export default function App() {
         />
         <MoveHistory history={state.history} />
         <Tournaments user={authUser} profile={profile} />
+        <Friends
+          user={authUser}
+          profile={profile}
+          inRoom={room !== null}
+          onEnterRoom={setRoom}
+        />
       </div>
       <PieceTray
         player="p1"
@@ -1045,6 +1052,8 @@ export default function App() {
       />
       <EndGameOverlay
         state={state}
+        user={authUser}
+        room={room}
         onPlayAgain={() => dispatch({ type: 'new-game' })}
       />
       {flashMsg && (

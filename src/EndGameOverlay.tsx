@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import type { GameState, Player } from './game/types';
+import type { User } from '@supabase/supabase-js';
+import { sendRequest } from './game/friends';
+import { supabase } from './game/supabase';
+import type { GameState, Player, RoomState } from './game/types';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
@@ -17,27 +20,70 @@ const REASON_LABEL: Record<
 
 type Props = {
   state: GameState;
+  user: User | null;
+  room: RoomState | null;
   onPlayAgain: () => void;
 };
 
 // End-game celebration overlay. Renders when the game has finished (won or
 // draw) and hasn't been dismissed via "View board". Auto-resets on the
 // next game so it shows again when the next game ends.
-export default function EndGameOverlay({ state, onPlayAgain }: Props) {
+export default function EndGameOverlay({ state, user, room, onPlayAgain }: Props) {
   const [dismissed, setDismissed] = useState(false);
+  // Opponent's user_id, fetched lazily from the games row when this is an
+  // MP game. Null for solo / 2P hot-seat or while the lookup is pending.
+  const [opponentId, setOpponentId] = useState<string | null>(null);
+  const [friendBusy, setFriendBusy] = useState(false);
+  const [friendNote, setFriendNote] = useState<string | null>(null);
 
   useEffect(() => {
-    // When a new game starts, allow the overlay to appear again next time.
     if (state.status.kind === 'in-progress') {
       setDismissed(false);
+      setFriendNote(null);
     }
   }, [state.status.kind]);
+
+  // Look up the opponent's user_id once the game has ended in an MP room.
+  // We read p1_id / p2_id from the games row and pick whichever isn't us.
+  useEffect(() => {
+    if (state.status.kind === 'in-progress') return;
+    if (!supabase || !user || !room) {
+      setOpponentId(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('games')
+        .select('p1_id, p2_id')
+        .eq('room_code', room.code)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      const { p1_id, p2_id } = data as { p1_id: string; p2_id: string | null };
+      const other = p1_id === user.id ? p2_id : p1_id;
+      setOpponentId(other ?? null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [state.status.kind, user, room]);
 
   if (state.status.kind === 'in-progress') return null;
   if (dismissed) return null;
 
-  // Pull the status into a local so the discriminated union narrows below.
   const status = state.status;
+
+  const onAddFriend = async () => {
+    if (!user || !opponentId) return;
+    setFriendBusy(true);
+    const r = await sendRequest(user.id, opponentId);
+    setFriendBusy(false);
+    if (r.ok) {
+      setFriendNote('Friend request sent.');
+    } else {
+      setFriendNote(r.message);
+    }
+  };
 
   return (
     <div className="end-game-overlay" role="dialog" aria-modal="true">
@@ -54,6 +100,16 @@ export default function EndGameOverlay({ state, onPlayAgain }: Props) {
           <button type="button" className="end-game-btn" onClick={onPlayAgain}>
             Play again
           </button>
+          {user && opponentId && (
+            <button
+              type="button"
+              className="end-game-btn end-game-btn--subtle"
+              disabled={friendBusy || friendNote !== null}
+              onClick={onAddFriend}
+            >
+              {friendNote ? 'Sent ✓' : friendBusy ? 'Sending…' : 'Add as friend'}
+            </button>
+          )}
           <button
             type="button"
             className="end-game-btn end-game-btn--subtle"
@@ -62,6 +118,7 @@ export default function EndGameOverlay({ state, onPlayAgain }: Props) {
             View board
           </button>
         </div>
+        {friendNote && <p className="end-game-friend-note">{friendNote}</p>}
       </div>
     </div>
   );
