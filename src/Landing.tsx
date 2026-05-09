@@ -144,13 +144,13 @@ function Hero() {
         />
         <h1 className="landing-hero-title">SkyFlag</h1>
         <p className="landing-hero-subtitle">
-          Strategy across three skies.
+          A world suspended above a world that failed.
         </p>
         <p className="landing-hero-pitch">
-          A turn-based strategy game played simultaneously on three boards —
-          ground, sky, and space. Capture all three flags, or seize the
-          Nexus. Four piece types, an AI tuned to think like a chess
-          engine, free to play in any browser.
+          A turn-based strategy game set in Kaleo, the three-layer arcology
+          where the Aetheri lifted what remained of civilization. Lead the
+          Grey Ravens or the White Stags. Neutralize the opposing clan's
+          three claim-seals, or guide your Captain to the Caelum Nexus.
         </p>
         <div className="landing-hero-actions">
           <a href="/play" className="landing-cta-button landing-cta-primary">
@@ -177,18 +177,18 @@ function FeaturesSection() {
         <div className="landing-features-grid">
           <Feature
             icon="◇◆◇"
-            title="Three boards at once"
-            body="Every game plays out simultaneously across Ground, Sky, and Space. Lifts move pieces between layers — but cost two activations, so vertical momentum has to be earned."
+            title="Three layers of Kaleo"
+            body="Every game plays out simultaneously across the Terran, Meridian, and Empyrean. Lifts move pieces between layers but cost two activations — vertical momentum has to be earned."
           />
           <Feature
             icon="♚♟♜♝"
             title="Four pieces, distinct roles"
-            body="Captains capture flags. Soldiers advance and promote. Rovers and Pilots transport between layers and leap-capture in close quarters. No piece is interchangeable."
+            body="Captains neutralize claim-seals. Soldiers advance and promote. Rovers and Pilots transport between layers and leap-capture in close quarters. No piece is interchangeable."
           />
           <Feature
             icon="∞"
             title="Two ways to win"
-            body="Capture all three of your opponent's flags — or seize the Nexus on the Space layer once the flags are gone. Both paths reward different play styles."
+            body="Neutralize the opposing clan's three claim-seals, or guide your Captain to the Caelum Nexus once the seals are gone. Both paths reward different play styles."
           />
           <Feature
             icon="✦"
@@ -228,24 +228,26 @@ function HowItWorksSection() {
         <h2 className="landing-section-title">How a game flows</h2>
         <ol className="landing-howto-list">
           <li>
-            <strong>Deploy.</strong> Each player starts with four pieces in
-            hand and one fixed deploy square on Ground. Get them onto the
-            board, one activation at a time.
+            <strong>Deploy.</strong> Each clan starts with four pieces in
+            hand and one fixed deploy square on the Terran. Bring them
+            onto the board, one activation at a time.
           </li>
           <li>
             <strong>Advance.</strong> Push your Soldier and Captain toward
-            the opponent's flag corners. Use Rovers and Pilots to lift
-            pieces between layers when the path opens up.
+            the opposing clan's claim-seal corners. Use Rovers and Pilots
+            to lift pieces between layers when the path opens up.
           </li>
           <li>
             <strong>Trade and pressure.</strong> Two activations per turn
             means tempo matters. Threats compound across layers — a piece
-            that's safe on Ground may be one lift away from a Sky capture.
+            that's safe on the Terran may be one lift away from a Meridian
+            capture.
           </li>
           <li>
-            <strong>Win.</strong> Capture all three opponent flags (Captain
-            lands on the flag square), or seize the Nexus at Space(3,3) once
-            all flags are off the board.
+            <strong>Win.</strong> Neutralize all three of the opposing
+            clan's claim-seals (Captain lands on the seal square), or
+            guide your Captain to the Caelum Nexus once the seals are
+            off the board.
           </li>
         </ol>
         <div className="landing-howto-cta">
