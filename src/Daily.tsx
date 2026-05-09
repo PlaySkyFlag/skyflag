@@ -140,6 +140,16 @@ export default function Daily({ open, onClose, themeId }: Props) {
 
   if (!open || !puzzle) return null;
 
+  // useReducer's initial value is locked at mount time. Daily is mounted
+  // with open=false (puzzle null → empty-object placeholder), so on the
+  // first render after the user opens it, `state` is still `{}` while
+  // `puzzle` has just been computed. The remote-sync useEffect runs
+  // AFTER this render, leaving a one-tick window where any access to
+  // state.inHand / state.onBoard etc. crashes ("reading 'undefined'").
+  // Bail this render; the effect fires next, and the second render
+  // shows the modal correctly.
+  if (!state.onBoard || !state.inHand) return null;
+
   const layerThemes = layerThemesFor(themeId);
 
   const selectedBoardPiece =
