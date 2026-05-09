@@ -12,6 +12,13 @@ import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { loadProfile, type Profile } from './game/profile';
 import { recordGame, type StatsMode } from './game/stats';
+import {
+  applyThemeToCssVars,
+  loadThemeId,
+  saveThemeId,
+  THEMES,
+  type ThemeId,
+} from './game/themes';
 import { legalActions } from './game/ai';
 import AiWorker from './game/aiWorker?worker';
 import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
@@ -34,38 +41,17 @@ import './App.css';
 
 const AI_THINK_DELAY_MS = 600;
 
-const SPACE_THEME: BoardTheme = {
-  lightFill: '#5b5f9a',
-  darkFill: '#3a3d6b',
-  background: '#15172e',
-  stroke: '#0a0b1c',
-  label: '#9ea4cf',
-  kind: 'space',
-};
-
-const SKY_THEME: BoardTheme = {
-  lightFill: '#bcdcef',
-  darkFill: '#7eb3d4',
-  background: '#2a4860',
-  stroke: '#163040',
-  label: '#a8c4d8',
-  kind: 'sky',
-};
-
-const GROUND_THEME: BoardTheme = {
-  lightFill: '#a8c48f',
-  darkFill: '#6b8e5a',
-  background: '#1f2a17',
-  stroke: '#2d3b25',
-  label: '#a4b89a',
-  kind: 'ground',
-};
-
-const LAYER_THEMES: Record<Layer, BoardTheme> = {
-  space: SPACE_THEME,
-  sky: SKY_THEME,
-  ground: GROUND_THEME,
-};
+// Build a BoardTheme record for the currently selected visual theme.
+// Layer kinds are tagged so Board.tsx can dispatch atmosphere by kind
+// (the kind-specific decorations are constant; only the colors change).
+function layerThemesFor(themeId: ThemeId): Record<Layer, BoardTheme> {
+  const t = THEMES[themeId].layers;
+  return {
+    space:  { ...t.space,  kind: 'space'  },
+    sky:    { ...t.sky,    kind: 'sky'    },
+    ground: { ...t.ground, kind: 'ground' },
+  };
+}
 
 const LAYER_NAMES: Record<Layer, string> = {
   space: 'Space / Empyrean',
@@ -256,6 +242,15 @@ export default function App() {
   }, [authUser]);
 
   const [statsOpen, setStatsOpen] = useState(false);
+  const [themeId, setThemeId] = useState<ThemeId>(() => loadThemeId());
+  // Apply CSS variables for the selected theme. Runs on mount + on
+  // every theme change so the rest of the UI (which uses var(--…))
+  // updates without per-component plumbing.
+  useEffect(() => {
+    applyThemeToCssVars(themeId);
+    saveThemeId(themeId);
+  }, [themeId]);
+  const layerThemes = layerThemesFor(themeId);
 
   // ELO: when an online MP game finishes, fire-and-forget the
   // apply-rating Edge Function. The function is idempotent (uses a
@@ -743,7 +738,7 @@ export default function App() {
     return (
       <Board
         key={layer}
-        theme={LAYER_THEMES[layer]}
+        theme={layerThemes[layer]}
         markers={markersForLayer(layer, state)}
         deployCells={deployCellsForLayer(layer)}
         activeDeployPlayer={layer === 'ground' ? activeDeployPlayer : null}
@@ -787,6 +782,17 @@ export default function App() {
           >
             Stats
           </button>
+          <select
+            className="hud-mode-select app-header-theme"
+            value={themeId}
+            onChange={(e) => setThemeId(e.target.value as ThemeId)}
+            aria-label="Visual theme"
+            title="Pick a visual theme"
+          >
+            {(Object.values(THEMES)).map((t) => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
         </div>
       </header>
       <StatusBar
