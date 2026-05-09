@@ -21,12 +21,18 @@
 // opening goes wrong). Random pick keeps games feeling distinct
 // without weakening play.
 
+import { DEPLOY_COORDS } from './constants';
 import type { Action } from './reducer';
 import type { GameState, PieceKind, Player } from './types';
 
 // Returns a book action for the current player at this state, or null
 // to fall through to the regular search. Called from chooseAction
 // before any search work begins.
+//
+// Note: the book guarantees its suggestions are LEGAL — callers can
+// dispatch them directly. The most subtle constraint is that
+// deploy-the-second-piece can only fire when the deploy coord is free,
+// i.e. the first piece has already moved off it.
 export function bookActionFor(state: GameState): Action | null {
   if (state.status.kind !== 'in-progress') return null;
 
@@ -35,16 +41,29 @@ export function bookActionFor(state: GameState): Action | null {
   const myHand = state.inHand[player];
 
   // ── Move 1: empty board, full hand ──────────────────────────────────
-  // Both players' first activation. Deploy a key attacker.
+  // Both players' first activation. Deploy a key attacker. Deploy
+  // coord is guaranteed free since nothing's on the board yet.
   if (myOnBoard.length === 0) {
     return deployFirstAttacker(myHand, player);
   }
 
-  // ── Move 2: one piece on board, three in hand ───────────────────────
-  // If the first deploy was a key attacker, follow up with the other
-  // attacker. If it was a transport (player went off-book), bail and
-  // let search take over.
+  // ── Move 2 (next-turn variant): one piece on board, deploy slot free
+  // ─────────────────────────────────────────────────────────────────
+  // Fires when the first-deployed piece has moved off the deploy
+  // square (typically on the next turn). Completes the soldier+captain
+  // pair — both attack-pieces committed before transports come out.
+  // The deploy-coord check is critical: skipping it would suggest an
+  // illegal "deploy on top of the existing piece" action.
   if (myOnBoard.length === 1 && myHand.length === 3) {
+    const deployCoord = DEPLOY_COORDS[player];
+    const slotOccupied = state.onBoard.some(
+      (bp) =>
+        bp.coord.layer === deployCoord.layer &&
+        bp.coord.row === deployCoord.row &&
+        bp.coord.col === deployCoord.col,
+    );
+    if (slotOccupied) return null;
+
     const firstKind = myOnBoard[0].piece.kind;
     if (firstKind === 'soldier' || firstKind === 'captain') {
       const want: PieceKind = firstKind === 'soldier' ? 'captain' : 'soldier';

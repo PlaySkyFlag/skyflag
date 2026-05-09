@@ -572,8 +572,19 @@ export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEA
   // without burning search time on positions whose answer is the same
   // every game. Falls through to search past move 2, where position-
   // specific judgment matters too much to hardcode.
+  //
+  // Defensive legality check — even though the book is supposed to
+  // only return legal actions, a bad book entry could otherwise wedge
+  // the AI by returning an illegal deploy/move that the reducer rejects
+  // (no-op state, AI loop spins). If the book's suggestion isn't in
+  // legalActions, fall through to search instead of trusting it.
   const book = bookActionFor(state);
-  if (book) return book;
+  if (book) {
+    const legal = legalActions(state);
+    if (legal.some((a) => actionsEqual(a, book))) {
+      return book;
+    }
+  }
 
   // History isn't read by the search and the reducer clones the array on
   // every action. Stripping it on entry removes that growing per-clone
