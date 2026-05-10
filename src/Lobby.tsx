@@ -10,11 +10,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { createInitialGameState } from './game/constants';
+import {
+  currentPresence as currentLobbyPresence,
+  sendBroadcast as sendLobbyBroadcast,
+  setAvailable as setLobbyAvailable,
+  subscribeBroadcast as subscribeLobbyBroadcast,
+  subscribePresence as subscribeLobbyPresence,
+} from './game/lobbyChannel';
 import { supabase } from './game/supabase';
 import type { Profile } from './game/profile';
 import type { RoomState } from './game/types';
-
-const LOBBY_CHANNEL = 'lobby:global';
 
 // Quick-match pool — separate from `lobby:global` so being challengeable
 // (named) doesn't auto-pair you, and being in the pool doesn't expose
@@ -96,61 +101,63 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
   const [searching, setSearching] = useState(false);
   const pairedRef = useRef(false);
 
-  // The Supabase channel is held in a ref so we can `track` / `untrack` and
-  // send broadcasts without re-creating it on every render. Recreated only
-  // when the user identity changes.
-  const channelRef = useRef<ReturnType<NonNullable<typeof supabase>['channel']> | null>(null);
+  // The Quick-match pool channel uses its own topic so the
+  // singleton lobby:global subscription isn't affected.
   const poolChannelRef = useRef<ReturnType<NonNullable<typeof supabase>['channel']> | null>(null);
 
-  // Subscribe to the lobby channel once per signed-in user. Listens for
-  // presence sync (who's available) and broadcasts (challenge envelopes).
+  // Subscribe to the lobby:global manager. The actual Supabase
+  // channel is owned by App.tsx via lobbyChannel.ts; we just
+  // register listeners and call the manager's helpers.
   useEffect(() => {
-    if (!supabase || !user) return;
-    const channel = supabase.channel(LOBBY_CHANNEL, {
-      config: { presence: { key: user.id } },
-    });
-    channelRef.current = channel;
+    if (!user) return;
+    // Hydrate from the manager's last-known presence so we render
+    // a sensible initial list even before the next sync fires.
+    const initial = currentLobbyPresence();
+    if (initial.size > 0) {
+      const list: Presence[] = [];
+      for (const m of initial.values()) list.push(m);
+      setOnline(list);
+      onPresenceChange?.(new Set(list.map((p) => p.user_id)));
+    }
 
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const raw = channel.presenceState() as Record<string, Presence[]>;
-        // presenceState gives us { [presenceKey]: [meta, ...] }. Each meta
-        // is the object we passed to track(). Flatten + dedupe by user_id
-        // so two tabs of the same user appear as one row.
-        const seen = new Set<string>();
+    const unsubs: Array<() => void> = [];
+
+    unsubs.push(
+      subscribeLobbyPresence((members) => {
         const list: Presence[] = [];
-        for (const arr of Object.values(raw)) {
-          for (const meta of arr) {
-            if (seen.has(meta.user_id)) continue;
-            seen.add(meta.user_id);
-            list.push(meta);
-          }
-        }
+        for (const m of members.values()) list.push(m);
         setOnline(list);
         // Mirror the presence set up to App so siblings (Friends panel)
         // can show an online dot without spinning up their own channel.
-        if (onPresenceChange) {
-          onPresenceChange(new Set(list.map((p) => p.user_id)));
-        }
-      })
-      .on('broadcast', { event: 'challenge' }, ({ payload }) => {
+        onPresenceChange?.(new Set(list.map((p) => p.user_id)));
+      }),
+    );
+
+    unsubs.push(
+      subscribeLobbyBroadcast('challenge', (payload) => {
         const c = payload as Challenge;
         if (c.to_user_id !== user.id) return;
         setIncoming(c);
-      })
-      .on('broadcast', { event: 'challenge-cancel' }, ({ payload }) => {
+      }),
+    );
+    unsubs.push(
+      subscribeLobbyBroadcast('challenge-cancel', (payload) => {
         const c = payload as Challenge;
         if (c.to_user_id !== user.id) return;
         setIncoming((prev) => (prev && prev.from_user_id === c.from_user_id ? null : prev));
-      })
-      .on('broadcast', { event: 'challenge-decline' }, ({ payload }) => {
+      }),
+    );
+    unsubs.push(
+      subscribeLobbyBroadcast('challenge-decline', (payload) => {
         const c = payload as Challenge;
         if (c.from_user_id !== user.id) return;
         setOutgoing((prev) => (prev && prev.to_user_id === c.to_user_id ? null : prev));
         setError(`${c.from_nickname || 'They'} declined the challenge.`);
         setTimeout(() => setError(null), 3000);
-      })
-      .on('broadcast', { event: 'challenge-accept' }, ({ payload }) => {
+      }),
+    );
+    unsubs.push(
+      subscribeLobbyBroadcast('challenge-accept', (payload) => {
         // Recipient accepted — close our "Challenging…" overlay and
         // hand the room up to App so the challenger also enters it.
         const c = payload as Challenge;
@@ -162,31 +169,25 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
           role: 'p1',
           status: 'playing',
         });
-      })
-      .subscribe();
+      }),
+    );
 
     return () => {
-      channel.unsubscribe();
-      channelRef.current = null;
+      for (const fn of unsubs) fn();
     };
-  }, [user]);
+  }, [user, onEnterRoom, onPresenceChange]);
 
   // Track / untrack our own presence whenever the availability toggle flips.
   useEffect(() => {
-    const channel = channelRef.current;
-    if (!channel || !profile) return;
-    if (available) {
-      channel.track({ user_id: user.id, nickname: profile.nickname });
-    } else {
-      channel.untrack();
-    }
-  }, [available, user, profile]);
+    if (!profile) return;
+    setLobbyAvailable(available);
+  }, [available, profile]);
 
   // Auto-untrack when this component unmounts so a closing tab doesn't
   // leave a stale presence row hanging.
   useEffect(() => {
     return () => {
-      channelRef.current?.untrack();
+      setLobbyAvailable(false);
     };
   }, []);
 
@@ -355,8 +356,6 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
         setError("You're already in a room — leave it first.");
         return;
       }
-      const channel = channelRef.current;
-      if (!channel) return;
 
       // Create the room on Supabase with us as p1 and target user as p2_id.
       // The opponent's client will join by code when they accept.
@@ -383,21 +382,14 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
         room_code: code,
       };
       setOutgoing(payload);
-      await channel.send({ type: 'broadcast', event: 'challenge', payload });
+      await sendLobbyBroadcast('challenge', payload);
     },
     [user, profile, inRoom],
   );
 
   const cancelOutgoing = useCallback(async () => {
     if (!supabase || !outgoing) return;
-    const channel = channelRef.current;
-    if (channel) {
-      await channel.send({
-        type: 'broadcast',
-        event: 'challenge-cancel',
-        payload: outgoing,
-      });
-    }
+    await sendLobbyBroadcast('challenge-cancel', outgoing);
     // Tear down the room we created since it'll never be joined.
     await supabase.from('games').delete().eq('room_code', outgoing.room_code);
     setOutgoing(null);
@@ -409,14 +401,7 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
     // Notify the challenger so their "Challenging…" overlay clears and
     // they also enter the room. Without this broadcast their UI stays
     // stuck behind a full-screen modal blocking every click.
-    const channel = channelRef.current;
-    if (channel) {
-      await channel.send({
-        type: 'broadcast',
-        event: 'challenge-accept',
-        payload: incoming,
-      });
-    }
+    await sendLobbyBroadcast('challenge-accept', incoming);
     // Joining the room is identical to typing the code in by hand, so we
     // hand the room state up to the parent and let the existing room flow
     // take over (sync, render, etc.).
@@ -431,14 +416,7 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
 
   const declineIncoming = useCallback(async () => {
     if (!incoming) return;
-    const channel = channelRef.current;
-    if (channel) {
-      await channel.send({
-        type: 'broadcast',
-        event: 'challenge-decline',
-        payload: incoming,
-      });
-    }
+    await sendLobbyBroadcast('challenge-decline', incoming);
     if (supabase) {
       // The challenger's room is now orphaned — clean it up so it doesn't
       // count toward their open rooms.

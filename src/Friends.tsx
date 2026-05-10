@@ -22,10 +22,10 @@ import {
   type FriendEntry,
 } from './game/friends';
 import { createInitialGameState } from './game/constants';
+import { sendBroadcast as sendLobbyBroadcast } from './game/lobbyChannel';
 import type { Profile } from './game/profile';
 import { supabase } from './game/supabase';
 
-const LOBBY_CHANNEL = 'lobby:global';
 const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 function generateRoomCode(): string {
@@ -146,21 +146,15 @@ export default function Friends({ user, profile, inRoom, onlineIds, inline = fal
         setError(`Couldn't create room: ${insertResult.error.message}`);
         return;
       }
-      // Reuse the lobby channel that Lobby has already subscribed to —
-      // .send() works post-subscribe, and Lobby's existing listeners on
-      // both sides will handle the accept/decline + room transition.
-      await supabase
-        .channel(LOBBY_CHANNEL)
-        .send({
-          type: 'broadcast',
-          event: 'challenge',
-          payload: {
-            from_user_id: user.id,
-            from_nickname: profile.nickname,
-            to_user_id: other.other_id,
-            room_code: code,
-          },
-        });
+      // Send via the singleton lobby-channel manager — App.tsx owns
+      // the actual subscription, both Lobby's listeners and the
+      // recipient's listeners are wired through subscribeBroadcast.
+      await sendLobbyBroadcast('challenge', {
+        from_user_id: user.id,
+        from_nickname: profile.nickname,
+        to_user_id: other.other_id,
+        room_code: code,
+      });
       setInfo(`Challenge sent to ${other.other_nickname}.`);
       setTimeout(() => setInfo(null), 4000);
     },

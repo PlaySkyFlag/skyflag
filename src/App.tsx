@@ -14,6 +14,11 @@ import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { useEntitlement } from './game/entitlements';
 import { listFriends } from './game/friends';
+import {
+  ensureLobbyChannel,
+  subscribePresence as subscribeLobbyPresence,
+  teardownLobbyChannel,
+} from './game/lobbyChannel';
 import { loadProfile, type Profile } from './game/profile';
 import { recordGame, totalGameCount, type StatsMode } from './game/stats';
 import {
@@ -514,32 +519,34 @@ export default function App() {
     saveSession({ game: state, aiPlayer, room, difficulty, clockOption });
   }, [state, aiPlayer, room, difficulty, clockOption]);
 
-  // Always-on lobby presence listener. Lobby.tsx subscribes too when
-  // its tab is open; this second listener keeps the header's "online"
-  // pill accurate even when the user is on a different tab. Both
-  // subscriptions feed the same lobbyOnlineIds state — duplicate
-  // listeners on the same channel are cheap and the dedupe in the
-  // sync handler keeps the set consistent.
+  // Always-on lobby presence listener via the shared lobbyChannel
+  // manager. Centralizing the channel here means Lobby.tsx and
+  // Friends.tsx can piggyback on the SAME subscription rather than
+  // creating their own — supabase-js dedupes channels by topic,
+  // so multiple subscribers on the same topic collide on .on()
+  // calls after the first .subscribe(). The header pill needs to
+  // stay accurate even when the Multiplayer tab is closed, so the
+  // singleton is owned at the App level and torn down only on
+  // sign-out.
   useEffect(() => {
-    if (!supabase || !authUser) return;
-    const sb = supabase;
-    const channel = sb.channel('lobby:global', {
-      config: { presence: { key: authUser.id } },
+    if (!authUser) {
+      teardownLobbyChannel();
+      setLobbyOnlineIds(new Set());
+      return;
+    }
+    ensureLobbyChannel({
+      user_id: authUser.id,
+      nickname: profile?.nickname ?? authUser.id.slice(0, 6),
     });
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const raw = channel.presenceState() as Record<string, Array<{ user_id: string }>>;
-        const ids = new Set<string>();
-        for (const arr of Object.values(raw)) {
-          for (const meta of arr) ids.add(meta.user_id);
-        }
-        setLobbyOnlineIds(ids);
-      })
-      .subscribe();
+    const unsub = subscribeLobbyPresence((members) => {
+      const ids = new Set<string>();
+      for (const m of members.values()) ids.add(m.user_id);
+      setLobbyOnlineIds(ids);
+    });
     return () => {
-      sb.removeChannel(channel);
+      unsub();
     };
-  }, [authUser]);
+  }, [authUser, profile?.nickname]);
 
   // Friends list cache. Refreshes when the signed-in user changes;
   // used to compute "M friends online" in the header pill.
