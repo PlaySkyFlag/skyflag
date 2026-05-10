@@ -67,8 +67,16 @@ export function useEntitlements(): { entitlements: Set<string>; loading: boolean
     // Realtime — pick up grants/revokes from server-side processes
     // (Stripe webhook, Apple receipt verification, etc.) without a
     // page refresh.
+    //
+    // Topic includes a random suffix so multiple hook instances
+    // (e.g. App.tsx using useEntitlement at the top level *and* the
+    // AccountModal opening with its own useEntitlements call) each
+    // get their own channel. supabase-js dedupes channels by topic;
+    // a shared topic causes the second hook's `.on('postgres_changes')`
+    // to throw because the channel was already subscribed by the first.
+    const suffix = Math.random().toString(36).slice(2, 10);
     const channel = sb
-      .channel(`entitlements:${userId}`)
+      .channel(`entitlements:${userId}:${suffix}`)
       .on(
         'postgres_changes',
         {
