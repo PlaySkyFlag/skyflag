@@ -34,6 +34,10 @@ type Props = {
   // Players + AI difficulty pickers so AI can't be re-introduced
   // into a 2-human game by accident.
   inMpRoom: boolean;
+  // True when the user holds the feature.plus entitlement. Unlocks
+  // the Expert difficulty option; without it the option is disabled
+  // with a "Plus subscription required" tooltip.
+  hasPlus: boolean;
 };
 
 export default function SettingsMenu({
@@ -48,6 +52,7 @@ export default function SettingsMenu({
   showThreats,
   onSetShowThreats,
   inMpRoom,
+  hasPlus,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [mutedNow, setMutedNow] = useState(isMuted());
@@ -121,6 +126,9 @@ export default function SettingsMenu({
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
+              <option value="expert" disabled={!hasPlus}>
+                {hasPlus ? 'Expert' : 'Expert — Plus required'}
+              </option>
             </select>
           </label>
           <label className="settings-row">

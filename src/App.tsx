@@ -12,6 +12,7 @@ import Daily from './Daily';
 import type { ChatMessage } from './Chat';
 import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
+import { useEntitlement } from './game/entitlements';
 import { loadProfile, type Profile } from './game/profile';
 import { recordGame, type StatsMode } from './game/stats';
 import {
@@ -291,6 +292,18 @@ export default function App() {
   // and the first-time profile form; this component just keeps a local
   // copy of the loaded profile for the footer label and downstream use.
   const { user: authUser } = useAuthUser();
+  // Plus entitlement gates the Expert AI difficulty. The hook subscribes
+  // to realtime entitlement changes, so a fresh subscription unlocks
+  // Expert mid-session and a cancellation re-locks it.
+  const { hasIt: hasPlus } = useEntitlement('feature.plus');
+  // If a session was saved at Expert and the user has since lost (or
+  // never had) the Plus entitlement, silently fall back to Hard so the
+  // AI doesn't run at depth 6 for someone outside the gate.
+  useEffect(() => {
+    if (difficulty === 'expert' && !hasPlus) {
+      setDifficulty('hard');
+    }
+  }, [difficulty, hasPlus]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [accountOpen, setAccountOpen] = useState(false);
   useEffect(() => {
@@ -663,7 +676,14 @@ export default function App() {
 
     const timer = setTimeout(() => {
       if (cancelled) return;
-      const searchDepth = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 3 : 4;
+      const searchDepth =
+        difficulty === 'easy'
+          ? 2
+          : difficulty === 'medium'
+            ? 3
+            : difficulty === 'expert'
+              ? 6
+              : 4;
       const req: AiWorkerRequest = {
         id: requestId,
         type: 'choose',
@@ -996,6 +1016,7 @@ export default function App() {
             showThreats={showThreats}
             onSetShowThreats={setShowThreats}
             inMpRoom={room !== null}
+            hasPlus={hasPlus}
           />
         </div>
       </header>

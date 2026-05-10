@@ -3,7 +3,7 @@ import type { GameState, Player, RoomState } from './types';
 
 const STORAGE_KEY = 'skyflag.session.v1';
 
-export type Difficulty = 'easy' | 'medium' | 'hard';
+export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
 
 export type Session = {
   game: GameState;
