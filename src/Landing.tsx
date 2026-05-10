@@ -138,11 +138,9 @@ function Hero() {
     <section className="landing-hero">
       <div className="landing-hero-inner">
         <img
-          src="/3phor-logo.webp"
+          src="/3phor-logo.png"
           alt="3phor"
           className="landing-hero-logo"
-          loading="eager"
-          decoding="async"
         />
         <h1 className="landing-hero-title">3phor</h1>
         <p className="landing-hero-tagline tagline-script">3phor the win!</p>

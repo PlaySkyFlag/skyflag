@@ -189,7 +189,6 @@ export default function Friends({ user, profile, inRoom, onlineIds, inline = fal
             type="text"
             className="friends-input"
             placeholder="Add by nickname"
-            aria-label="Add a friend by nickname"
             value={addInput}
             onChange={(e) => setAddInput(e.target.value)}
             onKeyDown={(e) => {

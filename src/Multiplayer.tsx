@@ -596,7 +596,6 @@ export default function Multiplayer({ room, roomMeta = null, forceOpen = false, 
                 autoCapitalize="characters"
                 spellCheck={false}
                 placeholder="CODE"
-                aria-label="4-letter room code to join"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 4))}
                 maxLength={4}
