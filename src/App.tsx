@@ -227,6 +227,9 @@ export default function App() {
   // by Friends so its online dots reflect the same channel without
   // spinning up a duplicate subscription.
   const [lobbyOnlineIds, setLobbyOnlineIds] = useState<Set<string>>(new Set());
+  // Friend ID set, refreshed on auth change. Used to compute "M friends
+  // online" in the header pill without re-querying every render.
+  const [friendIds, setFriendIds] = useState<Set<string>>(new Set());
   // Multiplayer is always two human players — auto-clear AI as soon as
   // a room becomes active so AI vs. opponent can't accidentally fight
   // for the same seat. The SettingsMenu also disables the mode picker
@@ -445,6 +448,61 @@ export default function App() {
   useEffect(() => {
     saveSession({ game: state, aiPlayer, room, difficulty, clockOption });
   }, [state, aiPlayer, room, difficulty, clockOption]);
+
+  // Always-on lobby presence listener. Lobby.tsx subscribes too when
+  // its tab is open; this second listener keeps the header's "online"
+  // pill accurate even when the user is on a different tab. Both
+  // subscriptions feed the same lobbyOnlineIds state — duplicate
+  // listeners on the same channel are cheap and the dedupe in the
+  // sync handler keeps the set consistent.
+  useEffect(() => {
+    if (!supabase || !authUser) return;
+    const sb = supabase;
+    const channel = sb.channel('lobby:global', {
+      config: { presence: { key: authUser.id } },
+    });
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const raw = channel.presenceState() as Record<string, Array<{ user_id: string }>>;
+        const ids = new Set<string>();
+        for (const arr of Object.values(raw)) {
+          for (const meta of arr) ids.add(meta.user_id);
+        }
+        setLobbyOnlineIds(ids);
+      })
+      .subscribe();
+    return () => {
+      sb.removeChannel(channel);
+    };
+  }, [authUser]);
+
+  // Friends list cache. Refreshes when the signed-in user changes;
+  // used to compute "M friends online" in the header pill.
+  useEffect(() => {
+    if (!authUser) {
+      setFriendIds(new Set());
+      return;
+    }
+    let cancelled = false;
+    import('./game/friends').then(({ listFriends }) => {
+      listFriends(authUser.id).then((entries) => {
+        if (cancelled) return;
+        // Only count accepted friendships — pending requests aren't friends yet.
+        setFriendIds(new Set(entries.filter((e) => e.direction === 'accepted').map((e) => e.other_id)));
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser]);
+
+  // Online counts derived from the two sources above.
+  const totalOnline = lobbyOnlineIds.size;
+  const friendsOnline = (() => {
+    let n = 0;
+    for (const id of friendIds) if (lobbyOnlineIds.has(id)) n++;
+    return n;
+  })();
 
   // "Save your guest account" banner. Shown when:
   //   1. User is signed in as a guest (anon — no email)
@@ -1035,6 +1093,29 @@ export default function App() {
           height={120}
         />
         <div className="app-header-actions">
+          {/* Live "who's available" pill — sticky and always visible
+              so users know whether there's anyone in the pool before
+              they open the Multiplayer tab. Friend count is the
+              high-signal half: even if only 2 strangers are online,
+              "1 friend online" is what gets people to actually play. */}
+          {authUser && (
+            <button
+              type="button"
+              className="hud-btn app-header-presence"
+              onClick={() => {
+                // Lobby panel — same tab the user would otherwise dig
+                // through Sidebar to reach.
+                const el = document.querySelector<HTMLButtonElement>('[data-tab-id="multiplayer"]');
+                if (el) el.click();
+              }}
+              title="Open the lobby to play a game"
+            >
+              <span className="app-header-presence-dot" aria-hidden /> {totalOnline} online
+              {friendsOnline > 0 && (
+                <> · <strong className="app-header-presence-friends">{friendsOnline} friend{friendsOnline === 1 ? '' : 's'}</strong></>
+              )}
+            </button>
+          )}
           <a
             href="/"
             className="hud-btn app-header-site"

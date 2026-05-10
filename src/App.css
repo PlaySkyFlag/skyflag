@@ -61,6 +61,42 @@
   justify-content: center;
 }
 
+/* Live online-presence pill in the header. Always visible while
+   signed in; clickable to jump into the Multiplayer lobby. Pulsing
+   green dot signals "live" without yelling. */
+.app-header-presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  background: rgba(111, 255, 138, 0.10);
+  border: 1px solid rgba(111, 255, 138, 0.40);
+  color: #d8f5dd;
+}
+.app-header-presence:hover {
+  background: rgba(111, 255, 138, 0.16);
+  border-color: rgba(111, 255, 138, 0.60);
+}
+.app-header-presence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6fff8a;
+  box-shadow: 0 0 0 0 rgba(111, 255, 138, 0.6);
+  animation: presence-pulse 2s ease-in-out infinite;
+}
+.app-header-presence-friends {
+  color: #ffd884;
+  font-weight: 700;
+}
+@keyframes presence-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(111, 255, 138, 0.55); }
+  70%  { box-shadow: 0 0 0 8px rgba(111, 255, 138, 0);    }
+  100% { box-shadow: 0 0 0 0   rgba(111, 255, 138, 0);    }
+}
+
 .app-header-account,
 .app-header-stats,
 .app-header-site {

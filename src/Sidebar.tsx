@@ -137,6 +137,7 @@ export default function Sidebar({
       <button
         type="button"
         key={id}
+        data-tab-id={id}
         className={`sidebar-tab${isActive ? ' sidebar-tab-active' : ''}`}
         aria-pressed={isActive}
         onClick={() => setActive(isActive ? null : id)}
