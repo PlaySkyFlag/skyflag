@@ -156,11 +156,16 @@ function findLastMove(state: GameState): LastMove | null {
   return null;
 }
 
+// Severity-graded threat record. `critical` is reserved for Captains
+// (losing one effectively loses the game) and promoted Captains. Other
+// pieces are `normal` — still threatened, but not game-ending.
+type ThreatCell = { row: number; col: number; severity: 'critical' | 'normal' };
+
 // Computes which of the current player's on-board pieces are sitting on
 // a square the opponent could move to next ply — i.e., immediate
-// capture threats. Grouped by layer for the per-board renderer.
-function computeThreats(state: GameState): Record<Layer, Array<{ row: number; col: number }>> {
-  const result: Record<Layer, Array<{ row: number; col: number }>> = {
+// capture threats. Severity reflects the value of the threatened piece.
+function computeThreats(state: GameState): Record<Layer, ThreatCell[]> {
+  const result: Record<Layer, ThreatCell[]> = {
     ground: [],
     sky: [],
     space: [],
@@ -178,7 +183,50 @@ function computeThreats(state: GameState): Record<Layer, Array<{ row: number; co
     if (bp.piece.owner !== state.currentPlayer) continue;
     const key = `${bp.coord.layer}:${bp.coord.row}:${bp.coord.col}`;
     if (attacks.has(key)) {
-      result[bp.coord.layer].push({ row: bp.coord.row, col: bp.coord.col });
+      // Captains (including promoted Soldiers) are critical — losing
+      // both Captains means losing all paths to the Nexus.
+      const severity: ThreatCell['severity'] =
+        bp.piece.kind === 'captain' ? 'critical' : 'normal';
+      result[bp.coord.layer].push({
+        row: bp.coord.row,
+        col: bp.coord.col,
+        severity,
+      });
+    }
+  }
+  return result;
+}
+
+// Flag-at-risk detection — independent of piece-threat warning because
+// flags aren't pieces. For each of MY still-uncaptured flags, check
+// whether any opponent Captain (original or promoted) has the flag
+// square in its legal-move set. Returns the flag coord per layer so
+// the Board renderer knows exactly where to draw the alert overlay.
+//
+// This is the highest-priority defensive signal in 3phor — a Captain
+// adjacent to your flag is closer to losing the game than a Soldier
+// hanging in capture range.
+function computeFlagThreats(state: GameState): Record<Layer, { row: number; col: number } | null> {
+  const result: Record<Layer, { row: number; col: number } | null> = {
+    ground: null, sky: null, space: null,
+  };
+  if (state.status.kind !== 'in-progress') return result;
+  const me = state.currentPlayer;
+  const opp = opponentOf(me);
+  // My flag positions on each layer (only the ones not yet captured).
+  const myFlags: Record<Layer, { row: number; col: number } | null> = {
+    ground: state.flags.ground[me] ? null : FLAG_COORDS[me].ground,
+    sky:    state.flags.sky[me]    ? null : FLAG_COORDS[me].sky,
+    space:  state.flags.space[me]  ? null : FLAG_COORDS[me].space,
+  };
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner !== opp) continue;
+    if (bp.piece.kind !== 'captain') continue;
+    for (const t of legalMovesFor(bp, state)) {
+      const flag = myFlags[t.layer];
+      if (flag && flag.row === t.row && flag.col === t.col) {
+        result[t.layer] = flag;
+      }
     }
   }
   return result;
@@ -1027,6 +1075,12 @@ export default function App() {
   const threats = showThreats
     ? computeThreats(state)
     : { space: [], sky: [], ground: [] };
+  // Flag-at-risk computed alongside piece threats — both are part of
+  // the same defensive overlay. Always on when showThreats is on; the
+  // signal is high enough that no one wants this hidden.
+  const flagThreats = showThreats
+    ? computeFlagThreats(state)
+    : { space: null, sky: null, ground: null };
   const renderBoard = (layer: Layer) => {
     const selectedCell =
       selectedBoardPiece && selectedBoardPiece.coord.layer === layer
@@ -1058,6 +1112,7 @@ export default function App() {
         lastMoveFrom={lastMoveFrom}
         lastMoveTo={lastMoveTo}
         threatenedCells={threats[layer]}
+        flagAtRisk={flagThreats[layer]}
         hintFrom={hintFrom}
         hintTo={hintTo}
       />

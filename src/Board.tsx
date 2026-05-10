@@ -122,7 +122,13 @@ type BoardProps = {
   lastMoveTo?: { row: number; col: number } | null;
   // Cells where a friendly piece is in opponent's attack range — get
   // a pulsing red threat ring so the player notices before blundering.
-  threatenedCells?: ReadonlyArray<{ row: number; col: number }>;
+  // Severity 'critical' (Captains) gets a heavier, brighter ring.
+  threatenedCells?: ReadonlyArray<{ row: number; col: number; severity?: 'critical' | 'normal' }>;
+  // Set when at least one opponent Captain can reach our (still
+  // uncaptured) flag on this layer next move. The coord points at the
+  // flag cell — we render a pulsing red overlay there. Highest-priority
+  // defensive signal in the game.
+  flagAtRisk?: { row: number; col: number } | null;
   // Optional AI hint highlight — same from/to shape as lastMove but
   // rendered in gold so it reads as "the suggested move" without being
   // confused with the just-played-move arrow.
@@ -142,6 +148,7 @@ export default function Board({
   lastMoveFrom = null,
   lastMoveTo = null,
   threatenedCells = [],
+  flagAtRisk = null,
   hintFrom = null,
   hintTo = null,
 }: BoardProps) {
@@ -701,6 +708,16 @@ export default function Board({
     const y = ORIGIN_Y + t.row * CELL;
     const cx = x + CELL / 2;
     const cy = y + CELL / 2;
+    // Critical = Captain in danger; brighter ring + heavier fill +
+    // larger badge. Losing a Captain is much closer to losing the
+    // game than losing any other piece, so it earns extra visual weight.
+    const critical = t.severity === 'critical';
+    const fill = critical ? 'rgba(255, 50, 50, 0.32)' : 'rgba(255, 70, 70, 0.22)';
+    const stroke = critical ? '#ff2828' : '#ff4d4d';
+    const ringWidth = critical ? 4.4 : 3.2;
+    const ringAnimMin = critical ? '4.0' : '2.8';
+    const ringAnimMax = critical ? '5.2' : '3.8';
+    const badgeRadius = critical ? 7.5 : 6.5;
     return (
       <g key={`thr-${t.row}-${t.col}`} pointerEvents="none">
         {/* Soft red fill across the whole cell */}
@@ -710,7 +727,7 @@ export default function Board({
           width={CELL - 2}
           height={CELL - 2}
           rx={3}
-          fill="rgba(255, 70, 70, 0.22)"
+          fill={fill}
         />
         {/* Bright pulsing ring around the piece */}
         <circle
@@ -718,8 +735,8 @@ export default function Board({
           cy={cy}
           r={CELL * 0.44}
           fill="none"
-          stroke="#ff4d4d"
-          strokeWidth={3.2}
+          stroke={stroke}
+          strokeWidth={ringWidth}
         >
           <animate
             attributeName="opacity"
@@ -729,19 +746,19 @@ export default function Board({
           />
           <animate
             attributeName="stroke-width"
-            values="2.8;3.8;2.8"
+            values={`${ringAnimMin};${ringAnimMax};${ringAnimMin}`}
             dur="1.2s"
             repeatCount="indefinite"
           />
         </circle>
-        {/* Warning badge in the top-left corner */}
-        <circle cx={x + 8} cy={y + 8} r={6.5} fill="#ff4d4d" stroke="#1a0606" strokeWidth={0.8} />
+        {/* Warning badge in the top-left corner — bigger for criticals */}
+        <circle cx={x + 8} cy={y + 8} r={badgeRadius} fill={stroke} stroke="#1a0606" strokeWidth={0.8} />
         <text
           x={x + 8}
           y={y + 8.5}
           textAnchor="middle"
           dominantBaseline="central"
-          fontSize={9}
+          fontSize={critical ? 11 : 9}
           fontWeight={900}
           fontFamily="system-ui, sans-serif"
           fill="#ffffff"
@@ -752,6 +769,36 @@ export default function Board({
       </g>
     );
   });
+
+  // Flag-at-risk overlay — pulsing red border around the specific flag
+  // cell when an opponent Captain can capture it next move. Drawn
+  // before markers so the flag glyph reads on top of the warning.
+  const flagThreatEl = (() => {
+    if (!flagAtRisk) return null;
+    const x = ORIGIN_X + flagAtRisk.col * CELL;
+    const y = ORIGIN_Y + flagAtRisk.row * CELL;
+    return (
+      <g key="flag-at-risk" pointerEvents="none">
+        <rect
+          x={x + 1}
+          y={y + 1}
+          width={CELL - 2}
+          height={CELL - 2}
+          rx={3}
+          fill="rgba(255, 50, 50, 0.18)"
+          stroke="#ff2828"
+          strokeWidth={2.5}
+        >
+          <animate
+            attributeName="opacity"
+            values="0.4;1;0.4"
+            dur="1.0s"
+            repeatCount="indefinite"
+          />
+        </rect>
+      </g>
+    );
+  })();
 
   const selectionEl = selectedCell ? (
     <rect
@@ -1113,6 +1160,7 @@ export default function Board({
         {selectionEl}
         {liftEls}
         {nexusEls}
+        {flagThreatEl}
         {threatEls}
         {markerEls}
         {badgeEls}
