@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+  html, body { margin: 0; padding: 0; background: #04070f; }
+  body { width: 512px; height: 512px; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1a2a4a"/>
+      <stop offset="60%" stop-color="#0a1224"/>
+      <stop offset="100%" stop-color="#04070f"/>
+    </radialGradient>
+    <linearGradient id="space" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2a3a78"/>
+      <stop offset="100%" stop-color="#162048"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#4a5a98"/>
+      <stop offset="100%" stop-color="#2a3a78"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#a07840"/>
+      <stop offset="100%" stop-color="#604018"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffe27a"/>
+      <stop offset="50%" stop-color="#e9b94a"/>
+      <stop offset="100%" stop-color="#a07820"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square background mirrors iOS / Android icon shape so the
+       mark works as an app icon as well as a website logo. -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Subtle starfield in the upper half -->
+  <g fill="#ffffff" opacity="0.45">
+    <circle cx="80"  cy="60"  r="1.6"/>
+    <circle cx="160" cy="40"  r="1"/>
+    <circle cx="240" cy="80"  r="1.4"/>
+    <circle cx="340" cy="50"  r="1.2"/>
+    <circle cx="420" cy="70"  r="1.5"/>
+    <circle cx="120" cy="120" r="1"/>
+    <circle cx="380" cy="120" r="1.2"/>
+    <circle cx="60"  cy="180" r="1.3"/>
+    <circle cx="450" cy="160" r="1"/>
+  </g>
+
+  <!-- Three stacked layer boards, isometric. Space → Sky → Ground,
+       same order as the in-game world. -->
+  <g transform="translate(166, 80)">
+    <g transform="skewX(-22)">
+      <rect x="0" y="0" width="180" height="34" rx="5"
+            fill="url(#space)" stroke="#5a6ab0" stroke-width="2"/>
+      <!-- Nexus marker on Space -->
+      <circle cx="135" cy="17" r="6" fill="none" stroke="#e9b94a" stroke-width="2.5"/>
+      <circle cx="135" cy="17" r="2.5" fill="#e9b94a"/>
+    </g>
+  </g>
+  <g transform="translate(178, 138)">
+    <g transform="skewX(-22)">
+      <rect x="0" y="0" width="180" height="34" rx="5"
+            fill="url(#sky)" stroke="#7080c0" stroke-width="2"/>
+    </g>
+  </g>
+  <g transform="translate(190, 196)">
+    <g transform="skewX(-22)">
+      <rect x="0" y="0" width="180" height="34" rx="5"
+            fill="url(#ground)" stroke="#a07840" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- Gold flag rising above the topmost layer — the win condition. -->
+  <g transform="translate(240, 30)">
+    <circle cx="0" cy="40" r="40" fill="#e9b94a" opacity="0.10"/>
+    <circle cx="0" cy="40" r="22" fill="#e9b94a" opacity="0.20"/>
+    <rect x="-2" y="0" width="4" height="68" fill="url(#gold)"/>
+    <path d="M 2 5 L 40 18 L 2 31 Z" fill="url(#gold)"/>
+  </g>
+
+  <!-- Wordmark "3phor" centered below the glyph -->
+  <text x="256" y="370"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="100"
+        font-weight="700"
+        fill="url(#gold)"
+        text-anchor="middle"
+        letter-spacing="-2">3phor</text>
+
+  <!-- Edition tag -->
+  <text x="256" y="410"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="18"
+        font-style="italic"
+        fill="#c9b07a"
+        text-anchor="middle"
+        letter-spacing="6">KALEO  EDITION</text>
+
+  <!-- Single tagline line, tight and small -->
+  <text x="256" y="456"
+        font-family="-apple-system, 'Helvetica Neue', sans-serif"
+        font-size="16"
+        fill="#9aaad8"
+        text-anchor="middle"
+        letter-spacing="2">THREE LAYERS  ·  FOUR LIFTS  ·  ONE NEXUS</text>
+</svg>
+</body>
+</html>
