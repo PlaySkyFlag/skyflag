@@ -175,15 +175,21 @@ export default function Tournaments({ user, profile, inline = false, onOpenAccou
     setError(null);
     const startsAt = new Date();
     const endsAt = new Date(startsAt.getTime() + newDays * 86_400_000);
-    const { error: insertErr } = await supabase.from('tournaments').insert({
-      name: trimmedName,
-      description: newDesc.trim() || null,
-      starts_at: startsAt.toISOString(),
-      ends_at: endsAt.toISOString(),
-      is_paid: false,
-      entry_fee_cents: 0,
-      created_by: user.id,
-    });
+    // Use .select() so we get the new row's id back — needed to fire
+    // the fill-push fan-out below.
+    const { data: inserted, error: insertErr } = await supabase
+      .from('tournaments')
+      .insert({
+        name: trimmedName,
+        description: newDesc.trim() || null,
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt.toISOString(),
+        is_paid: false,
+        entry_fee_cents: 0,
+        created_by: user.id,
+      })
+      .select('id')
+      .maybeSingle();
     setBusy(false);
     if (insertErr) {
       // RLS rejects the insert when the user already has an active
@@ -200,6 +206,18 @@ export default function Tournaments({ user, profile, inline = false, onOpenAccou
     setNewDesc('');
     setNewDays(7);
     refresh();
+
+    // Fire-and-forget fan-out push to opted-in users. We don't block
+    // the UI on this; if the function fails (network blip, edge
+    // function down), the tournament still exists and players can
+    // discover it the normal way.
+    if (inserted?.id) {
+      void supabase.functions
+        .invoke('notify-tournament-fill', {
+          body: { tournament_id: inserted.id },
+        })
+        .catch(() => undefined);
+    }
   }, [user, newName, newDesc, newDays, refresh]);
 
   const cancelTournament = useCallback(
