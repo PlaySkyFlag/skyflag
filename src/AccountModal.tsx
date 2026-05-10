@@ -354,49 +354,14 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
         <PlusPanel />
 
         {/* Guest upgrade prompt — shown only when the signed-in user has
-            no email, i.e. they're an anonymous account. Lets them link
-            an email to make their rating + profile portable across
-            devices without losing what they've earned. */}
-        {!user.email && (
-          <div className="account-upgrade-panel">
-            <strong className="account-upgrade-title">Save this account</strong>
-            <p className="account-upgrade-body">
-              Guest accounts only live on this device — clear your browser data
-              and your rating is gone. Link an email to keep your profile,
-              rating, and friends across any device you sign in on.
-            </p>
-            <form
-              className="account-email-form"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (!email.trim()) return;
-                setBusy(true);
-                setMessage(null);
-                const r = await linkEmailToAnonymous(email.trim());
-                setBusy(false);
-                if (r.ok) {
-                  setMessage(`✓ Confirmation email sent to ${email.trim()}. Click the link to save your account.`);
-                } else {
-                  setMessage(`Couldn't link email: ${r.message}`);
-                }
-              }}
-            >
-              <input
-                id="account-upgrade-email"
-                className="account-input"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-              />
-              <button type="submit" className="end-game-btn" disabled={busy}>
-                {busy ? 'Sending…' : 'Save with email'}
-              </button>
-            </form>
-          </div>
-        )}
+            no email, i.e. they're an anonymous account. Owns its own
+            state machine: idle → sent (waiting on confirm-click in
+            THIS browser) → user.email !== null disappears the panel
+            automatically. The "this browser" warning is the load-bearing
+            UX: clicking the link in a different browser silently
+            orphans the guest data, since Supabase treats the click as
+            a new session in that browser. */}
+        {!user.email && <GuestUpgradePanel />}
         {loadingProfile ? (
           <p className="account-message">Loading profile…</p>
         ) : (
@@ -515,6 +480,143 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
 
         {message && <p className="account-message">{message}</p>}
       </div>
+    </div>
+  );
+}
+
+// Guest → email-account upgrade. Three internal states:
+//   idle    — show the email form with the "click in this browser" warning
+//   sending — disable form while the Supabase call is in flight
+//   sent    — show a waiting view: which address, resend cooldown, change-email
+// Once the user clicks the confirmation link IN THIS BROWSER, Supabase
+// updates user.email and onAuthStateChange fires, the parent
+// re-renders, and this component is no longer mounted — no explicit
+// "success" UI needed.
+function GuestUpgradePanel() {
+  const [phase, setPhase] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [emailInput, setEmailInput] = useState('');
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [linkSentAt, setLinkSentAt] = useState<number | null>(null);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (linkSentAt === null) {
+      setCooldown(0);
+      return;
+    }
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - linkSentAt) / 1000);
+      const left = Math.max(0, MAGIC_LINK_COOLDOWN_S - elapsed);
+      setCooldown(left);
+      if (left === 0) setLinkSentAt(null);
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [linkSentAt]);
+
+  const sendLink = async (addr: string) => {
+    setPhase('sending');
+    setMsg(null);
+    const r = await linkEmailToAnonymous(addr);
+    if (r.ok) {
+      setSentTo(addr);
+      setLinkSentAt(Date.now());
+      setPhase('sent');
+    } else {
+      // Friendlier copy for "already registered" — common pitfall:
+      // user previously had an email account, doesn't realize it.
+      const taken = /already.*registered|already.*exists|email.*taken/i.test(r.message);
+      setMsg(
+        taken
+          ? "That email is already registered. Sign out and sign back in with it instead — note: your current guest progress won't carry over."
+          : `Couldn't link email: ${r.message}`,
+      );
+      setPhase('idle');
+    }
+  };
+
+  if (phase === 'sent') {
+    return (
+      <div className="account-upgrade-panel account-upgrade-sent">
+        <strong className="account-upgrade-title">Check your email</strong>
+        <p className="account-upgrade-body">
+          We sent a confirmation link to <strong>{sentTo}</strong>.
+        </p>
+        <div className="account-upgrade-warning">
+          ⚠ <strong>Click the link IN THIS BROWSER</strong> (the one you're
+          reading this in). Opening the link on a different device or
+          browser will start a fresh account there instead of saving
+          your guest progress here.
+        </div>
+        <div className="account-data-actions">
+          <button
+            type="button"
+            className="hud-btn"
+            disabled={cooldown > 0}
+            onClick={() => sentTo && sendLink(sentTo)}
+          >
+            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend link'}
+          </button>
+          <button
+            type="button"
+            className="hud-btn hud-btn-subtle"
+            onClick={() => {
+              setPhase('idle');
+              setSentTo(null);
+              setLinkSentAt(null);
+              setMsg(null);
+            }}
+          >
+            Use a different email
+          </button>
+        </div>
+        {msg && <p className="account-message">{msg}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="account-upgrade-panel">
+      <strong className="account-upgrade-title">Save this account</strong>
+      <p className="account-upgrade-body">
+        Guest accounts only live on this device — clear your browser data
+        and your rating is gone. Link an email to keep your profile,
+        rating, and friends across any device you sign in on.
+      </p>
+      <form
+        className="account-email-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const addr = emailInput.trim();
+          if (!addr) return;
+          sendLink(addr);
+        }}
+      >
+        <input
+          id="account-upgrade-email"
+          className="account-input"
+          type="email"
+          required
+          autoComplete="email"
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
+          placeholder="you@example.com"
+        />
+        <button
+          type="submit"
+          className="end-game-btn"
+          disabled={phase === 'sending'}
+        >
+          {phase === 'sending' ? 'Sending…' : 'Save with email'}
+        </button>
+      </form>
+      <p className="account-upgrade-foot">
+        We'll send a confirmation link. <strong>Click it in this same
+        browser</strong> to merge your guest account with the email.
+      </p>
+      {msg && <p className="account-message">{msg}</p>}
     </div>
   );
 }

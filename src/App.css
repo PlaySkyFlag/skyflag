@@ -1644,6 +1644,39 @@ button.tray-piece:hover {
   opacity: 0.85;
 }
 
+/* Foot note under the pre-send form — reinforces the same-browser
+   requirement at the moment of submit. Smaller than the body. */
+.account-upgrade-foot {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+/* Post-send waiting state — slightly different chrome so it reads as
+   a status panel rather than a CTA. */
+.account-upgrade-sent {
+  background: rgba(255, 216, 132, 0.06);
+}
+
+/* The load-bearing "click in this browser" warning. High-contrast
+   amber so users don't miss it — silently orphaning the guest account
+   by clicking in a different browser is the single most common failure
+   in this flow. */
+.account-upgrade-warning {
+  background: rgba(255, 184, 0, 0.12);
+  border-left: 3px solid #ffb800;
+  padding: 10px 12px;
+  margin: 8px 0 12px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #ffe27a;
+  border-radius: 6px;
+}
+.account-upgrade-warning strong {
+  color: #ffd884;
+}
+
 /* Lobby — embedded in the Multiplayer panel above the code-based create
    /join controls when the user is signed in and not yet in a room. */
 .lobby {
