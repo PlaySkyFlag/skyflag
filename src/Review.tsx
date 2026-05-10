@@ -46,43 +46,8 @@ import type {
   Action,
 } from './game/reducer';
 import type { Coord, GameState, HistoryEntry, Layer, PieceKind, Player } from './game/types';
+import { loadReviewSession, type ReviewSession } from './game/reviewSession';
 import './App.css';
-
-// ── Session storage shape ───────────────────────────────────────
-// The "current game" handoff between App.tsx (where the game just
-// ended) and Review.tsx (the /review/current route). Stored in
-// sessionStorage so it survives the navigation but doesn't pollute
-// long-term localStorage.
-const REVIEW_SESSION_KEY = '3phor.review-session.v1';
-
-export type ReviewSession = {
-  history: HistoryEntry[];
-  finalState: GameState;
-  p1Nickname?: string;
-  p2Nickname?: string;
-  // Optional permalink slug — when the just-ended game was online
-  // MP, the App stashes the room code here so the Review URL can
-  // be shared with anyone.
-  roomCode?: string;
-};
-
-export function stashReviewSession(session: ReviewSession): void {
-  try {
-    sessionStorage.setItem(REVIEW_SESSION_KEY, JSON.stringify(session));
-  } catch {
-    /* private mode / quota — review just won't be available */
-  }
-}
-
-function loadReviewSession(): ReviewSession | null {
-  try {
-    const raw = sessionStorage.getItem(REVIEW_SESSION_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as ReviewSession;
-  } catch {
-    return null;
-  }
-}
 
 // ── Board rendering helpers (mirrored from Watch.tsx) ──────────
 const LAYER_NAMES: Record<Layer, string> = {

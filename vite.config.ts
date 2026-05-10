@@ -25,4 +25,27 @@ export default defineConfig({
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     __GIT_SHA__: JSON.stringify(gitShortSha()),
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Force React + JSX runtime into a dedicated vendor chunk.
+        // Without this, Rollup's auto-chunking was placing the JSX
+        // runtime in the entry chunk while a shared `themes` chunk
+        // depended on it via a top-level call. Under some load
+        // orderings the export wasn't initialized in time, surfacing
+        // as a hard "e is not a function" crash on production.
+        // Putting React in its own vendor chunk gives every consumer
+        // a fully-initialized namespace before they evaluate.
+        manualChunks(id) {
+          if (
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/scheduler/')
+          ) {
+            return 'react-vendor';
+          }
+        },
+      },
+    },
+  },
 })

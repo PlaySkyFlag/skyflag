@@ -3,7 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import { sendRequest } from './game/friends';
 import { supabase } from './game/supabase';
 import type { GameState, GameStatus, Player, RoomState } from './game/types';
-import { stashReviewSession } from './Review';
+import { stashReviewSession } from './game/reviewSession';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
