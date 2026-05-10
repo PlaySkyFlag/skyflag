@@ -71,15 +71,22 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    // Pre-fill the email on the Stripe checkout when we have a real
+    // one. Anonymous users have email === '' not null, so a plain
+    // `?? undefined` would forward an empty string — which Stripe
+    // rejects with "Invalid email address". Use a stricter guard.
+    const validEmail =
+      typeof caller.user.email === 'string' &&
+      caller.user.email.includes('@')
+        ? caller.user.email
+        : undefined;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: price_id, quantity: 1 }],
       success_url,
       cancel_url,
-      // Pre-fill the email field on the Stripe checkout for a smoother
-      // signed-in experience. Anonymous users (no email) get an empty
-      // field and Stripe asks them to enter one.
-      customer_email: caller.user.email ?? undefined,
+      customer_email: validEmail,
       // Metadata threads the Supabase user id through Stripe's records
       // so the webhook can map the resulting subscription back to the
       // right user. Set on BOTH the session and the subscription_data
