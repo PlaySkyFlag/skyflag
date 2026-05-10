@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import { sendRequest } from './game/friends';
 import { supabase } from './game/supabase';
 import type { GameState, GameStatus, Player, RoomState } from './game/types';
+import { stashReviewSession } from './Review';
 
 const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
 
@@ -102,6 +103,28 @@ export default function EndGameOverlay({ state, user, room, onPlayAgain }: Props
         <div className="end-game-actions">
           <button type="button" className="end-game-btn" onClick={onPlayAgain}>
             Play again
+          </button>
+          {/* Review opens a dedicated /review/<slug> route that
+              walks through every move with engine analysis. The
+              session handoff is via sessionStorage so 1P / 2P
+              local games (no DB record) can also be reviewed. */}
+          <button
+            type="button"
+            className="end-game-btn end-game-btn--subtle"
+            onClick={() => {
+              stashReviewSession({
+                history: state.history,
+                finalState: state,
+                roomCode: room?.code,
+              });
+              // Hard navigation — the /review route is its own lazy
+              // chunk and main.tsx dispatches off window.location.
+              window.location.assign(
+                room ? `/review/${room.code}` : '/review/current',
+              );
+            }}
+          >
+            📊 Review this game
           </button>
           {user && opponentId && (
             <button

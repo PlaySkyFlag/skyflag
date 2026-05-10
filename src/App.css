@@ -2320,6 +2320,182 @@ button.tray-piece:hover {
   color: #ffd884;
   font-weight: 600;
 }
+
+/* ── Game review (/review/<slug>) ─────────────────────────────────
+   Layout mirrors the Watch route — three boards + a side panel of
+   per-move analysis. Distinct CSS class names so the watch view
+   stays a clean read-only spectator surface. */
+.review-app {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.review-roomcode {
+  opacity: 0.7;
+  font-weight: 400;
+}
+.review-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 10px 14px;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+.review-summary-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 240px;
+}
+.review-summary-label {
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+}
+.review-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+.review-summary-cell strong {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.review-progress {
+  padding: 10px 14px;
+  background: rgba(255, 216, 132, 0.06);
+  border: 1px solid rgba(255, 216, 132, 0.20);
+  border-radius: 10px;
+  font-size: 0.92rem;
+}
+.review-progress-bar {
+  margin-top: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.review-progress-fill {
+  height: 100%;
+  background: #ffd884;
+  transition: width 120ms ease-out;
+}
+
+.review-annotation {
+  padding: 12px 14px;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.review-annotation-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.review-annotation-line code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+.review-annotation-best {
+  opacity: 0.85;
+}
+.review-annotation-meta {
+  font-size: 0.78rem;
+  opacity: 0.6;
+  letter-spacing: 0.04em;
+}
+
+.review-scrubber {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.review-slider {
+  flex: 1;
+  min-width: 160px;
+  accent-color: #ffd884;
+}
+.review-ply-counter {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+.review-movelist {
+  padding: 10px 14px;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.review-movelist-title {
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+.review-movelist-ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.review-move-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+.review-move-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.review-move-row-active {
+  background: rgba(255, 216, 132, 0.10);
+  outline: 1px solid rgba(255, 216, 132, 0.30);
+}
+.review-move-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+.review-move-pip-p1 { background: var(--slate-fill); }
+.review-move-pip-p2 { background: var(--ivory-fill); }
+.review-move-num {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+  min-width: 32px;
+}
+.review-move-desc {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.84rem;
+}
+.review-move-class {
+  font-weight: 600;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
 .account-delete-confirm {
   width: 100%;
   display: flex;

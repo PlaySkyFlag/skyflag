@@ -852,6 +852,11 @@ export default function App() {
       if (cancelled) return;
       if (event.data.id !== requestId) return;
       worker.removeEventListener('message', handleMessage);
+      // Worker can also return 'analysis' responses now (used by the
+      // post-game review flow). The AI-turn path only ever sends
+      // 'choose' requests so 'action' is the expected type, but guard
+      // anyway in case a stray analysis response slips through.
+      if (event.data.type !== 'action') return;
       dispatch(event.data.action ?? { type: 'end-turn' });
     };
     worker.addEventListener('message', handleMessage);

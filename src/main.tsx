@@ -11,6 +11,7 @@ import { migrateLocalStorage } from './game/migrate.ts'
 // biggest single perf win available without further restructuring.
 const App = lazy(() => import('./App.tsx'))
 const Landing = lazy(() => import('./Landing.tsx'))
+const Review = lazy(() => import('./Review.tsx'))
 const Story = lazy(() => import('./Story.tsx'))
 const Watch = lazy(() => import('./Watch.tsx'))
 
@@ -26,9 +27,11 @@ const path = window.location.pathname;
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
+const isReview = path.startsWith('/review');
 
 let rendered;
-if (isWatch) rendered = <Watch />;
+if (isReview) rendered = <Review />;
+else if (isWatch) rendered = <Watch />;
 else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
 else rendered = <Landing />;
