@@ -39,7 +39,7 @@ export default class ErrorBoundary extends Component<Props, State> {
         <div className="error-boundary-card">
           <h2 className="error-boundary-title">Something broke.</h2>
           <p className="error-boundary-msg">
-            SkyFlag hit an unexpected error. Your local game is saved — a
+            3xedra hit an unexpected error. Your local game is saved — a
             reload usually clears it.
           </p>
           <pre className="error-boundary-trace">{this.state.error.message}</pre>

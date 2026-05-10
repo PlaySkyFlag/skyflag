@@ -973,7 +973,7 @@ export default function App() {
       <header className="app-header">
         <img
           src="/skyflag-logo.png"
-          alt="SkyFlag"
+          alt="3xedra"
           className="app-logo"
           width={120}
           height={120}
@@ -1352,10 +1352,10 @@ export default function App() {
       />
       <StatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
       <footer className="app-footer">
-        <p>© 2026 Limnology Research Corp. · SkyFlag™ Kaleo Edition.</p>
+        <p>© 2026 Limnology Research Corp. · 3xedra™ Kaleo Edition.</p>
         <p>
           Test feedback:{' '}
-          <a href="mailto:njatel@limnology.ca?subject=SkyFlag%20Test%20Feedback">
+          <a href="mailto:njatel@limnology.ca?subject=3xedra%20Test%20Feedback">
             njatel@limnology.ca
           </a>
         </p>

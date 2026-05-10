@@ -46,7 +46,7 @@ function StoryHeader() {
   return (
     <header className="story-header">
       <div className="story-header-inner">
-        <a href="/" className="story-back">← SkyFlag</a>
+        <a href="/" className="story-back">← 3xedra</a>
         <div className="story-header-meta">Volume One · Kaleo Edition</div>
         <a href="/play" className="story-cta-button">Play</a>
       </div>
@@ -58,7 +58,7 @@ function StoryFooter() {
   return (
     <footer className="story-footer">
       <div className="story-footer-inner">
-        <p className="story-footer-mark">SkyFlag — The Three Seals of Kaleo</p>
+        <p className="story-footer-mark">3xedra — The Three Seals of Kaleo</p>
         <p className="story-footer-meta">
           Storybook v3 · Kaleo Edition · © {new Date().getFullYear()} Limnology Research Corp.
         </p>
@@ -78,7 +78,7 @@ function Cover() {
       <div className="story-cover-glyph" aria-hidden="true">
         <ThreeLayersGlyph />
       </div>
-      <p className="story-cover-eyebrow">SkyFlag · Volume One</p>
+      <p className="story-cover-eyebrow">3xedra · Volume One</p>
       <h1 className="story-cover-title">The Three Seals<br />of Kaleo</h1>
       <p className="story-cover-subtitle">A story of the First Reclamation</p>
       <div className="story-cover-divider" aria-hidden="true">· · ·</div>

@@ -69,11 +69,11 @@ export default function Help({ inline = false }: Props) {
           Want the full story and complete rules?{' '}
           <a
             href="/skyflag-rulebook.pdf"
-            download="SkyFlag-Rulebook.pdf"
+            download="3xedra-Rulebook.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Download the SkyFlag rulebook (PDF)
+            Download the 3xedra rulebook (PDF)
           </a>
           .
         </p>

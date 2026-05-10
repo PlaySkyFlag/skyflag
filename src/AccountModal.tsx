@@ -84,7 +84,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
       <div className="account-overlay" role="dialog" aria-modal="true">
         <div className="account-card">
           <div className="account-header">
-            <h2 className="account-title">Welcome to SkyFlag</h2>
+            <h2 className="account-title">Welcome to 3xedra</h2>
             <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
           </div>
           <p className="account-intro">
@@ -388,15 +388,15 @@ function PlusPanel() {
   if (hasPlus) {
     return (
       <div className="account-plus-panel account-plus-active">
-        <strong>★ SkyFlag Plus active</strong>
-        <p>Thanks for supporting SkyFlag. All Plus features unlocked.</p>
+        <strong>★ 3xedra Plus active</strong>
+        <p>Thanks for supporting 3xedra. All Plus features unlocked.</p>
       </div>
     );
   }
 
   return (
     <div className="account-plus-panel">
-      <strong className="account-plus-title">SkyFlag Plus</strong>
+      <strong className="account-plus-title">3xedra Plus</strong>
       <p className="account-plus-body">
         Unlock advanced AI difficulty, puzzle archive with analysis,
         custom themes, ad-free play, and unlimited tournaments.

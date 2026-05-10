@@ -114,13 +114,13 @@ function Header() {
   return (
     <header className="landing-header">
       <div className="landing-header-inner">
-        <a href="/" className="landing-logo" aria-label="SkyFlag — home">
+        <a href="/" className="landing-logo" aria-label="3xedra — home">
           <img
             src="/skyflag-logo.png"
             alt=""
             className="landing-logo-img"
           />
-          <span className="landing-logo-text">SkyFlag</span>
+          <span className="landing-logo-text">3xedra</span>
         </a>
         <nav className="landing-nav">
           <a href="#features" className="landing-nav-link">Features</a>
@@ -143,9 +143,9 @@ function Hero() {
           className="landing-hero-logo"
           aria-hidden="true"
         />
-        <h1 className="landing-hero-title">SkyFlag</h1>
+        <h1 className="landing-hero-title">3xedra</h1>
         <p className="landing-hero-subtitle">
-          A world suspended above a world that failed.
+          Where strategists gather. Three layers. Four Lifts. One Exedra.
         </p>
         <p className="landing-hero-pitch">
           A turn-based strategy game set in Kaleo, the three-layer arcology
@@ -174,7 +174,7 @@ function FeaturesSection() {
   return (
     <section id="features" className="landing-section">
       <div className="landing-section-inner">
-        <h2 className="landing-section-title">What makes SkyFlag different</h2>
+        <h2 className="landing-section-title">What makes 3xedra different</h2>
         <div className="landing-features-grid">
           <Feature
             icon="◇◆◇"
@@ -289,7 +289,7 @@ function PricingSection() {
           </div>
           <div className="landing-pricing-tier landing-pricing-featured">
             <div className="landing-tier-badge">Plus</div>
-            <div className="landing-tier-name">SkyFlag Plus</div>
+            <div className="landing-tier-name">3xedra Plus</div>
             <div className="landing-tier-price">
               <span className="landing-tier-price-num">$4.99</span>
               <span className="landing-tier-price-period">/ month</span>
@@ -384,7 +384,7 @@ function DemoAsset() {
       <img
         className="landing-demo-gif"
         src="/demo.gif"
-        alt="SkyFlag gameplay demo"
+        alt="3xedra gameplay demo"
         style={{ display: 'none' }}
         onError={(e) => {
           // No demo.gif either — hide entirely, leaving just the live
@@ -401,7 +401,7 @@ function Footer() {
     <footer className="landing-footer">
       <div className="landing-footer-inner">
         <div className="landing-footer-brand">
-          <strong>SkyFlag</strong>
+          <strong>3xedra</strong>
           <p>By Limnology Research Corp.</p>
         </div>
         <div className="landing-footer-links">
