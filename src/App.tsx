@@ -1256,13 +1256,9 @@ export default function App() {
               👁 {watcherCount} watching
             </span>
           )}
-          <a
-            href="/"
-            className="hud-btn app-header-site"
-            title="Visit playskyflag.com — the public website"
-          >
-            playskyflag.com
-          </a>
+          {/* Public-website link removed for header-density cleanup —
+              the footer's link back to the marketing page covers
+              the same need without crowding the action row. */}
           <button
             type="button"
             className="hud-btn app-header-account"
