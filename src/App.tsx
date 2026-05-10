@@ -686,8 +686,14 @@ export default function App() {
         }, 50);
       });
 
+    // Per-effect-run suffix on the topic so StrictMode double-mount
+    // (or any future duplicate subscriber) can't trigger the
+    // "cannot add postgres_changes callbacks after subscribe()"
+    // collision pattern. Filter is room_code-based, so multiple
+    // unique topics still receive the same UPDATE events.
+    const roomSuffix = Math.random().toString(36).slice(2, 10);
     const channel = sb
-      .channel(`room:${room.code}`)
+      .channel(`room:${room.code}:${roomSuffix}`)
       .on(
         'postgres_changes',
         {

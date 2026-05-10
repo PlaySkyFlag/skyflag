@@ -159,9 +159,11 @@ export default function Watch() {
     // namespace but use distinct topics, so supabase-js doesn't
     // dedupe them into a single shared instance (see the
     // `room:` ↔ `room-broadcast:` split in App.tsx for the same
-    // bug class).
+    // bug class). Per-effect-run suffix on the postgres topic so
+    // StrictMode double-mount can't collide either.
+    const watchSuffix = Math.random().toString(36).slice(2, 10);
     const channel = sb
-      .channel(`watch:${roomCode}`)
+      .channel(`watch:${roomCode}:${watchSuffix}`)
       .on(
         'postgres_changes',
         {
