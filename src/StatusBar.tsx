@@ -51,21 +51,18 @@ export default function StatusBar({ state, aiPlayer }: Props) {
   const acts = state.activationsRemaining;
   const isAiTurn = aiPlayer === state.currentPlayer;
   return (
-    <>
-      <div className="hud-current">
-        <span className={`hud-pip hud-pip-${state.currentPlayer}`} aria-hidden />
-        <strong>{PLAYER_NAME[state.currentPlayer]}</strong>
-        <span className="hud-current-verb">{isAiTurn ? 'thinking…' : 'to move'}</span>
-      </div>
-      <div className="hud">
-        <span className="hud-section">
-          {acts} activation{acts === 1 ? '' : 's'} left
-        </span>
-        <span className="hud-divider">·</span>
-        <span className="hud-section">
-          Turn {state.turnNumber} / {TURN_LIMIT}
-        </span>
-      </div>
-    </>
+    <div className="hud hud-current-combined">
+      <span className={`hud-pip hud-pip-${state.currentPlayer}`} aria-hidden />
+      <strong>{PLAYER_NAME[state.currentPlayer]}</strong>
+      <span className="hud-current-verb">{isAiTurn ? 'thinking…' : 'to move'}</span>
+      <span className="hud-divider">·</span>
+      <span className="hud-section">
+        {acts} activation{acts === 1 ? '' : 's'} left
+      </span>
+      <span className="hud-divider">·</span>
+      <span className="hud-section">
+        Turn {state.turnNumber} / {TURN_LIMIT}
+      </span>
+    </div>
   );
 }

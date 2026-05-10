@@ -155,6 +155,11 @@ export default function Watch() {
         }
       });
 
+    // Postgres-changes channel and presence channel share a topic
+    // namespace but use distinct topics, so supabase-js doesn't
+    // dedupe them into a single shared instance (see the
+    // `room:` ↔ `room-broadcast:` split in App.tsx for the same
+    // bug class).
     const channel = sb
       .channel(`watch:${roomCode}`)
       .on(
@@ -176,9 +181,27 @@ export default function Watch() {
       )
       .subscribe();
 
+    // Presence channel — the spectator tracks themselves on a
+    // per-room presence channel so the players' clients can count
+    // viewers and show a "X watching" pill. Uses a random key so
+    // the same user across multiple tabs registers as multiple
+    // distinct presences (matches what the players will count as
+    // "people watching", not "users watching").
+    const presenceKey = `s_${Math.random().toString(36).slice(2, 10)}`;
+    const presenceChannel = sb
+      .channel(`watch-presence:${roomCode}`, {
+        config: { presence: { key: presenceKey } },
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({ at: Date.now() });
+        }
+      });
+
     return () => {
       mounted = false;
       sb.removeChannel(channel);
+      sb.removeChannel(presenceChannel);
     };
   }, [roomCode]);
 

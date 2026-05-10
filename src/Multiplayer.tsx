@@ -23,8 +23,18 @@ export type { RoomState };
 // accidentally re-joined by someone with the same userId.
 const ROOM_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
+type RoomMeta = {
+  is_public: boolean;
+  p1_public_opt_in: boolean;
+  p2_public_opt_in: boolean;
+};
+
 type Props = {
   room: RoomState | null;
+  // Public-spectating flags on the games row, plumbed in from App. Used
+  // to render the per-side opt-in toggle and the "Game is public"
+  // indicator inside the in-room panel.
+  roomMeta?: RoomMeta | null;
   // When true, the Multiplayer panel is forced open even outside a room.
   // Used so picking "2P" mode auto-expands the panel and shows the lobby
   // / room-code controls (the user can either play hot-seat OR online).
@@ -85,6 +95,14 @@ function NotificationsControl() {
   // this platform. Drives the toggle between Enable and Disable.
   const [subscribed, setSubscribed] = useState<boolean>(false);
 
+  // Tournament-fill opt-in. Stored as a flag on profiles so the
+  // notify-tournament-fill edge function (service-role) can fan out
+  // without needing to read per-user prefs. We surface it inside the
+  // "subscribed" branch so it's only shown to users for whom push
+  // actually works.
+  const [notifyFill, setNotifyFill] = useState<boolean>(false);
+  const [notifyFillBusy, setNotifyFillBusy] = useState(false);
+
   useEffect(() => {
     if (platform === 'web') setPermission(getPermissionState());
   }, [platform]);
@@ -111,6 +129,43 @@ function NotificationsControl() {
       cancelled = true;
     };
   }, [authUser, platform]);
+
+  // Read the tournament-fill opt-in flag from profiles. Doesn't depend
+  // on platform — the flag is global, even though the UI only shows it
+  // when push is enabled on the current device.
+  useEffect(() => {
+    if (!authUser || !supabase) {
+      setNotifyFill(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('notify_tournament_fill')
+        .eq('id', authUser.id)
+        .maybeSingle();
+      if (!cancelled) setNotifyFill(!!data?.notify_tournament_fill);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser]);
+
+  const toggleNotifyFill = async (next: boolean) => {
+    if (!authUser || !supabase) return;
+    setNotifyFillBusy(true);
+    const { error: updErr } = await supabase
+      .from('profiles')
+      .update({ notify_tournament_fill: next })
+      .eq('id', authUser.id);
+    setNotifyFillBusy(false);
+    if (updErr) {
+      setMessage(`Couldn't save preference: ${updErr.message}`);
+      return;
+    }
+    setNotifyFill(next);
+  };
 
   const onDisable = async () => {
     if (!authUser || !supabase) return;
@@ -160,6 +215,15 @@ function NotificationsControl() {
         <p className="mp-note">
           ✓ Notifications enabled. You'll be pinged when it's your turn.
         </p>
+        <label className="mp-notify-pref">
+          <input
+            type="checkbox"
+            checked={notifyFill}
+            disabled={notifyFillBusy}
+            onChange={(e) => toggleNotifyFill(e.target.checked)}
+          />
+          <span>Also notify me when a new tournament opens</span>
+        </label>
         <button
           type="button"
           className="hud-btn hud-btn-subtle"
@@ -272,7 +336,88 @@ function NotificationsControl() {
   );
 }
 
-export default function Multiplayer({ room, forceOpen = false, onRoomEntered, onLeave, onPresenceChange, inline = false }: Props) {
+// Per-side opt-in to public spectating. Both players must opt in before
+// `is_public` flips on (enforced by the games_reconcile_public_trg
+// trigger in migration 020). Either side can withdraw at any time.
+//
+// Tournament games are forced public by the v1 trigger and can't be
+// taken private by withdrawing — the toggle is hidden in that case.
+function SpectatorOptInControl({
+  room,
+  meta,
+}: {
+  room: RoomState;
+  meta: RoomMeta;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const myOptIn = room.role === 'p1' ? meta.p1_public_opt_in : meta.p2_public_opt_in;
+  const oppOptIn = room.role === 'p1' ? meta.p2_public_opt_in : meta.p1_public_opt_in;
+  // is_public=true with neither side's opt-in flag set means the v1
+  // trigger forced it public (shared tournament). Hide the toggle in
+  // that case so a player can't get a misleading "you opted in" UI.
+  const tournamentForced = meta.is_public && !meta.p1_public_opt_in && !meta.p2_public_opt_in;
+
+  if (tournamentForced) {
+    return (
+      <p className="mp-note">
+        🏆 Tournament game — public for spectators automatically.
+      </p>
+    );
+  }
+
+  const toggle = async () => {
+    if (!supabase) return;
+    setBusy(true);
+    setError(null);
+    const col = room.role === 'p1' ? 'p1_public_opt_in' : 'p2_public_opt_in';
+    const { error: updErr } = await supabase
+      .from('games')
+      .update({ [col]: !myOptIn })
+      .eq('room_code', room.code);
+    setBusy(false);
+    if (updErr) {
+      setError(`Couldn't update: ${updErr.message}`);
+    }
+    // No local state update — App's postgres_changes subscription will
+    // push the new flags down through props within ~50ms.
+  };
+
+  return (
+    <div className="mp-spec-optin">
+      {meta.is_public ? (
+        <p className="mp-note">👁 This game is public — anyone can watch live.</p>
+      ) : myOptIn ? (
+        <p className="mp-note">
+          You're OK with making this game public. Waiting for your opponent to agree.
+        </p>
+      ) : oppOptIn ? (
+        <p className="mp-note">
+          Your opponent has opted in to public spectating. Agree to allow viewers.
+        </p>
+      ) : (
+        <p className="mp-note">
+          Want spectators? Both players need to opt in to make the game watchable.
+        </p>
+      )}
+      <button
+        type="button"
+        className={`hud-btn ${myOptIn ? 'hud-btn-subtle' : ''}`}
+        disabled={busy}
+        onClick={toggle}
+      >
+        {busy
+          ? 'Saving…'
+          : myOptIn
+          ? 'Make this game private (only me)'
+          : 'Allow spectators (my side)'}
+      </button>
+      {error && <p className="mp-error">⚠ {error}</p>}
+    </div>
+  );
+}
+
+export default function Multiplayer({ room, roomMeta = null, forceOpen = false, onRoomEntered, onLeave, onPresenceChange, inline = false }: Props) {
   const { user: authUser } = useAuthUser();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [code, setCode] = useState('');
@@ -478,6 +623,9 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
                 : 'Opponent connected — game in progress.'}
             </p>
             <NotificationsControl />
+            {roomMeta && room.status !== 'waiting' && (
+              <SpectatorOptInControl room={room} meta={roomMeta} />
+            )}
             <button type="button" className="hud-btn hud-btn-subtle" onClick={onLeave}>
               Leave room
             </button>

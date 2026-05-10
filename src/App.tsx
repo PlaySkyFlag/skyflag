@@ -272,6 +272,15 @@ export default function App() {
   const [room, setRoom] = useState<RoomState | null>(
     INITIAL_SESSION?.room ?? null,
   );
+  // Per-room public-spectator flags. Populated from the games row hydrate
+  // and refreshed from postgres_changes; null when not in a room. Plumbed
+  // into Multiplayer so the in-room panel can show the opt-in toggle and
+  // the "Game is public" indicator.
+  const [roomMeta, setRoomMeta] = useState<{
+    is_public: boolean;
+    p1_public_opt_in: boolean;
+    p2_public_opt_in: boolean;
+  } | null>(null);
   // Mirror of the lobby:global presence set, populated by Lobby and read
   // by Friends so its online dots reflect the same channel without
   // spinning up a duplicate subscription.
@@ -642,7 +651,7 @@ export default function App() {
 
     sb
       .from('games')
-      .select('state, p2_id')
+      .select('state, p2_id, is_public, p1_public_opt_in, p2_public_opt_in')
       .eq('room_code', room.code)
       .single()
       .then(({ data, error }) => {
@@ -655,6 +664,11 @@ export default function App() {
             ? { ...prev, status: 'playing' }
             : prev,
         );
+        setRoomMeta({
+          is_public: !!data.is_public,
+          p1_public_opt_in: !!data.p1_public_opt_in,
+          p2_public_opt_in: !!data.p2_public_opt_in,
+        });
         // Clear the flag on the next tick so the push effect (which runs
         // after this dispatch's re-render) doesn't echo this state back.
         setTimeout(() => {
@@ -676,6 +690,9 @@ export default function App() {
           const newRow = payload.new as {
             state: GameState;
             p2_id: string | null;
+            is_public: boolean;
+            p1_public_opt_in: boolean;
+            p2_public_opt_in: boolean;
           };
           remoteSyncInFlight.current = true;
           dispatch({ type: 'remote-sync', state: newRow.state });
@@ -685,6 +702,11 @@ export default function App() {
               ? { ...prev, status: 'playing' }
               : prev,
           );
+          setRoomMeta({
+            is_public: !!newRow.is_public,
+            p1_public_opt_in: !!newRow.p1_public_opt_in,
+            p2_public_opt_in: !!newRow.p2_public_opt_in,
+          });
           setTimeout(() => {
             remoteSyncInFlight.current = false;
           }, 50);
@@ -941,11 +963,16 @@ export default function App() {
   // Per-room broadcast channel for draw offers (and future room-scoped
   // events: chat, takeback requests, etc.). Separate from the postgres-
   // changes subscription that syncs game state.
+  //
+  // Topic must NOT match the state-sync channel's `room:${code}` —
+  // supabase-js dedupes channels by topic, so reusing the same topic
+  // returns the already-subscribed instance and the second `.on()`
+  // call throws "cannot add callbacks after subscribe()".
   const drawChannelRef = useRef<ReturnType<NonNullable<typeof supabase>['channel']> | null>(null);
   useEffect(() => {
     if (!supabase || !room) return;
     const sb = supabase;
-    const channel = sb.channel(`room:${room.code}`);
+    const channel = sb.channel(`room-broadcast:${room.code}`);
     drawChannelRef.current = channel;
     channel
       .on('broadcast', { event: 'draw-offer' }, ({ payload }) => {
@@ -969,6 +996,45 @@ export default function App() {
     return () => {
       channel.unsubscribe();
       drawChannelRef.current = null;
+    };
+  }, [room]);
+
+  // Count of spectators currently watching this room. Mirrors the
+  // presence channel that Watch.tsx tracks itself on, so we don't
+  // need a server-side viewer counter. The pill only renders when
+  // count > 0 so the HUD stays clean for private games.
+  const [watcherCount, setWatcherCount] = useState(0);
+  useEffect(() => {
+    if (!supabase || !room) {
+      setWatcherCount(0);
+      return;
+    }
+    const sb = supabase;
+    const channel = sb
+      .channel(`watch-presence:${room.code}`, {
+        config: { presence: { key: `player_${room.role}` } },
+      })
+      .on('presence', { event: 'sync' }, () => {
+        const raw = channel.presenceState() as Record<string, unknown[]>;
+        let viewers = 0;
+        for (const [key, arr] of Object.entries(raw)) {
+          // Skip the player keys we register so two players don't
+          // count each other as spectators.
+          if (key.startsWith('player_')) continue;
+          viewers += arr.length;
+        }
+        setWatcherCount(viewers);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          // Track ourselves so the OTHER player's `sync` handler can
+          // skip us via the `player_` key prefix. Without tracking
+          // we'd be invisible and they'd never trigger a re-sync.
+          await channel.track({ at: Date.now() });
+        }
+      });
+    return () => {
+      sb.removeChannel(channel);
     };
   }, [room]);
 
@@ -1178,6 +1244,18 @@ export default function App() {
               )}
             </button>
           )}
+          {/* Live spectator count for the current room. Only renders when
+              someone is actually watching, so the HUD stays clean for
+              private games and empty rooms. */}
+          {room && watcherCount > 0 && (
+            <span
+              className="hud-btn app-header-watching"
+              title={`${watcherCount} ${watcherCount === 1 ? 'spectator is' : 'spectators are'} watching this game`}
+              aria-live="polite"
+            >
+              👁 {watcherCount} watching
+            </span>
+          )}
           <a
             href="/"
             className="hud-btn app-header-site"
@@ -1219,7 +1297,11 @@ export default function App() {
           />
         </div>
       </header>
-      <StatusBar state={state} aiPlayer={aiPlayer} />
+      {/* StatusBar moved into Sidebar (under the tab bar) so the
+          "<Side> to move · N activations left · Turn …" status sits
+          next to the panel switcher rather than floating above the
+          boards on its own. The `<header>` already establishes
+          identity; the status strip belongs with the controls. */}
       <GameToolbar
         gameOver={state.status.kind !== 'in-progress'}
         clockOption={clockOption}
@@ -1321,9 +1403,11 @@ export default function App() {
         authUser={authUser}
         profile={profile}
         room={room}
+        roomMeta={roomMeta}
         history={state.history}
         onlineIds={lobbyOnlineIds}
         aiPlayer={aiPlayer}
+        statusBar={<StatusBar state={state} aiPlayer={aiPlayer} />}
         onRoomEntered={setRoom}
         onLeaveRoom={() => setRoom(null)}
         onPresenceChange={setLobbyOnlineIds}

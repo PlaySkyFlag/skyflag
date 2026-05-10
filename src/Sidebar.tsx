@@ -21,13 +21,24 @@ import { useEffect, useState } from 'react';
 
 type TabId = 'rules' | 'multiplayer' | 'history' | 'tournaments' | 'friends' | 'spectate' | 'chat';
 
+type RoomMeta = {
+  is_public: boolean;
+  p1_public_opt_in: boolean;
+  p2_public_opt_in: boolean;
+};
+
 type Props = {
   authUser: User | null;
   profile: Profile | null;
   room: RoomState | null;
+  roomMeta: RoomMeta | null;
   history: HistoryEntry[];
   onlineIds: Set<string>;
   aiPlayer: import('./game/types').Player | null;
+  // Combined "<Side> to move · N activations left · Turn …" indicator,
+  // rendered right under the tab bar so the player's most-watched piece
+  // of state lives next to the panel controls.
+  statusBar?: import('react').ReactNode;
   onRoomEntered: (room: RoomState) => void;
   onLeaveRoom: () => void;
   onPresenceChange: (ids: Set<string>) => void;
@@ -45,9 +56,11 @@ export default function Sidebar({
   authUser,
   profile,
   room,
+  roomMeta,
   history,
   onlineIds,
   aiPlayer,
+  statusBar,
   onRoomEntered,
   onLeaveRoom,
   onPresenceChange,
@@ -98,6 +111,7 @@ export default function Sidebar({
           <Multiplayer
             inline
             room={room}
+            roomMeta={roomMeta}
             forceOpen
             onRoomEntered={onRoomEntered}
             onLeave={onLeaveRoom}
@@ -159,6 +173,8 @@ export default function Sidebar({
     <section className="sidebar" aria-label="Game panels">
       <nav className="sidebar-tabs" role="tablist">
         {tab('rules', '📖 Rules')}
+        {/* Tabs are declared first; the status strip renders directly
+            after the </nav> so it sits visually under the tab bar. */}
         <button
           type="button"
           className="sidebar-tab"
@@ -192,6 +208,7 @@ export default function Sidebar({
           </button>
         )}
       </nav>
+      {statusBar && <div className="sidebar-status">{statusBar}</div>}
       {active && <div className="sidebar-panel">{panel}</div>}
     </section>
   );

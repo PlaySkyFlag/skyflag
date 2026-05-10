@@ -351,6 +351,27 @@
   border: 1px solid rgba(245, 195, 67, 0.45);
 }
 
+/* Combined "<Side> to move · N activations left · Turn N/200" strip
+   that lives under the Sidebar tab bar. Slimmer padding than the
+   default .hud since it shares vertical space with the tabs. */
+.hud-current-combined {
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border-radius: 12px;
+}
+.hud-current-combined .hud-current-verb {
+  opacity: 0.78;
+  font-weight: 500;
+}
+
+/* Wrapper for the status strip when rendered inside Sidebar — adds a
+   small top margin so it doesn't crowd the tab bar. */
+.sidebar-status {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+
 .hud-btn {
   font: inherit;
   font-size: 0.85rem;
@@ -1077,6 +1098,22 @@ button.tray-piece:hover {
   line-height: 1.4;
 }
 
+.mp-notify-pref {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.92;
+}
+
+.mp-notify-pref input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #ffd884;
+}
+
 /* Layer-flow overlay: SVG positioned to cover the entire .board-stack so
    the curved arrows can span Ground ↔ Sky ↔ Space at the right scale.
    Rendered first in DOM (before the board items) so it paints BEHIND
@@ -1787,6 +1824,28 @@ button.tray-piece:hover {
   letter-spacing: 0.02em;
 }
 
+/* Quick-match strip — sits between the availability toggle and the
+   online list. Either shows the ⚡ Quick match button (idle) or a
+   "Searching…" status with a Cancel button. */
+.lobby-quickmatch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 4px 0 8px;
+  padding: 8px 10px;
+  background: rgba(255, 216, 132, 0.06);
+  border: 1px solid rgba(255, 216, 132, 0.20);
+  border-radius: 8px;
+}
+
+.lobby-searching {
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.92;
+}
+
 /* Tournaments — listed inside the Sidebar tab panel. Each
    tournament is a card with name + countdown + Join button + a
    collapsible leaderboard. */
@@ -2205,6 +2264,61 @@ button.tray-piece:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* Generic in-modal section block — used by ActiveSessionsSection and
+   any future account sub-section that needs a heading + body + list. */
+.account-section {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+}
+.account-section-title {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+.account-section-body {
+  font-size: 0.85rem;
+  opacity: 0.78;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.session-list {
+  list-style: none;
+  margin: 0 0 10px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.session-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+.session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.session-meta {
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+.session-current {
+  color: #ffd884;
+  font-weight: 600;
 }
 .account-delete-confirm {
   width: 100%;
