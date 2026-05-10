@@ -31,9 +31,19 @@ export async function listTotpFactors(): Promise<{
   if (!supabase) return { verified: null, unverified: null };
   const { data, error } = await supabase.auth.mfa.listFactors();
   if (error || !data) return { verified: null, unverified: null };
-  // The .totp array filters to TOTP factors specifically; .all has
-  // both totp and phone factors.
-  const totp = data.totp ?? [];
+  // Use `data.all` rather than `data.totp` — supabase-js narrows
+  // .totp to verified factors only at the type level, which makes
+  // a `status === 'unverified'` check land on a dead comparison
+  // and trip TS2367 in stricter builds. Filtering by factor_type
+  // off `.all` keeps both states in scope.
+  const all = (data.all ?? []) as Array<{
+    id: string;
+    factor_type: string;
+    status: string;
+    friendly_name?: string | null;
+    created_at: string;
+  }>;
+  const totp = all.filter((f) => f.factor_type === 'totp');
   const verified =
     (totp.find((f) => f.status === 'verified') as TotpFactor | undefined) ?? null;
   const unverified =

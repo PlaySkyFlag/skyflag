@@ -13,6 +13,7 @@ import type { ChatMessage } from './Chat';
 import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { useEntitlement } from './game/entitlements';
+import { listFriends } from './game/friends';
 import { loadProfile, type Profile } from './game/profile';
 import { recordGame, totalGameCount, type StatsMode } from './game/stats';
 import {
@@ -548,12 +549,14 @@ export default function App() {
       return;
     }
     let cancelled = false;
-    import('./game/friends').then(({ listFriends }) => {
-      listFriends(authUser.id).then((entries) => {
-        if (cancelled) return;
-        // Only count accepted friendships — pending requests aren't friends yet.
-        setFriendIds(new Set(entries.filter((e) => e.direction === 'accepted').map((e) => e.other_id)));
-      });
+    // Static import: the file is already pulled in statically by
+    // EndGameOverlay / Friends / Sidebar, so the dynamic import here
+    // didn't actually code-split anything (Vite warned about it as
+    // INEFFECTIVE_DYNAMIC_IMPORT).
+    listFriends(authUser.id).then((entries) => {
+      if (cancelled) return;
+      // Only count accepted friendships — pending requests aren't friends yet.
+      setFriendIds(new Set(entries.filter((e) => e.direction === 'accepted').map((e) => e.other_id)));
     });
     return () => {
       cancelled = true;
