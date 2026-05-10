@@ -129,18 +129,29 @@ async function upsertSubscription(sub: Stripe.Subscription): Promise<void> {
     return;
   }
 
-  const priceId = sub.items.data[0]?.price.id;
+  // In Stripe API 2025-03-31+ (which includes 2026-04-22.dahlia),
+  // current_period_end and current_period_start moved off the
+  // subscription onto each subscription item. Older versions kept
+  // them at the top level. Read from item first, fall back to top
+  // level, so the function works across API version boundaries.
+  const item = sub.items.data[0];
+  // @ts-expect-error — current_period_end exists on items in newer API versions but isn't in the older type defs.
+  const periodEndUnix = item?.current_period_end ?? sub.current_period_end;
+  // @ts-expect-error — same: current_period_start is on items in the new API.
+  const periodStartUnix = item?.current_period_start ?? sub.start_date;
+
+  const priceId = item?.price.id;
   const tier = priceId ? PRICE_TO_TIER[priceId] : undefined;
   if (!tier) {
     console.error('[stripe-webhook] unknown price id', priceId);
     return;
   }
 
-  const periodEnd = sub.current_period_end
-    ? new Date(sub.current_period_end * 1000).toISOString()
+  const periodEnd = periodEndUnix
+    ? new Date(periodEndUnix * 1000).toISOString()
     : null;
-  const startedAt = sub.start_date
-    ? new Date(sub.start_date * 1000).toISOString()
+  const startedAt = periodStartUnix
+    ? new Date(periodStartUnix * 1000).toISOString()
     : new Date().toISOString();
   const cancelledAt = sub.canceled_at
     ? new Date(sub.canceled_at * 1000).toISOString()
