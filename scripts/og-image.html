@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+  html, body { margin: 0; padding: 0; background: #04070f; }
+  body { width: 1200px; height: 630px; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#1a2a4a"/>
+      <stop offset="60%" stop-color="#0a1224"/>
+      <stop offset="100%" stop-color="#04070f"/>
+    </radialGradient>
+    <linearGradient id="space" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#1a2348"/>
+      <stop offset="100%" stop-color="#0e1530"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#3a4a78"/>
+      <stop offset="100%" stop-color="#243559"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#7a5a3a"/>
+      <stop offset="100%" stop-color="#4a3520"/>
+    </linearGradient>
+    <linearGradient id="goldFlag" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffe27a"/>
+      <stop offset="50%" stop-color="#e9b94a"/>
+      <stop offset="100%" stop-color="#a07820"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <g fill="#ffffff" opacity="0.5">
+    <circle cx="80"   cy="60"  r="1.4"/>
+    <circle cx="220"  cy="40"  r="1"/>
+    <circle cx="380"  cy="90"  r="1.6"/>
+    <circle cx="520"  cy="50"  r="1.1"/>
+    <circle cx="700"  cy="80"  r="1.4"/>
+    <circle cx="860"  cy="40"  r="1"/>
+    <circle cx="1020" cy="100" r="1.5"/>
+    <circle cx="1140" cy="50"  r="1.2"/>
+    <circle cx="160"  cy="180" r="1"/>
+    <circle cx="380"  cy="220" r="1.2"/>
+    <circle cx="950"  cy="200" r="1.3"/>
+    <circle cx="1080" cy="260" r="1"/>
+  </g>
+
+  <g transform="translate(80, 200)">
+    <text x="0" y="0"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="124"
+          font-weight="700"
+          fill="url(#goldFlag)"
+          letter-spacing="-2">SkyFlag</text>
+
+    <text x="6" y="42"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="22"
+          font-style="italic"
+          fill="#c9b07a"
+          letter-spacing="4">KALEO  EDITION</text>
+
+    <text x="0" y="120"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="32"
+          fill="#e8eef8"
+          font-style="italic">A world suspended</text>
+    <text x="0" y="162"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="32"
+          fill="#e8eef8"
+          font-style="italic">above a world that failed.</text>
+
+    <text x="0" y="220"
+          font-family="-apple-system, 'Helvetica Neue', sans-serif"
+          font-size="20"
+          fill="#a8b8d8"
+          letter-spacing="1">Turn-based strategy across three layers  ·  Free to play</text>
+
+    <rect x="0" y="252" width="270" height="44" rx="22"
+          fill="none" stroke="#e9b94a" stroke-width="2"/>
+    <text x="135" y="282"
+          font-family="-apple-system, 'Helvetica Neue', sans-serif"
+          font-size="20"
+          font-weight="600"
+          fill="#e9b94a"
+          text-anchor="middle"
+          letter-spacing="1">playskyflag.com</text>
+  </g>
+
+  <g transform="translate(880, 110) scale(1.6)">
+    <g transform="translate(0, 0) skewX(-20)">
+      <rect x="0" y="0" width="180" height="36" rx="4"
+            fill="url(#space)" stroke="#3b4878" stroke-width="1.5"/>
+      <circle cx="40"  cy="18" r="3" fill="#9aa8d8"/>
+      <circle cx="100" cy="18" r="3" fill="#7a5a3a"/>
+      <circle cx="135" cy="18" r="4" fill="none" stroke="#e9b94a" stroke-width="1.5"/>
+      <circle cx="135" cy="18" r="1.5" fill="#e9b94a"/>
+    </g>
+    <g transform="translate(10, 60) skewX(-20)">
+      <rect x="0" y="0" width="180" height="36" rx="4"
+            fill="url(#sky)" stroke="#5b6ba0" stroke-width="1.5"/>
+      <circle cx="50"  cy="18" r="3" fill="#9aa8d8"/>
+      <circle cx="120" cy="18" r="3" fill="#7a5a3a"/>
+      <circle cx="155" cy="18" r="3" fill="#9aa8d8"/>
+    </g>
+    <g transform="translate(20, 120) skewX(-20)">
+      <rect x="0" y="0" width="180" height="36" rx="4"
+            fill="url(#ground)" stroke="#7a5a3a" stroke-width="1.5"/>
+      <circle cx="30"  cy="18" r="3" fill="#9aa8d8"/>
+      <circle cx="70"  cy="18" r="3" fill="#9aa8d8"/>
+      <circle cx="120" cy="18" r="3" fill="#7a5a3a"/>
+      <circle cx="160" cy="18" r="3" fill="#7a5a3a"/>
+    </g>
+
+    <g transform="translate(70, -90)">
+      <circle cx="0" cy="40" r="44" fill="#e9b94a" opacity="0.12"/>
+      <circle cx="0" cy="40" r="28" fill="#e9b94a" opacity="0.20"/>
+      <rect x="-1.5" y="0" width="3" height="92" fill="url(#goldFlag)"/>
+      <path d="M 1 4 L 40 18 L 1 32 Z" fill="url(#goldFlag)"/>
+    </g>
+  </g>
+</svg>
+</body>
+</html>

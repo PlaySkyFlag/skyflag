@@ -3,16 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/skyflag-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#1a1c18" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- Primary SEO. Tagline matches the rulebook — "A world suspended
-         above a world that failed" is the canonical Kaleo Edition
-         opening line. -->
+    <!-- Search-engine crawl directives. max-image-preview:large lets
+         Google use a full-size og-image card instead of a tiny thumbnail
+         in search results — meaningful CTR uplift for branded queries. -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <!-- Primary SEO. Description trimmed to <160 chars so it shows
+         in full in Google SERP without truncation. -->
     <title>SkyFlag — A world suspended above a world that failed</title>
-    <meta name="description" content="SkyFlag is a turn-based strategy game set in Kaleo, the three-layer arcology — Terran, Meridian, Empyrean. Lead the Grey Ravens or White Stags. Neutralize three claim-seals or guide your Captain to the Caelum Nexus. Free to play." />
+    <meta name="description" content="Free turn-based strategy game across three layers — Terran, Meridian, Empyrean. Neutralize three claim-seals or claim the Caelum Nexus. Play now." />
     <meta name="keywords" content="SkyFlag, Kaleo, strategy game, turn-based, board game, online, multiplayer, daily puzzle, chess-like, AI opponent, three-layer game, Grey Ravens, White Stags" />
     <meta name="author" content="Limnology Research Corp." />
     <link rel="canonical" href="https://playskyflag.com/" />
@@ -35,7 +40,12 @@
     <meta name="twitter:description" content="Turn-based strategy across three layers of Kaleo. Neutralize three claim-seals or guide your Captain to the Caelum Nexus." />
     <meta name="twitter:image" content="https://playskyflag.com/og-image.png" />
 
-    <!-- Schema.org structured data — helps Google show a rich card -->
+    <!-- Schema.org structured data — helps Google render a rich card.
+         Two separate JSON-LD blocks: a VideoGame entity for the game
+         itself, and an Organization entity for the publisher (so
+         "Limnology Research Corp." can show up as a knowledge panel
+         eventually). Keeping them as two scripts keeps each entity
+         independently parseable. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -44,18 +54,39 @@
       "alternateName": "SkyFlag — Kaleo Edition",
       "description": "A turn-based strategy game set in Kaleo, the three-layer arcology. Neutralize the opposing clan's three claim-seals, or guide your Captain to the Caelum Nexus.",
       "url": "https://playskyflag.com/",
+      "image": "https://playskyflag.com/og-image.png",
       "applicationCategory": "Game",
       "operatingSystem": "Web, iOS",
       "genre": ["Strategy", "Board Game", "Turn-Based"],
+      "playMode": ["SinglePlayer", "MultiPlayer"],
+      "numberOfPlayers": {
+        "@type": "QuantitativeValue",
+        "minValue": 1,
+        "maxValue": 2
+      },
+      "inLanguage": "en",
+      "gamePlatform": ["Web Browser", "iOS"],
       "publisher": {
         "@type": "Organization",
-        "name": "Limnology Research Corp."
+        "name": "Limnology Research Corp.",
+        "url": "https://playskyflag.com/"
       },
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
       }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Limnology Research Corp.",
+      "url": "https://playskyflag.com/",
+      "logo": "https://playskyflag.com/skyflag-logo.png",
+      "sameAs": ["https://github.com/PlaySkyFlag"]
     }
     </script>
   </head>
