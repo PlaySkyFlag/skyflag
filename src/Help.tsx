@@ -68,12 +68,12 @@ export default function Help({ inline = false }: Props) {
         <p className="help-rulebook">
           Want the full story and complete rules?{' '}
           <a
-            href="/skyflag-rulebook.pdf"
-            download="3xedra-Rulebook.pdf"
+            href="/3phor-rulebook.pdf"
+            download="3phor-Rulebook.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Download the 3xedra rulebook (PDF)
+            Download the 3phor rulebook (PDF)
           </a>
           .
         </p>

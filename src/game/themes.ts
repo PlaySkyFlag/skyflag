@@ -92,7 +92,7 @@ export const THEMES: Record<ThemeId, Theme> = {
 
 export const DEFAULT_THEME: ThemeId = 'classic';
 
-const STORAGE_KEY = 'skyflag.theme.v1';
+const STORAGE_KEY = '3phor.theme.v1';
 
 export function loadThemeId(): ThemeId {
   try {

@@ -1,4 +1,4 @@
-/* playskyflag.com landing — gold-on-dark to match the in-game aesthetic.
+/* 3phor landing — gold-on-dark to match the in-game aesthetic.
    One-page scroll layout, mobile-first responsive sizing.
    Lives in its own CSS file (not App.css) so the landing renders even
    if App.css fails to load and so the bundles can be code-split later. */

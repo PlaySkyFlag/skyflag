@@ -1,4 +1,4 @@
-# SkyFlag — robots.txt
+# 3phor — robots.txt
 #
 # Default: allow all well-behaved crawlers everywhere except a few paths
 # that have no SEO value or could waste crawl budget.
@@ -12,7 +12,7 @@ Allow: /
 # to it, if/when we make one, than serve users a PDF download as their
 # first-touch result).
 Disallow: /sw.js
-Disallow: /skyflag-rulebook.pdf
+Disallow: /3phor-rulebook.pdf
 
 # The Vite dist/assets/ directory has hashed filenames that change every
 # build — no point indexing them; their content is rendered into pages.

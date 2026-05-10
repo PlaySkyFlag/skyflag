@@ -5,7 +5,7 @@
 // Only games with a clear "your side" are tracked: 1P (vs AI) and online
 // multiplayer. 2P hot-seat is excluded since both sides are "you".
 
-const STORAGE_KEY = 'skyflag.stats.v1';
+const STORAGE_KEY = '3phor.stats.v1';
 
 export type StatsMode = '1p-ravens' | '1p-stags' | 'online-ravens' | 'online-stags';
 

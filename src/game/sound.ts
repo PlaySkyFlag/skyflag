@@ -5,7 +5,7 @@
 // first sound trigger — every game action is initiated by a user click,
 // so the context begins in an unblocked state.
 
-const SOUND_KEY = 'skyflag.sound.muted';
+const SOUND_KEY = '3phor.sound.muted';
 
 let audioCtx: AudioContext | null = null;
 let muted = readMutedFromStorage();

@@ -1,4 +1,4 @@
-# SkyFlag
+# 3phor
 
 A two-player tactical race played across a three-layer arcology — Ground (Terran), Sky (Meridian), and Space (Empyrean). Each player commands four pieces (Captain, Soldier, Rover, Pilot) and must capture the opponent's three claim-flags, then land their Captain on the Caelum Nexus at Space(3,3) to win.
 

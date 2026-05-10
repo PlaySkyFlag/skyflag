@@ -1,13 +1,13 @@
 // Opening book — hard-coded "first few moves" for the AI so it doesn't
 // burn search time on positions where strong play is already known.
 //
-// Why a book at all: the first few moves of every SkyFlag game are
+// Why a book at all: the first few moves of every 3phor game are
 // essentially the same situation — empty board, full hand. Searching
 // to depth 4 for "deploy soldier or captain first?" produces the
 // same answer every time, costing real CPU. A book hands back the
 // answer instantly.
 //
-// What's in it: SkyFlag opening principles distilled to two rules:
+// What's in it: 3phor opening principles distilled to two rules:
 //   1. Deploy a key attacker first (Soldier or Captain — the pieces
 //      that can win games via flag-capture or promotion).
 //   2. Deploy the OTHER key attacker second so both win paths are
@@ -16,7 +16,7 @@
 // point the search is fast enough and benefits more from real
 // position-aware decisions than a hard-coded continuation.
 //
-// Variety: each rule offers 2 choices weighted by SkyFlag tradition
+// Variety: each rule offers 2 choices weighted by 3phor tradition
 // (Soldier slightly preferred first since it's cheaper to lose if the
 // opening goes wrong). Random pick keeps games feeling distinct
 // without weakening play.

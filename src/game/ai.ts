@@ -191,7 +191,7 @@ export function legalActions(state: GameState): Action[] {
   return actions;
 }
 
-// Distance metric tuned for SkyFlag: Chebyshev within a layer (Captain king-
+// Distance metric tuned for 3phor: Chebyshev within a layer (Captain king-
 // move) + heavy layer-change cost (lifts take two activations).
 function strategicDist(a: Coord, b: Coord): number {
   const layerCost = Math.abs(LAYER_INDEX[a.layer] - LAYER_INDEX[b.layer]) * 4;

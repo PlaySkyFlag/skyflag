@@ -133,7 +133,7 @@ Deno.serve(async (req: Request) => {
   if (subErr) return json({ ok: false, error: subErr.message }, 500);
   if (!subs || subs.length === 0) return json({ ok: true, reason: 'no-subscriptions' });
 
-  const title = from_nickname ? `${from_nickname} is waiting` : '3xedra — your turn';
+  const title = from_nickname ? `${from_nickname} is waiting` : '3phor — your turn';
   const bodyText = `Tap to play. Room ${room_code}.`;
 
   const results: Array<{ platform: string; ok: boolean; error?: string }> = [];

@@ -1,7 +1,7 @@
 import type { ClockOptionId } from './constants';
 import type { GameState, Player, RoomState } from './types';
 
-const STORAGE_KEY = 'skyflag.session.v1';
+const STORAGE_KEY = '3phor.session.v1';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
 

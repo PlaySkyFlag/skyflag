@@ -1,4 +1,4 @@
-# SkyFlag Cleanup TODO
+# 3phor Cleanup TODO
 
 Audit captured 2026-05-08 after Pass 1+2 polish. Pick items off as time
 allows; nothing here is blocking gameplay.
@@ -66,7 +66,7 @@ These are deferred features tracked separately:
 - Async multiplayer push notifications (iOS APNs cert + Supabase secrets
   are user-side manual setup)
 - **Stronger AI** — match what modern chess apps do. Practical wins for
-  SkyFlag: (a) richer evaluation (king safety, piece coordination,
+  3phor: (a) richer evaluation (king safety, piece coordination,
   flag-runner threat tempo, control of lifts/Nexus rather than just
   material), (b) killer-move + history heuristic move ordering on top
   of the existing iterative-deepening transposition table, (c) null-move

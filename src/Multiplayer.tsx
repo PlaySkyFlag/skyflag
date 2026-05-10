@@ -200,7 +200,7 @@ function NotificationsControl() {
             if (!result.ok) {
               setMessage(
                 result.reason === 'denied'
-                  ? 'Permission denied. Enable Notifications for 3xedra in iOS Settings.'
+                  ? 'Permission denied. Enable Notifications for 3phor in iOS Settings.'
                   : `Couldn't enable: ${result.message ?? result.reason}`,
               );
               return;

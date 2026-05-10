@@ -1,4 +1,4 @@
-/* SkyFlag's whole visual design assumes a dark page (board atmospheres,
+/* 3phor's whole visual design assumes a dark page (board atmospheres,
    panels, HUD all painted on dark fills). We used to follow the OS
    prefers-color-scheme, but that left users on light-mode systems
    reading black text on dark panels — most visible in the Rules tab

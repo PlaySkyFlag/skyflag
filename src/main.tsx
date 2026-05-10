@@ -5,6 +5,11 @@ import App from './App.tsx'
 import ErrorBoundary from './ErrorBoundary.tsx'
 import Landing from './Landing.tsx'
 import Story from './Story.tsx'
+import { migrateLocalStorage } from './game/migrate.ts'
+
+// Run the one-shot rebrand storage migration before anything else reads
+// from localStorage. Idempotent — safe to call on every boot.
+migrateLocalStorage();
 
 // Path-based routing without react-router. One-time check at mount —
 // hard navigation between pages (full page load) keeps the bundle

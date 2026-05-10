@@ -1,4 +1,4 @@
--- SkyFlag user profiles. Each row is 1:1 with an auth.users row, populated
+-- 3phor user profiles. Each row is 1:1 with an auth.users row, populated
 -- the first time a signed-in user completes the new-account form. RLS lets
 -- anyone read profiles (so opponents can see each other's nicknames) but
 -- only the owner can write their own row.

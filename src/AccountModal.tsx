@@ -84,7 +84,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
       <div className="account-overlay" role="dialog" aria-modal="true">
         <div className="account-card">
           <div className="account-header">
-            <h2 className="account-title">Welcome to 3xedra</h2>
+            <h2 className="account-title">Welcome to 3phor</h2>
             <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
           </div>
           <p className="account-intro">
@@ -367,7 +367,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
   );
 }
 
-// SkyFlag Plus subscription panel — shown to signed-in users on web who
+// 3phor Plus subscription panel — shown to signed-in users on web who
 // don't yet have the entitlement. Hidden on iOS native builds because
 // Apple's App Store policy requires in-app digital subscriptions to use
 // IAP, not external payment processors. iOS support is a separate
@@ -388,15 +388,15 @@ function PlusPanel() {
   if (hasPlus) {
     return (
       <div className="account-plus-panel account-plus-active">
-        <strong>★ 3xedra Plus active</strong>
-        <p>Thanks for supporting 3xedra. All Plus features unlocked.</p>
+        <strong>★ 3phor Plus active</strong>
+        <p>Thanks for supporting 3phor. All Plus features unlocked.</p>
       </div>
     );
   }
 
   return (
     <div className="account-plus-panel">
-      <strong className="account-plus-title">3xedra Plus</strong>
+      <strong className="account-plus-title">3phor Plus</strong>
       <p className="account-plus-body">
         Unlock advanced AI difficulty, puzzle archive with analysis,
         custom themes, ad-free play, and unlimited tournaments.

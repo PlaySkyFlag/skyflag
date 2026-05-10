@@ -276,14 +276,14 @@ export default function App() {
   // Persisted in localStorage so the choice survives refresh.
   const [showThreats, setShowThreats] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('skyflag.showThreats.v1') !== '0';
+      return localStorage.getItem('3phor.showThreats.v1') !== '0';
     } catch {
       return true;
     }
   });
   useEffect(() => {
     try {
-      localStorage.setItem('skyflag.showThreats.v1', showThreats ? '1' : '0');
+      localStorage.setItem('3phor.showThreats.v1', showThreats ? '1' : '0');
     } catch {
       // no-op — storage may be unavailable in private mode
     }
@@ -339,7 +339,7 @@ export default function App() {
     if (!room) return;
     if (!supabase) return;
     if (state.status.kind === 'in-progress') return;
-    const flag = `skyflag.rating-applied.${room.code}`;
+    const flag = `3phor.rating-applied.${room.code}`;
     try {
       if (localStorage.getItem(flag)) return;
     } catch {
@@ -416,7 +416,7 @@ export default function App() {
   // flag. The "Tutorial" button in the help row re-opens it any time.
   const [tutorialOpen, setTutorialOpen] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('skyflag.tutorial.v1.seen') !== '1';
+      return localStorage.getItem('3phor.tutorial.v1.seen') !== '1';
     } catch {
       return false;
     }
@@ -431,7 +431,7 @@ export default function App() {
   const closeTutorial = () => {
     setTutorialOpen(false);
     try {
-      localStorage.setItem('skyflag.tutorial.v1.seen', '1');
+      localStorage.setItem('3phor.tutorial.v1.seen', '1');
     } catch {
       // Storage may be unavailable in private mode — fine to lose the flag.
     }
@@ -972,8 +972,8 @@ export default function App() {
     <main className="app">
       <header className="app-header">
         <img
-          src="/skyflag-logo.png"
-          alt="3xedra"
+          src="/3phor-logo.png"
+          alt="3phor"
           className="app-logo"
           width={120}
           height={120}
@@ -1352,10 +1352,10 @@ export default function App() {
       />
       <StatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
       <footer className="app-footer">
-        <p>© 2026 Limnology Research Corp. · 3xedra™ Kaleo Edition.</p>
+        <p>© 2026 Limnology Research Corp. · 3phor™ Kaleo Edition.</p>
         <p>
           Test feedback:{' '}
-          <a href="mailto:njatel@limnology.ca?subject=3xedra%20Test%20Feedback">
+          <a href="mailto:njatel@limnology.ca?subject=3phor%20Test%20Feedback">
             njatel@limnology.ca
           </a>
         </p>

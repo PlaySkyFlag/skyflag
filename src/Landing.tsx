@@ -1,5 +1,5 @@
-// playskyflag.com landing page. Marketing surface for new visitors —
-// what SkyFlag is, why to play, where to start. The game itself lives
+// Landing page. Marketing surface for new visitors —
+// what 3phor is, why to play, where to start. The game itself lives
 // at /play; this page links there.
 //
 // Design notes:
@@ -114,13 +114,13 @@ function Header() {
   return (
     <header className="landing-header">
       <div className="landing-header-inner">
-        <a href="/" className="landing-logo" aria-label="3xedra — home">
+        <a href="/" className="landing-logo" aria-label="3phor — home">
           <img
-            src="/skyflag-logo.png"
+            src="/3phor-logo.png"
             alt=""
             className="landing-logo-img"
           />
-          <span className="landing-logo-text">3xedra</span>
+          <span className="landing-logo-text">3phor</span>
         </a>
         <nav className="landing-nav">
           <a href="#features" className="landing-nav-link">Features</a>
@@ -138,20 +138,21 @@ function Hero() {
     <section className="landing-hero">
       <div className="landing-hero-inner">
         <img
-          src="/skyflag-logo.png"
+          src="/3phor-logo.png"
           alt=""
           className="landing-hero-logo"
           aria-hidden="true"
         />
-        <h1 className="landing-hero-title">3xedra</h1>
+        <h1 className="landing-hero-title">3phor</h1>
         <p className="landing-hero-subtitle">
-          Where strategists gather. Three layers. Four Lifts. One Exedra.
+          Where strategists gather. Three layers. Four Lifts. One Nexus.
         </p>
         <p className="landing-hero-pitch">
-          A turn-based strategy game set in Kaleo, the three-layer arcology
-          where the Aetheri lifted what remained of civilization. Lead the
-          Grey Ravens or the White Stags. Neutralize the opposing clan's
-          three claim-seals, or guide your Captain to the Caelum Nexus.
+          A turn-based strategy game from the <em>Caelum Chronicles</em>{' '}
+          universe. Set in Kaleo, the three-layer arcology where the Aetheri
+          lifted what remained of civilization. Lead the Grey Ravens or the
+          White Stags. Neutralize the opposing clan's three claim-seals, or
+          guide your Captain to the Caelum Nexus.
         </p>
         <div className="landing-hero-actions">
           <a href="/play" className="landing-cta-button landing-cta-primary">
@@ -174,7 +175,7 @@ function FeaturesSection() {
   return (
     <section id="features" className="landing-section">
       <div className="landing-section-inner">
-        <h2 className="landing-section-title">What makes 3xedra different</h2>
+        <h2 className="landing-section-title">What makes 3phor different</h2>
         <div className="landing-features-grid">
           <Feature
             icon="◇◆◇"
@@ -289,7 +290,7 @@ function PricingSection() {
           </div>
           <div className="landing-pricing-tier landing-pricing-featured">
             <div className="landing-tier-badge">Plus</div>
-            <div className="landing-tier-name">3xedra Plus</div>
+            <div className="landing-tier-name">3phor Plus</div>
             <div className="landing-tier-price">
               <span className="landing-tier-price-num">$4.99</span>
               <span className="landing-tier-price-period">/ month</span>
@@ -384,7 +385,7 @@ function DemoAsset() {
       <img
         className="landing-demo-gif"
         src="/demo.gif"
-        alt="3xedra gameplay demo"
+        alt="3phor gameplay demo"
         style={{ display: 'none' }}
         onError={(e) => {
           // No demo.gif either — hide entirely, leaving just the live
@@ -401,7 +402,7 @@ function Footer() {
     <footer className="landing-footer">
       <div className="landing-footer-inner">
         <div className="landing-footer-brand">
-          <strong>3xedra</strong>
+          <strong>3phor</strong>
           <p>By Limnology Research Corp.</p>
         </div>
         <div className="landing-footer-links">

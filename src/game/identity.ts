@@ -2,7 +2,7 @@
 // per browser/device — no login required, but stable across sessions so a
 // player rejoining a multiplayer room is recognised as the same human.
 
-const STORAGE_KEY = 'skyflag.userId.v1';
+const STORAGE_KEY = '3phor.userId.v1';
 
 function generateUserId(): string {
   // Browser-native, no crypto package needed. crypto.randomUUID is in all
@@ -10,7 +10,7 @@ function generateUserId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID();
   }
-  // Fallback: 32 random hex chars. Not used on any browser SkyFlag targets,
+  // Fallback: 32 random hex chars. Not used on any browser 3phor targets,
   // but defensive against headless test environments.
   return Array.from({ length: 32 }, () =>
     Math.floor(Math.random() * 16).toString(16),
