@@ -143,7 +143,7 @@ function Hero() {
           className="landing-hero-logo"
         />
         <h1 className="landing-hero-title">3phor</h1>
-        <p className="landing-hero-tagline">3phor the win!</p>
+        <p className="landing-hero-tagline tagline-script">3phor the win!</p>
         <p className="landing-hero-subtitle">
           Where strategists gather. Three boards. Four Lifts. One Nexus.
         </p>

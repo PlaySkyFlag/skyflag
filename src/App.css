@@ -267,6 +267,17 @@
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
+/* Handwritten tagline at the top of the footer — quiet signature
+   above the legal/feedback lines. Smaller + dimmer than the
+   end-game version since it's ambient, not a moment. */
+.app-footer-rally {
+  margin: 0 0 6px;
+  font-size: 1.6rem;
+  color: #ffd884;
+  opacity: 0.92;
+  text-shadow: 0 1px 10px rgba(255, 216, 132, 0.25);
+}
+
 .app-footer p {
   margin: 2px 0;
 }
@@ -1182,6 +1193,17 @@ button.tray-piece:hover {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.78);
   letter-spacing: 0.02em;
+}
+
+/* Celebratory handwriting flourish on the end-game overlay. The
+   .tagline-script class supplies the font + rotation; this rule
+   adds size, color, and the soft glow so it reads as the headline
+   moment of the screen. */
+.end-game-rally {
+  margin: 14px 0 4px;
+  font-size: 2.2rem;
+  color: #ffd884;
+  text-shadow: 0 2px 16px rgba(255, 216, 132, 0.45);
 }
 
 .end-game-actions {

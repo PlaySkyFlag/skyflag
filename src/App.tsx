@@ -1655,6 +1655,10 @@ export default function App() {
       />
       <StatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
       <footer className="app-footer">
+        {/* Handwritten signature-style tagline above the legal
+            line — quiet brand presence on every page of /play
+            without crowding the HUD. */}
+        <p className="app-footer-rally tagline-script">3phor the win!</p>
         <p>© 2026 Limnology Research Corp. · 3phor™ Kaleo Edition.</p>
         <p>
           Test feedback:{' '}

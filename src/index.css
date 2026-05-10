@@ -34,3 +34,18 @@ body {
   font-weight: 600;
   letter-spacing: 0.06em;
 }
+
+/* Handwriting tagline — used wherever the "3phor the win!" rally
+   appears. Slight rotation gives it a personal, signed-by-the-
+   author quality against the otherwise polished gold-on-dark
+   palette. Color and size are set per-placement so this class
+   stays purely typographic. */
+.tagline-script {
+  font-family: 'Caveat', 'Brush Script MT', cursive;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  display: inline-block;
+  transform: rotate(-2deg);
+  transform-origin: center left;
+}

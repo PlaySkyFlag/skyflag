@@ -318,10 +318,12 @@
 }
 
 .landing-hero-tagline {
-  font-size: clamp(1.4rem, 3.4vw, 2rem);
+  /* Sized up because the handwriting font (Caveat) reads smaller
+     at the same point size than a sans-serif. The .tagline-script
+     class layered on top sets the font-family + slight rotation. */
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
   color: var(--landing-gold, #ffd884);
-  margin: 8px 0 14px;
-  font-weight: 700;
+  margin: 6px 0 16px;
   letter-spacing: 0.01em;
   text-shadow: 0 2px 18px rgba(255, 216, 132, 0.35);
 }
