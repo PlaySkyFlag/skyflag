@@ -15,6 +15,18 @@ import type { Profile } from './game/profile';
 import type { RoomState } from './game/types';
 
 const LOBBY_CHANNEL = 'lobby:global';
+
+// Quick-match pool — separate from `lobby:global` so being challengeable
+// (named) doesn't auto-pair you, and being in the pool doesn't expose
+// you to direct challenges. Pairing rule: when ≥2 peers are in the pool,
+// the peer with the lowest user_id is host; it inserts the games row and
+// broadcasts a `pair` envelope to its chosen opponent. This is fully
+// deterministic, so multiple peers can't race to create duplicate rooms.
+const POOL_CHANNEL = 'matchmaking:pool';
+// Auto-cancel a search after 5 minutes so a forgotten Quick-match doesn't
+// silently match a player who has wandered off.
+const POOL_TIMEOUT_MS = 5 * 60 * 1000;
+
 const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 function generateRoomCode(): string {
@@ -34,6 +46,21 @@ type Challenge = {
   from_user_id: string;
   from_nickname: string;
   to_user_id: string;
+  room_code: string;
+};
+
+type PoolEntry = {
+  user_id: string;
+  nickname: string;
+  joined_at: number;
+};
+
+// Sent by the host (canonical lowest user_id) to the peer it's pairing
+// with. Only the addressed user acts on it; everyone else ignores.
+type PairEvent = {
+  to_user_id: string;
+  from_user_id: string;
+  from_nickname: string;
   room_code: string;
 };
 
@@ -60,10 +87,20 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
   const [outgoing, setOutgoing] = useState<Challenge | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Quick-match pool state. `searching` drives the UI ("Searching…" /
+  // "Cancel"); `pairedRef` is a one-shot guard so the presence-sync
+  // handler and the broadcast-`pair` handler don't both try to enter
+  // a room (the host's own sync handler fires first and pairs; the
+  // recipient's broadcast handler then needs to know "I've already
+  // entered the room, ignore further sync events").
+  const [searching, setSearching] = useState(false);
+  const pairedRef = useRef(false);
+
   // The Supabase channel is held in a ref so we can `track` / `untrack` and
   // send broadcasts without re-creating it on every render. Recreated only
   // when the user identity changes.
   const channelRef = useRef<ReturnType<NonNullable<typeof supabase>['channel']> | null>(null);
+  const poolChannelRef = useRef<ReturnType<NonNullable<typeof supabase>['channel']> | null>(null);
 
   // Subscribe to the lobby channel once per signed-in user. Listens for
   // presence sync (who's available) and broadcasts (challenge envelopes).
@@ -152,6 +189,163 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
       channelRef.current?.untrack();
     };
   }, []);
+
+  // ── Quick-match pool ─────────────────────────────────────────────────
+  // Subscribe to the pool channel and listen for two things:
+  //   1) presence sync — if ≥2 peers are present and *I'm* the lowest
+  //      user_id (deterministic host), insert a games row and broadcast
+  //      a `pair` envelope to the second-lowest peer.
+  //   2) broadcast `pair` addressed to me — enter the room as p2.
+  //
+  // The host's own sync handler will see the pool, host-pair, and enter
+  // as p1 in one shot. The recipient gets the broadcast and enters as
+  // p2. `pairedRef` is a one-shot guard so neither side double-fires.
+  useEffect(() => {
+    if (!supabase || !user) return;
+    const sb = supabase;
+    const channel = sb.channel(POOL_CHANNEL, {
+      config: { presence: { key: user.id } },
+    });
+    poolChannelRef.current = channel;
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        if (pairedRef.current) return;
+        const raw = channel.presenceState() as Record<string, PoolEntry[]>;
+        const seen = new Set<string>();
+        const list: PoolEntry[] = [];
+        for (const arr of Object.values(raw)) {
+          for (const meta of arr) {
+            if (seen.has(meta.user_id)) continue;
+            seen.add(meta.user_id);
+            list.push(meta);
+          }
+        }
+        // Only act if I'm currently in the pool. Avoids stale-closure
+        // checks against the `searching` state.
+        if (!list.some((p) => p.user_id === user.id)) return;
+        if (list.length < 2) return;
+        // Canonical sort: lowest user_id is host. Both peers compute
+        // the same ordering and only the host takes action, so no race.
+        list.sort((a, b) => a.user_id.localeCompare(b.user_id));
+        const host = list[0];
+        const opp = list[1];
+        if (host.user_id !== user.id) return; // not my turn to host
+        pairedRef.current = true;
+        void hostPairRef.current?.(opp);
+      })
+      .on('broadcast', { event: 'pair' }, ({ payload }) => {
+        const ev = payload as PairEvent;
+        if (ev.to_user_id !== user.id || pairedRef.current) return;
+        pairedRef.current = true;
+        setSearching(false);
+        channel.untrack();
+        onEnterRoom({
+          code: ev.room_code,
+          role: 'p2',
+          status: 'playing',
+        });
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+      poolChannelRef.current = null;
+    };
+  }, [user, onEnterRoom]);
+
+  // Track / untrack our own pool presence whenever the searching toggle
+  // flips. Re-arms `pairedRef` on entry so a previous successful pairing
+  // doesn't silently block the next search.
+  useEffect(() => {
+    const channel = poolChannelRef.current;
+    if (!channel || !profile) return;
+    if (searching) {
+      pairedRef.current = false;
+      channel.track({
+        user_id: user.id,
+        nickname: profile.nickname,
+        joined_at: Date.now(),
+      });
+    } else {
+      channel.untrack();
+    }
+  }, [searching, user, profile]);
+
+  // 5-minute idle cancel — abandons the search if no pairing happens
+  // and surfaces a hint so the user knows why the spinner stopped.
+  useEffect(() => {
+    if (!searching) return;
+    const id = window.setTimeout(() => {
+      setSearching(false);
+      setError('No match found in 5 minutes — try again later.');
+      window.setTimeout(() => setError(null), 5000);
+    }, POOL_TIMEOUT_MS);
+    return () => window.clearTimeout(id);
+  }, [searching]);
+
+  // Auto-untrack on unmount so a closed tab doesn't leave a stale pool
+  // row that would mis-pair the next searcher.
+  useEffect(() => {
+    return () => {
+      poolChannelRef.current?.untrack();
+    };
+  }, []);
+
+  // hostPair lives in a ref so the long-lived `presence sync` handler
+  // (registered once at mount) can call the latest version without
+  // needing to be re-registered every time `profile` or `inRoom`
+  // changes — which would re-subscribe and lose the connection.
+  const hostPairRef = useRef<((opp: PoolEntry) => Promise<void>) | null>(null);
+  hostPairRef.current = useCallback(
+    async (opp: PoolEntry) => {
+      if (!supabase || !profile) return;
+      if (inRoom) {
+        // Shouldn't happen — UI disables Quick match in-room — but guard
+        // anyway so we don't strand a games row if state slips.
+        pairedRef.current = false;
+        return;
+      }
+      const sb = supabase;
+      const code = generateRoomCode();
+      const insertResult = await sb
+        .from('games')
+        .insert({
+          room_code: code,
+          state: createInitialGameState(),
+          p1_id: user.id,
+          p2_id: opp.user_id,
+        })
+        .select('*')
+        .single();
+      if (insertResult.error) {
+        setError(`Couldn't create match: ${insertResult.error.message}`);
+        pairedRef.current = false;
+        return;
+      }
+      const channel = poolChannelRef.current;
+      if (!channel) {
+        pairedRef.current = false;
+        return;
+      }
+      // Send the pair envelope BEFORE entering the room — once we
+      // unmount, the broadcast won't go out.
+      await channel.send({
+        type: 'broadcast',
+        event: 'pair',
+        payload: {
+          to_user_id: opp.user_id,
+          from_user_id: user.id,
+          from_nickname: profile.nickname,
+          room_code: code,
+        } satisfies PairEvent,
+      });
+      setSearching(false);
+      channel.untrack();
+      onEnterRoom({ code, role: 'p1', status: 'playing' });
+    },
+    [user, profile, inRoom, onEnterRoom],
+  );
 
   // ── Challenger flow ──────────────────────────────────────────────────
   const challenge = useCallback(
@@ -271,13 +465,40 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
             type="checkbox"
             checked={available}
             onChange={(e) => setAvailable(e.target.checked)}
-            disabled={inRoom}
+            disabled={inRoom || searching}
           />
           <span>I'm looking for a game</span>
         </label>
         <span className="lobby-count">
           {others.length} other{others.length === 1 ? '' : 's'} online
         </span>
+      </div>
+
+      <div className="lobby-quickmatch">
+        {searching ? (
+          <>
+            <span className="lobby-searching" aria-live="polite">
+              ⏳ Searching for a match…
+            </span>
+            <button
+              type="button"
+              className="end-game-btn end-game-btn--subtle"
+              onClick={() => setSearching(false)}
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            className="hud-btn"
+            disabled={inRoom || outgoing !== null || incoming !== null}
+            onClick={() => setSearching(true)}
+            title="Auto-pair with the next player who hits Quick match"
+          >
+            ⚡ Quick match
+          </button>
+        )}
       </div>
 
       {available ? (
