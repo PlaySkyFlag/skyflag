@@ -2238,6 +2238,30 @@ button.tray-piece:hover {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
+/* Clock pill sits right before the New game button so the user always
+   sees the time control they're about to commit to. Tiny labelled
+   dropdown — not hidden behind a settings gear. */
+.game-toolbar-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.game-toolbar-clock-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffd884;
+  font-weight: 700;
+}
+.game-toolbar-clock-select {
+  font-size: 0.8rem;
+  padding: 4px 6px;
+}
+
 /* Toolbar buttons get a darker fill than the page-level .hud-btn so
    the white label reads cleanly against the toolbar's dark panel. */
 .game-toolbar .hud-btn {

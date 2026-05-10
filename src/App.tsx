@@ -1079,6 +1079,8 @@ export default function App() {
       <StatusBar state={state} aiPlayer={aiPlayer} />
       <GameToolbar
         gameOver={state.status.kind !== 'in-progress'}
+        clockOption={clockOption}
+        onSetClockOption={setClockOption}
         hintEnabled={
           state.status.kind === 'in-progress' &&
           aiPlayer !== state.currentPlayer &&
