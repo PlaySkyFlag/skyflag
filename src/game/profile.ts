@@ -13,6 +13,7 @@ export type Profile = {
   gender: Gender | null;
   rating: number;
   games_played: number;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
 };

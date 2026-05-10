@@ -12,9 +12,15 @@ import {
   signInWithOAuth,
   signOut,
 } from './game/auth';
+import { removeAvatar, uploadAvatar } from './game/avatar';
 import { downloadExportFile, exportUserData } from './game/dataExport';
 import { useEntitlement } from './game/entitlements';
 import { loadProfile, saveProfile, type Gender, type Profile } from './game/profile';
+import {
+  countRemainingCodes,
+  generateRecoveryCodes,
+  useRecoveryCode,
+} from './game/recoveryCodes';
 import { supabase } from './game/supabase';
 
 // Stripe price ID for the Plus subscription tier. Set via env so the
@@ -310,6 +316,9 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
             </button>
           </form>
 
+          {/* Recovery-code path for users locked out of their email. */}
+          <RecoveryCodeSignIn />
+
           {message && <p className="account-message">{message}</p>}
         </div>
       </div>
@@ -340,6 +349,11 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
         </p>
         {profile && (
           <div className="account-rating">
+            <AvatarUploader
+              user={user}
+              currentUrl={profile.avatar_url}
+              onChange={(url) => setProfile({ ...profile, avatar_url: url })}
+            />
             <div className="account-rating-cell">
               <div className="account-rating-num">{profile.rating}</div>
               <div className="account-rating-label">Rating</div>
@@ -467,6 +481,10 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
             </div>
           </form>
         )}
+
+        {/* Recovery codes — only for users with verified email, since
+            the codes recover access to an email-linked account. */}
+        {user.email_confirmed_at && <RecoveryCodesSection user={user} />}
 
         {/* Account data — export + delete. Required for PIPEDA / App
             Store compliance. Visible to every signed-in user including
@@ -837,5 +855,290 @@ function PlusPanel() {
       </button>
       {err && <p className="account-message">{err}</p>}
     </div>
+  );
+}
+
+// Avatar uploader — picker + preview circle. Sits next to the rating
+// cells in the signed-in profile header. File goes to Supabase Storage
+// (RLS scopes writes by path prefix); profile row stores the public URL.
+function AvatarUploader({
+  user,
+  currentUrl,
+  onChange,
+}: {
+  user: User;
+  currentUrl: string | null;
+  onChange: (url: string | null) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const handleFile = async (file: File) => {
+    setBusy(true);
+    setErr(null);
+    const r = await uploadAvatar(user.id, file);
+    setBusy(false);
+    if (r.ok) onChange(r.url);
+    else setErr(r.message);
+  };
+
+  const handleRemove = async () => {
+    setBusy(true);
+    setErr(null);
+    const r = await removeAvatar(user.id);
+    setBusy(false);
+    if (r.ok) onChange(null);
+    else setErr(r.message);
+  };
+
+  return (
+    <div className="account-avatar-cell">
+      <label className="account-avatar-circle">
+        {currentUrl ? (
+          <img src={currentUrl} alt="Your avatar" />
+        ) : (
+          <span className="account-avatar-placeholder" aria-hidden="true">?</span>
+        )}
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFile(file);
+          }}
+          disabled={busy}
+          style={{ display: 'none' }}
+        />
+        <span className="account-avatar-overlay">
+          {busy ? '…' : currentUrl ? 'Change' : 'Upload'}
+        </span>
+      </label>
+      {currentUrl && !busy && (
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle account-avatar-remove"
+          onClick={handleRemove}
+          title="Remove avatar"
+        >
+          Remove
+        </button>
+      )}
+      {err && <p className="account-message account-avatar-error">{err}</p>}
+    </div>
+  );
+}
+
+// Recovery-codes panel — shows how many codes the user has left and
+// lets them generate a fresh set. The plaintext codes appear ONCE in
+// a one-time view; we tell the user explicitly that this is their only
+// chance to save them.
+function RecoveryCodesSection({ user }: { user: User }) {
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [shown, setShown] = useState<string[] | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
+  useEffect(() => {
+    countRemainingCodes(user.id).then(setRemaining);
+  }, [user.id]);
+
+  const generate = async () => {
+    setBusy(true);
+    setErr(null);
+    const r = await generateRecoveryCodes();
+    setBusy(false);
+    setConfirming(false);
+    if (r.ok) {
+      setShown(r.codes);
+      setRemaining(r.codes.length);
+    } else {
+      setErr(r.message);
+    }
+  };
+
+  const downloadCodes = () => {
+    if (!shown) return;
+    const text =
+      `3phor recovery codes — generated ${new Date().toLocaleString()}\n` +
+      `Account: ${user.email}\n\n` +
+      shown.map((c, i) => `${i + 1}.  ${c}`).join('\n') +
+      `\n\nStore these somewhere safe. Each code can only be used once,\n` +
+      `and you'll need both the code and your email to recover access.\n`;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `3phor-recovery-codes-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  return (
+    <div className="account-data-section">
+      <h3 className="account-data-title">Recovery codes</h3>
+      <p className="account-data-body">
+        One-shot codes that let you sign back in if you lose access to
+        your email. {remaining !== null && (
+          <strong>{remaining} of 8 active.</strong>
+        )}
+      </p>
+
+      {shown ? (
+        <div className="account-recovery-shown">
+          <p className="account-upgrade-warning">
+            ⚠ <strong>Save these now.</strong> They won't be shown
+            again. Generating new codes invalidates any previous set.
+          </p>
+          <ol className="account-recovery-list">
+            {shown.map((c, i) => (
+              <li key={i}><code>{c}</code></li>
+            ))}
+          </ol>
+          <div className="account-data-actions">
+            <button type="button" className="hud-btn" onClick={downloadCodes}>
+              ↓ Download as text file
+            </button>
+            <button
+              type="button"
+              className="hud-btn hud-btn-subtle"
+              onClick={() => setShown(null)}
+            >
+              I've saved them
+            </button>
+          </div>
+        </div>
+      ) : confirming ? (
+        <div className="account-delete-confirm">
+          <p className="account-delete-warning">
+            Generating new codes invalidates your previous set. If
+            you've already shared or saved old codes, those will stop
+            working immediately.
+          </p>
+          <div className="account-data-actions">
+            <button
+              type="button"
+              className="hud-btn hud-btn-warn"
+              onClick={generate}
+              disabled={busy}
+            >
+              {busy ? 'Generating…' : 'Generate new codes'}
+            </button>
+            <button
+              type="button"
+              className="hud-btn hud-btn-subtle"
+              onClick={() => setConfirming(false)}
+              disabled={busy}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="account-data-actions">
+          <button
+            type="button"
+            className="hud-btn"
+            onClick={() => (remaining === 0 ? generate() : setConfirming(true))}
+            disabled={busy}
+          >
+            {remaining === 0 ? 'Generate codes' : 'Generate new codes'}
+          </button>
+        </div>
+      )}
+      {err && <p className="account-message">{err}</p>}
+    </div>
+  );
+}
+
+// "Locked out? Use a recovery code" path — shown in the signed-out
+// AccountModal alongside the magic-link form. Calls use-recovery-code,
+// then navigates the browser to the issued action_link which signs
+// the user back in.
+function RecoveryCodeSignIn() {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  if (!open) {
+    return (
+      <p className="account-recovery-toggle">
+        Locked out of your email?{' '}
+        <button
+          type="button"
+          className="account-link-button"
+          onClick={() => setOpen(true)}
+        >
+          Use a recovery code →
+        </button>
+      </p>
+    );
+  }
+
+  return (
+    <form
+      className="account-recovery-form"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!email.trim() || !code.trim()) return;
+        setBusy(true);
+        setErr(null);
+        const r = await useRecoveryCode(email.trim(), code.trim());
+        if (r.ok) {
+          // Navigate to the action_link — Supabase Auth picks it up,
+          // issues a session, and onAuthStateChange flips the modal
+          // into the signed-in profile view.
+          window.location.href = r.actionLink;
+        } else {
+          setErr(r.message);
+          setBusy(false);
+        }
+      }}
+    >
+      <p className="account-data-body">
+        Enter your email and one of the recovery codes you saved when
+        you set up your account.
+      </p>
+      <input
+        type="email"
+        className="account-input"
+        placeholder="you@example.com"
+        autoComplete="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="text"
+        className="account-input"
+        placeholder="XXXX-XXXX-XXXX-XXXX"
+        autoComplete="off"
+        spellCheck={false}
+        required
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+      />
+      <div className="account-data-actions">
+        <button type="submit" className="end-game-btn" disabled={busy}>
+          {busy ? 'Verifying…' : 'Sign in with code'}
+        </button>
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle"
+          onClick={() => {
+            setOpen(false);
+            setErr(null);
+          }}
+          disabled={busy}
+        >
+          Cancel
+        </button>
+      </div>
+      {err && <p className="account-message">{err}</p>}
+    </form>
   );
 }

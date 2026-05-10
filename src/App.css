@@ -1443,7 +1443,8 @@ button.tray-piece:hover {
 
 .account-rating {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: auto 1fr 1fr;
+  align-items: center;
   gap: 10px;
   margin: 8px 0 14px;
 }
@@ -1835,6 +1836,119 @@ button.tray-piece:hover {
 .tournament-self td {
   background: rgba(255, 216, 132, 0.10);
   font-weight: 700;
+}
+
+/* Avatar uploader — circular preview with hover overlay that doubles
+   as the file picker (label wraps a hidden input). Lives in the rating
+   row next to the Rating + Online-games cells. */
+.account-avatar-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.account-avatar-circle {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid rgba(255, 216, 132, 0.45);
+  background: #0a1224;
+  display: block;
+}
+.account-avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.account-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1.8rem;
+  color: #5a6a90;
+  font-weight: 800;
+}
+.account-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffd884;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.account-avatar-circle:hover .account-avatar-overlay {
+  opacity: 1;
+}
+.account-avatar-remove {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+}
+.account-avatar-error {
+  font-size: 0.75rem;
+}
+
+/* Recovery codes — one-time-shown grid of codes; user must save these
+   before dismissing. List uses monospace + larger font so the codes
+   stand out vs. the rest of the modal copy. */
+.account-recovery-shown {
+  margin: 8px 0 0;
+}
+.account-recovery-list {
+  list-style: decimal;
+  padding-left: 28px;
+  margin: 12px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+.account-recovery-list code {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  color: #ffd884;
+}
+
+/* "Locked out?" link + form on the signed-out modal. */
+.account-recovery-toggle {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  opacity: 0.75;
+  text-align: center;
+}
+.account-link-button {
+  background: none;
+  border: none;
+  color: #ffd884;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.account-link-button:hover {
+  color: #ffe27a;
+}
+.account-recovery-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 216, 132, 0.30);
+  border-radius: 10px;
 }
 
 /* Account data section — export + delete. Sits below the profile
