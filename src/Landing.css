@@ -317,13 +317,47 @@
   text-shadow: 0 4px 30px rgba(255, 216, 132, 0.18);
 }
 
+.landing-hero-tagline {
+  font-size: clamp(1.4rem, 3.4vw, 2rem);
+  color: var(--landing-gold, #ffd884);
+  margin: 8px 0 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 18px rgba(255, 216, 132, 0.35);
+}
+
 .landing-hero-subtitle {
   font-size: clamp(1.15rem, 2.5vw, 1.4rem);
   color: var(--landing-text);
-  margin: 0 0 22px;
+  margin: 0 0 18px;
   line-height: 1.4;
   font-weight: 500;
   letter-spacing: -0.005em;
+}
+
+.landing-hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(18px, 4vw, 36px);
+  margin: 0 0 26px;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+}
+.landing-hero-stats li {
+  font-size: 0.92rem;
+  color: var(--landing-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.landing-hero-stats strong {
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--landing-gold, #ffd884);
+  vertical-align: -3px;
+  letter-spacing: 0;
 }
 
 .landing-hero-pitch {

@@ -143,9 +143,18 @@ function Hero() {
           className="landing-hero-logo"
         />
         <h1 className="landing-hero-title">3phor</h1>
+        <p className="landing-hero-tagline">3phor the win!</p>
         <p className="landing-hero-subtitle">
-          Where strategists gather. Three layers. Four Lifts. One Nexus.
+          Where strategists gather. Three boards. Four Lifts. One Nexus.
         </p>
+        {/* Numeric hero strip — leans on the three-board hook the
+            rest of the design is built around. Pure typography, no
+            extra art needed. */}
+        <ul className="landing-hero-stats" aria-label="At a glance">
+          <li><strong>3</strong> boards</li>
+          <li><strong>4</strong> piece types</li>
+          <li><strong>2</strong> ways to win</li>
+        </ul>
         <p className="landing-hero-pitch">
           A turn-based strategy game from the <em>Caelum Chronicles</em>{' '}
           universe. Set in Kaleo, the three-layer arcology where the Aetheri
@@ -323,11 +332,13 @@ function DemoSection() {
   return (
     <section className="landing-section landing-section-alt landing-demo-section">
       <div className="landing-section-inner">
-        <h2 className="landing-section-title">A live snapshot</h2>
+        <h2 className="landing-section-title">Three boards. One game.</h2>
         <p className="landing-demo-lead">
-          Three boards in play — Ground, Sky, Space. Pieces lift between
-          layers; flags sit in opposite corners. This is a real mid-game
-          position rendered by the same engine that runs your matches.
+          Every match plays out simultaneously across three 6×6 boards —
+          Ground, Sky, Space. Pieces lift between layers, threats compound
+          vertically, and a position that's safe on one board can be one
+          activation away from collapse on the next. <strong>3phor the
+          win!</strong>
         </p>
 
         {/* Optional asset slot — gameplay GIF or short MP4. Drop a file
@@ -402,6 +413,7 @@ function Footer() {
       <div className="landing-footer-inner">
         <div className="landing-footer-brand">
           <strong>3phor</strong>
+          <p className="landing-footer-tagline">3phor the win!</p>
           <p>By Limnology Research Corp.</p>
         </div>
         <div className="landing-footer-links">
