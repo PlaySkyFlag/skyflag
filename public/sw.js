@@ -24,8 +24,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: '/3phor-logo.png',
-      badge: '/3phor-logo.png',
+      icon: '/3phor-mark.png',
+      badge: '/3phor-mark.png',
       tag: '3phor-turn',
       // Replace any existing notification for the same room rather than
       // stacking up — the player only needs to know it's their turn.

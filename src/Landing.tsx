@@ -116,7 +116,7 @@ function Header() {
       <div className="landing-header-inner">
         <a href="/" className="landing-logo" aria-label="3phor — home">
           <img
-            src="/3phor-logo.png"
+            src="/3phor-mark.png"
             alt=""
             className="landing-logo-img"
           />
@@ -139,9 +139,8 @@ function Hero() {
       <div className="landing-hero-inner">
         <img
           src="/3phor-logo.png"
-          alt=""
+          alt="3phor"
           className="landing-hero-logo"
-          aria-hidden="true"
         />
         <h1 className="landing-hero-title">3phor</h1>
         <p className="landing-hero-subtitle">

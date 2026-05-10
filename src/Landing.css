@@ -283,11 +283,28 @@
 }
 
 .landing-hero-logo {
-  width: clamp(110px, 20vw, 160px);
+  /* Wide cinematic logo — fills the hero band. The image is ~1.83:1
+     so this sizing gives ~330px tall at 600px wide, ~440px at 800px. */
+  width: clamp(320px, 80vw, 800px);
   height: auto;
   display: block;
-  margin: 0 auto 18px;
-  filter: drop-shadow(0 8px 32px rgba(255, 216, 132, 0.22));
+  margin: 0 auto 8px;
+  filter: drop-shadow(0 12px 48px rgba(255, 216, 132, 0.18));
+}
+
+/* Hide the redundant h1 wordmark text — the image already carries
+   "3phor". Keep it in the DOM for SEO / accessibility (screen readers
+   announce it, Google indexes it). */
+.landing-hero-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .landing-hero-title {

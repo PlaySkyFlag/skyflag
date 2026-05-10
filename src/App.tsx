@@ -972,7 +972,7 @@ export default function App() {
     <main className="app">
       <header className="app-header">
         <img
-          src="/3phor-logo.png"
+          src="/3phor-mark.png"
           alt="3phor"
           className="app-logo"
           width={120}
