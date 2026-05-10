@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>3phor — Kaleo Edition — Rulebook v20</title>
+<style>
+  @page {
+    size: Letter;
+    margin: 0.85in 0.85in 1.0in 0.85in;
+  }
+  @page :first {
+    margin: 0;
+  }
+
+  :root {
+    --ink: #1a1c20;
+    --ink-soft: #4a4d52;
+    --gold: #b8902b;
+    --gold-deep: #876820;
+    --paper: #fbf9f4;
+    --rule: #d8d2c2;
+    --accent-bg: #f4ecd6;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+
+  /* ── Cover page ── */
+  .cover {
+    height: 11in;
+    width: 8.5in;
+    page-break-after: always;
+    background: radial-gradient(circle at 30% 30%, #1a2a4a 0%, #0a1224 60%, #04070f 100%);
+    color: #e8eef8;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1in;
+  }
+  .cover-eyebrow {
+    font-size: 11pt;
+    letter-spacing: 0.4em;
+    color: #c9b07a;
+    font-style: italic;
+    margin-bottom: 1em;
+  }
+  .cover-title {
+    font-size: 96pt;
+    color: #e9b94a;
+    font-weight: 700;
+    letter-spacing: -2pt;
+    line-height: 1;
+    margin: 0;
+    background: linear-gradient(180deg, #ffe27a 0%, #e9b94a 50%, #a07820 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cover-subtitle {
+    font-size: 14pt;
+    letter-spacing: 0.35em;
+    color: #c9b07a;
+    margin-top: 0.6em;
+    font-style: italic;
+  }
+  .cover-tagline {
+    font-size: 22pt;
+    margin-top: 2.5em;
+    font-style: italic;
+    color: #e8eef8;
+  }
+  .cover-tagline-sub {
+    font-size: 14pt;
+    color: #a8b8d8;
+    letter-spacing: 0.18em;
+    margin-top: 0.6em;
+  }
+  .cover-edition {
+    margin-top: 2.5em;
+    font-size: 13pt;
+    letter-spacing: 0.3em;
+    color: #c9b07a;
+  }
+  .cover-meta {
+    margin-top: 0.5em;
+    font-size: 11pt;
+    color: #a8b8d8;
+    letter-spacing: 0.06em;
+  }
+  .cover-bottom {
+    position: absolute;
+    bottom: 0.7in;
+    left: 1in;
+    right: 1in;
+    font-size: 9pt;
+    color: #a8b8d8;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── Body pages ── */
+  .page {
+    page-break-after: always;
+  }
+  .page:last-child {
+    page-break-after: avoid;
+  }
+
+  h1 {
+    font-size: 22pt;
+    color: var(--ink);
+    margin: 0 0 0.4em 0;
+    padding-bottom: 0.25em;
+    border-bottom: 2px solid var(--gold);
+    font-weight: 700;
+    letter-spacing: -0.5pt;
+  }
+  h1 .h1-num {
+    color: var(--gold);
+    margin-right: 0.5em;
+    font-weight: 800;
+  }
+  h2 {
+    font-size: 14pt;
+    color: var(--ink);
+    margin: 1.5em 0 0.4em 0;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  h3 {
+    font-size: 11.5pt;
+    color: var(--gold-deep);
+    margin: 1.2em 0 0.3em 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  p { margin: 0 0 0.7em 0; text-align: justify; }
+  em { font-style: italic; color: var(--ink-soft); }
+
+  /* Eyebrow strip on every body page for branding continuity */
+  .running-header {
+    position: running(header);
+  }
+
+  /* Pull quote */
+  .pull {
+    font-style: italic;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 12pt;
+    margin: 1.4em 2em;
+    padding: 0.8em 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .pull::before { content: '\201C'; color: var(--gold); margin-right: 0.1em; }
+  .pull::after  { content: '\201D'; color: var(--gold); margin-left: 0.1em; }
+
+  /* Accent box for important callouts (rules of thumb, warnings) */
+  .callout {
+    background: var(--accent-bg);
+    border-left: 4px solid var(--gold);
+    padding: 0.7em 1em;
+    margin: 1em 0;
+    page-break-inside: avoid;
+  }
+  .callout-title {
+    font-weight: 700;
+    color: var(--gold-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 9.5pt;
+    margin-bottom: 0.3em;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8em 0 1.2em;
+    font-size: 10.5pt;
+  }
+  th {
+    background: var(--accent-bg);
+    color: var(--gold-deep);
+    text-align: left;
+    padding: 0.5em 0.7em;
+    border-bottom: 2px solid var(--gold);
+    font-size: 9.5pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  td {
+    padding: 0.5em 0.7em;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Board diagram — grid using CSS so it renders crisply at any zoom */
+  .board {
+    display: grid;
+    grid-template-columns: 28pt repeat(6, 1fr);
+    grid-template-rows: 22pt repeat(6, 36pt);
+    gap: 1pt;
+    margin: 0.8em auto;
+    width: 4.6in;
+    border: 1.5pt solid var(--ink);
+    background: var(--ink);
+  }
+  .board-cell {
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9pt;
+    color: var(--ink);
+    position: relative;
+  }
+  .board-cell.label {
+    background: var(--accent-bg);
+    color: var(--gold-deep);
+    font-weight: 700;
+    font-size: 8.5pt;
+    letter-spacing: 0.05em;
+  }
+  .board-cell.dark { background: #ece6d3; }
+  .board-cell .marker {
+    font-size: 14pt;
+  }
+  .board-cell .lift   { color: #6b5a18; }
+  .board-cell .flag1  { color: #283a5a; font-weight: 700; }
+  .board-cell .flag2  { color: #6b6b6b; font-weight: 700; }
+  .board-cell .cap    { color: #283a5a; font-weight: 700; }
+  .board-cell .nexus  { color: var(--gold); font-weight: 700; }
+
+  .board-caption {
+    font-size: 9.5pt;
+    color: var(--ink-soft);
+    font-style: italic;
+    text-align: center;
+    margin: 0 1em 1.2em;
+  }
+
+  /* Two-column piece-card row */
+  .piece-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    border-top: 2px solid var(--gold);
+    padding-top: 0.8em;
+    margin-top: 1em;
+    page-break-inside: avoid;
+  }
+  .piece-card h3 { margin-top: 0; }
+  .piece-card .piece-glyph {
+    font-size: 60pt;
+    text-align: center;
+    color: var(--gold);
+    line-height: 1;
+    margin: 0.2em 0;
+  }
+  .piece-stat {
+    display: grid;
+    grid-template-columns: 80pt 1fr;
+    gap: 0.3em 0.8em;
+    margin-top: 0.5em;
+    font-size: 10pt;
+  }
+  .piece-stat dt {
+    font-weight: 700;
+    color: var(--gold-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 9pt;
+  }
+  .piece-stat dd { margin: 0; }
+
+  /* Footer for body pages */
+  .page-footer {
+    margin-top: 2em;
+    border-top: 1px solid var(--rule);
+    padding-top: 0.4em;
+    font-size: 8pt;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 0.06em;
+  }
+
+  /* Table of contents */
+  .toc {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .toc li {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px dotted var(--rule);
+    padding: 0.4em 0;
+    font-size: 11pt;
+  }
+  .toc .toc-num {
+    color: var(--gold);
+    font-weight: 700;
+    width: 2em;
+  }
+  .toc .toc-title {
+    flex: 1;
+  }
+  .toc .toc-page {
+    color: var(--ink-soft);
+    margin-left: 0.5em;
+  }
+
+  /* "New in v20" badge */
+  .new-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    font-size: 8pt;
+    padding: 1pt 6pt;
+    border-radius: 8pt;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    vertical-align: middle;
+    margin-left: 0.5em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<!-- ───── Cover ───── -->
+<section class="cover">
+  <div class="cover-eyebrow">A 3D STRATEGY GAME FROM THE CAELUM CHRONICLES UNIVERSE</div>
+  <h1 class="cover-title" style="border:none;">3phor</h1>
+  <div class="cover-subtitle">KALEO &nbsp; EDITION</div>
+  <div class="cover-tagline">Where strategists gather.</div>
+  <div class="cover-tagline-sub">THREE LAYERS &nbsp;·&nbsp; FOUR LIFTS &nbsp;·&nbsp; ONE NEXUS</div>
+  <div class="cover-edition">RULEBOOK &nbsp;·&nbsp; v20 &nbsp;·&nbsp; CROSS-BOARD RULE</div>
+  <div class="cover-meta">2 players &nbsp;·&nbsp; ages 8+ &nbsp;·&nbsp; 45–75 minutes</div>
+  <div class="cover-bottom">
+    3phor.com &nbsp;·&nbsp; © 2026 Limnology Research Corp. &nbsp;·&nbsp; Dr. Nelson Jatel, P.Ag.
+  </div>
+</section>
+
+<!-- ───── Foreword ───── -->
+<section class="page">
+  <h1><span class="h1-num">·</span>Foreword</h1>
+  <h2>From SkyFlag to 3phor</h2>
+  <p>This game began life in 2026 under the working title <em>SkyFlag</em>. The world,
+    the pieces, the geometry, and the spirit of play have not changed; the brand has.
+    The game you hold is now <strong>3phor</strong> — the inaugural game of the
+    <em>Caelum Chronicles</em> universe, of which the Kaleo Edition is the first
+    chapter.</p>
+  <p>Everything in the rulebook v19.1 (Cross-Board Rule, Edition 1.1) is preserved
+    in v20. What's been added comes from a year of playing the game across solo, 2P
+    hot-seat, and online formats — additions that <em>support</em> the core
+    geometry rather than alter it.</p>
+
+  <h2>What's new in v20</h2>
+  <table>
+    <tr><th>Addition</th><th>Effect on the core game</th></tr>
+    <tr>
+      <td><strong>Time controls</strong> (5 / 10 / 30 min)</td>
+      <td>Optional. Off by default; identical core rules.</td>
+    </tr>
+    <tr>
+      <td><strong>Resignation &amp; draw offers</strong></td>
+      <td>Either player may resign or offer a draw at any time.</td>
+    </tr>
+    <tr>
+      <td><strong>AI difficulty levels</strong></td>
+      <td>Easy / Medium / Hard / Expert. Solo play only.</td>
+    </tr>
+    <tr>
+      <td><strong>Online multiplayer</strong></td>
+      <td>Rated games, friends, tournaments. Same rules.</td>
+    </tr>
+    <tr>
+      <td><strong>Daily Puzzle</strong></td>
+      <td>One shared tactical position per day. Single-side, race-the-clock.</td>
+    </tr>
+  </table>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>Foreword</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── Kaleo lore page ───── -->
+<section class="page">
+  <h1><span class="h1-num">·</span>Kaleo</h1>
+  <h2>A world above a world that failed</h2>
+  <p>Long ago, when the planet below gave way to salt, dust, and ruined basins,
+    the Aetheri lifted what remained of civilization into a three-layer arcology.
+    The lowest layer — the Terran — holds the reservoirs, farms, workshops, and
+    crowded human districts. Above it, the Meridian carries charged air, transit
+    architecture, and the old routing systems. At the summit rests the Empyrean —
+    the quiet upper shell where the Aetheri left their highest instruments.</p>
+  <p>At the centre of the Empyrean, and only there, waits the Caelum Nexus.
+    The lower layers have no such central shrine. What they have, instead, are
+    corners.</p>
+  <p>Each clan placed three dormant claim-seals in the corners of its own
+    territory on each layer — proofs of presence left for the Aetheri to witness.
+    Defend your seals; the opponent's seals are your targets. Only by crossing
+    into the opposing clan's territory and neutralizing all three of its seals
+    may a Captain earn the right to approach the Nexus. The Aetheri did not
+    trust survival to strength alone; they built Kaleo as a system of proofs,
+    and the proof demanded is reach.</p>
+
+  <div class="pull">The Aetheri did not build three layers. They built three answers to the same question.</div>
+
+  <h2>The Two Clans</h2>
+  <p>For seven generations, Kaleo was one people. The schism came during a crisis
+    whose name the archives still record — a disease that tore through the lower
+    districts while the council debated what to do. One faction argued for
+    immediate escalation: open the Aetheri archives, petition the Nexus. The other
+    argued for containment: preserve what remained, refuse panic, work with the
+    tools already at hand.</p>
+  <p>The containment faction won the argument by one vote. Their victory
+    stabilized Kaleo at the cost of two hundred thousand Terran residents who
+    might have been saved. The escalation faction did not forget. Over four
+    generations they consolidated into the <strong>Grey Ravens</strong>. The
+    faction that had won became the <strong>White Stags</strong>. Each clan drew
+    its name and totem from the temperament that had defined its position in
+    that ancient debate.</p>
+  <p>Six generations later, both clans still claim duty. Both claim restraint.
+    Both claim they are acting for Kaleo. Both are correct. Neither is complete.
+    The contest that decides Kaleo's next age is the raid on the opposing clan's
+    three seals, and the answer of the Nexus.</p>
+
+  <table style="margin-top: 1.2em;">
+    <tr><th>Grey Ravens</th><th>White Stags</th></tr>
+    <tr>
+      <td><em>"We have been here longer than the crisis. We will be here longer than its answer."</em></td>
+      <td><em>"We were given a path. If we do not walk it, it becomes a monument to our refusal."</em></td>
+    </tr>
+  </table>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>Lore</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── Contents ───── -->
+<section class="page">
+  <h1><span class="h1-num">·</span>Contents</h1>
+  <p>This rulebook proceeds in the order you will need it. Pages marked
+    <span class="new-badge">NEW</span> are additions in v20.</p>
+  <ul class="toc">
+    <li><span class="toc-num">1</span><span class="toc-title">Overview</span></li>
+    <li><span class="toc-num">2</span><span class="toc-title">Components &amp; Setup</span></li>
+    <li><span class="toc-num">3</span><span class="toc-title">The Four Pieces</span></li>
+    <li><span class="toc-num">4</span><span class="toc-title">Turn Sequence</span></li>
+    <li><span class="toc-num">5</span><span class="toc-title">The Lifts</span></li>
+    <li><span class="toc-num">6</span><span class="toc-title">The Flags &amp; the Nexus</span></li>
+    <li><span class="toc-num">7</span><span class="toc-title">Win Conditions</span></li>
+    <li><span class="toc-num">8</span><span class="toc-title">Game Phases</span></li>
+    <li><span class="toc-num">9</span><span class="toc-title">Play Modes <span class="new-badge">NEW</span></span></li>
+    <li><span class="toc-num">10</span><span class="toc-title">Quick Reference</span></li>
+  </ul>
+
+  <h3>How to use this rulebook</h3>
+  <p>If you are sitting down to your first game, read sections 1–4 before
+    setup. Section 10 is a single-page reference designed to live beside the
+    board during play.</p>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>Contents</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 1 · Overview ───── -->
+<section class="page">
+  <h1><span class="h1-num">1</span>Overview</h1>
+  <p><strong>3phor</strong> is a two-player tactical race played across a
+    three-layer arcology. Each player commands four pieces — a Captain, a
+    Soldier, a Rover, and a Pilot — and pursues the opposing clan's three
+    claim-flags, one on each layer of the board. Flags may be captured in
+    any order. Once all three of the opponent's flags are claimed, your
+    Captain must land on the <strong>Caelum Nexus</strong> at Space(3,3) to win.</p>
+  <p>Pieces move and capture by geometry alone. There are no special
+    abilities, no cards, no dice. Everything the game offers comes from
+    the interaction of four movement profiles with the architecture of
+    three stacked boards and the four vertical transit points — the
+    <strong>Lifts</strong> — that connect them.</p>
+
+  <div class="callout">
+    <div class="callout-title">The objective</div>
+    <p>Each player must capture the opponent's three flags, one on each layer
+      of the arcology. Capture all three — in any order — then land your
+      Captain on the Nexus at Space(3,3) to win.</p>
+  </div>
+
+  <h2>Board coordinates</h2>
+  <p>All three layers share the same coordinate system. A cell is identified
+    as <em>Layer(row, col)</em>. Row 0 is the top edge; row 5 is the bottom.
+    Col 0 is the left edge; col 5 is the right.</p>
+  <table>
+    <tr><th>Layer name</th><th>In-world name</th><th>Notable feature</th></tr>
+    <tr><td>Ground</td><td>Terran</td><td>Starting layer — pieces deploy here.</td></tr>
+    <tr><td>Sky</td><td>Meridian</td><td>Middle transit layer. Most contested phase.</td></tr>
+    <tr><td>Space</td><td>Empyrean</td><td>Contains the Nexus at Space(3,3).</td></tr>
+  </table>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>1 · Overview</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 2 · Components & Setup ───── -->
+<section class="page">
+  <h1><span class="h1-num">2</span>Components &amp; Setup</h1>
+  <h2>Components</h2>
+  <table>
+    <tr><th>Item</th><th>Quantity &amp; notes</th></tr>
+    <tr><td>Three-layer board</td><td>Ground, Sky, Space — each a 6×6 grid sharing coordinates.</td></tr>
+    <tr><td>Player pieces</td><td>4 per player: Captain, Soldier, Rover, Pilot. P1 = slate; P2 = ivory.</td></tr>
+    <tr><td>Flag markers</td><td>3 per player: Ground Flag (⚑), Sky Flag (⚑), Space Flag (★).</td></tr>
+    <tr><td>Lift tokens</td><td>12 total — four per layer, marking the Lift cells.</td></tr>
+    <tr><td>Nexus marker</td><td>1 — placed at Space(3,3).</td></tr>
+  </table>
+
+  <h2>The Board</h2>
+  <p>The board comprises three stacked 6×6 layers. Four Lifts at
+    (1,1) · (1,4) · (4,1) · (4,4) connect every layer. Flag positions are
+    fixed and symmetric for the two players.</p>
+
+  <h3>Ground — the Terran layer</h3>
+  <div class="board">
+    <div class="board-cell label"></div>
+    <div class="board-cell label">c0</div><div class="board-cell label">c1</div>
+    <div class="board-cell label">c2</div><div class="board-cell label">c3</div>
+    <div class="board-cell label">c4</div><div class="board-cell label">c5</div>
+
+    <div class="board-cell label">r0</div>
+    <div class="board-cell"><span class="flag1">⚑ P1</span></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"><span class="cap">● P1</span></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r1</div>
+    <div class="board-cell"></div><div class="board-cell"><span class="lift">⬆</span></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"><span class="lift">⬆</span></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r2</div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r3</div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r4</div>
+    <div class="board-cell"></div><div class="board-cell"><span class="lift">⬆</span></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"><span class="lift">⬆</span></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r5</div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"><span class="flag2">● P2</span></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"><span class="flag2">⚑ P2</span></div>
+  </div>
+  <div class="board-caption">P1 Ground Flag at G(0,0); P2 at G(5,5). Captains start: P1 G(0,3), P2 G(5,2).
+    Lifts ⬆ at (1,1), (1,4), (4,1), (4,4).</div>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>2 · Components &amp; Setup</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 2 (cont.) · Sky and Space boards ───── -->
+<section class="page">
+  <h2>Sky — the Meridian layer</h2>
+  <div class="board">
+    <div class="board-cell label"></div>
+    <div class="board-cell label">c0</div><div class="board-cell label">c1</div>
+    <div class="board-cell label">c2</div><div class="board-cell label">c3</div>
+    <div class="board-cell label">c4</div><div class="board-cell label">c5</div>
+
+    <div class="board-cell label">r0</div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"><span class="flag1">⚑ P1</span></div>
+
+    <div class="board-cell label">r1</div>
+    <div class="board-cell"></div><div class="board-cell"><span class="lift">⬆</span></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"><span class="lift">⬆</span></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r2</div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r3</div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r4</div>
+    <div class="board-cell"></div><div class="board-cell"><span class="lift">⬆</span></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"><span class="lift">⬆</span></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r5</div>
+    <div class="board-cell"><span class="flag2">⚑ P2</span></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+  </div>
+  <div class="board-caption">P1 Sky Flag at Sky(0,5); P2 at Sky(5,0) — diagonally opposite.</div>
+
+  <h2>Space — the Empyrean layer</h2>
+  <div class="board">
+    <div class="board-cell label"></div>
+    <div class="board-cell label">c0</div><div class="board-cell label">c1</div>
+    <div class="board-cell label">c2</div><div class="board-cell label">c3</div>
+    <div class="board-cell label">c4</div><div class="board-cell label">c5</div>
+
+    <div class="board-cell label">r0</div>
+    <div class="board-cell"><span class="flag1">★ P1</span></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r1</div>
+    <div class="board-cell"></div><div class="board-cell"><span class="lift">⬆</span></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"><span class="lift">⬆</span></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r2</div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r3</div>
+    <div class="board-cell"></div><div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"><span class="nexus">◎ NX</span></div><div class="board-cell"></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r4</div>
+    <div class="board-cell"></div><div class="board-cell"><span class="lift">⬆</span></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"><span class="lift">⬆</span></div><div class="board-cell"></div>
+
+    <div class="board-cell label">r5</div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"></div>
+    <div class="board-cell"></div><div class="board-cell"><span class="flag2">★ P2</span></div>
+  </div>
+  <div class="board-caption">P1 Space Flag at Space(0,0); P2 at Space(5,5). Each echoes the Ground Flag corner
+    (the <em>Aetheri Echo Point</em>). The Nexus ◎ sits at Space(3,3).</div>
+
+  <div class="callout">
+    <div class="callout-title">Lifts — all layers</div>
+    <p>The four Lift positions are the same on all three layers:
+      (1,1) · (1,4) · (4,1) · (4,4). No two Lifts are within king-move of
+      each other. A Captain cannot threaten two Lifts from a single
+      position — Lift defence is by positioning, not cluster control.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>2 · Components &amp; Setup</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 2 · Setup table ───── -->
+<section class="page">
+  <h2>Setup</h2>
+  <table>
+    <tr><th></th><th>P1 · Slate</th><th>P2 · Ivory</th><th>Notes</th></tr>
+    <tr><td>Captain start</td><td>Ground (0,3)</td><td>Ground (5,2)</td><td>In hand; deploy costs 1 activation.</td></tr>
+    <tr><td>Soldier</td><td>In hand</td><td>In hand</td><td>Deploy during play — 1 activation.</td></tr>
+    <tr><td>Rover</td><td>In hand</td><td>In hand</td><td>Deploy during play — 1 activation.</td></tr>
+    <tr><td>Pilot</td><td>In hand</td><td>In hand</td><td>Deploy during play — 1 activation.</td></tr>
+    <tr><td>Ground Flag ⚑</td><td>G(0,0)</td><td>G(5,5)</td><td>Place at each player's corner.</td></tr>
+    <tr><td>Sky Flag ⚑</td><td>Sky(0,5)</td><td>Sky(5,0)</td><td>Opposite corner on the Sky layer.</td></tr>
+    <tr><td>Space Flag ★</td><td>Space(0,0)</td><td>Space(5,5)</td><td>Echoes the Ground Flag corner.</td></tr>
+    <tr><td>Nexus ◎</td><td>Space(3,3)</td><td>Space(3,3)</td><td>Shared finish cell.</td></tr>
+    <tr><td>Activations</td><td>2 per turn</td><td>2 per turn</td><td>Both players start with the same budget.</td></tr>
+  </table>
+
+  <div class="callout">
+    <div class="callout-title">Setup steps</div>
+    <ol style="margin: 0; padding-left: 1.2em;">
+      <li>Place 12 Lift tokens — 4 per layer at (1,1), (1,4), (4,1), (4,4).</li>
+      <li>Place P1's flags at G(0,0), Sky(0,5), Space(0,0). Place P2's flags at G(5,5), Sky(5,0), Space(5,5).</li>
+      <li>Place the Nexus marker ◎ at Space(3,3).</li>
+      <li>All pieces (Captain, Soldier, Rover, Pilot) start in hand. Determine the first player by any mutual method.</li>
+      <li>Each turn, both players have 2 activations.</li>
+    </ol>
+  </div>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>2 · Components &amp; Setup</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 3 · The Four Pieces ───── -->
+<section class="page">
+  <h1><span class="h1-num">3</span>The Four Pieces</h1>
+  <p>All tactical power comes from movement, capture geometry, and
+    positioning. Pieces use the same movement on every layer. The summary
+    table below is followed by a detailed card for each piece.</p>
+
+  <table>
+    <tr><th>Piece</th><th>Movement</th><th>Capture</th><th>Role</th></tr>
+    <tr>
+      <td><strong>Captain</strong> ♚</td>
+      <td>King-move: 1 sq in any of 8 directions.</td>
+      <td>Lands on opponent's cell.</td>
+      <td>Win-capable. Captures flags &amp; lands on Space(3,3) to finish.</td>
+    </tr>
+    <tr>
+      <td><strong>Soldier</strong> ♟</td>
+      <td>Forward only. First move ≤ 2 sq; subsequent 1 sq.</td>
+      <td>1 sq diagonally forward.</td>
+      <td>Deploys from hand. Promotes to Captain at the far row on Ground.</td>
+    </tr>
+    <tr>
+      <td><strong>Rover</strong> ♜</td>
+      <td>Orthogonal ≤ 2 sq.</td>
+      <td>1 step only — cannot capture at 2 squares.</td>
+      <td>Lift-corridor guard. Blocks approaches.</td>
+    </tr>
+    <tr>
+      <td><strong>Pilot</strong> ♝</td>
+      <td>Diagonal ≤ 2 sq. May jump over an intervening piece.</td>
+      <td>Lands on opponent beyond the jump — jumped piece captured.</td>
+      <td>Flanks Lift approaches. Reaches threats over defenders.</td>
+    </tr>
+  </table>
+
+  <div class="piece-card">
+    <div>
+      <h3>Captain · Dantec</h3>
+      <p><em>Slate — Renn Dantec · Ivory — Sera Dantec</em></p>
+      <p>The only piece — along with a promoted Soldier — that can capture
+        flags and answer the Nexus. Every other piece exists to protect her
+        approach.</p>
+    </div>
+    <div>
+      <div class="piece-glyph">♚</div>
+      <dl class="piece-stat">
+        <dt>Movement</dt><dd>1 sq in any of 8 directions (king-move). All layers.</dd>
+        <dt>Capture</dt><dd>By landing on the opponent's cell.</dd>
+        <dt>Role</dt><dd>Win-capable. Captures flags. Finishes the game at Space(3,3).</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="piece-card">
+    <div>
+      <h3>Soldier · Durren</h3>
+      <p><em>Slate — Toren Durren · Ivory — Kael Durren</em></p>
+      <p>Deploys from hand. Forward-only. A Soldier that reaches the back
+        rank on Ground changes the game: a second win-capable piece appears
+        on the board.</p>
+    </div>
+    <div>
+      <div class="piece-glyph">♟</div>
+      <dl class="piece-stat">
+        <dt>Movement</dt><dd>Forward only (P1 down rows; P2 up rows). First move ≤ 2 sq; subsequent 1 sq.</dd>
+        <dt>Capture</dt><dd>1 sq diagonally forward only.</dd>
+        <dt>Role</dt><dd>Controls approach corridors. Promotes to Captain at the far row.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">Soldier promotion</div>
+    <p>When a Soldier reaches the far row on the Ground layer (row 5 for P1;
+      row 0 for P2), it promotes immediately to a Captain. A promoted
+      Captain has full Captain powers: it may capture flags and land on
+      Space(3,3) to finish the game.</p>
+    <p>Flag-capture progress is shared across both Captains — you do not
+      need to capture all three flags with the same Captain. Players may
+      therefore field up to two Captains simultaneously.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>3 · The Four Pieces</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 3 (cont.) · Rover and Pilot ───── -->
+<section class="page">
+  <div class="piece-card">
+    <div>
+      <h3>Rover · Thandiwe</h3>
+      <p><em>Slate — Mox Thandiwe · Ivory — Iva Thandiwe</em></p>
+      <p>Rovers lock down Lift corridors and force the opponent to reroute.
+        A Rover does not need to strike — a Rover only needs to stand in the
+        correct place.</p>
+    </div>
+    <div>
+      <div class="piece-glyph">♜</div>
+      <dl class="piece-stat">
+        <dt>Movement</dt><dd>Orthogonal ≤ 2 squares (horizontally or vertically). All layers.</dd>
+        <dt>Capture</dt><dd>1 step only — cannot capture at 2 squares.</dd>
+        <dt>Role</dt><dd>Limited rook. Corridor control. Lift defence.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="piece-card">
+    <div>
+      <h3>Pilot · Voss</h3>
+      <p><em>Slate — Zara Voss · Ivory — Arin Voss</em></p>
+      <p>The Pilot converts a screen into a liability. The one piece that
+        reaches a threat over defending pieces — arriving one square sooner
+        than the defender expected.</p>
+    </div>
+    <div>
+      <div class="piece-glyph">♝</div>
+      <dl class="piece-stat">
+        <dt>Movement</dt><dd>Diagonal ≤ 2 squares. May jump over an intervening piece.</dd>
+        <dt>Capture</dt><dd>Lands on opponent beyond the jump — jumped piece is captured.</dd>
+        <dt>Role</dt><dd>Limited bishop with jump-capture. Flanks Lift approaches.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">Pilot jump details</div>
+    <p>A Pilot at A may jump to C if there is exactly one piece (friend or
+      enemy) at B, where A → B → C is a straight diagonal of 2 squares.
+      If C holds an enemy piece, both that piece <em>and</em> the jumped
+      piece at B are captured.</p>
+    <p>If C is empty, the move is legal — the Pilot still passes over the
+      jumped piece but only the jumped piece is captured.</p>
+    <p>A Pilot cannot jump over more than one piece, and cannot end its
+      move on a square occupied by a friendly piece.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>3 · The Four Pieces</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 4 · Turn Sequence ───── -->
+<section class="page">
+  <h1><span class="h1-num">4</span>Turn Sequence</h1>
+  <p>Each turn proceeds through the following steps in order. You must take
+    every action available within your activation budget — you cannot pass
+    if a legal action exists.</p>
+
+  <table>
+    <tr><th>Step</th><th>What you do</th></tr>
+    <tr>
+      <td><strong>1 · Deploy (optional)</strong></td>
+      <td>Place 1 piece from hand onto your starting cell on the Ground layer. Costs 1 activation. A newly deployed piece cannot move on the same activation.</td>
+    </tr>
+    <tr>
+      <td><strong>2 · Activate</strong></td>
+      <td>Take up to 2 actions with deployed pieces. Each action is one of: move a piece, capture, step up or down a Lift. You must act if any legal action is available.</td>
+    </tr>
+    <tr>
+      <td><strong>3 · Flag check</strong></td>
+      <td>If one of your Captains (original or promoted) just landed on a cell containing an opponent's flag, capture it immediately. Remove the flag marker.</td>
+    </tr>
+    <tr>
+      <td><strong>4 · Nexus check</strong></td>
+      <td>If all three of your opponent's flags have been captured and one of your Captains just landed on Space(3,3), you win immediately.</td>
+    </tr>
+    <tr>
+      <td><strong>5 · Pass initiative</strong></td>
+      <td>The other player now takes their turn.</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <div class="callout-title">Activation summary</div>
+    <p><strong>Standard:</strong> 2 activations per turn for both players.</p>
+    <p><strong>Lift use:</strong> move to a Lift cell (1 activation on one turn), then step up or down one layer (1 activation on the next turn). The Lift step itself cannot capture.</p>
+    <p><strong>Flag capture</strong> is automatic at step 3 — it does not consume an activation, and it grants no bonus activation.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>4 · Turn Sequence</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 5 · The Lifts ───── -->
+<section class="page">
+  <h1><span class="h1-num">5</span>The Lifts</h1>
+  <p>Lifts connect the three layers. They always occupy the same (row, col)
+    on each layer: (1,1) · (1,4) · (4,1) · (4,4). These four positions form
+    a square ring inside the board, each exactly one king-move from a flag
+    corner on the Ground layer.</p>
+
+  <div class="callout">
+    <div class="callout-title">Using a Lift — two turns</div>
+    <p>Using a Lift takes two separate activations on two separate turns:</p>
+    <ul style="margin: 0.3em 0 0.6em 0; padding-left: 1.2em;">
+      <li><strong>Turn A:</strong> move your piece onto the Lift cell on its current layer (1 activation).</li>
+      <li><strong>Turn B:</strong> step your piece up or down one layer via that Lift (1 activation).</li>
+    </ul>
+    <p>A piece cannot arrive at a Lift and step through it in the same
+      activation. <em>Exception:</em> if a piece ends a turn already on a
+      Lift cell, it may step up or down on its very next activation.</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">Lift occupation rule</div>
+    <p>A piece on a Lift cell on one layer blocks the Lift step from the
+      adjacent layer. The blocking piece does <em>not</em> need to be on
+      the same Lift cell as the ascending piece — it needs to be at the
+      same (row, col) on the layer above or below.</p>
+    <p>The blocked Lift step cannot capture the blocking piece. To clear
+      a blocked Lift, remove the blocking piece through normal play on
+      its own layer.</p>
+    <p><strong>Strategy:</strong> parking a defender on the Space Lift
+      above your own flag (P1: Space(1,1); P2: Space(4,4)) simultaneously
+      guards the approach AND blocks that Lift from Sky, denying the
+      opponent an ascent.</p>
+  </div>
+
+  <p><em>Lift independence:</em> no two Lifts are within king-move of each
+    other. A piece on one Lift cell cannot threaten any other Lift. There
+    is no cluster fortress — each Lift must be defended individually
+    through positioning.</p>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>5 · The Lifts</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 6 · Flags & the Nexus ───── -->
+<section class="page">
+  <h1><span class="h1-num">6</span>The Flags &amp; the Nexus</h1>
+  <p>Each player captures the opponent's three flags, placed in the
+    opponent's corners. Landing on your own flag cell does nothing —
+    your flag stays in place until the opponent captures it. Flags may
+    be captured in any order — Ground, Sky, and Space are fully
+    independent objectives. Once all three of the opponent's flags are
+    captured, your Captain must reach the Nexus at Space(3,3) to win.</p>
+
+  <table>
+    <tr><th></th><th>P1 · Slate (targets)</th><th>P2 · Ivory (targets)</th></tr>
+    <tr><td>Ground Flag ⚑</td><td>G(5,5) — bottom-right</td><td>G(0,0) — top-left</td></tr>
+    <tr><td>Sky Flag ⚑</td><td>Sky(5,0) — bottom-left</td><td>Sky(0,5) — top-right</td></tr>
+    <tr><td>Space Flag ★</td><td>Space(5,5) — bottom-right</td><td>Space(0,0) — top-left</td></tr>
+    <tr><td>Nearest Lift</td><td>(4,4) for G &amp; Space · (4,1) for Sky</td><td>(1,1) for G &amp; Space · (1,4) for Sky</td></tr>
+    <tr><td>Nexus ◎</td><td>Space(3,3) — shared finish cell</td><td>Space(3,3) — shared finish cell</td></tr>
+  </table>
+
+  <div class="callout">
+    <div class="callout-title">Flag capture</div>
+    <p>A Captain (original or promoted) lands on an opponent's flag cell
+      → the flag is captured instantly. Remove the marker. A friendly or
+      enemy piece on the flag cell does <em>not</em> block capture — a
+      Captain may always land on and capture an opponent's flag regardless
+      of who else occupies it.</p>
+    <p>Flag capture does not grant a bonus activation. The turn continues
+      with its normal budget.</p>
+    <p>After all three opponent flags are captured, your Captain must
+      reach Space(3,3) to win.</p>
+  </div>
+
+  <h2>The Aetheri Echo Point</h2>
+  <p>Each player's Ground and Space flags share the same (row, col) — the
+    <em>Aetheri Echo Point</em>. Continuity of position across layers was
+    the proof the Aetheri required. The Sky flag sits at the diagonally
+    opposite corner, enforcing a genuine horizontal traverse on the
+    central layer.</p>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>6 · Flags &amp; the Nexus</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 7 · Win Conditions ───── -->
+<section class="page">
+  <h1><span class="h1-num">7</span>Win Conditions</h1>
+  <table>
+    <tr><th>Condition</th><th>How it triggers</th></tr>
+    <tr>
+      <td><strong>Win by Nexus</strong> (primary)</td>
+      <td>A Captain on your side captures all three of your opponent's flags — Ground, Sky, and Space, in any order — and then lands on the Nexus cell at Space(3,3). Either the original Captain or a promoted Captain may trigger this win. Flags may be captured across both Captains collectively.</td>
+    </tr>
+    <tr>
+      <td><strong>Win by Elimination</strong></td>
+      <td>Your opponent has no Captain on the board and none in hand, and no Soldier remaining that could promote to a Captain. All Captain-capable pieces have been permanently captured.</td>
+    </tr>
+    <tr>
+      <td><strong>Win by Resignation</strong> <span class="new-badge">NEW</span></td>
+      <td>Your opponent resigns the game from the in-game toolbar. The win is recorded as a resignation in the stats.</td>
+    </tr>
+    <tr>
+      <td><strong>Win by Time-out</strong> <span class="new-badge">NEW</span></td>
+      <td>If a time control is in effect and your opponent's clock reaches zero, you win immediately. Time controls are optional and default to off.</td>
+    </tr>
+    <tr>
+      <td><strong>Draw by Agreement</strong> <span class="new-badge">NEW</span></td>
+      <td>Either player may offer a draw at any time; if accepted, the game ends with no winner.</td>
+    </tr>
+    <tr>
+      <td><strong>Turn-limit Draw</strong></td>
+      <td>180 turns without a win. Tiebreak, in order: (1) flags captured; (2) pieces remaining; (3) opponent pieces captured; (4) highest layer occupied; (5) Captain Chebyshev distance to Space(3,3).</td>
+    </tr>
+  </table>
+
+  <h2>Competitive Note</h2>
+  <p>3phor contains a minor structural asymmetry in its spatial geometry.
+    Specifically, Space(3,3) is not equidistant from the Player 1 (P1) and
+    Player 2 (P2) starting positions when evaluated through optimal Captain
+    movement paths. Under efficient play, P1 can reach this key space in
+    18 actions, whereas P2 requires 19. This one-action differential
+    introduces a slight first-player advantage, analogous to the initiative
+    observed for White in Chess. To mitigate this imbalance in competitive
+    play, matches are structured as a best-of-three series, with players
+    alternating starting positions between games. This format ensures
+    that each player has equal exposure to both positional advantages
+    over the course of the match.</p>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>7 · Win Conditions</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 8 · Game Phases ───── -->
+<section class="page">
+  <h1><span class="h1-num">8</span>Game Phases</h1>
+  <p>The three-flag system with a Nexus finish creates four natural phases
+    of play. Flags may be pursued in any order, but the geometry rewards
+    a sequential path.</p>
+
+  <table>
+    <tr><th>Phase</th><th>Layer</th><th>What happens</th></tr>
+    <tr>
+      <td><strong>1 · Ground Race</strong></td>
+      <td>Ground</td>
+      <td>Both Captains on Ground racing across the board to capture the opposing Ground Flag. Soldiers deploy during play. Rovers and Pilots may ascend to Sky or Space immediately. Early Lift skirmishes determine approach control. ~3–4 rounds.</td>
+    </tr>
+    <tr>
+      <td><strong>2 · Sky Crossing</strong></td>
+      <td>Sky</td>
+      <td>Sky transit is the hardest leg: the target Sky Flag is diagonally opposite from the Lift nearest your Ground approach (four king-moves). Both Captains must cross the full board width in Sky. Most contested phase. ~4–5 rounds.</td>
+    </tr>
+    <tr>
+      <td><strong>3 · Space Flag</strong></td>
+      <td>Space</td>
+      <td>After Sky, the Captain ascends to Space. With echoed corners, the target Space Flag sits at the same position as the target Ground Flag — immediate recognition, but the opponent may already be contesting the layer. ~2–3 rounds under competition.</td>
+    </tr>
+    <tr>
+      <td><strong>4 · Nexus Finish</strong></td>
+      <td>Space</td>
+      <td>With all three flags captured, the Captain must converge on Space(3,3). The Nexus is central — 2 or 3 king-moves from any Space Flag — and either Captain (original or promoted) can finish. 2–3 activations minimum.</td>
+    </tr>
+  </table>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>8 · Game Phases</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 9 · Play Modes (NEW) ───── -->
+<section class="page">
+  <h1><span class="h1-num">9</span>Play Modes <span class="new-badge">NEW IN v20</span></h1>
+  <p>3phor is the same game in every mode. These mode descriptions
+    document how it's actually played on the digital editions
+    (3phor.com on web and iOS); the rules above govern all of them.</p>
+
+  <h2>Solo vs AI</h2>
+  <p>Single-player against a computer opponent. The AI uses an
+    iterative-deepening minimax search with alpha-beta pruning,
+    transposition table, killer-move + history heuristic move ordering,
+    a piece-square table evaluator, and a small opening book. Four
+    difficulty levels:</p>
+  <table>
+    <tr><th>Difficulty</th><th>Search depth</th><th>Best for</th></tr>
+    <tr><td>Easy</td>     <td>2 ply</td><td>First-time players learning the geometry.</td></tr>
+    <tr><td>Medium</td>   <td>3 ply</td><td>Once you've won a few Easy games.</td></tr>
+    <tr><td>Hard</td>     <td>4 ply</td><td>Default for confident players.</td></tr>
+    <tr><td>Expert · <em>Plus</em></td><td>6 ply</td><td>Sterner opponent. Requires the Plus subscription.</td></tr>
+  </table>
+  <p>Difficulty is set in <em>Settings → AI difficulty</em>. The choice
+    persists across sessions.</p>
+
+  <h2>Two-Player Hot-Seat</h2>
+  <p>Two humans sharing one device. Pass after each turn. No clock by
+    default; enable a clock from <em>Settings → Clock</em> for a timed
+    game. No account required.</p>
+
+  <h2>Online Multiplayer</h2>
+  <p>Two humans on separate devices, real-time over the network. Both
+    players sign in (guest, email, Apple, or Google) and either create
+    a room or join one by code. Sessions sync via Supabase realtime;
+    push notifications fire on your turn if the app isn't focused.</p>
+  <ul style="margin-top: 0.3em;">
+    <li><strong>Ratings.</strong> Every completed online game updates both players' ELO ratings. K-factor 24.</li>
+    <li><strong>Friends.</strong> Save opponents' nicknames; see who's online and challenge directly.</li>
+    <li><strong>Tournaments.</strong> Round-robin and bracketed events. Free events open to all; entry-fee events require the Tournament Entry entitlement.</li>
+  </ul>
+
+  <h2>Daily Puzzle</h2>
+  <p>One shared tactical position per day. The same starting position is
+    served to every player worldwide; solve as efficiently as you can.
+    A briefing screen presents the objective and a short rules recap
+    before the position is revealed (the chess.com / Lichess "I'm ready"
+    pattern).</p>
+
+  <h2>Time Controls</h2>
+  <p>Optional. Default off. When a clock is in effect, each player has
+    the chosen budget for the entire game — there is no per-move
+    increment. If your clock reaches zero, you lose by Time-out.</p>
+  <table>
+    <tr><th>Option</th><th>Per side</th><th>Best for</th></tr>
+    <tr><td>Off</td>      <td>—</td>      <td>Untimed casual play.</td></tr>
+    <tr><td>5 minutes</td><td>5 min</td>  <td>Blitz — fast, decisive.</td></tr>
+    <tr><td>10 minutes</td><td>10 min</td><td>Rapid — most online matches.</td></tr>
+    <tr><td>30 minutes</td><td>30 min</td><td>Classical — thoughtful play.</td></tr>
+  </table>
+
+  <h2>Resignation &amp; Draw Offers</h2>
+  <p>Either player may resign at any time from the in-game toolbar.
+    Either may also offer a draw; the opponent accepts or declines.
+    A resignation is recorded as a loss for the resigner; an accepted
+    draw counts as a draw for both. In solo play, the AI's "willingness"
+    to accept a draw depends on the position evaluation — if the AI
+    believes it is winning, it will decline.</p>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>9 · Play Modes</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+<!-- ───── 10 · Quick Reference ───── -->
+<section class="page">
+  <h1><span class="h1-num">10</span>Quick Reference</h1>
+  <p>Keep this page beside the board during play.</p>
+
+  <table>
+    <tr><th>Rule</th><th>Summary</th></tr>
+    <tr><td><strong>Win</strong></td><td>Captain captures all 3 opponent flags (Ground, Sky, Space) in any order, then lands on Space(3,3).</td></tr>
+    <tr><td><strong>P1 targets</strong></td><td>G(5,5) · Sky(5,0) · Space(5,5)</td></tr>
+    <tr><td><strong>P2 targets</strong></td><td>G(0,0) · Sky(0,5) · Space(0,0)</td></tr>
+    <tr><td><strong>Nexus ◎</strong></td><td>Space(3,3) — shared finish cell.</td></tr>
+    <tr><td><strong>Lifts</strong></td><td>(1,1) · (1,4) · (4,1) · (4,4). Same on all layers. Two-turn transit. Not within king-move of each other.</td></tr>
+    <tr><td><strong>Lift occupation</strong></td><td>Piece above or below blocks the Lift step from the adjacent layer. The step cannot capture.</td></tr>
+    <tr><td><strong>Activations</strong></td><td>2 per turn. Flag capture does not grant a bonus.</td></tr>
+    <tr><td><strong>Captain</strong> ♚</td><td>King-move (1 sq, 8 dirs, all layers). Capture by landing. Flag-capable. Wins on Space(3,3).</td></tr>
+    <tr><td><strong>Soldier</strong> ♟</td><td>Forward-only. First move ≤ 2 sq. Capture: diagonal-forward. Promotes to Captain at the far row on Ground.</td></tr>
+    <tr><td><strong>Rover</strong> ♜</td><td>Orthogonal ≤ 2 sq. Capture at 1 step only.</td></tr>
+    <tr><td><strong>Pilot</strong> ♝</td><td>Diagonal ≤ 2 sq. May jump an intervening piece to capture beyond.</td></tr>
+    <tr><td><strong>Promotion</strong></td><td>Soldier reaching far row on Ground becomes a Captain. Can capture flags and trigger the Nexus win.</td></tr>
+    <tr><td><strong>Any layer</strong></td><td>Any piece may ascend or descend via Lift at any time.</td></tr>
+    <tr><td><strong>Turn limit</strong></td><td>180 turns. Tiebreak: flags &gt; pieces &gt; captures &gt; layer &gt; distance to Space(3,3).</td></tr>
+    <tr><td><strong>Clock</strong> <span class="new-badge">NEW</span></td><td>Optional 5 / 10 / 30 minutes per side. Zero clock = Time-out loss.</td></tr>
+    <tr><td><strong>Resign / Draw</strong> <span class="new-badge">NEW</span></td><td>Either player may resign or offer a draw at any time.</td></tr>
+  </table>
+
+  <div style="text-align: center; margin-top: 2em; padding-top: 1em; border-top: 2px solid var(--gold);
+              font-style: italic; color: var(--gold-deep); letter-spacing: 0.18em; font-size: 11pt;">
+    3 phor &nbsp;·&nbsp; Kaleo Edition &nbsp;·&nbsp; Rulebook v20 &nbsp;·&nbsp; Cross-Board Rule
+  </div>
+  <div style="text-align: center; font-size: 9pt; color: var(--ink-soft); margin-top: 0.5em; letter-spacing: 0.06em;">
+    3phor.com &nbsp;·&nbsp; © 2026 Limnology Research Corp. &nbsp;·&nbsp; Dr. Nelson Jatel, P.Ag.
+  </div>
+
+  <div class="page-footer">
+    <span>3phor — Kaleo Edition — v20</span>
+    <span>10 · Quick Reference</span>
+    <span>3phor.com</span>
+  </div>
+</section>
+
+</body>
+</html>
