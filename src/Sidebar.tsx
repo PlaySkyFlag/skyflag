@@ -32,6 +32,10 @@ type Props = {
   onPresenceChange: (ids: Set<string>) => void;
   onOpenTutorial: () => void;
   onOpenDaily: () => void;
+  // Opens the AccountModal from inside child panels — currently used
+  // by the Tournaments "Verify email to join" CTA so unverified guests
+  // have a one-click path to linking an email.
+  onOpenAccount: () => void;
   chatMessages: ChatMessage[];
   onSendChat: (text: string) => boolean;
 };
@@ -48,6 +52,7 @@ export default function Sidebar({
   onPresenceChange,
   onOpenTutorial,
   onOpenDaily,
+  onOpenAccount,
   chatMessages,
   onSendChat,
 }: Props) {
@@ -101,7 +106,7 @@ export default function Sidebar({
       case 'history':
         return <MoveHistory inline history={history} />;
       case 'tournaments':
-        return <Tournaments inline user={authUser} profile={profile} />;
+        return <Tournaments inline user={authUser} profile={profile} onOpenAccount={onOpenAccount} />;
       case 'friends':
         return (
           <Friends

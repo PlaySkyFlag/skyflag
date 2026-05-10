@@ -1183,6 +1183,7 @@ export default function App() {
         onLeaveRoom={() => setRoom(null)}
         onPresenceChange={setLobbyOnlineIds}
         onOpenTutorial={() => setTutorialOpen(true)}
+        onOpenAccount={() => setAccountOpen(true)}
         onOpenDaily={() => setDailyOpen(true)}
         chatMessages={chatMessages}
         onSendChat={(text: string) => {

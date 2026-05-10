@@ -122,6 +122,34 @@ Deno.serve(async (req: Request) => {
     .maybeSingle();
   if (existing) return json({ ok: true, reason: 'already-applied' });
 
+  // Verified-email gate (migration 015). If either player hasn't
+  // confirmed an email — guest accounts, half-completed sign-ups —
+  // we skip the rating math entirely. The game still ran, but it's
+  // an unrated friendly. Both clients get this same reason back so
+  // the UI can explain why no rating delta showed up.
+  const { data: verifyRows, error: verifyErr } = await supabase
+    .rpc('has_verified_email_bulk', { ids: [winnerId, loserId] })
+    .catch(() => ({ data: null, error: null }));
+  // Fall back to per-id calls if the bulk RPC doesn't exist (deployed
+  // independently). Two calls is fine — this only runs once per game.
+  let bothVerified = false;
+  if (Array.isArray(verifyRows) && verifyRows.length === 2) {
+    bothVerified = verifyRows.every((r: { verified: boolean }) => r.verified);
+  } else {
+    const a = await supabase.rpc('has_verified_email', { uid: winnerId });
+    const b = await supabase.rpc('has_verified_email', { uid: loserId });
+    bothVerified = a.data === true && b.data === true;
+    if (verifyErr) console.error('[apply-rating] verify check error', verifyErr);
+  }
+  if (!bothVerified) {
+    return json({
+      ok: true,
+      reason: 'unverified-skip',
+      detail:
+        "Rating not applied — both players need a verified email. Guests can play but games stay unrated until an email is linked.",
+    });
+  }
+
   // Fetch current ratings for both players.
   const { data: profs, error: profsErr } = await supabase
     .from('profiles')

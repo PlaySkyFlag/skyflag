@@ -407,6 +407,17 @@ export default function Multiplayer({ room, forceOpen = false, onRoomEntered, on
 
   const body = (
     <div className="help-body">
+        {/* Unrated-game notice for guests / unverified users. Online MP
+            stays open to everyone, but rating updates require a verified
+            email (migration 015 + apply-rating Edge Function). Heads-up
+            so the user isn't surprised when their rating doesn't move. */}
+        {!inRoom && authUser && authUser.email_confirmed_at === null && (
+          <p className="mp-note">
+            <strong>Guest games are unrated.</strong> You can still play
+            online — but rating updates kick in once you verify an email.
+            Open the Sign-in panel to link one.
+          </p>
+        )}
         {!inRoom && authUser && (
           <Lobby
             user={authUser}

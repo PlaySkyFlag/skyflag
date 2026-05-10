@@ -49,9 +49,13 @@ type Props = {
   user: User | null;
   profile: Profile | null;
   inline?: boolean;
+  // Opens the AccountModal so unverified guests can link an email
+  // when they want to join a tournament. Passed through from App via
+  // Sidebar.
+  onOpenAccount?: () => void;
 };
 
-export default function Tournaments({ user, profile, inline = false }: Props) {
+export default function Tournaments({ user, profile, inline = false, onOpenAccount }: Props) {
   const [open, setOpen] = useState<Tournament[]>([]);
   const [myEntries, setMyEntries] = useState<Set<string>>(new Set());
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardRow[]>>({});
@@ -311,6 +315,12 @@ export default function Tournaments({ user, profile, inline = false }: Props) {
             ? `Starts in ${formatRemaining(t.starts_at)}`
             : `Ends in ${formatRemaining(t.ends_at)}`;
           const isMine = user !== null && t.created_by === user.id;
+          // Verified-email check (migration 015). Guests and email-link
+          // users mid-confirmation will have email_confirmed_at = null.
+          // The DB will reject the join with an RLS error if we skip
+          // this client guard, so we surface the requirement up front
+          // with a friendlier CTA.
+          const verified = user !== null && user.email_confirmed_at !== null;
           return (
             <div key={t.id} className="tournament">
               <div className="tournament-header">
@@ -332,6 +342,15 @@ export default function Tournaments({ user, profile, inline = false }: Props) {
                       <span className="tournament-joined">✓ Joined</span>
                     ) : upcoming ? (
                       <span className="tournament-meta">Joinable when it starts</span>
+                    ) : !verified ? (
+                      <button
+                        type="button"
+                        className="hud-btn hud-btn-subtle"
+                        onClick={() => onOpenAccount?.()}
+                        title="Tournaments require a verified email — link one to join"
+                      >
+                        Verify email to join
+                      </button>
                     ) : (
                       <button
                         type="button"
