@@ -45,16 +45,69 @@ export function useAuthUser(): { user: User | null; loading: boolean } {
   return { user, loading };
 }
 
-// Sends a magic link to `email`. The link points back to the app's origin;
-// when the user clicks it, Supabase exchanges the token and onAuthStateChange
-// fires with the new session.
+// Sends a one-time email login code to `email`. Supabase's email
+// template includes BOTH a magic link and a 6-digit token, so the user
+// has two ways to redeem:
+//   1. Click the link in the email (original flow — but only works if
+//      they click in the same browser the request came from).
+//   2. Type the 6-digit code into the app (more robust — works across
+//      devices and browsers; no redirect URL allowlist issues).
+//
+// Friendly error messages for the two most common breakage modes:
+//   - Server-side rate limit (separate from the local cooldown — set
+//     by Supabase per email; Pro plan or custom SMTP raises the cap).
+//   - Email provider blocked the address (typo, unreachable mailbox).
 export async function sendMagicLink(email: string): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: window.location.origin },
   });
-  if (error) return { ok: false, message: error.message };
+  if (error) {
+    if (/rate limit/i.test(error.message) || /too many/i.test(error.message)) {
+      return {
+        ok: false,
+        message:
+          "Too many email requests. Wait a couple of minutes, or use the 6-digit code from a previous email if you still have it.",
+      };
+    }
+    if (/invalid email/i.test(error.message)) {
+      return { ok: false, message: 'That email address looks invalid — double-check the spelling.' };
+    }
+    return { ok: false, message: error.message };
+  }
+  return { ok: true };
+}
+
+// Verifies a 6-digit OTP code typed into the app. Same effect as
+// clicking the magic link, but stays inside the current browser tab —
+// no redirect, no "wrong browser" trap, no allowlist issues.
+//
+// Supabase accepts the code with or without spaces / dashes; we
+// normalize to digits-only here so a copy-paste from email works.
+export async function verifyEmailCode(
+  email: string,
+  code: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
+  const token = code.replace(/[^0-9]/g, '');
+  if (token.length !== 6) {
+    return { ok: false, message: 'Code should be 6 digits.' };
+  }
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: 'email',
+  });
+  if (error) {
+    if (/expired/i.test(error.message)) {
+      return { ok: false, message: 'That code has expired — request a new one.' };
+    }
+    if (/invalid/i.test(error.message) || /not found/i.test(error.message)) {
+      return { ok: false, message: 'Code didn\'t match. Check the latest email and try again.' };
+    }
+    return { ok: false, message: error.message };
+  }
   return { ok: true };
 }
 
@@ -126,14 +179,51 @@ export async function signInWithOAuth(
 }
 
 // Upgrade an anonymous (guest) user into a permanent account by linking
-// an email. Supabase sends a confirmation link to the email; clicking
-// it merges the existing anon user-id with the new email-based identity,
-// so the user's profile, rating, friends, and games all carry over.
+// an email. Supabase sends a confirmation email containing both a
+// magic link AND a 6-digit code; the user can redeem either way (see
+// verifyEmailChangeCode below). Clicking the link must happen in the
+// same browser to merge the anon user-id with the email identity;
+// the code path lifts that constraint.
 export async function linkEmailToAnonymous(
   email: string,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
   const { error } = await supabase.auth.updateUser({ email });
-  if (error) return { ok: false, message: error.message };
+  if (error) {
+    if (/rate limit/i.test(error.message) || /too many/i.test(error.message)) {
+      return { ok: false, message: 'Too many email requests. Wait a couple of minutes and try again.' };
+    }
+    return { ok: false, message: error.message };
+  }
+  return { ok: true };
+}
+
+// Verifies a 6-digit code from the "confirm email change" email — the
+// equivalent of clicking the link in that email, but without the
+// "same browser" constraint. Used by GuestUpgradePanel to complete
+// the guest → email merge from any device.
+export async function verifyEmailChangeCode(
+  email: string,
+  code: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
+  const token = code.replace(/[^0-9]/g, '');
+  if (token.length !== 6) {
+    return { ok: false, message: 'Code should be 6 digits.' };
+  }
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: 'email_change',
+  });
+  if (error) {
+    if (/expired/i.test(error.message)) {
+      return { ok: false, message: 'That code has expired — request a new one.' };
+    }
+    if (/invalid/i.test(error.message) || /not found/i.test(error.message)) {
+      return { ok: false, message: 'Code didn\'t match. Check the latest email and try again.' };
+    }
+    return { ok: false, message: error.message };
+  }
   return { ok: true };
 }

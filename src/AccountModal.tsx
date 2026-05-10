@@ -9,9 +9,13 @@ import {
   linkEmailToAnonymous,
   sendMagicLink,
   signInAnonymously,
-  signInWithOAuth,
   signOut,
+  verifyEmailChangeCode,
+  verifyEmailCode,
 } from './game/auth';
+// Note: signInWithOAuth is intentionally NOT imported — Apple/Google
+// buttons are hidden until provider config is finalized. The helper
+// itself stays in game/auth.ts for the eventual re-enable.
 import PlusBadge from './PlusBadge';
 import RatingHistory from './RatingHistory';
 import { removeAvatar, uploadAvatar } from './game/avatar';
@@ -23,6 +27,13 @@ import {
   generateRecoveryCodes,
   useRecoveryCode,
 } from './game/recoveryCodes';
+import {
+  listSessions,
+  revokeAllOtherSessions,
+  revokeSession,
+  summarizeUserAgent,
+  type SessionRow,
+} from './game/sessions';
 import { supabase } from './game/supabase';
 
 // Stripe price ID for the Plus subscription tier. Set via env so the
@@ -97,9 +108,21 @@ function clearDraft(): void {
   }
 }
 
-// Cooldown (seconds) between magic-link sends. Stops accidental spam
-// and rate-limit hits; the user gets a visible countdown instead.
-const MAGIC_LINK_COOLDOWN_S = 30;
+// Cooldown (seconds) between magic-link sends. Set to 120s (2 minutes)
+// so the local cooldown comfortably outlasts Supabase Auth's server-
+// side per-email throttle — at 30s users were repeatedly tripping the
+// real server limit and seeing a confusing "rate limited" error
+// instead of a friendly local countdown.
+const MAGIC_LINK_COOLDOWN_S = 120;
+
+// "Resend in 119s" reads awkwardly past the one-minute mark; switch to
+// mm:ss once we cross 60s so a 2-minute cooldown shows "1:59" → "0:01".
+function formatCooldown(s: number): string {
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${r.toString().padStart(2, '0')}`;
+}
 
 export default function AccountModal({ user, open, onClose, onProfileChange }: Props) {
   const [email, setEmail] = useState('');
@@ -114,6 +137,14 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
   // null means "never sent in this session" so the button is enabled.
   const [magicSentAt, setMagicSentAt] = useState<number | null>(null);
   const [cooldownLeft, setCooldownLeft] = useState(0);
+
+  // After the user sends an email, we pivot the form to "enter the
+  // 6-digit code" mode. The magic link in the email still works; the
+  // code input is the more robust path that doesn't depend on
+  // redirect URLs or the email being clicked in the same browser.
+  const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
+  const [codeInput, setCodeInput] = useState('');
+  const [verifying, setVerifying] = useState(false);
 
   // Tick the cooldown counter once per second while it's active. The
   // button label rerenders based on cooldownLeft.
@@ -235,92 +266,153 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
             No email, no password. You can save your account later.
           </p>
 
-          <div className="account-divider"><span>or save progress across devices</span></div>
+          {/* OAuth (Apple / Google) is currently hidden — providers
+              aren't fully wired up in production, and showing buttons
+              that error out scared off would-be sign-ups. The code
+              path stays in `signInWithOAuth` so we can re-enable
+              instantly once provider config is finalized. */}
 
-          {/* OAuth row — Apple per Apple's iOS sign-in policy + Google for
-              the rest. Standard provider button styling. */}
-          <div className="account-oauth-row">
-            <button
-              type="button"
-              className="account-oauth-btn account-oauth-apple"
-              disabled={busy}
-              onClick={async () => {
+          <div className="account-divider"><span>or save progress with email</span></div>
+
+          {/* Email sign-in — dual-redemption flow.
+              Stage 1 (no email sent yet): show email input + "Send code"
+              Stage 2 (sent): show 6-digit code input + Verify, with the
+                              option to resend (cooldown-gated) or change
+                              the email.
+              The user can EITHER click the magic link in the email OR
+              type the 6-digit code into stage 2. Code path is more
+              bomb-proof: works across devices, no redirect URL issues,
+              no "wrong browser" trap. */}
+          {emailSentTo === null ? (
+            <form
+              className="account-email-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (cooldownLeft > 0) return;
+                const addr = email.trim();
+                if (!addr) return;
                 setBusy(true);
                 setMessage(null);
-                const r = await signInWithOAuth('apple');
+                const result = await sendMagicLink(addr);
                 setBusy(false);
-                if (!r.ok) setMessage(r.message);
+                if (result.ok) {
+                  setEmailSentTo(addr);
+                  setMagicSentAt(Date.now());
+                  setMessage(null);
+                } else {
+                  setMessage(`Couldn't send: ${result.message}`);
+                }
               }}
             >
-               Sign in with Apple
-            </button>
-            <button
-              type="button"
-              className="account-oauth-btn account-oauth-google"
-              disabled={busy}
-              onClick={async () => {
-                setBusy(true);
+              <input
+                id="account-email"
+                className="account-input"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+              <button
+                type="submit"
+                className="end-game-btn end-game-btn--subtle"
+                disabled={busy || cooldownLeft > 0}
+              >
+                {busy
+                  ? 'Sending…'
+                  : cooldownLeft > 0
+                    ? `Resend in ${formatCooldown(cooldownLeft)}`
+                    : 'Send sign-in code'}
+              </button>
+            </form>
+          ) : (
+            <form
+              className="account-email-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const code = codeInput.replace(/[^0-9]/g, '');
+                if (code.length !== 6) {
+                  setMessage('Code should be 6 digits — check the email.');
+                  return;
+                }
+                setVerifying(true);
                 setMessage(null);
-                const r = await signInWithOAuth('google');
-                setBusy(false);
-                if (!r.ok) setMessage(r.message);
+                const r = await verifyEmailCode(emailSentTo, code);
+                setVerifying(false);
+                if (!r.ok) {
+                  setMessage(r.message);
+                }
+                // On success the auth state listener fires and the
+                // modal re-renders into the signed-in branch
+                // automatically — no further action needed here.
               }}
             >
-              <span className="account-oauth-google-glyph">G</span> Sign in with Google
-            </button>
-          </div>
-
-          <div className="account-divider"><span>or use email</span></div>
-
-          {/* Email magic-link form — kept for users without Apple/Google
-              accounts and as a fallback if the OAuth providers are
-              misconfigured. Visually de-emphasized.
-              Resend cooldown: after sending, the button stays disabled
-              with a countdown so the user doesn't double-tap (which
-              hits Supabase rate-limits and produces a confusing error)
-              but can resend after MAGIC_LINK_COOLDOWN_S seconds. */}
-          <form
-            className="account-email-form"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              if (cooldownLeft > 0) return;
-              if (!email.trim()) return;
-              setBusy(true);
-              setMessage(null);
-              const result = await sendMagicLink(email.trim());
-              setBusy(false);
-              if (result.ok) {
-                setMessage(`✓ Magic link sent to ${email.trim()}. Check your inbox — the link expires in about an hour.`);
-                setMagicSentAt(Date.now());
-              } else {
-                setMessage(`Couldn't send link: ${result.message}`);
-              }
-            }}
-          >
-            <input
-              id="account-email"
-              className="account-input"
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-            <button
-              type="submit"
-              className="end-game-btn end-game-btn--subtle"
-              disabled={busy || cooldownLeft > 0}
-            >
-              {busy
-                ? 'Sending…'
-                : cooldownLeft > 0
-                  ? `Resend in ${cooldownLeft}s`
-                  : magicSentAt
-                    ? 'Resend link'
-                    : 'Send magic link'}
-            </button>
-          </form>
+              <p className="account-message">
+                ✓ We sent an email to <strong>{emailSentTo}</strong>. Either
+                click the link in the email (must be the same browser as
+                this tab), <strong>or</strong> type the 6-digit code from
+                the email below — that works from anywhere.
+              </p>
+              <input
+                id="account-otp"
+                className="account-input"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9 \-]*"
+                maxLength={9}
+                value={codeInput}
+                onChange={(e) => setCodeInput(e.target.value)}
+                placeholder="123456"
+                aria-label="6-digit sign-in code"
+              />
+              <div className="account-actions">
+                <button
+                  type="submit"
+                  className="end-game-btn"
+                  disabled={verifying}
+                >
+                  {verifying ? 'Verifying…' : 'Sign in'}
+                </button>
+                <button
+                  type="button"
+                  className="end-game-btn end-game-btn--subtle"
+                  disabled={busy || cooldownLeft > 0}
+                  onClick={async () => {
+                    setBusy(true);
+                    setMessage(null);
+                    const result = await sendMagicLink(emailSentTo);
+                    setBusy(false);
+                    if (result.ok) {
+                      setMagicSentAt(Date.now());
+                      setMessage('Sent a fresh email.');
+                    } else {
+                      setMessage(`Couldn't resend: ${result.message}`);
+                    }
+                  }}
+                >
+                  {cooldownLeft > 0
+                    ? `Resend in ${formatCooldown(cooldownLeft)}`
+                    : busy
+                      ? 'Sending…'
+                      : 'Resend'}
+                </button>
+                <button
+                  type="button"
+                  className="end-game-btn end-game-btn--subtle"
+                  onClick={() => {
+                    setEmailSentTo(null);
+                    setCodeInput('');
+                    setMagicSentAt(null);
+                    setMessage(null);
+                  }}
+                >
+                  Use a different email
+                </button>
+              </div>
+            </form>
+          )}
 
           {/* Recovery-code path for users locked out of their email. */}
           <RecoveryCodeSignIn />
@@ -498,6 +590,12 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
             the codes recover access to an email-linked account. */}
         {user.email_confirmed_at && <RecoveryCodesSection user={user} />}
 
+        {/* Active sessions — list every device signed in to this
+            account and let the user kick any of them off. Visible to
+            every signed-in user (incl. guests) since hijack of a
+            guest token is just as bad as hijack of an email account. */}
+        <ActiveSessionsSection />
+
         {/* Account data — export + delete. Required for PIPEDA / App
             Store compliance. Visible to every signed-in user including
             guests; the export is useful even for ephemeral guest data
@@ -529,6 +627,9 @@ function GuestUpgradePanel() {
   const [msg, setMsg] = useState<string | null>(null);
   const [linkSentAt, setLinkSentAt] = useState<number | null>(null);
   const [cooldown, setCooldown] = useState(0);
+  // OTP code redemption — same email, two redemption paths.
+  const [codeInput, setCodeInput] = useState('');
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     if (linkSentAt === null) {
@@ -572,14 +673,53 @@ function GuestUpgradePanel() {
       <div className="account-upgrade-panel account-upgrade-sent">
         <strong className="account-upgrade-title">Check your email</strong>
         <p className="account-upgrade-body">
-          We sent a confirmation link to <strong>{sentTo}</strong>.
+          We sent a confirmation to <strong>{sentTo}</strong>. Either click
+          the link in the email (must be the same browser as this tab),
+          {' '}<strong>or</strong> type the 6-digit code below — that
+          works from any device.
         </p>
-        <div className="account-upgrade-warning">
-          ⚠ <strong>Click the link IN THIS BROWSER</strong> (the one you're
-          reading this in). Opening the link on a different device or
-          browser will start a fresh account there instead of saving
-          your guest progress here.
-        </div>
+        <form
+          className="account-email-form"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!sentTo) return;
+            const code = codeInput.replace(/[^0-9]/g, '');
+            if (code.length !== 6) {
+              setMsg('Code should be 6 digits — check the email.');
+              return;
+            }
+            setVerifying(true);
+            setMsg(null);
+            const r = await verifyEmailChangeCode(sentTo, code);
+            setVerifying(false);
+            if (!r.ok) {
+              setMsg(r.message);
+            }
+            // On success the user.email field updates, the parent
+            // re-renders, and this panel disappears automatically.
+          }}
+        >
+          <input
+            id="account-upgrade-otp"
+            className="account-input"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9 \-]*"
+            maxLength={9}
+            value={codeInput}
+            onChange={(e) => setCodeInput(e.target.value)}
+            placeholder="123456"
+            aria-label="6-digit confirmation code"
+          />
+          <button
+            type="submit"
+            className="end-game-btn"
+            disabled={verifying}
+          >
+            {verifying ? 'Verifying…' : 'Confirm with code'}
+          </button>
+        </form>
         <div className="account-data-actions">
           <button
             type="button"
@@ -587,7 +727,7 @@ function GuestUpgradePanel() {
             disabled={cooldown > 0}
             onClick={() => sentTo && sendLink(sentTo)}
           >
-            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend link'}
+            {cooldown > 0 ? `Resend in ${formatCooldown(cooldown)}` : 'Resend'}
           </button>
           <button
             type="button"
@@ -596,6 +736,7 @@ function GuestUpgradePanel() {
               setPhase('idle');
               setSentTo(null);
               setLinkSentAt(null);
+              setCodeInput('');
               setMsg(null);
             }}
           >
@@ -646,6 +787,129 @@ function GuestUpgradePanel() {
         We'll send a confirmation link. <strong>Click it in this same
         browser</strong> to merge your guest account with the email.
       </p>
+      {msg && <p className="account-message">{msg}</p>}
+    </div>
+  );
+}
+
+// Active-sessions section — shows every device signed in to the
+// account, with revoke buttons for "this isn't me" panic. The
+// caller's current session is marked and uses local sign-out instead
+// of the revoke endpoint (so the SDK clears its own state cleanly).
+//
+// Three actions surface:
+//   - "Sign out this device" per row (other devices only)
+//   - "Sign out everywhere else" (revoke all others, keep current)
+//   - "Sign out everywhere" (full global sign-out via Supabase)
+function ActiveSessionsSection() {
+  const [sessions, setSessions] = useState<SessionRow[] | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const refresh = async () => {
+    const list = await listSessions();
+    setSessions(list);
+  };
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  const onRevoke = async (id: string) => {
+    setBusy(true);
+    setMsg(null);
+    const r = await revokeSession(id);
+    setBusy(false);
+    if (!r.ok) {
+      setMsg(`Couldn't sign out: ${r.message}`);
+      return;
+    }
+    setMsg('Signed out that device.');
+    void refresh();
+  };
+
+  const onRevokeOthers = async () => {
+    if (!confirm('Sign out every device EXCEPT this one?')) return;
+    setBusy(true);
+    setMsg(null);
+    const r = await revokeAllOtherSessions();
+    setBusy(false);
+    if (!r.ok) {
+      setMsg(`Couldn't sign out others: ${r.message}`);
+      return;
+    }
+    setMsg('Signed out every other device.');
+    void refresh();
+  };
+
+  const onRevokeAll = async () => {
+    if (!supabase) return;
+    if (!confirm("Sign out everywhere, INCLUDING this device? You'll have to sign back in."))
+      return;
+    setBusy(true);
+    // scope: 'global' tells Supabase to revoke every refresh token
+    // for this user — including the local one, which then triggers
+    // an onAuthStateChange(SIGNED_OUT) and the parent unmounts us.
+    await supabase.auth.signOut({ scope: 'global' });
+    setBusy(false);
+  };
+
+  return (
+    <div className="account-section">
+      <strong className="account-section-title">Active sessions</strong>
+      <p className="account-section-body">
+        Every device that's currently signed in to this account. If you
+        see something you don't recognize, sign it out.
+      </p>
+      {sessions === null ? (
+        <p className="account-message">Loading sessions…</p>
+      ) : sessions.length === 0 ? (
+        <p className="account-message">No active sessions found.</p>
+      ) : (
+        <ul className="session-list">
+          {sessions.map((s) => (
+            <li key={s.id} className="session-row">
+              <div className="session-info">
+                <strong>
+                  {summarizeUserAgent(s.user_agent)}
+                  {s.current && <span className="session-current"> · this device</span>}
+                </strong>
+                <span className="session-meta">
+                  {s.ip ? `${s.ip} · ` : ''}
+                  Last active {new Date(s.updated_at).toLocaleString()}
+                </span>
+              </div>
+              {!s.current && (
+                <button
+                  type="button"
+                  className="hud-btn hud-btn-subtle"
+                  disabled={busy}
+                  onClick={() => onRevoke(s.id)}
+                >
+                  Sign out
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="account-data-actions">
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle"
+          disabled={busy || (sessions !== null && sessions.length <= 1)}
+          onClick={onRevokeOthers}
+        >
+          Sign out everywhere else
+        </button>
+        <button
+          type="button"
+          className="hud-btn hud-btn-subtle"
+          disabled={busy}
+          onClick={onRevokeAll}
+        >
+          Sign out everywhere
+        </button>
+      </div>
       {msg && <p className="account-message">{msg}</p>}
     </div>
   );
