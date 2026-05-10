@@ -1804,6 +1804,47 @@ button.tray-piece:hover {
   font-weight: 700;
 }
 
+/* "Yours" badge on tournaments owned by the signed-in user — same gold
+   pill family as the free/paid pills. */
+.tournament-mine {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 6px;
+  background: rgba(255, 216, 132, 0.18);
+  color: #ffd884;
+}
+
+/* Create-tournament row sits above the list. The form expands inline
+   so the user never loses context with the existing tournaments. */
+.tournament-create-row {
+  margin: 0 0 14px;
+}
+.tournament-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+}
+.tournament-create-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: #d8e0f0;
+}
+.tournament-create-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
 /* Friends panel — same card-in-disclosure pattern as Tournaments. The
    row layout reuses the lobby-row look so online players feel familiar. */
 .friends-add-row {

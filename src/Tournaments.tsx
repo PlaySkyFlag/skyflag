@@ -16,7 +16,19 @@ type Tournament = {
   ends_at: string;
   is_paid: boolean;
   entry_fee_cents: number;
+  created_by: string | null;
+  cancelled_at: string | null;
 };
+
+// User-selectable duration options in days. Constrained at the DB level
+// to between 1 and 30 days; these are sensible presets.
+const DURATION_OPTIONS = [
+  { days: 1,  label: '1 day' },
+  { days: 3,  label: '3 days' },
+  { days: 7,  label: '7 days' },
+  { days: 14, label: '14 days' },
+  { days: 30, label: '30 days' },
+];
 
 type TournamentEntry = {
   tournament_id: string;
@@ -51,12 +63,15 @@ export default function Tournaments({ user, profile, inline = false }: Props) {
     if (!supabase) return;
     const sb = supabase;
     const nowIso = new Date().toISOString();
+    // Show anything still alive: not cancelled, not yet ended. This
+    // surfaces upcoming tournaments too so players can pre-register
+    // and the creator sees their own scheduled events.
     const { data: tlist } = await sb
       .from('tournaments')
       .select('*')
-      .lte('starts_at', nowIso)
       .gte('ends_at', nowIso)
-      .order('ends_at', { ascending: true });
+      .is('cancelled_at', null)
+      .order('starts_at', { ascending: true });
     const tournaments = (tlist ?? []) as Tournament[];
     setOpen(tournaments);
 
@@ -131,21 +146,171 @@ export default function Tournaments({ user, profile, inline = false }: Props) {
     [user, profile, refresh],
   );
 
+  // Create-tournament form state. `showCreate` toggles the form open;
+  // the rest are the bound inputs.
+  const [showCreate, setShowCreate] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newDesc, setNewDesc] = useState('');
+  const [newDays, setNewDays] = useState<number>(7);
+
+  const createTournament = useCallback(async () => {
+    if (!supabase || !user) return;
+    const trimmedName = newName.trim();
+    if (trimmedName.length < 3) {
+      setError('Tournament name must be at least 3 characters.');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    const startsAt = new Date();
+    const endsAt = new Date(startsAt.getTime() + newDays * 86_400_000);
+    const { error: insertErr } = await supabase.from('tournaments').insert({
+      name: trimmedName,
+      description: newDesc.trim() || null,
+      starts_at: startsAt.toISOString(),
+      ends_at: endsAt.toISOString(),
+      is_paid: false,
+      entry_fee_cents: 0,
+      created_by: user.id,
+    });
+    setBusy(false);
+    if (insertErr) {
+      // RLS rejects the insert when the user already has an active
+      // tournament — surface that as a friendly message rather than
+      // the raw policy violation.
+      const msg = /violates row-level security/i.test(insertErr.message)
+        ? "You already have an active tournament. Cancel it before starting another."
+        : `Couldn't create: ${insertErr.message}`;
+      setError(msg);
+      return;
+    }
+    setShowCreate(false);
+    setNewName('');
+    setNewDesc('');
+    setNewDays(7);
+    refresh();
+  }, [user, newName, newDesc, newDays, refresh]);
+
+  const cancelTournament = useCallback(
+    async (tid: string) => {
+      if (!supabase || !user) return;
+      if (!confirm('Cancel this tournament? Players will be unable to join or score new games.')) return;
+      setBusy(true);
+      setError(null);
+      const { error: updErr } = await supabase
+        .from('tournaments')
+        .update({ cancelled_at: new Date().toISOString() })
+        .eq('id', tid);
+      setBusy(false);
+      if (updErr) {
+        setError(`Couldn't cancel: ${updErr.message}`);
+        return;
+      }
+      refresh();
+    },
+    [user, refresh],
+  );
+
   if (!supabase) return null;
 
   const body = (
     <div className="help-body">
+        {/* Create-tournament affordance — signed-in users only. The
+            actual policy is enforced in the DB; the UI just shortcuts
+            the obvious "signed out" case so we don't surface a confusing
+            RLS error. */}
+        {user && profile && (
+          <div className="tournament-create-row">
+            {!showCreate ? (
+              <button
+                type="button"
+                className="hud-btn"
+                onClick={() => {
+                  setShowCreate(true);
+                  setError(null);
+                }}
+              >
+                + Create tournament
+              </button>
+            ) : (
+              <div className="tournament-create-form">
+                <input
+                  type="text"
+                  className="account-input"
+                  placeholder="Tournament name (3–60 characters)"
+                  maxLength={60}
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  autoFocus
+                />
+                <textarea
+                  className="account-input"
+                  placeholder="Description (optional)"
+                  maxLength={500}
+                  value={newDesc}
+                  onChange={(e) => setNewDesc(e.target.value)}
+                  rows={2}
+                />
+                <label className="tournament-create-label">
+                  Duration
+                  <select
+                    className="hud-mode-select"
+                    value={newDays}
+                    onChange={(e) => setNewDays(Number(e.target.value))}
+                  >
+                    {DURATION_OPTIONS.map((o) => (
+                      <option key={o.days} value={o.days}>{o.label}</option>
+                    ))}
+                  </select>
+                </label>
+                <p className="lobby-hint">
+                  Free tournament. Starts immediately. Players join via the
+                  list below, then score wins by playing each other in the
+                  online lobby. 1 active tournament per creator.
+                </p>
+                <div className="tournament-create-actions">
+                  <button
+                    type="button"
+                    className="hud-btn"
+                    disabled={busy}
+                    onClick={createTournament}
+                  >
+                    {busy ? 'Creating…' : 'Create tournament'}
+                  </button>
+                  <button
+                    type="button"
+                    className="hud-btn hud-btn-subtle"
+                    disabled={busy}
+                    onClick={() => {
+                      setShowCreate(false);
+                      setNewName('');
+                      setNewDesc('');
+                      setError(null);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {open.length === 0 && (
           <p className="lobby-hint">
-            No open arenas right now — check back later, or stay tuned for
-            announcements.
+            No open arenas right now — {user && profile ? 'create one above' : 'sign in to create one'}, or check back later.
           </p>
         )}
         {open.map((t) => {
           const joined = myEntries.has(t.id);
           const board = leaderboards[t.id] ?? [];
           const expanded = expandedId === t.id || (expandedId === null && t === open[0]);
-          const endsIn = formatRemaining(t.ends_at);
+          const now = Date.now();
+          const startsTs = new Date(t.starts_at).getTime();
+          const upcoming = startsTs > now;
+          const timeLabel = upcoming
+            ? `Starts in ${formatRemaining(t.starts_at)}`
+            : `Ends in ${formatRemaining(t.ends_at)}`;
+          const isMine = user !== null && t.created_by === user.id;
           return (
             <div key={t.id} className="tournament">
               <div className="tournament-header">
@@ -157,13 +322,16 @@ export default function Tournaments({ user, profile, inline = false }: Props) {
                     ) : (
                       <span className="tournament-free">Free</span>
                     )}
+                    {isMine && <span className="tournament-mine">Yours</span>}
                   </div>
-                  <div className="tournament-meta">Ends in {endsIn} · {board.length} entrants</div>
+                  <div className="tournament-meta">{timeLabel} · {board.length} entrants</div>
                 </div>
                 <div className="tournament-actions">
                   {user && profile ? (
                     joined ? (
                       <span className="tournament-joined">✓ Joined</span>
+                    ) : upcoming ? (
+                      <span className="tournament-meta">Joinable when it starts</span>
                     ) : (
                       <button
                         type="button"
@@ -176,6 +344,17 @@ export default function Tournaments({ user, profile, inline = false }: Props) {
                     )
                   ) : (
                     <span className="tournament-meta">Sign in to join</span>
+                  )}
+                  {isMine && (
+                    <button
+                      type="button"
+                      className="hud-btn hud-btn-warn"
+                      disabled={busy}
+                      onClick={() => cancelTournament(t.id)}
+                      title="Cancel this tournament"
+                    >
+                      Cancel
+                    </button>
                   )}
                   <button
                     type="button"
