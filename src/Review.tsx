@@ -17,6 +17,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Board, { type BoardTheme, type Marker } from './Board';
+import EvalGraph from './EvalGraph';
 import {
   DEPLOY_COORDS,
   FLAG_COORDS,
@@ -387,6 +388,15 @@ export default function Review() {
           );
         })}
       </div>
+
+      {/* Eval graph — p1-perspective evaluation over time. Click to
+          jump the scrubber to that move. Renders even while analysis
+          is in progress (uses the streamed partial array). */}
+      <EvalGraph
+        analyses={result?.analyses ?? progress.partial}
+        currentPly={ply}
+        onPlyClick={setPly}
+      />
 
       {/* Annotation for the current move */}
       <div className="review-annotation">
