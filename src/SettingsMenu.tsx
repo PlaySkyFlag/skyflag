@@ -151,9 +151,14 @@ export default function SettingsMenu({
               value={themeId}
               onChange={(e) => onSetTheme(e.target.value as ThemeId)}
             >
-              {Object.values(THEMES).map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
+              {Object.values(THEMES).map((t) => {
+                const locked = t.requiresEntitlement === 'feature.plus' && !hasPlus;
+                return (
+                  <option key={t.id} value={t.id} disabled={locked}>
+                    {t.name}{locked ? ' — Plus' : ''}
+                  </option>
+                );
+              })}
             </select>
           </label>
           <label className="settings-row">

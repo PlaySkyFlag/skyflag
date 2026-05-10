@@ -14,6 +14,7 @@ export type Profile = {
   rating: number;
   games_played: number;
   avatar_url: string | null;
+  is_plus: boolean;
   created_at: string;
   updated_at: string;
 };

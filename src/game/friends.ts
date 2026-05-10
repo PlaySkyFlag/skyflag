@@ -23,6 +23,7 @@ export type FriendEntry = {
   other_id: string;
   other_nickname: string;
   other_rating: number;
+  other_is_plus: boolean;
   direction: FriendDirection;
   created_at: string;
 };
@@ -133,15 +134,20 @@ export async function listFriends(meId: string): Promise<FriendEntry[]> {
   const otherIds = friendships.map((r) => (r.user_a_id === meId ? r.user_b_id : r.user_a_id));
   const { data: profileRows, error: profErr } = await supabase
     .from('profiles')
-    .select('id, nickname, rating')
+    .select('id, nickname, rating, is_plus')
     .in('id', otherIds);
   if (profErr) {
     console.error('[friends] profiles lookup failed', profErr);
     return [];
   }
-  const byId = new Map<string, { nickname: string; rating: number }>();
-  for (const p of (profileRows ?? []) as { id: string; nickname: string; rating: number }[]) {
-    byId.set(p.id, { nickname: p.nickname, rating: p.rating });
+  const byId = new Map<string, { nickname: string; rating: number; is_plus: boolean }>();
+  for (const p of (profileRows ?? []) as {
+    id: string;
+    nickname: string;
+    rating: number;
+    is_plus: boolean;
+  }[]) {
+    byId.set(p.id, { nickname: p.nickname, rating: p.rating, is_plus: p.is_plus ?? false });
   }
 
   return friendships.map((r) => {
@@ -159,6 +165,7 @@ export async function listFriends(meId: string): Promise<FriendEntry[]> {
       other_id: otherId,
       other_nickname: prof?.nickname ?? otherId.slice(0, 8),
       other_rating: prof?.rating ?? 1200,
+      other_is_plus: prof?.is_plus ?? false,
       direction,
       created_at: r.created_at,
     };

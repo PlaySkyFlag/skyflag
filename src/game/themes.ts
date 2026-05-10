@@ -9,7 +9,16 @@
 
 import type { Layer } from './types';
 
-export type ThemeId = 'classic' | 'twilight' | 'aurora' | 'frost';
+export type ThemeId =
+  | 'classic'
+  | 'twilight'
+  | 'aurora'
+  | 'frost'
+  // Plus-only themes — gated behind feature.plus. Selecting one of
+  // these while not subscribed falls back to the default theme.
+  | 'empyrean-gold'
+  | 'storm'
+  | 'verdant';
 
 export type LayerThemeDef = {
   lightFill: string;
@@ -31,6 +40,10 @@ export type Theme = {
   name: string;
   layers: Record<Layer, LayerThemeDef>;
   players: Record<'p1' | 'p2', PlayerPaletteDef>;
+  // Entitlement required to USE this theme. Free themes leave it null.
+  // The UI renders gated themes with a Plus label and falls back to
+  // DEFAULT_THEME on selection if the user isn't entitled.
+  requiresEntitlement?: 'feature.plus';
 };
 
 // ─── Theme registry ──────────────────────────────────────────────────
@@ -88,6 +101,49 @@ export const THEMES: Record<ThemeId, Theme> = {
       p2: { fill: '#f0f4f8', border: '#cdd5dd', accent: '#dbe8f2', textOnLight: '#0a1828' },
     },
   },
+  // ── Plus-only themes ────────────────────────────────────────────────
+  'empyrean-gold': {
+    id: 'empyrean-gold',
+    name: 'Empyrean Gold',
+    requiresEntitlement: 'feature.plus',
+    layers: {
+      space:  { lightFill: '#6a5128', darkFill: '#4a3818', background: '#241a08', stroke: '#100a04', label: '#e9b94a' },
+      sky:    { lightFill: '#a07820', darkFill: '#7a5a18', background: '#3a2a10', stroke: '#181008', label: '#ffd884' },
+      ground: { lightFill: '#c89a3a', darkFill: '#a07820', background: '#2a1f0e', stroke: '#100a04', label: '#ffe27a' },
+    },
+    players: {
+      p1: { fill: '#1a1004', border: '#3a2a10', accent: '#ffd884', textOnLight: '#ffe27a' },
+      p2: { fill: '#fff5d6', border: '#e9d4a0', accent: '#ffe27a', textOnLight: '#241a08' },
+    },
+  },
+  storm: {
+    id: 'storm',
+    name: 'Storm',
+    requiresEntitlement: 'feature.plus',
+    layers: {
+      space:  { lightFill: '#3a4060', darkFill: '#252a40', background: '#0c1020', stroke: '#04060c', label: '#9aa8d0' },
+      sky:    { lightFill: '#586480', darkFill: '#3a455d', background: '#1a2238', stroke: '#080c18', label: '#aab8d8' },
+      ground: { lightFill: '#404858', darkFill: '#2a3040', background: '#101620', stroke: '#04060c', label: '#98a0b0' },
+    },
+    players: {
+      p1: { fill: '#080c18', border: '#1e283c', accent: '#7a92c8', textOnLight: '#c0ccdc' },
+      p2: { fill: '#e8ecf4', border: '#b8c0d0', accent: '#d4dcea', textOnLight: '#0c1020' },
+    },
+  },
+  verdant: {
+    id: 'verdant',
+    name: 'Verdant',
+    requiresEntitlement: 'feature.plus',
+    layers: {
+      space:  { lightFill: '#3a5a4a', darkFill: '#243e32', background: '#0a1a12', stroke: '#04100a', label: '#9ed4b0' },
+      sky:    { lightFill: '#6aa888', darkFill: '#447a62', background: '#1a3828', stroke: '#0a1c14', label: '#b8e0c4' },
+      ground: { lightFill: '#88c08a', darkFill: '#588f5a', background: '#142818', stroke: '#08160c', label: '#a8d4a8' },
+    },
+    players: {
+      p1: { fill: '#08160c', border: '#1e3a26', accent: '#6fd58a', textOnLight: '#c8e8d0' },
+      p2: { fill: '#f0f8e8', border: '#c8d8b8', accent: '#dbecbc', textOnLight: '#142818' },
+    },
+  },
 };
 
 export const DEFAULT_THEME: ThemeId = 'classic';
@@ -102,6 +158,23 @@ export function loadThemeId(): ThemeId {
     /* ignore */
   }
   return DEFAULT_THEME;
+}
+
+// True if the theme is gated behind an entitlement the user lacks.
+// Caller passes the user's `hasPlus` flag from useEntitlement.
+export function isThemeLocked(id: ThemeId, hasPlus: boolean): boolean {
+  const t = THEMES[id];
+  if (!t?.requiresEntitlement) return false;
+  if (t.requiresEntitlement === 'feature.plus' && !hasPlus) return true;
+  return false;
+}
+
+// Returns the theme to actually apply: the stored choice if usable,
+// otherwise DEFAULT_THEME. Use this anywhere a theme is read so that
+// a user who downgrades from Plus doesn't get stuck on a locked theme.
+export function resolveThemeId(id: ThemeId, hasPlus: boolean): ThemeId {
+  if (isThemeLocked(id, hasPlus)) return DEFAULT_THEME;
+  return id;
 }
 
 export function saveThemeId(id: ThemeId): void {

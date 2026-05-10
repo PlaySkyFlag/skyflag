@@ -12,6 +12,8 @@ import {
   signInWithOAuth,
   signOut,
 } from './game/auth';
+import PlusBadge from './PlusBadge';
+import RatingHistory from './RatingHistory';
 import { removeAvatar, uploadAvatar } from './game/avatar';
 import { downloadExportFile, exportUserData } from './game/dataExport';
 import { useEntitlement } from './game/entitlements';
@@ -103,6 +105,10 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // Plus status — used by RatingHistory + any other Plus-gated UI here.
+  // PlusPanel sub-component calls useEntitlement itself; both calls hit
+  // the same context-backed cache, so this is essentially free.
+  const { hasIt: hasPlus } = useEntitlement('feature.plus');
 
   // Magic-link send timestamp (ms) — used to compute the resend cooldown.
   // null means "never sent in this session" so the button is enabled.
@@ -334,6 +340,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
         <div className="account-header">
           <h2 className="account-title">
             {isFirstTime ? 'Create your profile' : 'Your profile'}
+            <PlusBadge isPlus={profile?.is_plus} size="large" title="You're a Plus subscriber" />
           </h2>
           <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
         </div>
@@ -366,6 +373,11 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
         )}
 
         <PlusPanel />
+
+        {/* Rating history sparkline — Plus-only. For non-subscribers
+            this renders a teaser with a CTA so they see what they're
+            missing without being able to inspect the data. */}
+        {profile && <RatingHistory user={user} hasPlus={hasPlus} />}
 
         {/* Guest upgrade prompt — shown only when the signed-in user has
             no email, i.e. they're an anonymous account. Owns its own

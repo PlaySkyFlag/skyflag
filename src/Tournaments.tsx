@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
+import PlusBadge from './PlusBadge';
 import { supabase } from './game/supabase';
 import type { Profile } from './game/profile';
 
@@ -43,6 +44,7 @@ type TournamentEntry = {
 type LeaderboardRow = TournamentEntry & {
   nickname: string;
   rating: number;
+  is_plus: boolean;
 };
 
 type Props = {
@@ -102,16 +104,20 @@ export default function Tournaments({ user, profile, inline = false, onOpenAccou
         .limit(20);
       const entries = (rows ?? []) as TournamentEntry[];
       const ids = entries.map((e) => e.user_id);
-      let profMap = new Map<string, { nickname: string; rating: number }>();
+      let profMap = new Map<string, { nickname: string; rating: number; is_plus: boolean }>();
       if (ids.length > 0) {
         const { data: profs } = await sb
           .from('profiles')
-          .select('id, nickname, rating')
+          .select('id, nickname, rating, is_plus')
           .in('id', ids);
         profMap = new Map(
           (profs ?? []).map((p) => [
             p.id as string,
-            { nickname: p.nickname as string, rating: p.rating as number },
+            {
+              nickname: p.nickname as string,
+              rating: p.rating as number,
+              is_plus: (p.is_plus as boolean) ?? false,
+            },
           ]),
         );
       }
@@ -121,6 +127,7 @@ export default function Tournaments({ user, profile, inline = false, onOpenAccou
           ...e,
           nickname: meta?.nickname ?? '—',
           rating: meta?.rating ?? 1200,
+          is_plus: meta?.is_plus ?? false,
         };
       });
       setLeaderboards((prev) => ({ ...prev, [targetId]: board }));
@@ -408,7 +415,7 @@ export default function Tournaments({ user, profile, inline = false, onOpenAccou
                         {board.map((row, i) => (
                           <tr key={row.user_id} className={user && row.user_id === user.id ? 'tournament-self' : undefined}>
                             <td>{i + 1}</td>
-                            <td>{row.nickname}</td>
+                            <td>{row.nickname}<PlusBadge isPlus={row.is_plus} /></td>
                             <td>{row.rating}</td>
                             <td>{row.wins}</td>
                             <td>{row.draws}</td>

@@ -209,6 +209,19 @@ async function upsertSubscription(sub: Stripe.Subscription): Promise<void> {
       if (error) console.error('[stripe-webhook] entitlement delete failed', error);
     }
   }
+
+  // Mirror the entitlement state onto profiles.is_plus so leaderboards,
+  // friend lists, and chat can render the Plus badge without joining
+  // entitlements (which is RLS-gated to self). Only the 'plus' tier
+  // sets this; other tiers wouldn't qualify.
+  if (entitlementId === 'feature.plus') {
+    const shouldBePlus = isActive && periodEnd !== null;
+    const { error: profErr } = await supabase
+      .from('profiles')
+      .update({ is_plus: shouldBePlus })
+      .eq('id', userId);
+    if (profErr) console.error('[stripe-webhook] profiles.is_plus update failed', profErr);
+  }
 }
 
 async function markSubscriptionCancelled(sub: Stripe.Subscription): Promise<void> {
@@ -237,6 +250,14 @@ async function markSubscriptionCancelled(sub: Stripe.Subscription): Promise<void
     .delete()
     .eq('user_id', userId)
     .eq('entitlement_id', entitlementId);
+
+  // Clear the denormalized Plus flag so the badge disappears immediately.
+  if (entitlementId === 'feature.plus') {
+    await supabase
+      .from('profiles')
+      .update({ is_plus: false })
+      .eq('id', userId);
+  }
 }
 
 function mapStripeStatus(stripeStatus: Stripe.Subscription.Status): string {

@@ -12,6 +12,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
+import PlusBadge from './PlusBadge';
 import {
   acceptRequest,
   findProfileByNickname,
@@ -219,7 +220,7 @@ export default function Friends({ user, profile, inRoom, onlineIds, inline = fal
               {incoming.map((f) => (
                 <li key={f.other_id} className="friends-row">
                   <span className="friends-nickname">
-                    {f.other_nickname}{' '}
+                    {f.other_nickname}<PlusBadge isPlus={f.other_is_plus} />{' '}
                     <span className="friends-rating">{f.other_rating}</span>
                   </span>
                   <span className="friends-actions">
@@ -281,7 +282,7 @@ export default function Friends({ user, profile, inRoom, onlineIds, inline = fal
                       className={`friends-dot${online ? ' friends-dot-online' : ''}`}
                       aria-hidden
                     />
-                    {f.other_nickname}{' '}
+                    {f.other_nickname}<PlusBadge isPlus={f.other_is_plus} />{' '}
                     <span className="friends-rating">{f.other_rating}</span>
                   </span>
                   <span className="friends-actions">

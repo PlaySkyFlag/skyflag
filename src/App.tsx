@@ -18,6 +18,7 @@ import { recordGame, totalGameCount, type StatsMode } from './game/stats';
 import {
   applyThemeToCssVars,
   loadThemeId,
+  resolveThemeId,
   saveThemeId,
   THEMES,
   type ThemeId,
@@ -325,14 +326,20 @@ export default function App() {
 
   const [statsOpen, setStatsOpen] = useState(false);
   const [themeId, setThemeId] = useState<ThemeId>(() => loadThemeId());
+  // Resolve the effective theme — falls back to the default if the
+  // stored choice is gated behind a Plus entitlement the user no
+  // longer has (e.g., subscription cancelled while they were on
+  // Empyrean Gold). The picker stays on their preferred selection so
+  // re-upgrading restores it instantly.
+  const effectiveThemeId = resolveThemeId(themeId, hasPlus);
   // Apply CSS variables for the selected theme. Runs on mount + on
   // every theme change so the rest of the UI (which uses var(--…))
   // updates without per-component plumbing.
   useEffect(() => {
-    applyThemeToCssVars(themeId);
+    applyThemeToCssVars(effectiveThemeId);
     saveThemeId(themeId);
-  }, [themeId]);
-  const layerThemes = layerThemesFor(themeId);
+  }, [effectiveThemeId, themeId]);
+  const layerThemes = layerThemesFor(effectiveThemeId);
 
   // ELO: when an online MP game finishes, fire-and-forget the
   // apply-rating Edge Function. The function is idempotent (uses a
