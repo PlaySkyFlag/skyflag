@@ -267,6 +267,7 @@ export default function Tournaments({ user, profile, inline = false, onOpenAccou
                   type="text"
                   className="account-input"
                   placeholder="Tournament name (3–60 characters)"
+                  aria-label="Tournament name"
                   maxLength={60}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}

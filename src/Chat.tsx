@@ -77,6 +77,7 @@ export default function Chat({ messages, myRole, onSend, active }: Props) {
           type="text"
           className="chat-input"
           placeholder={active ? 'Message your opponent…' : 'Not in a room'}
+          aria-label="Chat message"
           value={draft}
           maxLength={MAX_LEN}
           disabled={!active}
