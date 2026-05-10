@@ -42,6 +42,12 @@ function save(file: StatsFile): void {
   }
 }
 
+// Total games played to date. Cheap O(1) read used by the guest-upgrade
+// banner heuristic so we only nudge users who've actually invested time.
+export function totalGameCount(): number {
+  return load().history.length;
+}
+
 export function recordGame(rec: GameRecord): void {
   const file = load();
   file.history.push(rec);

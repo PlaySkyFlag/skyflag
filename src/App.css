@@ -1804,6 +1804,53 @@ button.tray-piece:hover {
   font-weight: 700;
 }
 
+/* Save-your-guest-account banner — surfaces the link-email upgrade at
+   the top of the app once the user has invested real time (3+ games)
+   so they don't lose their rating to a browser clear. Persistent but
+   one-click dismissible; localStorage flag keeps it dismissed. */
+.save-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, rgba(255, 216, 132, 0.16), rgba(255, 216, 132, 0.10));
+  border-bottom: 1px solid rgba(255, 216, 132, 0.35);
+  color: #fff5d6;
+  font-size: 0.9rem;
+}
+.save-banner-message {
+  flex: 1;
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+}
+.save-banner-message strong {
+  color: #ffd884;
+  font-weight: 700;
+}
+.save-banner-message:hover {
+  text-decoration: underline;
+}
+.save-banner-dismiss {
+  background: none;
+  border: 1px solid rgba(255, 216, 132, 0.40);
+  color: #ffd884;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.save-banner-dismiss:hover {
+  background: rgba(255, 216, 132, 0.16);
+}
+
 /* "Yours" badge on tournaments owned by the signed-in user — same gold
    pill family as the free/paid pills. */
 .tournament-mine {

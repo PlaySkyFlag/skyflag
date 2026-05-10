@@ -14,7 +14,7 @@ import Tutorial from './Tutorial';
 import { useAuthUser } from './game/auth';
 import { useEntitlement } from './game/entitlements';
 import { loadProfile, type Profile } from './game/profile';
-import { recordGame, type StatsMode } from './game/stats';
+import { recordGame, totalGameCount, type StatsMode } from './game/stats';
 import {
   applyThemeToCssVars,
   loadThemeId,
@@ -445,6 +445,37 @@ export default function App() {
   useEffect(() => {
     saveSession({ game: state, aiPlayer, room, difficulty, clockOption });
   }, [state, aiPlayer, room, difficulty, clockOption]);
+
+  // "Save your guest account" banner. Shown when:
+  //   1. User is signed in as a guest (anon — no email)
+  //   2. They've played 3+ tracked games (real investment)
+  //   3. They haven't dismissed the banner before
+  // Clicking the message opens AccountModal so they can link an email.
+  // Re-evaluated whenever a game finishes (state.status flips).
+  const [saveBannerDismissed, setSaveBannerDismissed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('3phor.save-banner.dismissed.v1') === '1';
+    } catch {
+      return false;
+    }
+  });
+  const [gameCount, setGameCount] = useState(0);
+  useEffect(() => {
+    setGameCount(totalGameCount());
+  }, [state.status.kind]);
+  const showSaveBanner =
+    !!authUser &&
+    !authUser.email &&
+    !saveBannerDismissed &&
+    gameCount >= 3;
+  const dismissSaveBanner = () => {
+    setSaveBannerDismissed(true);
+    try {
+      localStorage.setItem('3phor.save-banner.dismissed.v1', '1');
+    } catch {
+      /* no-op */
+    }
+  };
 
   // Clock tick — when a game has a clock and is in-progress, fire a
   // tick-clock action every 100ms with the current wall-clock time so
@@ -970,6 +1001,31 @@ export default function App() {
 
   return (
     <main className="app">
+      {showSaveBanner && (
+        <div
+          className="save-banner"
+          role="status"
+          aria-live="polite"
+        >
+          <button
+            type="button"
+            className="save-banner-message"
+            onClick={() => setAccountOpen(true)}
+            title="Link an email to save your guest account"
+          >
+            <strong>★ Save your guest account</strong> — link an email so your rating, stats, and friends survive a browser clear.
+          </button>
+          <button
+            type="button"
+            className="save-banner-dismiss"
+            onClick={dismissSaveBanner}
+            aria-label="Dismiss this reminder"
+            title="Don't show again"
+          >
+            ×
+          </button>
+        </div>
+      )}
       <header className="app-header">
         <img
           src="/3phor-mark.png"

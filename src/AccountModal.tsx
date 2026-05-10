@@ -38,10 +38,91 @@ const GENDER_OPTIONS: Array<{ value: Gender; label: string }> = [
   { value: 'prefer-not-to-say', label: 'Prefer not to say' },
 ];
 
+// localStorage key for an in-progress profile create-form draft. Saved
+// as the user types, restored when the modal re-opens. Cleared on
+// successful save. Survives refresh, accidental modal close, even a
+// crash mid-typing — kills the #1 "I lost my typing" failure mode.
+const PROFILE_DRAFT_KEY = '3phor.profile-draft.v1';
+
+type ProfileDraft = {
+  nickname: string;
+  fullName: string;
+  age: string;
+  gender: Gender | '';
+};
+
+function loadDraft(): ProfileDraft | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<ProfileDraft>;
+    return {
+      nickname: typeof parsed.nickname === 'string' ? parsed.nickname : '',
+      fullName: typeof parsed.fullName === 'string' ? parsed.fullName : '',
+      age: typeof parsed.age === 'string' ? parsed.age : '',
+      gender: (parsed.gender as Gender | '') ?? '',
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft(d: ProfileDraft): void {
+  try {
+    // Don't persist empty drafts — no point cluttering storage.
+    if (!d.nickname && !d.fullName && !d.age && !d.gender) {
+      localStorage.removeItem(PROFILE_DRAFT_KEY);
+      return;
+    }
+    localStorage.setItem(PROFILE_DRAFT_KEY, JSON.stringify(d));
+  } catch {
+    /* private mode / quota — fine to lose the draft */
+  }
+}
+
+function clearDraft(): void {
+  try {
+    localStorage.removeItem(PROFILE_DRAFT_KEY);
+  } catch {
+    /* no-op */
+  }
+}
+
+// Cooldown (seconds) between magic-link sends. Stops accidental spam
+// and rate-limit hits; the user gets a visible countdown instead.
+const MAGIC_LINK_COOLDOWN_S = 30;
+
 export default function AccountModal({ user, open, onClose, onProfileChange }: Props) {
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  // Magic-link send timestamp (ms) — used to compute the resend cooldown.
+  // null means "never sent in this session" so the button is enabled.
+  const [magicSentAt, setMagicSentAt] = useState<number | null>(null);
+  const [cooldownLeft, setCooldownLeft] = useState(0);
+
+  // Tick the cooldown counter once per second while it's active. The
+  // button label rerenders based on cooldownLeft.
+  useEffect(() => {
+    if (magicSentAt === null) {
+      setCooldownLeft(0);
+      return;
+    }
+    const update = () => {
+      const elapsed = Math.floor((Date.now() - magicSentAt) / 1000);
+      const left = Math.max(0, MAGIC_LINK_COOLDOWN_S - elapsed);
+      setCooldownLeft(left);
+      if (left === 0) {
+        // No need to keep ticking — interval will be cleared by the
+        // dependency change.
+        setMagicSentAt(null);
+      }
+    };
+    update();
+    const id = window.setInterval(update, 1000);
+    return () => window.clearInterval(id);
+  }, [magicSentAt]);
 
   // Profile form fields. Hydrated from existing profile if present.
   const [nickname, setNickname] = useState('');
@@ -50,10 +131,15 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
   const [gender, setGender] = useState<Gender | ''>('');
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
+  // True after we've shown the "Restored your draft" hint at least
+  // once, so the message doesn't re-fire on every re-render.
+  const [draftRestored, setDraftRestored] = useState(false);
 
   // When the modal opens with a signed-in user, fetch their profile so we
   // know whether to show the first-time create form (empty) or the edit
-  // form (pre-filled).
+  // form (pre-filled). For new users without a saved profile, also
+  // restore any in-progress draft from localStorage so a refresh
+  // mid-typing doesn't lose work.
   useEffect(() => {
     if (!open || !user) return;
     setLoadingProfile(true);
@@ -66,15 +152,37 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
         setAge(p.age?.toString() ?? '');
         setGender(p.gender ?? '');
       } else {
-        setNickname('');
-        setFullName('');
-        setAge('');
-        setGender('');
+        // No profile yet — try the localStorage draft first.
+        const draft = loadDraft();
+        if (draft && (draft.nickname || draft.fullName || draft.age || draft.gender)) {
+          setNickname(draft.nickname);
+          setFullName(draft.fullName);
+          setAge(draft.age);
+          setGender(draft.gender);
+          if (!draftRestored) {
+            setMessage('Restored your in-progress profile from last time.');
+            setDraftRestored(true);
+          }
+        } else {
+          setNickname('');
+          setFullName('');
+          setAge('');
+          setGender('');
+        }
       }
       setLoadingProfile(false);
       onProfileChange(p);
     });
-  }, [open, user, onProfileChange]);
+  }, [open, user, onProfileChange, draftRestored]);
+
+  // Autosave the draft as the user types. Only persist when the user
+  // doesn't yet have a saved profile — for existing-user edits, we
+  // don't want to leak partial edits into localStorage (the canonical
+  // copy is in Supabase).
+  useEffect(() => {
+    if (!open || !user || profile) return;
+    saveDraft({ nickname, fullName, age, gender });
+  }, [open, user, profile, nickname, fullName, age, gender]);
 
   if (!open) return null;
 
@@ -153,18 +261,24 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
 
           {/* Email magic-link form — kept for users without Apple/Google
               accounts and as a fallback if the OAuth providers are
-              misconfigured. Visually de-emphasized. */}
+              misconfigured. Visually de-emphasized.
+              Resend cooldown: after sending, the button stays disabled
+              with a countdown so the user doesn't double-tap (which
+              hits Supabase rate-limits and produces a confusing error)
+              but can resend after MAGIC_LINK_COOLDOWN_S seconds. */}
           <form
             className="account-email-form"
             onSubmit={async (e) => {
               e.preventDefault();
+              if (cooldownLeft > 0) return;
               if (!email.trim()) return;
               setBusy(true);
               setMessage(null);
               const result = await sendMagicLink(email.trim());
               setBusy(false);
               if (result.ok) {
-                setMessage(`✓ Magic link sent to ${email.trim()}. Check your inbox.`);
+                setMessage(`✓ Magic link sent to ${email.trim()}. Check your inbox — the link expires in about an hour.`);
+                setMagicSentAt(Date.now());
               } else {
                 setMessage(`Couldn't send link: ${result.message}`);
               }
@@ -180,8 +294,18 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
             />
-            <button type="submit" className="end-game-btn end-game-btn--subtle" disabled={busy}>
-              {busy ? 'Sending…' : 'Send magic link'}
+            <button
+              type="submit"
+              className="end-game-btn end-game-btn--subtle"
+              disabled={busy || cooldownLeft > 0}
+            >
+              {busy
+                ? 'Sending…'
+                : cooldownLeft > 0
+                  ? `Resend in ${cooldownLeft}s`
+                  : magicSentAt
+                    ? 'Resend link'
+                    : 'Send magic link'}
             </button>
           </form>
 
@@ -290,11 +414,27 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               });
               setBusy(false);
               if (result.ok) {
+                // Successful save — clear the localStorage draft. The
+                // canonical copy is now in Supabase; keeping a draft
+                // around would re-pre-fill the form on next open with
+                // potentially stale data.
+                clearDraft();
                 setProfile(result.profile);
                 onProfileChange(result.profile);
                 setMessage('✓ Saved.');
               } else {
-                setMessage(`Couldn't save: ${result.message}`);
+                // Friendly error for the unique-index violation on
+                // nickname (Postgres error code 23505). Other errors
+                // pass through verbatim.
+                const collision =
+                  /duplicate key value|unique constraint|profiles_nickname/i.test(
+                    result.message,
+                  );
+                setMessage(
+                  collision
+                    ? `That nickname is already taken. Try a different one.`
+                    : `Couldn't save: ${result.message}`,
+                );
               }
             }}
           >
