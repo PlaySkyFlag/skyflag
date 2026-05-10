@@ -100,7 +100,59 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Static loading shell — visible immediately on first paint,
+         even before the JS bundle parses. React replaces this with
+         the real route once it mounts. If JS never runs (parse
+         error, blocked network, etc.) the user sees this instead
+         of a silent black screen. -->
+    <div id="root">
+      <div style="padding:24px;color:#ffd884;font-family:system-ui,-apple-system,sans-serif;text-align:center;font-size:1.1rem;margin-top:40px;letter-spacing:0.04em;">
+        Loading 3phor…
+      </div>
+    </div>
+
+    <!-- Uncaught-error surface. If anything throws before React's
+         ErrorBoundary mounts (module import error, syntax error in
+         a chunk, blocked extension, etc.), this rewrites #root with
+         a visible error card so the user can copy the message
+         instead of staring at a void. Removed once we've identified
+         and fixed any remaining init-time crashes. -->
+    <script>
+      (function () {
+        function showError(message, filename, lineno) {
+          var root = document.getElementById('root');
+          if (!root) return;
+          // Only replace if root still contains the static shell.
+          // If React already replaced it, the error happened after
+          // mount and an ErrorBoundary will handle it.
+          if (!root.querySelector('[data-react-mounted]')) {
+            root.innerHTML =
+              '<div style="padding:22px 26px;margin:40px auto;max-width:560px;background:rgba(20,30,52,0.95);border:1px solid rgba(255,138,138,0.45);border-radius:14px;color:#f5f7fb;font-family:system-ui,-apple-system,sans-serif;line-height:1.5;">' +
+              '<h2 style="margin:0 0 8px;font-size:1.2rem;color:#ff9a9a;">3phor — initial load failed</h2>' +
+              '<p style="margin:0 0 12px;opacity:0.9;">The app hit a problem before React could start. Try a hard reload first (Cmd+Shift+R / Ctrl+Shift+R). If it keeps happening, the error below is the cause:</p>' +
+              '<pre style="margin:0 0 14px;padding:10px 12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.10);border-radius:8px;font:0.78rem ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word;max-height:30vh;overflow:auto;">' +
+              String(message || 'unknown error') +
+              (filename ? '\n  at ' + filename + ':' + (lineno || '?') : '') +
+              '</pre>' +
+              '<button onclick="location.reload()" style="padding:8px 14px;background:rgba(255,216,132,0.15);border:1px solid rgba(255,216,132,0.50);color:#ffd884;border-radius:8px;cursor:pointer;font:inherit;font-weight:600;">Reload</button>' +
+              '</div>';
+          }
+        }
+        window.addEventListener('error', function (e) {
+          showError(e.message, e.filename, e.lineno);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = e.reason;
+          showError((r && r.message) || String(r), r && r.fileName, r && r.lineNumber);
+        });
+      })();
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
+    <noscript>
+      <div style="padding:24px;color:#f5f3ee;font-family:system-ui,-apple-system,sans-serif;text-align:center;max-width:640px;margin:40px auto;">
+        3phor needs JavaScript to run. Enable JavaScript and reload.
+      </div>
+    </noscript>
   </body>
 </html>

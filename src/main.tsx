@@ -48,7 +48,13 @@ else rendered = <Landing />;
 //     here and doesn't take down the surrounding shell. The user
 //     gets "Try again without reloading" — often enough to clear
 //     a transient bad state without losing local game progress.
-createRoot(document.getElementById('root')!).render(
+// Mark the root so index.html's pre-mount error catcher knows
+// React has taken over and shouldn't overwrite us. The attribute
+// stays whether the inner render succeeds or the ErrorBoundary
+// catches — both replace the static shell.
+const rootEl = document.getElementById('root')!;
+rootEl.setAttribute('data-react-mounted', '1');
+createRoot(rootEl).render(
   <StrictMode>
     <ErrorBoundary>
       <Suspense fallback={<div className="route-loading">Loading…</div>}>
