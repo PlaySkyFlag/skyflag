@@ -12,13 +12,14 @@ import Friends from './Friends';
 import Help from './Help';
 import MoveHistory from './MoveHistory';
 import Multiplayer from './Multiplayer';
+import Spectators from './Spectators';
 import Tournaments from './Tournaments';
 import { listFriends } from './game/friends';
 import type { Profile } from './game/profile';
 import type { HistoryEntry, RoomState } from './game/types';
 import { useEffect, useState } from 'react';
 
-type TabId = 'rules' | 'multiplayer' | 'history' | 'tournaments' | 'friends' | 'chat';
+type TabId = 'rules' | 'multiplayer' | 'history' | 'tournaments' | 'friends' | 'spectate' | 'chat';
 
 type Props = {
   authUser: User | null;
@@ -107,6 +108,8 @@ export default function Sidebar({
         return <MoveHistory inline history={history} />;
       case 'tournaments':
         return <Tournaments inline user={authUser} profile={profile} onOpenAccount={onOpenAccount} />;
+      case 'spectate':
+        return <Spectators inline />;
       case 'friends':
         return (
           <Friends
@@ -175,6 +178,7 @@ export default function Sidebar({
         {tab('multiplayer', '👥 Multiplayer')}
         {tab('history', `📜 History${history.length > 0 ? ` (${history.length})` : ''}`)}
         {tab('tournaments', '🏆 Tournaments')}
+        {tab('spectate', '👁 Spectate')}
         {tab('friends', '🤝 Friends', pendingCount)}
         {tab('chat', '💬 Chat')}
         {active && (

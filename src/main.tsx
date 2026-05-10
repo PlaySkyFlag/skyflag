@@ -5,6 +5,7 @@ import App from './App.tsx'
 import ErrorBoundary from './ErrorBoundary.tsx'
 import Landing from './Landing.tsx'
 import Story from './Story.tsx'
+import Watch from './Watch.tsx'
 import { migrateLocalStorage } from './game/migrate.ts'
 
 // Run the one-shot rebrand storage migration before anything else reads
@@ -18,9 +19,11 @@ migrateLocalStorage();
 const path = window.location.pathname;
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
+const isWatch = path.startsWith('/watch');
 
 let rendered;
-if (isApp) rendered = <App />;
+if (isWatch) rendered = <Watch />;
+else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
 else rendered = <Landing />;
 

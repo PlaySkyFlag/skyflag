@@ -1941,6 +1941,113 @@ button.tray-piece:hover {
   text-transform: uppercase;
 }
 
+/* Spectator panel row — clickable card that navigates to /watch/<code>. */
+.spectator-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.spectator-row:hover {
+  background: rgba(255, 216, 132, 0.08);
+  border-color: rgba(255, 216, 132, 0.35);
+}
+.spectator-players {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+}
+.spectator-player {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.spectator-rating {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+.spectator-vs {
+  opacity: 0.5;
+  font-size: 0.8rem;
+}
+.spectator-meta {
+  font-size: 0.78rem;
+  opacity: 0.65;
+  letter-spacing: 0.04em;
+}
+
+/* Watch view — full-page read-only spectator surface at /watch/<code>. */
+.watch-app .watch-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffd884;
+  margin: 0;
+}
+.watch-app .watch-sub {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+.watch-players {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px;
+  margin: 6px auto;
+  max-width: 720px;
+}
+.watch-player {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  min-width: 180px;
+}
+.watch-player-active {
+  border-color: rgba(255, 216, 132, 0.55);
+  background: rgba(255, 216, 132, 0.08);
+}
+.watch-player strong {
+  color: #f0f4f8;
+  font-size: 0.95rem;
+}
+.watch-player span {
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+.watch-clock {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: #ffd884 !important;
+  opacity: 1 !important;
+  font-size: 0.95rem !important;
+}
+.watch-winner {
+  color: #6fff8a !important;
+  font-weight: 700;
+  opacity: 1 !important;
+}
+.watch-error {
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
 /* Plus badge — small gold star shown next to nicknames of paid users.
    Two sizes: inline (default, matches text) and large (profile header). */
 .plus-badge {
