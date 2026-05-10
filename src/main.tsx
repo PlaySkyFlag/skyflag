@@ -36,11 +36,25 @@ else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
 else rendered = <Landing />;
 
+// Two error boundaries:
+//   * OUTER — catches catastrophic errors and lazy-chunk load
+//     failures. The Suspense fallback throws upward when a chunk
+//     can't be fetched (network blip, stale deploy), and this
+//     boundary turns that into a recoverable "Reload" overlay
+//     instead of a blank page.
+//   * INNER — wraps the actual route render. A crash in one
+//     route's component tree (a malformed Supabase row, a worker
+//     callback throwing, an SVG attribute getting NaN) is caught
+//     here and doesn't take down the surrounding shell. The user
+//     gets "Try again without reloading" — often enough to clear
+//     a transient bad state without losing local game progress.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <Suspense fallback={<div className="route-loading">Loading…</div>}>
-        {rendered}
+        <ErrorBoundary>
+          {rendered}
+        </ErrorBoundary>
       </Suspense>
     </ErrorBoundary>
   </StrictMode>,
