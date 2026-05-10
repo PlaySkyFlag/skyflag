@@ -14,7 +14,7 @@
 // the board is symmetric and P2 advances in the opposite direction.
 //
 // Magnitudes are tuned to fit alongside the other evaluation terms:
-//   - Material: 30 (rover) to 350 (captain)
+//   - Material: 60 (rover/pilot) to 700 (captain)
 //   - Distance-to-target penalty: ~3 per square
 //   - Mobility: 1.2 per legal move
 // PST values cap around 22 — meaningful pull without overriding material.

@@ -147,15 +147,19 @@ const LAYER_INDEX: Record<Layer, number> = { ground: 0, sky: 1, space: 2 };
 
 function pieceValue(kind: PieceKind): number {
   switch (kind) {
-    // Captain bumped 100 → 350 — losing your last Captain ends the game,
-    // so the AI should treat Captain material as fundamentally different
-    // from minor pieces. The previous 100 was too close to a Soldier
-    // and let the search trade Captain-for-Soldier swaps as if they
-    // were near-equal exchanges.
-    case 'captain': return 350;
-    case 'soldier': return 60;
-    case 'rover':   return 30;
-    case 'pilot':   return 30;
+    // Aggressive-capture tuning pass: previous values let flag-rush
+    // dominate piece-trading decisions. The new scale puts piece
+    // material clearly above flag bonuses, especially for the
+    // Captain — capturing a Captain (700) is now worth more than
+    // sweeping all three opponent flags combined (3 × 200 = 600).
+    // Soldiers also bumped because they're the recruiting pool for
+    // promoted Captains, so trading them away has real strategic
+    // cost. Rovers and Pilots are minor utility but each adds a
+    // useful threat vector — 60 keeps them above noise.
+    case 'captain': return 700;
+    case 'soldier': return 120;
+    case 'rover':   return 60;
+    case 'pilot':   return 60;
   }
 }
 
@@ -268,11 +272,23 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   for (const piece of state.inHand[aiPlayer]) score += pieceValue(piece.kind) * 0.7;
   for (const piece of state.inHand[opp])      score -= pieceValue(piece.kind) * 0.7;
 
-  // Flag progress — opponent flags I've captured are good; mine they took, bad.
+  // Flag progress — opponent flags I've captured are good; mine they
+  // took, bad. Per-flag bonus dropped 500 → 200 so flag-grabbing
+  // doesn't dominate piece-capture decisions in the search; the win
+  // condition itself is still handled by WIN_SCORE at terminal nodes.
+  let myFlagsCaptured = 0;
+  let oppFlagsCaptured = 0;
   for (const layer of ['ground', 'sky', 'space'] as const) {
-    if (state.flags[layer][opp])      score += 500;
-    if (state.flags[layer][aiPlayer]) score -= 500;
+    if (state.flags[layer][opp])      { score += 200; myFlagsCaptured++; }
+    if (state.flags[layer][aiPlayer]) { score -= 200; oppFlagsCaptured++; }
   }
+
+  // Final-flag rush — once a side has 2 of 3 flags, the third is
+  // decisive. Add a meaningful bonus for whichever side is one flag
+  // away so the AI doesn't dawdle on side-quests when it's about to
+  // win, and defends harder when the opponent is about to win.
+  if (myFlagsCaptured === 2)  score += 300;
+  if (oppFlagsCaptured === 2) score -= 300;
 
   // Strategic positioning — closer is better for me, opponent farther is also
   // better for me. Each square of distance worth ~3 score points.
@@ -307,13 +323,18 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
     if (owner === aiPlayer && oppInfo.squares.has(key)) {
       score -= value * 0.40;
       if (bp.piece.kind === 'captain') {
-        score -= 250;
+        // Bumped 250 → 400 to match the higher Captain material value.
+        // A threatened Captain is the single most urgent thing on the
+        // board; the AI should retreat or interpose hard.
+        score -= 400;
         myCaptainsThreatened++;
       }
     } else if (owner === opp && myInfo.squares.has(key)) {
       score += value * 0.40;
       if (bp.piece.kind === 'captain') {
-        score += 250;
+        // Symmetric — opponent's threatened Captain is the most
+        // valuable target the AI can chase.
+        score += 400;
         oppCaptainsThreatened++;
       }
     }
@@ -322,9 +343,10 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   // Multi-Captain hazards: if the AI has any Captain threatened AND
   // can't defend or retreat both, the situation compounds. Apply an
   // extra fork-style penalty per threatened Captain past the first
-  // (the first one already lost 250 above).
-  if (myCaptainsThreatened > 1) score -= 200 * (myCaptainsThreatened - 1);
-  if (oppCaptainsThreatened > 1) score += 200 * (oppCaptainsThreatened - 1);
+  // (the first one already lost 400 above). Bumped 200 → 300 to match
+  // the higher Captain weight.
+  if (myCaptainsThreatened > 1) score -= 300 * (myCaptainsThreatened - 1);
+  if (oppCaptainsThreatened > 1) score += 300 * (oppCaptainsThreatened - 1);
 
   return score;
 }
