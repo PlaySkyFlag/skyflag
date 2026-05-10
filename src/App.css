@@ -1804,6 +1804,61 @@ button.tray-piece:hover {
   font-weight: 700;
 }
 
+/* Account data section — export + delete. Sits below the profile
+   form in AccountModal. Visually de-emphasized vs. the profile fields
+   above, but the delete-confirm flow is high-contrast (warn-color) so
+   the destructive action doesn't disappear. */
+.account-data-section {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+.account-data-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d8e0f0;
+  margin: 0 0 6px 0;
+}
+.account-data-body {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+.account-data-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.account-delete-confirm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 138, 138, 0.08);
+  border: 1px solid rgba(255, 138, 138, 0.30);
+  border-radius: 10px;
+}
+.account-delete-warning {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+  color: #ffd884;
+}
+.account-delete-warning strong {
+  color: #ff8a8a;
+}
+.account-delete-warning code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  color: #ff8a8a;
+}
+
 /* Save-your-guest-account banner — surfaces the link-email upgrade at
    the top of the app once the user has invested real time (3+ games)
    so they don't lose their rating to a browser clear. Persistent but

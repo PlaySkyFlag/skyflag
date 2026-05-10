@@ -12,6 +12,7 @@ import {
   signInWithOAuth,
   signOut,
 } from './game/auth';
+import { downloadExportFile, exportUserData } from './game/dataExport';
 import { useEntitlement } from './game/entitlements';
 import { loadProfile, saveProfile, type Gender, type Profile } from './game/profile';
 import { supabase } from './game/supabase';
@@ -501,8 +502,151 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
             </div>
           </form>
         )}
+
+        {/* Account data — export + delete. Required for PIPEDA / App
+            Store compliance. Visible to every signed-in user including
+            guests; the export is useful even for ephemeral guest data
+            (local stats, friends list). Delete is gated behind a
+            typed confirmation to prevent accidental destruction. */}
+        <AccountDataSection user={user} onAfterDelete={() => {
+          onProfileChange(null);
+          onClose();
+        }} />
+
         {message && <p className="account-message">{message}</p>}
       </div>
+    </div>
+  );
+}
+
+// "Account data" section — separate component to keep AccountModal's
+// state tidy. Owns its own busy/message state for export and delete.
+function AccountDataSection({
+  user,
+  onAfterDelete,
+}: {
+  user: User;
+  onAfterDelete: () => void;
+}) {
+  const [exporting, setExporting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [localMsg, setLocalMsg] = useState<string | null>(null);
+
+  const onExport = async () => {
+    setExporting(true);
+    setLocalMsg(null);
+    try {
+      const bundle = await exportUserData(user);
+      downloadExportFile(bundle);
+      setLocalMsg('✓ Export started — check your downloads folder.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Export failed.';
+      setLocalMsg(`Couldn't export: ${msg}`);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const onDelete = async () => {
+    if (confirmText.trim().toLowerCase() !== 'delete') {
+      setLocalMsg('Type DELETE in the box to confirm.');
+      return;
+    }
+    if (!supabase) return;
+    setDeleting(true);
+    setLocalMsg(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        body: {},
+      });
+      if (error) throw new Error(error.message);
+      if (data && data.ok === false) throw new Error(data.error ?? 'Delete failed.');
+      // Sign out locally — the server has already invalidated the
+      // auth row; this clears the local session and triggers the
+      // onAuthStateChange listeners that re-render the app as
+      // signed-out.
+      await signOut();
+      onAfterDelete();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Delete failed.';
+      setLocalMsg(`Couldn't delete: ${msg}`);
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="account-data-section">
+      <h3 className="account-data-title">Your account data</h3>
+      <p className="account-data-body">
+        Download everything we have on you, or delete your account.
+        Required by privacy law — and good practice.
+      </p>
+      <div className="account-data-actions">
+        <button
+          type="button"
+          className="hud-btn"
+          onClick={onExport}
+          disabled={exporting || deleting}
+        >
+          {exporting ? 'Preparing…' : '↓ Download my data'}
+        </button>
+        {!confirming ? (
+          <button
+            type="button"
+            className="hud-btn hud-btn-warn"
+            onClick={() => {
+              setConfirming(true);
+              setLocalMsg(null);
+            }}
+            disabled={deleting}
+          >
+            Delete my account
+          </button>
+        ) : (
+          <div className="account-delete-confirm">
+            <p className="account-delete-warning">
+              <strong>This is permanent.</strong> Your profile, rating,
+              friends, and tournament entries will be wiped. Game records
+              survive but your name is removed from them. Any active
+              Plus subscription is cancelled. Type <code>DELETE</code>{' '}
+              below to confirm.
+            </p>
+            <input
+              type="text"
+              className="account-input"
+              placeholder="Type DELETE to confirm"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              autoFocus
+            />
+            <div className="account-data-actions">
+              <button
+                type="button"
+                className="hud-btn hud-btn-warn"
+                onClick={onDelete}
+                disabled={deleting}
+              >
+                {deleting ? 'Deleting…' : 'Permanently delete'}
+              </button>
+              <button
+                type="button"
+                className="hud-btn hud-btn-subtle"
+                onClick={() => {
+                  setConfirming(false);
+                  setConfirmText('');
+                  setLocalMsg(null);
+                }}
+                disabled={deleting}
+              >
+                Keep my account
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+      {localMsg && <p className="account-message">{localMsg}</p>}
     </div>
   );
 }
