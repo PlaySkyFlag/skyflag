@@ -629,9 +629,19 @@ export default function App() {
 
   // AI loop: when it's the AI's turn and the game is in progress, send the
   // state to the worker and dispatch its chosen action when it comes back.
-  // The effect re-runs after each dispatch (state changes), automatically
-  // scheduling the next AI activation. When the turn passes back to the
-  // human, currentPlayer no longer matches aiPlayer and the loop stops.
+  // The effect re-runs after each dispatch (history grows / activations
+  // change / turn flips), automatically scheduling the next AI activation.
+  // When the turn passes back to the human, currentPlayer no longer matches
+  // aiPlayer and the loop stops.
+  //
+  // Important: depend on game-progress signals, NOT the whole `state`. With
+  // a clock running, applyTick produces a fresh state object every 100ms;
+  // putting `state` here would cancel the AI_THINK_DELAY_MS timer below
+  // before it could ever fire, leaving the AI permanently silent.
+  // `stateRef` carries the latest state into the worker payload without
+  // creating a re-run dependency.
+  const stateRef = useRef(state);
+  stateRef.current = state;
   useEffect(() => {
     if (room) return;
     if (!aiPlayer) return;
@@ -657,7 +667,7 @@ export default function App() {
       const req: AiWorkerRequest = {
         id: requestId,
         type: 'choose',
-        state,
+        state: stateRef.current,
         searchDepth,
       };
       worker.postMessage(req);
@@ -668,7 +678,15 @@ export default function App() {
       clearTimeout(timer);
       worker.removeEventListener('message', handleMessage);
     };
-  }, [aiPlayer, state, room, difficulty]);
+  }, [
+    aiPlayer,
+    state.currentPlayer,
+    state.status.kind,
+    state.activationsRemaining,
+    state.history.length,
+    room,
+    difficulty,
+  ]);
 
   const inProgress = state.status.kind === 'in-progress';
   const isAiTurn = aiPlayer === state.currentPlayer && inProgress;
@@ -685,6 +703,9 @@ export default function App() {
   // (covering #6: a stuck player with no deploys/moves still ends turn
   // cleanly instead of locking the UI). The AI's loop handles its own
   // end-of-turn separately, so guard on !isAiTurn to avoid duplicates.
+  // Same caveat as the AI effect above: do NOT depend on the full `state`,
+  // or a running clock will cancel the 380ms timer on every tick and the
+  // human's turn will never end.
   useEffect(() => {
     if (!inProgress) return;
     if (isAiTurn) return;
@@ -696,7 +717,15 @@ export default function App() {
       dispatch({ type: 'end-turn' });
     }, 380);
     return () => clearTimeout(timer);
-  }, [state, inProgress, isAiTurn, isMpBlocking]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state.currentPlayer,
+    state.activationsRemaining,
+    state.history.length,
+    inProgress,
+    isAiTurn,
+    isMpBlocking,
+  ]);
 
   const selectedBoardPiece =
     selection?.kind === 'board'
@@ -930,6 +959,13 @@ export default function App() {
           height={120}
         />
         <div className="app-header-actions">
+          <a
+            href="/"
+            className="hud-btn app-header-site"
+            title="Visit playskyflag.com — the public website"
+          >
+            playskyflag.com
+          </a>
           <button
             type="button"
             className="hud-btn app-header-account"

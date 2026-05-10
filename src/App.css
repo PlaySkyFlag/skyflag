@@ -62,7 +62,8 @@
 }
 
 .app-header-account,
-.app-header-stats {
+.app-header-stats,
+.app-header-site {
   font-size: 0.9rem;
   font-weight: 600;
   padding: 8px 16px;
@@ -72,9 +73,18 @@
 }
 
 .app-header-account:hover,
-.app-header-stats:hover {
+.app-header-stats:hover,
+.app-header-site:hover {
   background: #11192e;
   border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Anchor needs explicit text-decoration reset — global a styles add an
+   underline that the buttons should not have. */
+.app-header-site {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Stats modal layout — grid of high-level numbers, then per-mode table,
