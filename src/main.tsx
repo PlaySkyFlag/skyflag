@@ -1,12 +1,18 @@
-import { StrictMode } from 'react'
+import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
 import ErrorBoundary from './ErrorBoundary.tsx'
-import Landing from './Landing.tsx'
-import Story from './Story.tsx'
-import Watch from './Watch.tsx'
 import { migrateLocalStorage } from './game/migrate.ts'
+
+// Route components are lazy-loaded so a visitor pulls down only the
+// chunk for the URL they hit. Landing is the marketing surface and
+// stays light; /play (App) drags in the AI worker, the board, and
+// every modal — keeping that ~600kB out of the / bundle is the
+// biggest single perf win available without further restructuring.
+const App = lazy(() => import('./App.tsx'))
+const Landing = lazy(() => import('./Landing.tsx'))
+const Story = lazy(() => import('./Story.tsx'))
+const Watch = lazy(() => import('./Watch.tsx'))
 
 // Run the one-shot rebrand storage migration before anything else reads
 // from localStorage. Idempotent — safe to call on every boot.
@@ -30,7 +36,9 @@ else rendered = <Landing />;
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
-      {rendered}
+      <Suspense fallback={<div className="route-loading">Loading…</div>}>
+        {rendered}
+      </Suspense>
     </ErrorBoundary>
   </StrictMode>,
 )
