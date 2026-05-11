@@ -23,6 +23,27 @@ export type { RoomState };
 // accidentally re-joined by someone with the same userId.
 const ROOM_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
+// "Looks transient" predicate for supabase-js errors. A 503 / 504 /
+// fetch failure shouldn't be terminal on the first try — Vercel + the
+// Supabase edge occasionally throw a momentary 5xx during deploy or
+// when a region is rebalancing. Single-retry policy below uses this
+// to distinguish "the room code you typed doesn't exist" (terminal,
+// surface to user) from "the network blipped" (retry once).
+function looksTransient(err: unknown): boolean {
+  if (!err) return false;
+  const e = err as { message?: string; code?: string; status?: number };
+  const msg = (e.message ?? '').toLowerCase();
+  if (msg.includes('failed to fetch')) return true;
+  if (msg.includes('network')) return true;
+  if (msg.includes('timeout')) return true;
+  if (e.status === 503 || e.status === 504) return true;
+  return false;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 type RoomMeta = {
   is_public: boolean;
   p1_public_opt_in: boolean;
@@ -465,7 +486,11 @@ export default function Multiplayer({ room, roomMeta = null, forceOpen = false, 
     setError(null);
     try {
       const userId = getEffectiveUserId(authUser?.id ?? null);
-      // Retry on (rare) room-code collisions — unique constraint on the table.
+      let didTransientRetry = false;
+      // Retry on (rare) room-code collisions — unique constraint on the
+      // table. Also tolerate a single transient network blip (503/504/
+      // "Failed to fetch") so a Supabase region rebalance or Vercel cold
+      // start doesn't dead-end the user on their first click.
       for (let attempt = 0; attempt < 5; attempt++) {
         const tryCode = generateRoomCode();
         const { data, error: insertErr } = await supabase
@@ -482,8 +507,15 @@ export default function Multiplayer({ room, roomMeta = null, forceOpen = false, 
           onRoomEntered({ code: data.room_code, role: 'p1', status: 'waiting' });
           return;
         }
-        // 23505 = unique_violation in Postgres. Anything else, surface.
-        if (insertErr.code !== '23505') throw insertErr;
+        // 23505 = unique_violation in Postgres — try a different room code.
+        if (insertErr.code === '23505') continue;
+        // Transient (network / 5xx) — one quiet retry, then surface.
+        if (looksTransient(insertErr) && !didTransientRetry) {
+          didTransientRetry = true;
+          await sleep(500);
+          continue;
+        }
+        throw insertErr;
       }
       throw new Error('Could not allocate a room code after 5 attempts');
     } catch (err) {
@@ -501,12 +533,26 @@ export default function Multiplayer({ room, roomMeta = null, forceOpen = false, 
     setError(null);
     try {
       const userId = getEffectiveUserId(authUser?.id ?? null);
-      const { data: existing, error: fetchErr } = await supabase
-        .from('games')
-        .select('*')
-        .eq('room_code', cleaned)
-        .maybeSingle();
-      if (fetchErr) throw fetchErr;
+      // Single transient retry on the initial fetch — same rationale as
+      // handleCreate. The follow-up UPDATE (take p2 seat) doesn't retry
+      // because a retry there could double-book in pathological races.
+      let existing: { p1_id: string | null; p2_id: string | null; created_at: string | null; room_code: string } | null = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const { data, error: fetchErr } = await supabase
+          .from('games')
+          .select('*')
+          .eq('room_code', cleaned)
+          .maybeSingle();
+        if (!fetchErr) {
+          existing = data;
+          break;
+        }
+        if (attempt === 0 && looksTransient(fetchErr)) {
+          await sleep(500);
+          continue;
+        }
+        throw fetchErr;
+      }
       if (!existing) {
         throw new Error(`No room ${cleaned} — check the code`);
       }

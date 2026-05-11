@@ -412,21 +412,16 @@ export default function App() {
     if (!room) return;
     if (!supabase) return;
     if (state.status.kind === 'in-progress') return;
-    const flag = `3phor.rating-applied.${room.code}`;
-    try {
-      if (localStorage.getItem(flag)) return;
-    } catch {
-      /* fall through */
-    }
+    // No client-side idempotency gate — apply-rating is server-side
+    // idempotent via the game_results primary key on room_code, so the
+    // second invoke for the same room is a cheap no-op. The previous
+    // localStorage flag silently dropped rating updates whenever a
+    // user cleared their browser data between game-end and dispatch,
+    // and added complexity without adding safety.
     const sb = supabase;
     sb.functions
       .invoke('apply-rating', { body: { room_code: room.code } })
       .then(() => {
-        try {
-          localStorage.setItem(flag, '1');
-        } catch {
-          /* ignore */
-        }
         // Refresh local profile so the new rating shows up immediately.
         if (authUser) {
           loadProfile(authUser.id).then((p) => p && setProfile(p));
@@ -1042,7 +1037,14 @@ export default function App() {
       channel.unsubscribe();
       drawChannelRef.current = null;
     };
-  }, [room]);
+    // Depend on the room IDENTITY signals (code + role), not the room
+    // object reference. setRoom(prev => ({ ...prev, status: 'playing' }))
+    // produces a new object reference every time the players' join state
+    // advances, and a `[room]` dep would tear down + recreate this
+    // broadcast channel on each of those benign reference changes —
+    // losing any draw/chat messages in flight on the previous instance.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room?.code, room?.role]);
 
   // Count of spectators currently watching this room. Mirrors the
   // presence channel that Watch.tsx tracks itself on, so we don't
@@ -1081,7 +1083,11 @@ export default function App() {
     return () => {
       sb.removeChannel(channel);
     };
-  }, [room]);
+    // Same reasoning as the draw channel above — don't re-subscribe on
+    // every `setRoom(prev => ...)` reference change. Role is in the
+    // deps because the presence key bakes it in (player_p1 / player_p2).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room?.code, room?.role]);
 
   // Is the current player's deploy pad occupied (by any piece)? Used to
   // gate the pad's "drop me here" highlight and to flash a hint when the

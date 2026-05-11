@@ -200,8 +200,31 @@ export default function Watch() {
         }
       });
 
+    // Belt-and-suspenders de-publish detection. The postgres-changes
+    // handler above catches the UPDATE that flips is_public → false,
+    // but Realtime delivery depends on RLS evaluating against the new
+    // row state. If the policy filters out post-private updates the
+    // spectator never sees the kick event and sits indefinitely on
+    // the last public snapshot. A 30-second poll closes that window:
+    // if the row is no longer visible (RLS yanked it) or comes back
+    // with is_public=false, surface the same error and stop refresh.
+    const publicCheck = window.setInterval(() => {
+      sb
+        .from('games')
+        .select('is_public')
+        .eq('room_code', roomCode)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!mounted) return;
+          if (!data || !data.is_public) {
+            setError('This game is no longer public.');
+          }
+        });
+    }, 30_000);
+
     return () => {
       mounted = false;
+      window.clearInterval(publicCheck);
       sb.removeChannel(channel);
       sb.removeChannel(presenceChannel);
     };

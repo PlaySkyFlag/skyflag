@@ -443,7 +443,8 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
             type="checkbox"
             checked={available}
             onChange={(e) => setAvailable(e.target.checked)}
-            disabled={inRoom || searching}
+            disabled={inRoom || searching || !profile}
+            title={!profile ? 'Loading your profile…' : undefined}
           />
           <span>I'm looking for a game</span>
         </label>
@@ -470,9 +471,13 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
           <button
             type="button"
             className="hud-btn"
-            disabled={inRoom || outgoing !== null || incoming !== null}
+            disabled={inRoom || outgoing !== null || incoming !== null || !profile}
             onClick={() => setSearching(true)}
-            title="Auto-pair with the next player who hits Quick match"
+            title={
+              !profile
+                ? 'Loading your profile…'
+                : 'Auto-pair with the next player who hits Quick match'
+            }
           >
             ⚡ Quick match
           </button>
