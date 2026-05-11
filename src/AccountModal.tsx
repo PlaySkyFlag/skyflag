@@ -464,8 +464,6 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
           </div>
         )}
 
-        <PlusPanel />
-
         {/* Rating history sparkline — Plus-only. For non-subscribers
             this renders a teaser with a CTA so they see what they're
             missing without being able to inspect the data. */}
@@ -605,6 +603,12 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
           onProfileChange(null);
           onClose();
         }} />
+
+        {/* Plus pitch lives at the bottom of the modal — a soft
+            reminder of what's coming for subscribers, not a wall the
+            user has to scroll past to reach the actual profile form
+            on first sign-up. */}
+        <PlusPanel />
 
         {message && <p className="account-message">{message}</p>}
       </div>
