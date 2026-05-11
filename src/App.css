@@ -1583,6 +1583,89 @@ button.tray-piece:hover {
   opacity: 0.65;
 }
 
+/* Welcome chooser card — narrower than the full profile card since
+   it holds only two CTAs and a divider. Keeps the choice focused
+   rather than spreading across a wider surface. */
+.account-card--narrow {
+  width: min(380px, calc(100vw - 32px));
+}
+
+/* Secondary CTA on the welcome chooser — outline-style "Sign in"
+   button paired with the filled primary "Start playing" button. Uses
+   the same width and padding as the primary so the two CTAs read as
+   visual equals, just with different fill weights. */
+.account-secondary {
+  width: 100%;
+  font-size: 1rem;
+  padding: 12px 16px;
+  margin-top: 4px;
+}
+
+/* Back arrow in the sign-in screen header. Mirrors .account-close
+   placement but lives at the LEADING edge so the header reads
+   ← Title × — standard mobile chrome pattern. */
+.account-back {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-right: 6px;
+}
+
+.account-back:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+/* When the header has a back button, the title centers between the
+   two icon-buttons instead of hugging the leading edge — easier to
+   scan and matches the look of native settings screens. */
+.account-back ~ .account-title {
+  flex: 1;
+  text-align: center;
+}
+
+/* Secondary action row inside the OTP screen — Resend + Use a
+   different email. Rendered as small text links rather than buttons
+   so they don't compete with the dominant "Sign in" CTA above. */
+.account-actions--secondary {
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+}
+
+.account-text-btn {
+  background: transparent;
+  border: none;
+  color: #ffd884;
+  cursor: pointer;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.account-text-btn:hover:not(:disabled) {
+  color: #ffe9b0;
+}
+
+.account-text-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  text-decoration: none;
+}
+
+.account-text-sep {
+  color: rgba(255, 255, 255, 0.35);
+  user-select: none;
+}
+
 /* OAuth row — Apple + Google sign-in buttons, side by side on wide
    screens, stacked on narrow ones. Visual weight sits between the
    primary guest button (bigger) and the email form (smaller). */

@@ -124,7 +124,17 @@ function formatCooldown(s: number): string {
   return `${m}:${r.toString().padStart(2, '0')}`;
 }
 
+// Signed-out modal has a small state machine — keeps the welcome
+// screen uncluttered and gives returning users a clear, labeled
+// "Sign in" path. 'choose' is the welcome screen with two CTAs;
+// 'signin' is the email/OTP flow. Whether 'signin' shows the email
+// input or the code input is derived from `emailSentTo` so we don't
+// need a third state. Email OTP auto-creates an account for new
+// emails, so the same flow serves new and returning users.
+type SignedOutMode = 'choose' | 'signin';
+
 export default function AccountModal({ user, open, onClose, onProfileChange }: Props) {
+  const [mode, setMode] = useState<SignedOutMode>('choose');
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -179,6 +189,19 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
   // once, so the message doesn't re-fire on every re-render.
   const [draftRestored, setDraftRestored] = useState(false);
 
+  // Reset the chooser → sign-in flow each time the modal closes so a
+  // returning user always starts on the welcome screen instead of
+  // landing back in the middle of an abandoned OTP entry.
+  useEffect(() => {
+    if (!open) {
+      setMode('choose');
+      setEmailSentTo(null);
+      setCodeInput('');
+      setMagicSentAt(null);
+      setMessage(null);
+    }
+  }, [open]);
+
   // When the modal opens with a signed-in user, fetch their profile so we
   // know whether to show the first-time create form (empty) or the edit
   // form (pre-filled). For new users without a saved profile, also
@@ -230,102 +253,143 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
 
   if (!open) return null;
 
-  // ── Signed-out state — guest-first, then OAuth, then email ──────────
+  // ── Signed-out state — chooser → sign-in (email + code) ─────────────
   if (!user) {
-    return (
-      <div className="account-overlay" role="dialog" aria-modal="true">
-        <div className="account-card">
-          <div className="account-header">
-            <h2 className="account-title">Welcome to 3phor</h2>
-            <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
-          </div>
-          <p className="account-intro">
-            Pick how you want to play. Online play, ratings, and tournaments
-            work with any of these — guest accounts can be saved permanently
-            later.
-          </p>
+    // Welcome chooser — the default landing screen. Two clear paths:
+    // start playing as a guest (one click, dominant), or sign in
+    // (returning users with an existing account). Nothing else on
+    // screen so the choice reads cleanly.
+    if (mode === 'choose') {
+      return (
+        <div className="account-overlay" role="dialog" aria-modal="true">
+          <div className="account-card account-card--narrow">
+            <div className="account-header">
+              <h2 className="account-title">Welcome to 3phor</h2>
+              <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
+            </div>
 
-          {/* Primary: instant guest sign-in. The dominant button because
-              this is the lowest-friction path and converts best. */}
-          <button
-            type="button"
-            className="end-game-btn account-primary"
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              setMessage(null);
-              const r = await signInAnonymously();
-              setBusy(false);
-              if (!r.ok) setMessage(r.message);
-            }}
-            title="Start playing instantly — guest account on this device"
-          >
-            {busy ? 'Signing in…' : '▶ Continue as guest'}
-          </button>
-          <p className="account-primary-sub">
-            No email, no password. You can save your account later.
-          </p>
-
-          {/* OAuth (Apple / Google) is currently hidden — providers
-              aren't fully wired up in production, and showing buttons
-              that error out scared off would-be sign-ups. The code
-              path stays in `signInWithOAuth` so we can re-enable
-              instantly once provider config is finalized. */}
-
-          <div className="account-divider"><span>or save progress with email</span></div>
-
-          {/* Email sign-in — dual-redemption flow.
-              Stage 1 (no email sent yet): show email input + "Send code"
-              Stage 2 (sent): show 6-digit code input + Verify, with the
-                              option to resend (cooldown-gated) or change
-                              the email.
-              The user can EITHER click the magic link in the email OR
-              type the 6-digit code into stage 2. Code path is more
-              bomb-proof: works across devices, no redirect URL issues,
-              no "wrong browser" trap. */}
-          {emailSentTo === null ? (
-            <form
-              className="account-email-form"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (cooldownLeft > 0) return;
-                const addr = email.trim();
-                if (!addr) return;
+            <button
+              type="button"
+              className="end-game-btn account-primary"
+              disabled={busy}
+              onClick={async () => {
                 setBusy(true);
                 setMessage(null);
-                const result = await sendMagicLink(addr);
+                const r = await signInAnonymously();
                 setBusy(false);
-                if (result.ok) {
-                  setEmailSentTo(addr);
-                  setMagicSentAt(Date.now());
-                  setMessage(null);
-                } else {
-                  setMessage(`Couldn't send: ${result.message}`);
-                }
+                if (!r.ok) setMessage(r.message);
+              }}
+              title="Start playing instantly — guest account on this device"
+            >
+              {busy ? 'Signing in…' : '▶ Start playing'}
+            </button>
+            <p className="account-primary-sub">
+              Free, no email needed. You can save your account later.
+            </p>
+
+            <div className="account-divider"><span>or</span></div>
+
+            <button
+              type="button"
+              className="end-game-btn end-game-btn--subtle account-secondary"
+              onClick={() => {
+                setMessage(null);
+                setMode('signin');
               }}
             >
-              <input
-                id="account-email"
-                className="account-input"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-              />
-              <button
-                type="submit"
-                className="end-game-btn end-game-btn--subtle"
-                disabled={busy || cooldownLeft > 0}
+              Sign in
+            </button>
+            <p className="account-primary-sub">
+              Pick up where you left off.
+            </p>
+
+            {message && <p className="account-message">{message}</p>}
+          </div>
+        </div>
+      );
+    }
+
+    // 'signin' mode — email → 6-digit code. Same Supabase OTP flow
+    // for new and returning emails (Supabase auto-creates an account
+    // if the email is unknown), so this screen serves both groups
+    // even though the chooser CTA is labeled "Sign in".
+    const onBack = () => {
+      setMode('choose');
+      setEmailSentTo(null);
+      setCodeInput('');
+      setMagicSentAt(null);
+      setMessage(null);
+    };
+    return (
+      <div className="account-overlay" role="dialog" aria-modal="true">
+        <div className="account-card account-card--narrow">
+          <div className="account-header">
+            <button
+              type="button"
+              className="account-back"
+              onClick={onBack}
+              aria-label="Back"
+              title="Back"
+            >
+              ←
+            </button>
+            <h2 className="account-title">
+              {emailSentTo === null ? 'Sign in' : 'Enter your code'}
+            </h2>
+            <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
+          </div>
+
+          {emailSentTo === null ? (
+            <>
+              <p className="account-intro">
+                Enter the email tied to your account. We'll send a 6-digit
+                sign-in code. New email? An account is created automatically.
+              </p>
+              <form
+                className="account-email-form"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (cooldownLeft > 0) return;
+                  const addr = email.trim();
+                  if (!addr) return;
+                  setBusy(true);
+                  setMessage(null);
+                  const result = await sendMagicLink(addr);
+                  setBusy(false);
+                  if (result.ok) {
+                    setEmailSentTo(addr);
+                    setMagicSentAt(Date.now());
+                    setMessage(null);
+                  } else {
+                    setMessage(`Couldn't send: ${result.message}`);
+                  }
+                }}
               >
-                {busy
-                  ? 'Sending…'
-                  : cooldownLeft > 0
-                    ? `Resend in ${formatCooldown(cooldownLeft)}`
-                    : 'Send sign-in code'}
-              </button>
-            </form>
+                <input
+                  id="account-email"
+                  className="account-input"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  aria-label="Email address"
+                />
+                <button
+                  type="submit"
+                  className="end-game-btn"
+                  disabled={busy || cooldownLeft > 0}
+                >
+                  {busy
+                    ? 'Sending…'
+                    : cooldownLeft > 0
+                      ? `Resend in ${formatCooldown(cooldownLeft)}`
+                      : 'Send sign-in code'}
+                </button>
+              </form>
+              <RecoveryCodeSignIn />
+            </>
           ) : (
             <form
               className="account-email-form"
@@ -340,19 +404,15 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
                 setMessage(null);
                 const r = await verifyEmailCode(emailSentTo, code);
                 setVerifying(false);
-                if (!r.ok) {
-                  setMessage(r.message);
-                }
+                if (!r.ok) setMessage(r.message);
                 // On success the auth state listener fires and the
                 // modal re-renders into the signed-in branch
                 // automatically — no further action needed here.
               }}
             >
-              <p className="account-message">
-                ✓ We sent an email to <strong>{emailSentTo}</strong>. Either
-                click the link in the email (must be the same browser as
-                this tab), <strong>or</strong> type the 6-digit code from
-                the email below — that works from anywhere.
+              <p className="account-intro">
+                We sent a code to <strong>{emailSentTo}</strong>. Type it
+                below, or click the link in the email (same browser only).
               </p>
               <input
                 id="account-otp"
@@ -366,18 +426,19 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
                 onChange={(e) => setCodeInput(e.target.value)}
                 placeholder="123456"
                 aria-label="6-digit sign-in code"
+                autoFocus
               />
-              <div className="account-actions">
-                <button
-                  type="submit"
-                  className="end-game-btn"
-                  disabled={verifying}
-                >
-                  {verifying ? 'Verifying…' : 'Sign in'}
-                </button>
+              <button
+                type="submit"
+                className="end-game-btn"
+                disabled={verifying}
+              >
+                {verifying ? 'Verifying…' : 'Sign in'}
+              </button>
+              <div className="account-actions account-actions--secondary">
                 <button
                   type="button"
-                  className="end-game-btn end-game-btn--subtle"
+                  className="account-text-btn"
                   disabled={busy || cooldownLeft > 0}
                   onClick={async () => {
                     setBusy(true);
@@ -396,11 +457,12 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
                     ? `Resend in ${formatCooldown(cooldownLeft)}`
                     : busy
                       ? 'Sending…'
-                      : 'Resend'}
+                      : 'Resend code'}
                 </button>
+                <span className="account-text-sep">·</span>
                 <button
                   type="button"
-                  className="end-game-btn end-game-btn--subtle"
+                  className="account-text-btn"
                   onClick={() => {
                     setEmailSentTo(null);
                     setCodeInput('');
@@ -413,9 +475,6 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               </div>
             </form>
           )}
-
-          {/* Recovery-code path for users locked out of their email. */}
-          <RecoveryCodeSignIn />
 
           {message && <p className="account-message">{message}</p>}
         </div>
