@@ -47,6 +47,26 @@ function normalizeCode(raw: string): string {
   return `${clean.slice(0, 4)}-${clean.slice(4, 8)}-${clean.slice(8, 12)}-${clean.slice(12, 16)}`;
 }
 
+// Rate-limit windows. Generous enough that a legitimate user fumbling
+// the code a few times isn't locked out, strict enough that a script
+// can't grind millions of attempts. Backed by public.recovery_code_attempts
+// (see migration 023). Per-email limit is the primary defense (an attacker
+// usually knows or guesses the target email); per-IP secondary, in case a
+// single attacker tries many emails from one source.
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+const MAX_PER_EMAIL_PER_WINDOW = 5;
+const MAX_PER_IP_PER_WINDOW = 20;
+
+function clientIp(req: Request): string | null {
+  // Supabase routes through Cloudflare; cf-connecting-ip is the most
+  // reliable header. Fall back to x-forwarded-for first hop.
+  const cf = req.headers.get('cf-connecting-ip');
+  if (cf) return cf;
+  const xff = req.headers.get('x-forwarded-for');
+  if (xff) return xff.split(',')[0]?.trim() ?? null;
+  return null;
+}
+
 // @ts-expect-error — Deno-only.
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
@@ -64,6 +84,57 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, error: 'missing-params' }, 400);
   }
 
+  const ip = clientIp(req);
+  const windowStart = new Date(Date.now() - RATE_WINDOW_MS).toISOString();
+
+  // Per-email throttle. Recent attempts are counted regardless of success
+  // so a successful retry doesn't reset the counter — keeps the per-window
+  // ceiling honest. The successful attempt itself still gets through; only
+  // subsequent attempts within the window are blocked.
+  const { count: emailCount, error: emailCountErr } = await admin
+    .from('recovery_code_attempts')
+    .select('id', { count: 'exact', head: true })
+    .eq('email', email)
+    .gte('attempted_at', windowStart);
+  if (emailCountErr) {
+    console.error('[use-recovery-code] rate-check email failed', emailCountErr);
+    // Fail-closed: if the rate-limit table is unreachable, reject rather
+    // than allowing unlimited attempts.
+    return json({ ok: false, error: 'temporarily-unavailable' }, 503);
+  }
+  if ((emailCount ?? 0) >= MAX_PER_EMAIL_PER_WINDOW) {
+    return json({ ok: false, error: 'too-many-attempts' }, 429);
+  }
+
+  // Per-IP throttle (only when we have an IP; if absent, skip rather than
+  // hard-fail — Supabase's edge runtime should always provide one).
+  if (ip) {
+    const { count: ipCount, error: ipCountErr } = await admin
+      .from('recovery_code_attempts')
+      .select('id', { count: 'exact', head: true })
+      .eq('ip', ip)
+      .gte('attempted_at', windowStart);
+    if (ipCountErr) {
+      console.error('[use-recovery-code] rate-check ip failed', ipCountErr);
+      return json({ ok: false, error: 'temporarily-unavailable' }, 503);
+    }
+    if ((ipCount ?? 0) >= MAX_PER_IP_PER_WINDOW) {
+      return json({ ok: false, error: 'too-many-attempts' }, 429);
+    }
+  }
+
+  // Helper to log this attempt. Fire-and-forget so a logging hiccup
+  // doesn't block the user's response — the worst case is a missed
+  // rate-limit window, which we'd rather have than a false 5xx.
+  const logAttempt = (success: boolean) => {
+    admin
+      .from('recovery_code_attempts')
+      .insert({ email, ip, success })
+      .then((r: { error: { message: string } | null }) => {
+        if (r.error) console.error('[use-recovery-code] log failed', r.error);
+      });
+  };
+
   // Find the user by email. admin.listUsers is paginated, so use the
   // direct query instead.
   const { data: users, error: lookupErr } = await admin.auth.admin.listUsers({
@@ -79,6 +150,7 @@ Deno.serve(async (req: Request) => {
   const user = (users?.users ?? []).find((u) => u.email?.toLowerCase() === email);
   if (!user) {
     // Generic error so attackers can't enumerate registered emails.
+    logAttempt(false);
     return json({ ok: false, error: 'invalid-code' }, 401);
   }
 
@@ -96,6 +168,7 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, error: 'lookup-failed' }, 500);
   }
   if (!row) {
+    logAttempt(false);
     return json({ ok: false, error: 'invalid-code' }, 401);
   }
 
@@ -124,6 +197,7 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, error: 'link-failed' }, 500);
   }
 
+  logAttempt(true);
   return json({
     ok: true,
     action_link: linkData.properties.action_link,

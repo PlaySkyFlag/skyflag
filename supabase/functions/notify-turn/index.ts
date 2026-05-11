@@ -126,6 +126,29 @@ Deno.serve(async (req: Request) => {
   const { recipient_user_id, room_code, from_nickname } = body;
   if (!recipient_user_id || !room_code) return json({ ok: false, error: 'missing-fields' }, 400);
 
+  // Authorize: the caller must be one of the two players in the room
+  // they're sending a notification about, AND the recipient must be
+  // the other player in that same room. Without this, any signed-in
+  // user could spam any other user with arbitrary `from_nickname`
+  // labels by guessing user IDs + room codes.
+  const { data: game, error: gameErr } = await supabase
+    .from('games')
+    .select('p1_id, p2_id')
+    .eq('room_code', room_code)
+    .maybeSingle();
+  if (gameErr) return json({ ok: false, error: gameErr.message }, 500);
+  if (!game) return json({ ok: false, error: 'no-such-room' }, 404);
+  const participantIds = [game.p1_id, game.p2_id].filter(Boolean) as string[];
+  if (!participantIds.includes(caller.user.id)) {
+    return json({ ok: false, error: 'forbidden' }, 403);
+  }
+  if (!participantIds.includes(recipient_user_id)) {
+    return json({ ok: false, error: 'recipient-not-in-room' }, 403);
+  }
+  if (recipient_user_id === caller.user.id) {
+    return json({ ok: false, error: 'self-notify' }, 400);
+  }
+
   const { data: subs, error: subErr } = await supabase
     .from('push_subscriptions')
     .select('platform, endpoint, p256dh, auth, apns_token')

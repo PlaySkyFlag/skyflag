@@ -513,6 +513,26 @@ export default function App() {
   // "push to Supabase" effect doesn't echo it back into a feedback loop.
   const remoteSyncInFlight = useRef(false);
 
+  // Latest game state, mirrored into a ref so effects that should NOT
+  // re-run on every clock tick can still read the freshest state.
+  //
+  // Why: a running clock dispatches `tick-clock` every 100ms (see the
+  // clock-tick effect below), which makes `state` a new reference 10×
+  // per second. Listing `state` in an effect's deps therefore re-runs
+  // it 10× per second. Two effects below depend on this:
+  //
+  //   * MP push to Supabase — without the ref we'd POST games.state
+  //     ten times a second per online game with a clock, burning
+  //     bandwidth + Supabase quota.
+  //   * AI worker dispatch — without the ref the AI_THINK_DELAY_MS
+  //     timer would cancel before firing, leaving the AI silent.
+  //
+  // Both effects depend on narrowly-chosen signals (history.length,
+  // status.kind) for "something meaningful changed" and reach for
+  // `stateRef.current` to read the latest values.
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   // Auto-save game state, AI mode, room, and difficulty (so a refresh
   // keeps everything intact). Selection state is transient and not persisted.
   useEffect(() => {
@@ -751,8 +771,11 @@ export default function App() {
     if (!supabase) return;
     if (remoteSyncInFlight.current) return;
     const sb = supabase;
+    // Read latest state through the ref — see stateRef declaration
+    // above for why this isn't just `state`.
+    const currentState = stateRef.current;
     sb.from('games')
-      .update({ state })
+      .update({ state: currentState })
       .eq('room_code', room.code)
       .then(({ error }) => {
         if (error) {
@@ -769,7 +792,7 @@ export default function App() {
         // we'd notify the opponent on every activation, including ones
         // they already know about.
         const opponentRole: Player = room.role === 'p1' ? 'p2' : 'p1';
-        const currentTurnPlayer = state.currentPlayer;
+        const currentTurnPlayer = currentState.currentPlayer;
         if (
           currentTurnPlayer === opponentRole &&
           lastSyncedTurnPlayer.current !== opponentRole
@@ -797,8 +820,11 @@ export default function App() {
         }
         lastSyncedTurnPlayer.current = currentTurnPlayer;
       });
+    // Intentionally narrow deps: history.length grows on every action,
+    // status.kind flips on game end. Clock-only state changes (tick-clock
+    // running every 100ms) don't belong here — see stateRef comment.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, room?.code, pushNonce]);
+  }, [state.history.length, state.status.kind, room?.code, pushNonce]);
 
   // Drop selection whenever the active player or game status changes.
   useEffect(() => {
@@ -832,11 +858,9 @@ export default function App() {
   // Important: depend on game-progress signals, NOT the whole `state`. With
   // a clock running, applyTick produces a fresh state object every 100ms;
   // putting `state` here would cancel the AI_THINK_DELAY_MS timer below
-  // before it could ever fire, leaving the AI permanently silent.
-  // `stateRef` carries the latest state into the worker payload without
-  // creating a re-run dependency.
-  const stateRef = useRef(state);
-  stateRef.current = state;
+  // before it could ever fire, leaving the AI permanently silent. The
+  // shared `stateRef` declared earlier carries the latest state into
+  // the worker payload without creating a re-run dependency.
   useEffect(() => {
     if (room) return;
     if (!aiPlayer) return;
