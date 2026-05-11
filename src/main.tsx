@@ -1,19 +1,58 @@
-import { StrictMode, Suspense, lazy } from 'react'
+import { StrictMode, Suspense, lazy, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import ErrorBoundary from './ErrorBoundary.tsx'
 import { migrateLocalStorage } from './game/migrate.ts'
+
+// Stale-deploy auto-recovery for route chunks. When Vercel redeploys
+// while a user has a tab open, the next route-navigation tries to
+// fetch a chunk whose hash no longer exists on the CDN. Without this
+// wrapper that throws "Failed to fetch" into the ErrorBoundary and
+// the user sees the "Something broke" card. Instead we do a single
+// reload (gated by a sessionStorage flag against reload loops); the
+// fresh HTML references the current chunk hashes.
+const STALE_DEPLOY_KEY = '3phor.stale-deploy-reloaded'
+function looksLikeStaleChunk(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err)
+  const lower = msg.toLowerCase()
+  return (
+    lower.includes('failed to fetch') ||
+    lower.includes('loading chunk') ||
+    lower.includes('dynamically imported module') ||
+    lower.includes('importing a module script') ||
+    lower.includes('error loading module')
+  )
+}
+function lazyWithRetry<T extends ComponentType<unknown>>(
+  factory: () => Promise<{ default: T }>,
+) {
+  return lazy(async () => {
+    try {
+      return await factory()
+    } catch (err) {
+      // Reload exactly once. Second-time failures fall through to
+      // the ErrorBoundary so a real bug isn't masked by a loop.
+      if (looksLikeStaleChunk(err) && !sessionStorage.getItem(STALE_DEPLOY_KEY)) {
+        try { sessionStorage.setItem(STALE_DEPLOY_KEY, '1') } catch { /* private mode */ }
+        location.reload()
+        // Park the promise — reload() interrupts before it resolves.
+        return new Promise<{ default: T }>(() => undefined)
+      }
+      throw err
+    }
+  })
+}
 
 // Route components are lazy-loaded so a visitor pulls down only the
 // chunk for the URL they hit. Landing is the marketing surface and
 // stays light; /play (App) drags in the AI worker, the board, and
 // every modal — keeping that ~600kB out of the / bundle is the
 // biggest single perf win available without further restructuring.
-const App = lazy(() => import('./App.tsx'))
-const Landing = lazy(() => import('./Landing.tsx'))
-const Review = lazy(() => import('./Review.tsx'))
-const Story = lazy(() => import('./Story.tsx'))
-const Watch = lazy(() => import('./Watch.tsx'))
+const App = lazyWithRetry(() => import('./App.tsx'))
+const Landing = lazyWithRetry(() => import('./Landing.tsx'))
+const Review = lazyWithRetry(() => import('./Review.tsx'))
+const Story = lazyWithRetry(() => import('./Story.tsx'))
+const Watch = lazyWithRetry(() => import('./Watch.tsx'))
 
 // Run the one-shot rebrand storage migration before anything else reads
 // from localStorage. Idempotent — safe to call on every boot.

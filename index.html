@@ -119,9 +119,37 @@
          and fixed any remaining init-time crashes. -->
     <script>
       (function () {
+        // Stale-deploy auto-recovery. When Vercel redeploys, the HTML
+        // referenced from the user's browser cache may point at chunk
+        // hashes that no longer exist on the CDN. The dynamic import
+        // then throws "Failed to fetch …" before React can mount. We
+        // detect that pattern, do a one-shot reload to fetch the new
+        // HTML (which references the current chunks), and only fall
+        // through to the visible error card if reloading itself
+        // didn't fix it (genuine bug, not stale deploy).
+        var RELOAD_KEY = '3phor.stale-deploy-reloaded';
+        function looksLikeStaleChunk(msg) {
+          if (!msg) return false;
+          var s = String(msg).toLowerCase();
+          return (
+            s.indexOf('failed to fetch') !== -1 ||
+            s.indexOf('loading chunk') !== -1 ||
+            s.indexOf('dynamically imported module') !== -1 ||
+            s.indexOf('importing a module script') !== -1 ||
+            s.indexOf('error loading module') !== -1
+          );
+        }
         function showError(message, filename, lineno) {
           var root = document.getElementById('root');
           if (!root) return;
+          // Stale-deploy: try a single reload. sessionStorage flag
+          // prevents an infinite loop if the error survives the
+          // reload (meaning it's a real bug, not a cache mismatch).
+          if (looksLikeStaleChunk(message) && !sessionStorage.getItem(RELOAD_KEY)) {
+            try { sessionStorage.setItem(RELOAD_KEY, '1'); } catch (_) {}
+            location.reload();
+            return;
+          }
           // Only replace if root still contains the static shell.
           // If React already replaced it, the error happened after
           // mount and an ErrorBoundary will handle it.
@@ -144,6 +172,15 @@
         window.addEventListener('unhandledrejection', function (e) {
           var r = e.reason;
           showError((r && r.message) || String(r), r && r.fileName, r && r.lineNumber);
+        });
+        // Clear the reload flag once we're confident this load is
+        // healthy — by the time the React app has been visible for a
+        // second or two, the cycle is over. Done in window.load so
+        // it runs after the entry chunk has at least started.
+        window.addEventListener('load', function () {
+          setTimeout(function () {
+            try { sessionStorage.removeItem(RELOAD_KEY); } catch (_) {}
+          }, 2000);
         });
       })();
     </script>
