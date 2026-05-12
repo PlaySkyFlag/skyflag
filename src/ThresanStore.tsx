@@ -17,10 +17,11 @@ import './ThresanStore.css';
 // Fill these in as the campaign reaches each milestone. Empty strings
 // are handled gracefully — the page degrades to email-only signup.
 
-// Paste your Stripe Payment Link URL here once you've created it in
-// the Stripe dashboard (mode: payment, amount: deposit, "I'll deliver
-// later"). Empty = Founders reservations not yet open.
-const FOUNDERS_RESERVATION_URL = '';
+// Stripe Payment Link for the $108 refundable Founders Edition
+// Reservation. Capped at 500 payments (Stripe enforces server-side).
+// Empty string disables the Reserve button and degrades the page to
+// email-only signup — useful if reservations need to be paused.
+const FOUNDERS_RESERVATION_URL = 'https://buy.stripe.com/14A7sFdUCgpzg9R3PNbwk00';
 
 // Paste the live Kickstarter campaign URL here once the campaign
 // launches. Empty = pre-launch (current state).
@@ -388,7 +389,7 @@ function Faq() {
           />
           <FaqItem
             q="What does the Founders deposit cover?"
-            a={`A $${FOUNDERS_PRICE_USD} refundable deposit reserves one of the first ${FOUNDERS_TOTAL_SLOTS} numbered copies, locks in the Kickstarter pledge price, and earns the Founders perks above. The full deposit applies to your eventual Kickstarter pledge — you're not paying extra to reserve.`}
+            a={`A $${FOUNDERS_PRICE_USD} refundable deposit reserves one of the first ${FOUNDERS_TOTAL_SLOTS} numbered copies and earns the Founders perks above. When the Kickstarter launches, your deposit applies in full as a credit toward your pledge — you're not paying extra to reserve, and the deposit remains refundable any time before shipping.`}
           />
           <FaqItem
             q="Refunds?"
