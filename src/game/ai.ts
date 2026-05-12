@@ -504,10 +504,36 @@ function quiescence(
   return value;
 }
 
-// Minimax with alpha-beta. `aiPlayer` is fixed throughout the search (the side
-// we're optimising for). Whether a node is a max- or min-node depends on
-// whether state.currentPlayer matches `aiPlayer`. `ply` counts half-moves
-// from the root — used by the killer-move heuristic to index per-ply slots.
+// Cheap "is this player's Captain in danger?" check. 3phor's analog of
+// "in check" in chess. Used to disable null-move pruning when the side
+// to move is under tactical pressure — passing the turn would let the
+// opponent capture the Captain on the next move, which would erroneously
+// trigger pruning of lines that are actually critical to evaluate.
+function captainThreatened(state: GameState, player: Player): boolean {
+  const opp = opponentOf(player);
+  const oppAttacks = new Set<string>();
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner !== opp) continue;
+    for (const target of legalMovesFor(bp, state)) {
+      oppAttacks.add(`${target.layer}:${target.row}:${target.col}`);
+    }
+  }
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner !== player) continue;
+    if (bp.piece.kind !== 'captain') continue;
+    const key = `${bp.coord.layer}:${bp.coord.row}:${bp.coord.col}`;
+    if (oppAttacks.has(key)) return true;
+  }
+  return false;
+}
+
+// Minimax with alpha-beta + null-move pruning + late-move reduction.
+// `aiPlayer` is fixed throughout the search (the side we're optimising
+// for). Whether a node is a max- or min-node depends on whether
+// state.currentPlayer matches `aiPlayer`. `ply` counts half-moves from
+// the root — used by the killer-move heuristic to index per-ply slots.
+// `allowNull` blocks consecutive null-moves so we don't recurse via
+// the null-pass child into another null-pass.
 function minimax(
   state: GameState,
   depth: number,
@@ -515,6 +541,7 @@ function minimax(
   alpha: number,
   beta: number,
   aiPlayer: Player,
+  allowNull: boolean = true,
 ): number {
   if (state.status.kind !== 'in-progress') {
     return evaluate(state, aiPlayer);
@@ -539,23 +566,98 @@ function minimax(
     if (ttHit.flag === 'upper' && ttHit.score <= alpha) return ttHit.score;
   }
 
+  const isMax = state.currentPlayer === aiPlayer;
+
+  // ─── Null-move pruning ─────────────────────────────────────────────
+  // If even after passing the turn (end-turn) the position is still
+  // beyond our window, the actual best move can only be better — prune
+  // the whole subtree. Safe in 3phor because:
+  //   1. Passing is always legal (end-turn always available).
+  //   2. Passing strictly loses tempo — zugzwang in the chess sense
+  //      ("any move makes me worse") doesn't really happen here, so
+  //      a null-move score is a conservative lower-bound (max) /
+  //      upper-bound (min).
+  // Disabled when: shallow depth (R=2 reduction needs room), at root
+  // (we need a real best action there), Captain threatened (passing
+  // = losing Captain), or we just nulled (no double-nulls).
+  const R_NULL = 2;
+  if (
+    allowNull &&
+    depth >= 3 &&
+    ply > 0 &&
+    !captainThreatened(state, state.currentPlayer)
+  ) {
+    const passState = reduce(state, { type: 'end-turn' });
+    const nullScore = minimax(
+      passState,
+      depth - 1 - R_NULL,
+      ply + 1,
+      alpha,
+      beta,
+      aiPlayer,
+      false,
+    );
+    if (isMax) {
+      if (nullScore >= beta) return beta; // fail-high: even passing beats beta
+    } else {
+      if (nullScore <= alpha) return alpha; // fail-low: even passing is below alpha
+    }
+  }
+
   const actions = legalActions(state);
   if (actions.length === 0) {
     // No legal action — the player must end-turn. Recurse on the resulting
-    // state (turn passes to opponent).
+    // state (turn passes to opponent). Allow null on the recursion since
+    // this isn't itself a null-move (it's a forced end-turn).
     const next = reduce(state, { type: 'end-turn' });
-    return minimax(next, depth - 1, ply + 1, alpha, beta, aiPlayer);
+    return minimax(next, depth - 1, ply + 1, alpha, beta, aiPlayer, true);
   }
 
   const ordered = orderActionsWithPriority(state, actions, ttHit?.bestAction, ply);
-  const isMax = state.currentPlayer === aiPlayer;
 
   let value = isMax ? -Infinity : Infinity;
   let bestAction: Action | undefined;
 
-  for (const action of ordered) {
+  // ─── Move loop with Late Move Reduction (LMR) ──────────────────────
+  // For moves past the first few — which are most likely the best
+  // moves due to ordering (TT best, captures, killers, history) — try
+  // a reduced-depth search first. If it returns a value that would
+  // improve our bound, re-search at full depth. Otherwise accept the
+  // reduced result. Net effect: spend full depth only on moves that
+  // look promising even at shallow depth, save effort on the rest.
+  const LMR_REDUCTION = 1;
+  const LMR_LATE_THRESHOLD = 3;
+  for (let i = 0; i < ordered.length; i++) {
+    const action = ordered[i];
     const next = reduce(state, action);
-    const childValue = minimax(next, depth - 1, ply + 1, alpha, beta, aiPlayer);
+
+    const isLate = i >= LMR_LATE_THRESHOLD;
+    const isQuiet = !isCapture(state, action);
+    const canReduce = depth >= 3 && isLate && isQuiet;
+
+    let childValue: number;
+    if (canReduce) {
+      // Reduced search first.
+      childValue = minimax(
+        next,
+        depth - 1 - LMR_REDUCTION,
+        ply + 1,
+        alpha,
+        beta,
+        aiPlayer,
+        true,
+      );
+      // If the reduced search suggests this move could improve the
+      // bound, re-search at full depth to confirm. Otherwise take the
+      // reduced-depth value as good enough (it bounds the true value).
+      const wouldImprove = isMax ? childValue > alpha : childValue < beta;
+      if (wouldImprove && childValue > alphaOrig && childValue < betaOrig) {
+        childValue = minimax(next, depth - 1, ply + 1, alpha, beta, aiPlayer, true);
+      }
+    } else {
+      childValue = minimax(next, depth - 1, ply + 1, alpha, beta, aiPlayer, true);
+    }
+
     if (isMax) {
       if (childValue > value) {
         value = childValue;
