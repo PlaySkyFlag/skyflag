@@ -12,6 +12,10 @@ import { useEffect } from 'react';
 import './AshtapadaSplash.css';
 
 const PLAY_URL = 'https://playskyflag.com/play?ref=ashtapada';
+// Absolute URL so the link works from both ashtapada.com (where the
+// hostname check would re-render the splash on any local path) and
+// from playskyflag.com/ashtapada during in-browser iteration.
+const ORIGINS_URL = 'https://playskyflag.com/origins?ref=ashtapada';
 
 export default function AshtapadaSplash() {
   // Override the static index.html meta tags so a share preview from
@@ -35,19 +39,46 @@ export default function AshtapadaSplash() {
 
   return (
     <div className="ashtapada">
-      <main className="ashtapada-inner">
-        <img src="/3phor-logo.png" alt="" className="ashtapada-sigil" />
-        <p className="ashtapada-eyebrow">Ashtapada, lifted.</p>
-        <h1 className="ashtapada-title">Thresan: Skyflag</h1>
-        <p className="ashtapada-tagline tagline-script">
-          Three worlds. One proof.
-        </p>
-        <a href={PLAY_URL} className="ashtapada-cta">
-          Play
-        </a>
-        <p className="ashtapada-fineprint">
-          A turn-based strategy game from the <em>Thresan</em> universe.
-        </p>
+      <main>
+        <section className="ashtapada-hero">
+          <div className="ashtapada-inner">
+            <img src="/3phor-logo.png" alt="" className="ashtapada-sigil" />
+            <p className="ashtapada-eyebrow">Ashtapada, lifted.</p>
+            <h1 className="ashtapada-title">Thresan: Skyflag</h1>
+            <p className="ashtapada-tagline tagline-script">
+              Three worlds. One proof.
+            </p>
+            <a href={PLAY_URL} className="ashtapada-cta">
+              Play
+            </a>
+            <p className="ashtapada-fineprint">
+              A turn-based strategy game from the <em>Thresan</em> universe.
+            </p>
+          </div>
+        </section>
+
+        <section className="ashtapada-more" aria-label="Origins">
+          <div className="ashtapada-more-inner">
+            <p className="ashtapada-more-eyebrow">Origins</p>
+            <p className="ashtapada-more-prose">
+              Ashtapada is one of the oldest known board games — the
+              eight-by-eight grid that ancient India played for thousands
+              of years, and the same grid that, centuries later, carried
+              Chaturanga west into Persia and eventually became chess.
+              Skyflag returns to that root and takes a different fork.
+              Where chess kept the single plane, Skyflag lifts it: three
+              stacked six-by-six boards, sixty-four squares opened to one
+              hundred and eight. In the world of <em>Thresan</em>, the
+              lift is literal — the Aetheri raised what remained of
+              civilization into three living layers, and the game
+              ascended with the city. Ashtapada was the floor. The
+              Aetheri built the sky.
+            </p>
+            <a href={ORIGINS_URL} className="ashtapada-more-link">
+              Read the full origins →
+            </a>
+          </div>
+        </section>
       </main>
     </div>
   );

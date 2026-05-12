@@ -124,6 +124,7 @@ function Header() {
         </a>
         <nav className="landing-nav">
           <a href="#features" className="landing-nav-link">Features</a>
+          <a href="/origins" className="landing-nav-link">Origins</a>
           <a href="/story" className="landing-nav-link">Story</a>
           <a href="#pricing" className="landing-nav-link">Pricing</a>
           <a href="/play" className="landing-cta-button landing-cta-primary landing-cta-small">Play</a>

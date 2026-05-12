@@ -51,6 +51,7 @@ function lazyWithRetry<T extends ComponentType<unknown>>(
 const App = lazyWithRetry(() => import('./App.tsx'))
 const AshtapadaSplash = lazyWithRetry(() => import('./AshtapadaSplash.tsx'))
 const Landing = lazyWithRetry(() => import('./Landing.tsx'))
+const Origins = lazyWithRetry(() => import('./Origins.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
 const Watch = lazyWithRetry(() => import('./Watch.tsx'))
@@ -75,6 +76,7 @@ const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
 const isReview = path.startsWith('/review');
+const isOrigins = path.startsWith('/origins');
 const isAshtapadaPath = path.startsWith('/ashtapada');
 
 let rendered;
@@ -83,6 +85,7 @@ else if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
 else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
+else if (isOrigins) rendered = <Origins />;
 else if (isAshtapadaPath) rendered = <AshtapadaSplash />;
 else rendered = <Landing />;
 

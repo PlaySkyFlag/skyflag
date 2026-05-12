@@ -1,0 +1,260 @@
+/* Origins — heritage page styling. Gold-on-dark like Landing/Splash;
+   palette declared by literal values rather than CSS variables so the
+   page renders correctly even if no other stylesheet loads. */
+
+.origins {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(194, 164, 107, 0.08), transparent 70%),
+    #06090f;
+  color: #E6E2D8;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+:where(.origins a) {
+  color: #C2A46B;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+:where(.origins a):hover {
+  opacity: 0.85;
+}
+
+/* ─── Header ───────────────────────────────────────────────────── */
+
+.origins-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6, 9, 15, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(194, 164, 107, 0.12);
+}
+
+.origins-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.origins-back {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.origins-header-meta {
+  font-size: 0.78rem;
+  color: rgba(245, 247, 251, 0.6);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.origins-cta-button {
+  background: #C2A46B;
+  color: #111826 !important;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  transition: background 0.15s ease;
+}
+.origins-cta-button:hover {
+  background: #ffe4a3;
+  opacity: 1;
+}
+
+@media (max-width: 540px) {
+  .origins-header-meta {
+    display: none;
+  }
+}
+
+/* ─── Hero ─────────────────────────────────────────────────────── */
+
+.origins-hero {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 64px 24px 24px;
+}
+
+.origins-hero-eyebrow {
+  color: #C2A46B;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+  font-weight: 600;
+}
+
+.origins-hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: #C2A46B;
+  margin: 0 0 24px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+}
+
+.origins-hero-lead {
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  color: rgba(245, 247, 251, 0.85);
+  max-width: 580px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Article body ─────────────────────────────────────────────── */
+
+.origins-article {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.origins-section {
+  margin-bottom: 56px;
+}
+
+.origins-section-title {
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: #C2A46B;
+  margin: 0 0 24px;
+  letter-spacing: -0.01em;
+}
+
+.origins-prose {
+  font-size: 1.05rem;
+  color: rgba(245, 247, 251, 0.92);
+  margin: 0 0 18px;
+  line-height: 1.7;
+}
+
+.origins-prose em {
+  color: #C2A46B;
+  font-style: italic;
+}
+
+.origins-rally {
+  margin: 40px 0 0;
+  font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+  color: #C2A46B;
+  text-align: center;
+  text-shadow: 0 2px 18px rgba(194, 164, 107, 0.35);
+}
+
+/* ─── Figures ──────────────────────────────────────────────────── */
+
+.origins-figure {
+  margin: 0 0 28px;
+}
+
+.origins-figure-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(194, 164, 107, 0.32);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.origins-figure-caption {
+  margin: 12px 4px 0;
+  font-size: 0.85rem;
+  color: rgba(245, 247, 251, 0.62);
+  line-height: 1.55;
+  font-style: italic;
+}
+
+/* ─── Sources ──────────────────────────────────────────────────── */
+
+.origins-sources {
+  margin-top: 72px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(194, 164, 107, 0.18);
+}
+
+.origins-sources-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(245, 247, 251, 0.6);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+
+.origins-sources-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(245, 247, 251, 0.72);
+  line-height: 1.7;
+}
+
+.origins-sources-list li {
+  margin-bottom: 10px;
+}
+
+/* ─── Footer ───────────────────────────────────────────────────── */
+
+.origins-footer {
+  border-top: 1px solid rgba(194, 164, 107, 0.12);
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.origins-footer-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.origins-footer-mark {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #C2A46B;
+  margin: 0 0 6px;
+}
+
+.origins-footer-tagline {
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  color: #C2A46B;
+}
+
+.origins-footer-links {
+  font-size: 0.9rem;
+  color: rgba(245, 247, 251, 0.65);
+  margin: 0 0 12px;
+}
+
+.origins-footer-meta {
+  font-size: 0.8rem;
+  color: rgba(245, 247, 251, 0.45);
+  margin: 0;
+}
+
+@media (max-width: 540px) {
+  .origins-hero {
+    padding: 44px 16px 16px;
+  }
+  .origins-article {
+    padding: 28px 16px 60px;
+  }
+  .origins-section {
+    margin-bottom: 44px;
+  }
+  .origins-sources {
+    margin-top: 56px;
+  }
+}
