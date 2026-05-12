@@ -355,7 +355,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
           {emailSentTo === null ? (
             <>
               <p className="account-intro">
-                Enter the email tied to your account. We'll send a 6-digit
+                Enter the email tied to your account. We'll send you a
                 sign-in code. New email? An account is created automatically.
               </p>
               <form
@@ -750,8 +750,8 @@ function GuestUpgradePanel() {
         <strong className="account-upgrade-title">Check your email</strong>
         <p className="account-upgrade-body">
           We sent a confirmation to <strong>{sentTo}</strong>. Enter the
-          6-digit code from that email below — works from any device,
-          and keeps your guest account intact. (The email also contains
+          code from that email below — works from any device, and keeps
+          your guest account intact. (The email also contains
           a clickable link; if you use it, open it in <em>this same
           browser tab</em>, otherwise your guest profile won't merge.)
         </p>
@@ -861,7 +861,7 @@ function GuestUpgradePanel() {
         </button>
       </form>
       <p className="account-upgrade-foot">
-        We'll send a 6-digit code to that address. Type it in here to
+        We'll send a code to that address. Type it in here to
         link your guest profile — works from any device. (The email
         also includes a clickable link; if you use it, it must be opened
         in <em>this same browser tab</em> or your guest profile gets
