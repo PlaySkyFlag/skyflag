@@ -7,6 +7,7 @@ import AccountModal from './AccountModal';
 import SettingsMenu from './SettingsMenu';
 import Sidebar from './Sidebar';
 import StatsModal from './StatsModal';
+import FeedbackModal from './FeedbackModal';
 import StatusBar from './StatusBar';
 import Daily from './Daily';
 import type { ChatMessage } from './Chat';
@@ -398,6 +399,7 @@ export default function App() {
   }, [authUser]);
 
   const [statsOpen, setStatsOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [themeId, setThemeId] = useState<ThemeId>(() => loadThemeId());
   // Resolve the effective theme — falls back to the default if the
   // stored choice is gated behind a Plus entitlement the user no
@@ -1706,14 +1708,26 @@ export default function App() {
         onClose={() => setStatsOpen(false)}
         userId={authUser?.id ?? null}
       />
+      <FeedbackModal
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+        userId={authUser?.id ?? null}
+      />
       <footer className="app-footer">
         {/* Handwritten signature-style tagline above the legal
             line — quiet brand presence on every page of /play
             without crowding the HUD. */}
         <p className="app-footer-rally tagline-script">Three worlds. One proof.</p>
         <p>© 2026 Limnology Research Corp. · Thresan™: Skyflag — Kaleo Edition.</p>
-        <p>
-          Test feedback:{' '}
+        <p className="app-footer-feedback">
+          <button
+            type="button"
+            className="hud-btn"
+            onClick={() => setFeedbackOpen(true)}
+          >
+            💬 Send feedback
+          </button>
+          {' '}or email{' '}
           <a href="mailto:njatel@limnology.ca?subject=Thresan%3A%20Skyflag%20Test%20Feedback">
             njatel@limnology.ca
           </a>

@@ -1537,6 +1537,38 @@ button.tray-piece:hover {
   line-height: 1.4;
 }
 
+/* Error variant — same shape, red text. Used by the feedback modal
+   and any other form-submission error surface that wants to draw
+   the eye without making the whole modal feel broken. */
+.account-message--error {
+  color: #ff9a9a;
+}
+
+/* Feedback modal textarea — bigger by default since users tend to
+   write more than one line of feedback, and a tall box invites a
+   thorough description rather than a one-liner. Keeps .account-input
+   border / focus behaviour via inheritance. */
+.account-feedback-textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  padding: 10px 12px;
+}
+
+/* Footer feedback CTA — gives the "Send feedback" button room to
+   breathe. The button is the primary path; the email link is a
+   secondary fallback for users who prefer email. */
+.app-footer-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
 /* "or" divider between magic-link form and "Continue as guest" — a
    thin rule with the word floated on top so the two paths read as
    alternatives rather than steps. */
