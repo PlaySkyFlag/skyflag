@@ -64,18 +64,26 @@ migrateLocalStorage();
 // smaller and the routing dead simple. Add a router if separate
 // landing pages need client-side transitions.
 const path = window.location.pathname;
+const hostname = window.location.hostname.toLowerCase();
+// ashtapada.com is a bridging domain — every URL on it should land
+// on the splash, not the main game. Match explicit hostnames rather
+// than endsWith so a future subdomain (staging.ashtapada.com, etc.)
+// stays opt-in instead of silently inheriting the splash render.
+const isAshtapadaHost =
+  hostname === 'ashtapada.com' || hostname === 'www.ashtapada.com';
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
 const isReview = path.startsWith('/review');
-const isAshtapada = path.startsWith('/ashtapada');
+const isAshtapadaPath = path.startsWith('/ashtapada');
 
 let rendered;
-if (isReview) rendered = <Review />;
+if (isAshtapadaHost) rendered = <AshtapadaSplash />;
+else if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
 else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
-else if (isAshtapada) rendered = <AshtapadaSplash />;
+else if (isAshtapadaPath) rendered = <AshtapadaSplash />;
 else rendered = <Landing />;
 
 // Mark the root so index.html's pre-mount error catcher knows
