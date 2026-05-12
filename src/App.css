@@ -397,6 +397,10 @@
   color: inherit;
   cursor: pointer;
   letter-spacing: 0.02em;
+  /* Prevent the label from breaking onto multiple lines inside the
+     button when the parent (e.g. a tight flex container in the
+     footer) squeezes its width. */
+  white-space: nowrap;
 }
 
 .hud-btn:hover {
@@ -1557,16 +1561,31 @@ button.tray-piece:hover {
   padding: 10px 12px;
 }
 
-/* Footer feedback CTA — gives the "Send feedback" button room to
-   breathe. The button is the primary path; the email link is a
-   secondary fallback for users who prefer email. */
+/* Footer feedback CTA — the button is the primary path; the email
+   line is a secondary fallback. Stacked vertically (button on its
+   own line, fallback as smaller text below) so the layout never
+   crams them onto one row at narrow viewports. */
 .app-footer-feedback {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 12px 0;
+  gap: 6px;
+  margin: 14px 0 6px;
+}
+
+/* Slightly larger padding than the default .hud-btn — this is the
+   primary CTA in the footer, not an inline HUD action. */
+.app-footer-feedback-btn {
+  padding: 8px 18px;
+  font-size: 0.95rem;
+}
+
+/* Email fallback line — small + dim so it sits clearly below the
+   button without competing for attention. */
+.app-footer-feedback-fallback {
+  margin: 0;
+  font-size: 0.78rem;
+  opacity: 0.7;
 }
 
 /* "or" divider between magic-link form and "Continue as guest" — a

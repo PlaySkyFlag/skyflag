@@ -1719,19 +1719,21 @@ export default function App() {
             without crowding the HUD. */}
         <p className="app-footer-rally tagline-script">Three worlds. One proof.</p>
         <p>© 2026 Limnology Research Corp. · Thresan™: Skyflag — Kaleo Edition.</p>
-        <p className="app-footer-feedback">
+        <div className="app-footer-feedback">
           <button
             type="button"
-            className="hud-btn"
+            className="hud-btn app-footer-feedback-btn"
             onClick={() => setFeedbackOpen(true)}
           >
             💬 Send feedback
           </button>
-          {' '}or email{' '}
-          <a href="mailto:njatel@limnology.ca?subject=Thresan%3A%20Skyflag%20Test%20Feedback">
-            njatel@limnology.ca
-          </a>
-        </p>
+          <p className="app-footer-feedback-fallback">
+            or email{' '}
+            <a href="mailto:njatel@limnology.ca?subject=Thresan%3A%20Skyflag%20Test%20Feedback">
+              njatel@limnology.ca
+            </a>
+          </p>
+        </div>
         <p className="app-footer-build">
           <button
             type="button"
