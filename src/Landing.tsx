@@ -105,6 +105,7 @@ export default function Landing() {
       <FeaturesSection />
       <HowItWorksSection />
       <PricingSection />
+      <PhysicalEditionSection />
       <Footer />
     </div>
   );
@@ -127,6 +128,7 @@ function Header() {
           <a href="/origins" className="landing-nav-link">Origins</a>
           <a href="/story" className="landing-nav-link">Story</a>
           <a href="#pricing" className="landing-nav-link">Pricing</a>
+          <a href="#edition" className="landing-nav-link">Edition</a>
           <a href="/play" className="landing-cta-button landing-cta-primary landing-cta-small">Play</a>
         </nav>
       </div>
@@ -317,6 +319,39 @@ function PricingSection() {
             </a>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function PhysicalEditionSection() {
+  // Coda to the Landing — after the digital game is fully pitched
+  // (features, mechanics, pricing), point engaged readers at the
+  // physical edition waitlist. Visitors who scrolled this far are
+  // the highest-quality Kickstarter lead pool.
+  return (
+    <section id="edition" className="landing-section landing-section-alt">
+      <div className="landing-section-inner landing-edition-inner">
+        <h2 className="landing-section-title">And in your hands</h2>
+        <p className="landing-edition-lead">
+          A physical edition is coming to Kickstarter — three boards,
+          lifted, in brass and acrylic. Join the waitlist for the
+          launch email.
+        </p>
+        <figure className="landing-edition-figure">
+          <img
+            src="/skyflag-render-tower.jpg"
+            alt="Thresan: Skyflag physical edition — three transparent boards stacked on an illuminated base."
+            className="landing-edition-render"
+            loading="lazy"
+          />
+        </figure>
+        <a
+          href="https://thresan.store"
+          className="landing-cta-button landing-cta-primary"
+        >
+          See the physical edition →
+        </a>
       </div>
     </section>
   );

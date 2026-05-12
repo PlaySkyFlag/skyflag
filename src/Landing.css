@@ -612,6 +612,34 @@
   width: 100%;
 }
 
+/* ─── Physical edition coda ────────────────────────────────────── */
+
+.landing-edition-inner {
+  text-align: center;
+}
+
+.landing-edition-lead {
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  color: var(--landing-text-muted);
+  margin: 0 auto 36px;
+  max-width: 580px;
+  line-height: 1.6;
+}
+
+.landing-edition-figure {
+  margin: 0 auto 32px;
+  max-width: 560px;
+}
+
+.landing-edition-render {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--landing-radius);
+  border: 1px solid var(--landing-gold-line);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
 /* ─── Demo (live mini-board + optional GIF/MP4 asset) ──────────── */
 
 .landing-demo-section {

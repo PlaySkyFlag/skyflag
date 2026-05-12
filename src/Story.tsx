@@ -63,7 +63,9 @@ function StoryFooter() {
           Storybook v3 · Kaleo Edition · © {new Date().getFullYear()} Limnology Research Corp.
         </p>
         <p className="story-footer-links">
-          <a href="/">Home</a> · <a href="/play">Play</a>
+          <a href="/">Home</a> · <a href="/play">Play</a> ·{' '}
+          <a href="/origins">Origins</a> ·{' '}
+          <a href="https://thresan.store">Edition</a>
         </p>
       </div>
     </footer>

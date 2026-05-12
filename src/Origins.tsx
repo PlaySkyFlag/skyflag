@@ -223,7 +223,8 @@ function Footer() {
         </p>
         <p className="origins-footer-links">
           <a href="/">Home</a> · <a href="/story">The Story</a> ·{' '}
-          <a href="/play">Play</a>
+          <a href="/play">Play</a> ·{' '}
+          <a href="https://thresan.store">Edition</a>
         </p>
         <p className="origins-footer-meta">
           © {new Date().getFullYear()} Limnology Research Corp.
