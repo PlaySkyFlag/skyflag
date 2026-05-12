@@ -1,0 +1,531 @@
+/* ThresanStore — physical edition waitlist landing. Same gold-on-dark
+   palette as Landing/Origins/Splash, declared by literal values so
+   the surface stays self-contained. */
+
+.store {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(194, 164, 107, 0.10), transparent 70%),
+    #06090f;
+  color: #E6E2D8;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+:where(.store a) {
+  color: #C2A46B;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+:where(.store a):hover {
+  opacity: 0.85;
+}
+
+.store h1, .store h2, .store h3 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Header ───────────────────────────────────────────────────── */
+
+.store-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6, 9, 15, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(194, 164, 107, 0.12);
+}
+
+.store-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.store-back {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.store-header-meta {
+  font-size: 0.78rem;
+  color: rgba(245, 247, 251, 0.6);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 540px) {
+  .store-header-meta {
+    display: none;
+  }
+}
+
+/* ─── Buttons & links ──────────────────────────────────────────── */
+
+.store-cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #C2A46B;
+  color: #111826 !important;
+  padding: 11px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.store-cta-button:hover:not(:disabled) {
+  background: #ffe4a3;
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(194, 164, 107, 0.25);
+}
+
+.store-cta-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.store-cta-primary {
+  /* The brand gold by default. Larger variants below scale it up. */
+}
+
+.store-cta-large {
+  padding: 16px 36px;
+  font-size: 1.05rem;
+  box-shadow: 0 6px 24px rgba(194, 164, 107, 0.25);
+}
+
+.store-cta-small {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.store-cta-link {
+  display: inline-block;
+  color: #C2A46B;
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  margin-top: 14px;
+}
+
+/* ─── Hero ─────────────────────────────────────────────────────── */
+
+.store-hero {
+  padding: 80px 24px 60px;
+  text-align: center;
+}
+
+.store-hero-inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.store-hero-eyebrow {
+  color: #C2A46B;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+  font-weight: 600;
+}
+
+.store-hero-title {
+  font-size: clamp(2.6rem, 7vw, 4.4rem);
+  font-weight: 800;
+  color: #C2A46B;
+  margin: 0 0 24px;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+}
+
+.store-hero-lead {
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: rgba(245, 247, 251, 0.88);
+  max-width: 620px;
+  margin: 0 auto 32px;
+  line-height: 1.55;
+}
+
+.store-hero-lead strong {
+  color: #C2A46B;
+  font-weight: 600;
+}
+
+.store-hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 48px;
+}
+
+.store-hero-render {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 16px;
+  border: 1px solid rgba(194, 164, 107, 0.32);
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* ─── Sections ─────────────────────────────────────────────────── */
+
+.store-section {
+  padding: 72px 24px;
+}
+
+.store-section-alt {
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(194, 164, 107, 0.10);
+  border-bottom: 1px solid rgba(194, 164, 107, 0.10);
+}
+
+.store-section-inner {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.store-section-title {
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  font-weight: 800;
+  color: #C2A46B;
+  margin: 0 0 28px;
+  text-align: center;
+  letter-spacing: -0.015em;
+}
+
+.store-section-fineprint {
+  margin: 24px auto 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(245, 247, 251, 0.55);
+  max-width: 540px;
+  line-height: 1.55;
+}
+
+/* ─── Showcase (side-by-side renders) ──────────────────────────── */
+
+.store-showcase {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+@media (min-width: 720px) {
+  .store-showcase {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.store-figure {
+  margin: 0;
+}
+
+.store-figure-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(194, 164, 107, 0.32);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.store-figure-caption {
+  margin: 12px 4px 0;
+  font-size: 0.85rem;
+  color: rgba(245, 247, 251, 0.62);
+  text-align: center;
+  font-style: italic;
+}
+
+.store-includes {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 620px;
+  font-size: 1rem;
+  color: rgba(245, 247, 251, 0.88);
+  line-height: 1.7;
+}
+
+.store-includes li {
+  padding: 10px 0 10px 26px;
+  position: relative;
+  border-bottom: 1px solid rgba(194, 164, 107, 0.08);
+}
+
+.store-includes li:last-child {
+  border-bottom: none;
+}
+
+.store-includes li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  color: #C2A46B;
+  font-size: 0.7rem;
+}
+
+.store-includes strong {
+  color: #E6E2D8;
+  font-weight: 600;
+}
+
+/* ─── Founders Edition ─────────────────────────────────────────── */
+
+.store-founders-lead {
+  font-size: 1.05rem;
+  color: rgba(245, 247, 251, 0.88);
+  margin: 0 auto 28px;
+  max-width: 620px;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.store-founders-perks {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto 32px;
+  max-width: 560px;
+}
+
+.store-founders-perks li {
+  padding: 12px 0 12px 28px;
+  position: relative;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: rgba(245, 247, 251, 0.88);
+  border-bottom: 1px solid rgba(194, 164, 107, 0.08);
+}
+
+.store-founders-perks li:last-child {
+  border-bottom: none;
+}
+
+.store-founders-perks li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  color: #C2A46B;
+  font-size: 0.8rem;
+}
+
+.store-founders-perks strong {
+  color: #E6E2D8;
+  font-weight: 600;
+}
+
+.store-founders-perk-detail {
+  display: block;
+  color: rgba(245, 247, 251, 0.6);
+  font-size: 0.88rem;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.store-founders-action {
+  text-align: center;
+  margin: 0 0 20px;
+}
+
+.store-founders-soon {
+  color: rgba(245, 247, 251, 0.7);
+  font-size: 0.98rem;
+  font-style: italic;
+  padding: 16px 20px;
+  border: 1px dashed rgba(194, 164, 107, 0.32);
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.store-founders-refund {
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(245, 247, 251, 0.55);
+  max-width: 540px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Waitlist form ────────────────────────────────────────────── */
+
+.store-waitlist-inner {
+  max-width: 560px;
+  text-align: center;
+}
+
+.store-waitlist-lead {
+  font-size: 1.05rem;
+  color: rgba(245, 247, 251, 0.82);
+  margin: 0 auto 28px;
+  line-height: 1.55;
+}
+
+.store-waitlist-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+@media (min-width: 540px) {
+  .store-waitlist-form {
+    flex-direction: row;
+  }
+}
+
+.store-waitlist-input {
+  flex: 1;
+  padding: 13px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(194, 164, 107, 0.32);
+  background: rgba(255, 255, 255, 0.04);
+  color: #E6E2D8;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.store-waitlist-input::placeholder {
+  color: rgba(245, 247, 251, 0.4);
+}
+
+.store-waitlist-input:focus {
+  border-color: #C2A46B;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.store-waitlist-input:disabled {
+  opacity: 0.55;
+}
+
+.store-waitlist-error {
+  flex-basis: 100%;
+  margin: 8px 0 0;
+  color: #ff9a9a;
+  font-size: 0.88rem;
+}
+
+.store-waitlist-success {
+  font-size: 1.05rem;
+  color: #E6E2D8;
+  background: rgba(194, 164, 107, 0.08);
+  border: 1px solid rgba(194, 164, 107, 0.32);
+  border-radius: 12px;
+  padding: 20px 24px;
+  line-height: 1.55;
+}
+
+.store-waitlist-success strong {
+  color: #C2A46B;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ─── FAQ ──────────────────────────────────────────────────────── */
+
+.store-faq {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.store-faq-item {
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(194, 164, 107, 0.12);
+}
+
+.store-faq-item:last-child {
+  border-bottom: none;
+}
+
+.store-faq-q {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #C2A46B;
+  margin: 0 0 10px;
+  letter-spacing: -0.005em;
+}
+
+.store-faq-a {
+  font-size: 0.98rem;
+  color: rgba(245, 247, 251, 0.85);
+  margin: 0;
+  line-height: 1.7;
+}
+
+.store-faq-a a {
+  color: #C2A46B;
+  font-weight: 600;
+}
+
+/* ─── Footer ───────────────────────────────────────────────────── */
+
+.store-footer {
+  border-top: 1px solid rgba(194, 164, 107, 0.12);
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.store-footer-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.store-footer-mark {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #C2A46B;
+  margin: 0 0 6px;
+}
+
+.store-footer-tagline {
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  color: #C2A46B;
+}
+
+.store-footer-links {
+  font-size: 0.9rem;
+  color: rgba(245, 247, 251, 0.65);
+  margin: 0 0 12px;
+}
+
+.store-footer-meta {
+  font-size: 0.8rem;
+  color: rgba(245, 247, 251, 0.45);
+  margin: 0;
+}
+
+@media (max-width: 540px) {
+  .store-hero {
+    padding: 56px 16px 44px;
+  }
+  .store-section {
+    padding: 56px 16px;
+  }
+}

@@ -54,6 +54,7 @@ const Landing = lazyWithRetry(() => import('./Landing.tsx'))
 const Origins = lazyWithRetry(() => import('./Origins.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
+const ThresanStore = lazyWithRetry(() => import('./ThresanStore.tsx'))
 const Watch = lazyWithRetry(() => import('./Watch.tsx'))
 
 // Run the one-shot rebrand storage migration before anything else reads
@@ -72,21 +73,30 @@ const hostname = window.location.hostname.toLowerCase();
 // stays opt-in instead of silently inheriting the splash render.
 const isAshtapadaHost =
   hostname === 'ashtapada.com' || hostname === 'www.ashtapada.com';
+// thresan.store — physical edition waitlist. Every URL on this host
+// lands on the store, same pattern as ashtapada.com. Defensive
+// redirects from thresan.com/.io/.studio and playskyflag.io/.studio/.store
+// are handled by vercel.json before traffic ever reaches this app.
+const isThresanStoreHost =
+  hostname === 'thresan.store' || hostname === 'www.thresan.store';
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
 const isReview = path.startsWith('/review');
 const isOrigins = path.startsWith('/origins');
 const isAshtapadaPath = path.startsWith('/ashtapada');
+const isThresanStorePath = path.startsWith('/thresan-store');
 
 let rendered;
 if (isAshtapadaHost) rendered = <AshtapadaSplash />;
+else if (isThresanStoreHost) rendered = <ThresanStore />;
 else if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
 else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
 else if (isOrigins) rendered = <Origins />;
 else if (isAshtapadaPath) rendered = <AshtapadaSplash />;
+else if (isThresanStorePath) rendered = <ThresanStore />;
 else rendered = <Landing />;
 
 // Mark the root so index.html's pre-mount error catcher knows
