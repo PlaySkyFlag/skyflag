@@ -180,7 +180,7 @@ function Showcase() {
               loading="lazy"
             />
             <figcaption className="store-figure-caption">
-              Layout — transparent terrace tower
+              Concept render — transparent terrace tower layout
             </figcaption>
           </figure>
           <figure className="store-figure">
@@ -191,7 +191,7 @@ function Showcase() {
               loading="lazy"
             />
             <figcaption className="store-figure-caption">
-              Layout — fan-spread array
+              Concept render — fan-spread array layout
             </figcaption>
           </figure>
         </div>
@@ -215,9 +215,12 @@ function Showcase() {
           </li>
         </ul>
         <p className="store-section-fineprint">
-          Final component spec confirmed at Kickstarter launch.
-          Reservations carry the same price into and through the
-          campaign.
+          Renders shown are concept art for the manufactured premium
+          edition — used to set context for what the physical edition
+          aspires to. Actual photographs of the 3D-printed prototype
+          coming soon. Final component spec confirmed at Kickstarter
+          launch; reservations carry the same price into and through
+          the campaign.
         </p>
       </div>
     </section>
