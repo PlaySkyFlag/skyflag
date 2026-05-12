@@ -293,6 +293,39 @@
   font-weight: 600;
 }
 
+/* ─── Prototype (kitchen-counter beat) ─────────────────────────── */
+
+.store-prototype-lead {
+  font-size: 1.05rem;
+  color: rgba(245, 247, 251, 0.88);
+  margin: 0 auto 32px;
+  max-width: 620px;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.store-prototype-figure {
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+.store-prototype-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(194, 164, 107, 0.32);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.store-prototype-caption {
+  margin: 14px 4px 0;
+  font-size: 0.85rem;
+  color: rgba(245, 247, 251, 0.62);
+  text-align: center;
+  font-style: italic;
+}
+
 /* ─── Founders Edition ─────────────────────────────────────────── */
 
 .store-founders-lead {

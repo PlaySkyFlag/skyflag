@@ -58,6 +58,7 @@ export default function ThresanStore() {
       <main>
         <Hero />
         <Showcase />
+        <Prototype />
         <Founders />
         <Waitlist />
         <Faq />
@@ -199,8 +200,8 @@ function Showcase() {
             <strong>Three 6×6 boards</strong> — Terran, Meridian, Empyrean
           </li>
           <li>
-            <strong>Sixteen pieces</strong> per side — Captain, Soldier,
-            Rover, Pilot — brass and acrylic
+            <strong>Four pieces per side</strong> — Captain, Soldier,
+            Rover, Pilot — slate and ivory finishes
           </li>
           <li>
             <strong>Illuminated base</strong> with the Thresan sigil
@@ -218,6 +219,39 @@ function Showcase() {
           Reservations carry the same price into and through the
           campaign.
         </p>
+      </div>
+    </section>
+  );
+}
+
+// ─── Prototype — the kitchen-counter beat ──────────────────────────
+// Placed between the polished renders (Showcase) and the Founders ask.
+// The job: prove the maker is real, the design is hand-tested, the
+// product isn't vaporware. Photographic evidence right before the
+// $108 commitment is the highest-leverage placement for trust.
+
+function Prototype() {
+  return (
+    <section className="store-section">
+      <div className="store-section-inner">
+        <h2 className="store-section-title">Before the renders</h2>
+        <p className="store-prototype-lead">
+          The first version of Thresan: Skyflag lived on a kitchen
+          counter. Three layers cut from board stock, dowels at the
+          corners, painted figurines for pieces. The whole game's
+          shape was tested here before any of it was rendered.
+        </p>
+        <figure className="store-prototype-figure">
+          <img
+            src="/thresan-prototype-kitchen.jpg"
+            alt="Hand-built three-layer prototype of Thresan: Skyflag on a kitchen counter — cardboard boards, wooden dowels at the corners, painted figurines as game pieces."
+            className="store-prototype-img"
+            loading="lazy"
+          />
+          <figcaption className="store-prototype-caption">
+            The first prototype — kitchen, cardboard, dowels.
+          </figcaption>
+        </figure>
       </div>
     </section>
   );
