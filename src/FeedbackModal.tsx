@@ -99,7 +99,7 @@ export default function FeedbackModal({ open, onClose, userId }: Props) {
             </div>
           </>
         ) : (
-          <form onSubmit={onSubmit} className="account-email-form">
+          <form onSubmit={onSubmit} className="account-feedback-form">
             <p className="account-intro">
               Found a bug, hit a confusing moment, have an idea?
               Tell us — every report shapes the next build. We

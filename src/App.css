@@ -1885,6 +1885,20 @@ button.tray-piece:hover {
   }
 }
 
+/* Feedback form — always stacked vertically (label / input / label /
+   textarea / actions). Does NOT switch to flex-row on wider screens
+   like .account-email-form does, since the fields are heterogeneous
+   (select + textarea + multiple labels) and would mash together. */
+.account-feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-feedback-form .account-label {
+  margin-top: 4px;
+}
+
 /* Skyflag Plus subscription panel — gold-accented because this is the
    primary monetization surface in the modal. Active state (user has
    the entitlement) shows a calmer confirmation; inactive state is the
