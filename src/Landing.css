@@ -497,7 +497,7 @@
 .landing-pricing-lead {
   text-align: center;
   color: var(--landing-text-muted);
-  margin: -16px 0 32px;
+  margin: 0 0 32px;
   font-size: 1.0rem;
 }
 
@@ -623,7 +623,7 @@
 .landing-demo-lead {
   text-align: center;
   color: var(--landing-text-muted);
-  margin: -16px auto 32px;
+  margin: 0 auto 32px;
   font-size: 1.0rem;
   max-width: 620px;
   line-height: 1.6;

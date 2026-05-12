@@ -11,7 +11,7 @@
 //     promise with marketing speak; we're better off being direct about
 //     what exists today.
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Board, { type Marker } from './Board';
 import {
   FLAG_COORDS,
@@ -114,13 +114,13 @@ function Header() {
   return (
     <header className="landing-header">
       <div className="landing-header-inner">
-        <a href="/" className="landing-logo" aria-label="Skyflag — home">
+        <a href="/" className="landing-logo" aria-label="Thresan: Skyflag — home">
           <img
-            src="/3phor-mark.png"
+            src="/3phor-logo.png"
             alt=""
             className="landing-logo-img"
           />
-          <span className="landing-logo-text">Skyflag</span>
+          <span className="landing-logo-text">Thresan: Skyflag</span>
         </a>
         <nav className="landing-nav">
           <a href="#features" className="landing-nav-link">Features</a>
@@ -370,12 +370,19 @@ function DemoSection() {
 }
 
 // Optional gameplay GIF / MP4 placed at /public/demo.gif or
-// /public/demo.mp4. Renders nothing if the file isn't present (the
-// browser shows a broken image, so we use onError to hide). Saves a
-// re-deploy when the user wants to add or update the demo asset.
+// /public/demo.mp4. The wrapper is hidden until something actually
+// loads — avoids the empty-styled-box that <video> renders when its
+// src 404s (onError doesn't fire reliably for missing video sources).
 function DemoAsset() {
+  const [videoOk, setVideoOk] = useState(false);
+  const [gifOk, setGifOk] = useState(false);
+  const showGif = !videoOk && gifOk;
+  const visible = videoOk || gifOk;
   return (
-    <div className="landing-demo-asset">
+    <div
+      className="landing-demo-asset"
+      style={{ display: visible ? undefined : 'none' }}
+    >
       <video
         className="landing-demo-video"
         src="/demo.mp4"
@@ -384,24 +391,17 @@ function DemoAsset() {
         muted
         playsInline
         preload="metadata"
-        onError={(e) => {
-          // No demo.mp4 — try demo.gif via image, hide if also absent.
-          const v = e.currentTarget;
-          v.style.display = 'none';
-          const fallback = v.nextElementSibling as HTMLImageElement | null;
-          if (fallback) fallback.style.display = 'block';
-        }}
+        style={{ display: videoOk ? undefined : 'none' }}
+        onLoadedData={() => setVideoOk(true)}
+        onError={() => setVideoOk(false)}
       />
       <img
         className="landing-demo-gif"
         src="/demo.gif"
         alt="Skyflag gameplay demo"
-        style={{ display: 'none' }}
-        onError={(e) => {
-          // No demo.gif either — hide entirely, leaving just the live
-          // SVG demo below.
-          (e.currentTarget as HTMLImageElement).style.display = 'none';
-        }}
+        style={{ display: showGif ? undefined : 'none' }}
+        onLoad={() => setGifOk(true)}
+        onError={() => setGifOk(false)}
       />
     </div>
   );
@@ -420,9 +420,6 @@ function Footer() {
           <a href="/play">Play</a>
           <a href="/story">The Story</a>
           <a href="#pricing">Pricing</a>
-          <a href="https://github.com/PlaySkyFlag/skyflag" target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
         </div>
         <div className="landing-footer-meta">
           © {new Date().getFullYear()} Limnology Research Corp.
