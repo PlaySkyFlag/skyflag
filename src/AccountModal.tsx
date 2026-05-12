@@ -437,7 +437,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
                 maxLength={11}
                 value={codeInput}
                 onChange={(e) => setCodeInput(e.target.value)}
-                placeholder="• • • • • • • •"
+                placeholder="••••••••"
                 aria-label="Sign-in code from the email"
                 autoFocus
               />
@@ -786,7 +786,7 @@ function GuestUpgradePanel() {
             maxLength={11}
             value={codeInput}
             onChange={(e) => setCodeInput(e.target.value)}
-            placeholder="• • • • • • • •"
+            placeholder="••••••••"
             aria-label="Confirmation code from the email"
           />
           <button

@@ -1487,27 +1487,30 @@ button.tray-piece:hover {
   box-shadow: 0 0 0 2px rgba(194, 164, 107, 0.25);
 }
 
-/* OTP code input — wider, taller, monospaced and letter-spaced so the
-   6–8 digit sign-in code is comfortable to read AND to type. Pairs
-   with .account-input (variant, not replacement) so border / focus
-   behaviour stays consistent with other form inputs. */
+/* OTP code input — wider, taller, monospaced so the 6–8 digit sign-in
+   code is comfortable to read AND to type. Pairs with .account-input
+   (variant, not replacement) so border / focus behaviour stays
+   consistent with other form inputs.
+   Letter-spacing tightened from 0.35em → 0.18em — at 0.35 an 8-digit
+   code overflowed narrow modal widths and the cursor landed off-screen.
+   Font also dropped 1.5 → 1.25rem; the monospace + bold weight do most
+   of the "this is a code field" work. */
 .account-otp-input {
   font-family: 'SF Mono', Menlo, Consolas, 'Courier New', monospace;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: 0.35em;
+  letter-spacing: 0.18em;
   text-align: center;
-  padding: 14px 16px;
-  /* Slight extra width via min-height keeps the box feeling like a
-     dedicated code field, not just a text input. */
-  min-height: 56px;
+  padding: 12px 14px;
+  min-height: 48px;
 }
 
 .account-otp-input::placeholder {
-  /* Faded so the dots read as a hint, not as content the user has to
-     clear. Letter-spacing inherited from the rule above. */
+  /* Faded so the placeholder reads as a hint, not as content the user
+     has to clear. */
   color: rgba(255, 255, 255, 0.22);
   font-weight: 400;
+  letter-spacing: 0.1em;
 }
 
 .account-row {
