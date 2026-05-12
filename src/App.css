@@ -1573,11 +1573,66 @@ button.tray-piece:hover {
   margin: 14px 0 6px;
 }
 
-/* Slightly larger padding than the default .hud-btn — this is the
-   primary CTA in the footer, not an inline HUD action. */
+/* Prominent gold-filled CTA — overrides the muted .hud-btn defaults
+   so this button stands out as the primary feedback path during the
+   beta. Gradient + glow pulse make it visible against the dim footer
+   palette without straying from the brand colour system. */
 .app-footer-feedback-btn {
-  padding: 8px 18px;
-  font-size: 0.95rem;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: linear-gradient(180deg, #ffe27a 0%, #C2A46B 55%, #a07820 100%);
+  color: #0d0f13;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 4px 14px rgba(194, 164, 107, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  /* Subtle attention-grabbing pulse — the glow breathes every 3s.
+     Slow enough to feel ambient, strong enough to draw the eye
+     without becoming annoying during a long session. */
+  animation: footer-feedback-pulse 3s ease-in-out infinite;
+  transition: transform 0.12s ease, box-shadow 0.18s ease;
+}
+
+.app-footer-feedback-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 22px rgba(194, 164, 107, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  background: linear-gradient(180deg, #ffe9a0 0%, #d4b478 55%, #b08828 100%);
+  color: #0d0f13;
+  /* Stop the pulse on hover — once the user has noticed it, the
+     animation becomes noise rather than signal. */
+  animation: none;
+}
+
+.app-footer-feedback-btn:active {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.30);
+}
+
+@keyframes footer-feedback-pulse {
+  0%, 100% {
+    box-shadow:
+      0 4px 14px rgba(194, 164, 107, 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 4px 24px rgba(194, 164, 107, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+}
+
+/* Honour reduced-motion preferences — the pulse is decorative and
+   non-essential, so users who disable animations don't see it. */
+@media (prefers-reduced-motion: reduce) {
+  .app-footer-feedback-btn {
+    animation: none;
+  }
 }
 
 /* Email fallback line — small + dim so it sits clearly below the
