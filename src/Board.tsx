@@ -625,8 +625,8 @@ export default function Board({
           width={CELL - 4}
           height={CELL - 4}
           rx={4}
-          fill="rgba(255, 216, 132, 0.15)"
-          stroke="rgba(255, 216, 132, 0.85)"
+          fill="rgba(194, 164, 107, 0.15)"
+          stroke="rgba(194, 164, 107, 0.85)"
           strokeWidth={2}
           strokeDasharray="5 3"
           pointerEvents="none"
@@ -642,8 +642,8 @@ export default function Board({
           width={CELL - 4}
           height={CELL - 4}
           rx={4}
-          fill="rgba(255, 216, 132, 0.32)"
-          stroke="rgba(255, 216, 132, 0.95)"
+          fill="rgba(194, 164, 107, 0.32)"
+          stroke="rgba(194, 164, 107, 0.95)"
           strokeWidth={2.4}
           strokeDasharray="5 3"
           pointerEvents="none"
@@ -677,7 +677,7 @@ export default function Board({
               markerHeight="5"
               orient="auto"
             >
-              <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" fill="rgba(255, 216, 132, 0.95)" />
+              <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" fill="rgba(194, 164, 107, 0.95)" />
             </marker>
           </defs>
           <line
@@ -685,7 +685,7 @@ export default function Board({
             y1={fy + uy * inset}
             x2={tx - ux * inset}
             y2={ty - uy * inset}
-            stroke="rgba(255, 216, 132, 0.9)"
+            stroke="rgba(194, 164, 107, 0.9)"
             strokeWidth={3}
             strokeLinecap="round"
             strokeDasharray="6 4"

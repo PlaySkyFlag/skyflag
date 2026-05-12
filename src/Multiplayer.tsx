@@ -285,7 +285,7 @@ function NotificationsControl() {
             if (!result.ok) {
               setMessage(
                 result.reason === 'denied'
-                  ? 'Permission denied. Enable Notifications for 3phor in iOS Settings.'
+                  ? 'Permission denied. Enable Notifications for Skyflag in iOS Settings.'
                   : `Couldn't enable: ${result.message ?? result.reason}`,
               );
               return;
@@ -485,7 +485,17 @@ export default function Multiplayer({ room, roomMeta = null, forceOpen = false, 
     setBusy(true);
     setError(null);
     try {
-      const userId = getEffectiveUserId(authUser?.id ?? null);
+      // Defense-in-depth: the render-level gate above already hides the
+      // Create/Join buttons when authUser is null, but if anon sign-in
+      // races or fails silently between render and click, the device-id
+      // fallback would write a p1_id that RLS rejects on every UPDATE.
+      // Bail early with a clear message instead.
+      if (!authUser?.id) {
+        setBusy(false);
+        setError('Sign in first to create or join an online room.');
+        return;
+      }
+      const userId = getEffectiveUserId(authUser.id);
       let didTransientRetry = false;
       // Retry on (rare) room-code collisions — unique constraint on the
       // table. Also tolerate a single transient network blip (503/504/
@@ -532,7 +542,13 @@ export default function Multiplayer({ room, roomMeta = null, forceOpen = false, 
     setBusy(true);
     setError(null);
     try {
-      const userId = getEffectiveUserId(authUser?.id ?? null);
+      // Same defense-in-depth gate as handleCreate — see comment there.
+      if (!authUser?.id) {
+        setBusy(false);
+        setError('Sign in first to create or join an online room.');
+        return;
+      }
+      const userId = getEffectiveUserId(authUser.id);
       // Single transient retry on the initial fetch — same rationale as
       // handleCreate. The follow-up UPDATE (take p2 seat) doesn't retry
       // because a retry there could double-book in pathological races.

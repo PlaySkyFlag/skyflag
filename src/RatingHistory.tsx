@@ -138,14 +138,14 @@ export default function RatingHistory({ user, hasPlus }: Props) {
           x2={WIDTH - PAD_X}
           y1={yOf(start)}
           y2={yOf(start)}
-          stroke="rgba(255, 216, 132, 0.15)"
+          stroke="rgba(194, 164, 107, 0.15)"
           strokeDasharray="3 4"
           vectorEffect="non-scaling-stroke"
         />
         <path
           d={pathD}
           fill="none"
-          stroke="#ffd884"
+          stroke="#C2A46B"
           strokeWidth={1.8}
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -156,7 +156,7 @@ export default function RatingHistory({ user, hasPlus }: Props) {
           cx={xOf(points[points.length - 1].when)}
           cy={yOf(current)}
           r={3}
-          fill="#ffd884"
+          fill="#C2A46B"
         />
       </svg>
       <div className="rating-history-footer">

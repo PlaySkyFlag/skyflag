@@ -171,7 +171,7 @@ Deno.serve(async (req: Request) => {
     .in('user_id', recipients);
   if (subErr) return json({ ok: false, error: subErr.message }, 500);
 
-  const title = '3phor — new tournament';
+  const title = 'Skyflag — new tournament';
   const bodyText = `"${(t.name as string).slice(0, 60)}" just opened. Tap to join.`;
   const targetUrl = '/play';
 

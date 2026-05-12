@@ -170,7 +170,7 @@ export default function EvalGraph({ analyses, currentPly, onPlyClick }: Props) {
             areas tint slate. Using clipPath would be ideal but a
             single filled path with low opacity reads fine for the
             scale of this chart. */}
-        <path d={areaPath} fill="rgba(255, 216, 132, 0.16)" />
+        <path d={areaPath} fill="rgba(194, 164, 107, 0.16)" />
         {/* Center line (eval = 0) */}
         <line
           x1={0}
@@ -184,7 +184,7 @@ export default function EvalGraph({ analyses, currentPly, onPlyClick }: Props) {
         <polyline
           points={pathPoints}
           fill="none"
-          stroke="#ffd884"
+          stroke="#C2A46B"
           strokeWidth={2}
           strokeLinejoin="round"
           strokeLinecap="round"

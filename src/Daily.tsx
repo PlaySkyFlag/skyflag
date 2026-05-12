@@ -131,7 +131,7 @@ export default function Daily({ open, onClose, themeId }: Props) {
   // Two-phase modal: 'briefing' shows the objective + a quick rules
   // recap before revealing the position; 'playing' is the actual puzzle
   // interaction. Mirrors the chess.com / Lichess pattern of giving the
-  // user a deliberate "I'm ready" beat — especially helpful in 3phor
+  // user a deliberate "I'm ready" beat — especially helpful in Skyflag
   // since the rules are less universal than chess.
   const [phase, setPhase] = useState<'briefing' | 'playing'>('briefing');
 

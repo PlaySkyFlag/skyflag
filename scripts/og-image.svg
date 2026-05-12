@@ -5,7 +5,7 @@
   <defs>
     <radialGradient id="bg" cx="30%" cy="30%" r="80%">
       <stop offset="0%" stop-color="#1a2a4a"/>
-      <stop offset="60%" stop-color="#0a1224"/>
+      <stop offset="60%" stop-color="#111826"/>
       <stop offset="100%" stop-color="#04070f"/>
     </radialGradient>
     <linearGradient id="space" x1="0" x2="0" y1="0" y2="1">
@@ -49,14 +49,21 @@
 
   <!-- LEFT SIDE — wordmark + tagline -->
   <g transform="translate(80, 200)">
-    <!-- "SkyFlag" wordmark in gold serif. Letter spacing wide for a
-         display-type feel; weight heavy so it reads at thumbnail size. -->
+    <!-- "Skyflag" wordmark in gold serif, with "THRESAN" overline. Letter
+         spacing wide for a display-type feel; weight heavy so it reads at
+         thumbnail size. Font-size 108 (down from 124) to leave breathing
+         room under "THRESAN" without cramping the right-side iconography. -->
+    <text x="0" y="-72"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="36"
+          fill="#c9b07a"
+          letter-spacing="10">THRESAN</text>
     <text x="0" y="0"
           font-family="Georgia, 'Times New Roman', serif"
-          font-size="124"
+          font-size="108"
           font-weight="700"
           fill="url(#goldFlag)"
-          letter-spacing="-2">SkyFlag</text>
+          letter-spacing="-1">Skyflag</text>
 
     <!-- Edition tag, small, italicized, just under the wordmark -->
     <text x="6" y="42"

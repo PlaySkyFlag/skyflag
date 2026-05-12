@@ -59,7 +59,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     },
     players: {
       p1: { fill: '#0f1830', border: '#1e2a48', accent: '#a8b8d8', textOnLight: '#c8d2e8' },
-      p2: { fill: '#fff4dc', border: '#ebd9b8', accent: '#ffd884', textOnLight: '#1a1a1a' },
+      p2: { fill: '#fff4dc', border: '#ebd9b8', accent: '#C2A46B', textOnLight: '#1a1a1a' },
     },
   },
   twilight: {
@@ -108,11 +108,11 @@ export const THEMES: Record<ThemeId, Theme> = {
     requiresEntitlement: 'feature.plus',
     layers: {
       space:  { lightFill: '#6a5128', darkFill: '#4a3818', background: '#241a08', stroke: '#100a04', label: '#e9b94a' },
-      sky:    { lightFill: '#a07820', darkFill: '#7a5a18', background: '#3a2a10', stroke: '#181008', label: '#ffd884' },
+      sky:    { lightFill: '#a07820', darkFill: '#7a5a18', background: '#3a2a10', stroke: '#181008', label: '#C2A46B' },
       ground: { lightFill: '#c89a3a', darkFill: '#a07820', background: '#2a1f0e', stroke: '#100a04', label: '#ffe27a' },
     },
     players: {
-      p1: { fill: '#1a1004', border: '#3a2a10', accent: '#ffd884', textOnLight: '#ffe27a' },
+      p1: { fill: '#1a1004', border: '#3a2a10', accent: '#C2A46B', textOnLight: '#ffe27a' },
       p2: { fill: '#fff5d6', border: '#e9d4a0', accent: '#ffe27a', textOnLight: '#241a08' },
     },
   },

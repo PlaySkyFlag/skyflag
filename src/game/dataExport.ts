@@ -107,7 +107,7 @@ export async function exportUserData(user: User): Promise<ExportBundle> {
 // today's date so multiple exports don't overwrite each other in the
 // downloads folder.
 export function downloadExportFile(bundle: ExportBundle): void {
-  const filename = `3phor-data-export-${bundle.exported_at.slice(0, 10)}.json`;
+  const filename = `skyflag-data-export-${bundle.exported_at.slice(0, 10)}.json`;
   const blob = new Blob([JSON.stringify(bundle, null, 2)], {
     type: 'application/json',
   });

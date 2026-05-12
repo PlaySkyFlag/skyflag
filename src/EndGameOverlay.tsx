@@ -104,7 +104,7 @@ export default function EndGameOverlay({ state, user, room, onPlayAgain }: Props
             gives the end-game moment a personal, signed-by-the-house
             feel. Only shown on a finished game so it doesn't appear
             during a draw-offer modal or similar mid-game state. */}
-        <p className="end-game-rally tagline-script">3phor the win!</p>
+        <p className="end-game-rally tagline-script">Three worlds. One proof.</p>
         <div className="end-game-actions">
           <button type="button" className="end-game-btn" onClick={onPlayAgain}>
             Play again

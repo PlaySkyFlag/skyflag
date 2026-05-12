@@ -46,7 +46,7 @@ function StoryHeader() {
   return (
     <header className="story-header">
       <div className="story-header-inner">
-        <a href="/" className="story-back">← 3phor</a>
+        <a href="/" className="story-back">← Skyflag</a>
         <div className="story-header-meta">Volume One · Kaleo Edition</div>
         <a href="/play" className="story-cta-button">Play</a>
       </div>
@@ -58,7 +58,7 @@ function StoryFooter() {
   return (
     <footer className="story-footer">
       <div className="story-footer-inner">
-        <p className="story-footer-mark">3phor — The Three Seals of Kaleo</p>
+        <p className="story-footer-mark">Thresan: Skyflag — The Three Seals of Kaleo</p>
         <p className="story-footer-meta">
           Storybook v3 · Kaleo Edition · © {new Date().getFullYear()} Limnology Research Corp.
         </p>
@@ -78,7 +78,7 @@ function Cover() {
       <div className="story-cover-glyph" aria-hidden="true">
         <ThreeLayersGlyph />
       </div>
-      <p className="story-cover-eyebrow">3phor · Volume One</p>
+      <p className="story-cover-eyebrow">Thresan: Skyflag · Volume One</p>
       <h1 className="story-cover-title">The Three Seals<br />of Kaleo</h1>
       <p className="story-cover-subtitle">A story of the First Reclamation</p>
       <div className="story-cover-divider" aria-hidden="true">· · ·</div>
@@ -1148,7 +1148,7 @@ function ThreeLayersGlyph() {
       <rect x="0" y="6" width="200" height="6" rx="2" fill="#3e5878" opacity="0.85" />
       <rect x="0" y="36" width="200" height="6" rx="2" fill="#6585a8" opacity="0.85" />
       <rect x="0" y="66" width="200" height="6" rx="2" fill="#9c7a55" opacity="0.85" />
-      <circle cx="100" cy="9" r="3.5" fill="#ffd884" />
+      <circle cx="100" cy="9" r="3.5" fill="#C2A46B" />
     </svg>
   );
 }
@@ -1185,7 +1185,7 @@ function StagGlyph({ small }: { small?: boolean } = {}) {
         fill="#f5e8c0"
         opacity="0.9"
       />
-      <circle cx="46" cy="20" r="2" fill="#ffd884" opacity="0.7" />
+      <circle cx="46" cy="20" r="2" fill="#C2A46B" opacity="0.7" />
       <line x1="0" y1="56" x2="64" y2="56" stroke="#f5e8c0" strokeWidth="1" opacity="0.4" />
     </svg>
   );
@@ -1196,20 +1196,20 @@ function NexusGlyph() {
     <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <radialGradient id="nexus-glow">
-          <stop offset="0%" stopColor="#ffd884" stopOpacity="0.6" />
-          <stop offset="50%" stopColor="#ffd884" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#ffd884" stopOpacity="0" />
+          <stop offset="0%" stopColor="#C2A46B" stopOpacity="0.6" />
+          <stop offset="50%" stopColor="#C2A46B" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#C2A46B" stopOpacity="0" />
         </radialGradient>
       </defs>
       <circle cx="60" cy="60" r="55" fill="url(#nexus-glow)" />
       <path
         d="M 60 20 L 70 60 L 60 100 L 50 60 Z"
-        fill="#ffd884"
+        fill="#C2A46B"
         opacity="0.85"
       />
       <path
         d="M 20 60 L 60 50 L 100 60 L 60 70 Z"
-        fill="#ffd884"
+        fill="#C2A46B"
         opacity="0.85"
       />
       <circle cx="60" cy="60" r="5" fill="#fff8e0" />

@@ -91,8 +91,11 @@ export async function verifyEmailCode(
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
   const token = code.replace(/[^0-9]/g, '');
-  if (token.length !== 6) {
-    return { ok: false, message: 'Code should be 6 digits.' };
+  // Supabase OTP length is configurable per-project (6, 7, or 8 digits);
+  // accept any of those rather than hardcoding 6 and forcing a
+  // dashboard setting that has to stay in sync.
+  if (token.length < 6 || token.length > 8) {
+    return { ok: false, message: 'Code should be 6–8 digits — check the email.' };
   }
   const { error } = await supabase.auth.verifyOtp({
     email,
@@ -111,9 +114,45 @@ export async function verifyEmailCode(
   return { ok: true };
 }
 
+// Keys cleared on sign-out. These hold per-user data (the previous
+// user's mid-game state, their stats cache, their draft profile, etc.)
+// and would otherwise leak to whoever signs in next on the same browser.
+// Per-device preferences are NOT cleared: theme, sound, tutorial-seen,
+// showThreats, and the anonymous device-id all survive a sign-out.
+const USER_SCOPED_KEYS = [
+  '3phor.session.v1',            // current/most-recent game state
+  '3phor.stats.v1',              // local stats cache (server is authoritative)
+  '3phor.profile-draft.v1',      // in-progress profile-form text
+  '3phor.review-session.v1',     // post-game review handoff data
+  '3phor.save-banner.dismissed.v1', // guest-upgrade banner dismiss flag
+];
+
+// Wipes all per-user localStorage keys. Called by signOut so the next
+// user on the same browser doesn't inherit the previous user's stats,
+// in-progress game, or profile draft. Also clears the dynamic
+// `3phor.rating-applied.{room.code}` keys (one per online MP game).
+function clearUserScopedLocalStorage(): void {
+  try {
+    for (const k of USER_SCOPED_KEYS) {
+      localStorage.removeItem(k);
+    }
+    // Dynamic per-room flags — walk the namespace prefix.
+    const toRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('3phor.rating-applied.')) toRemove.push(k);
+    }
+    for (const k of toRemove) localStorage.removeItem(k);
+  } catch {
+    // Quota / private-mode failures are fine — there was nothing
+    // sensitive to leak in those modes anyway.
+  }
+}
+
 export async function signOut(): Promise<void> {
   if (!supabase) return;
   await supabase.auth.signOut();
+  clearUserScopedLocalStorage();
 }
 
 // Instantly sign in as a fresh anonymous user. Returned session has a
@@ -208,8 +247,10 @@ export async function verifyEmailChangeCode(
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!supabase) return { ok: false, message: 'Supabase is not configured.' };
   const token = code.replace(/[^0-9]/g, '');
-  if (token.length !== 6) {
-    return { ok: false, message: 'Code should be 6 digits.' };
+  // Match verifyEmailCode — accept whatever OTP length Supabase is
+  // currently configured for (6, 7, or 8 digits).
+  if (token.length < 6 || token.length > 8) {
+    return { ok: false, message: 'Code should be 6–8 digits — check the email.' };
   }
   const { error } = await supabase.auth.verifyOtp({
     email,

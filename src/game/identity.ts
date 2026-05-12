@@ -10,7 +10,7 @@ function generateUserId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID();
   }
-  // Fallback: 32 random hex chars. Not used on any browser 3phor targets,
+  // Fallback: 32 random hex chars. Not used on any browser Skyflag targets,
   // but defensive against headless test environments.
   return Array.from({ length: 32 }, () =>
     Math.floor(Math.random() * 16).toString(16),

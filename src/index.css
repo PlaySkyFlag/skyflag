@@ -1,4 +1,4 @@
-/* 3phor's whole visual design assumes a dark page (board atmospheres,
+/* Skyflag's whole visual design assumes a dark page (board atmospheres,
    panels, HUD all painted on dark fills). We used to follow the OS
    prefers-color-scheme, but that left users on light-mode systems
    reading black text on dark panels — most visible in the Rules tab
@@ -6,8 +6,8 @@
    dark palette so the look is consistent regardless of OS preference. */
 :root {
   color-scheme: dark;
-  background: #1a1c18;
-  color: #f5f3ee;
+  background: #111826;
+  color: #E6E2D8;
 }
 
 * {
@@ -28,14 +28,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0a1224;
-  color: #ffd884;
+  background: #111826;
+  color: #C2A46B;
   font-size: 1.05rem;
   font-weight: 600;
   letter-spacing: 0.06em;
 }
 
-/* Handwriting tagline — used wherever the "3phor the win!" rally
+/* Handwriting tagline — used wherever the "Three worlds. One proof." rally
    appears. Slight rotation gives it a personal, signed-by-the-
    author quality against the otherwise polished gold-on-dark
    palette. Color and size are set per-placement so this class
@@ -74,7 +74,7 @@ body {
   border: 1px solid rgba(255, 138, 138, 0.45);
   border-radius: 14px;
   padding: 22px 26px;
-  color: #f5f7fb;
+  color: #E6E2D8;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
 }
 
@@ -115,14 +115,14 @@ body {
      a route where the error fired before App. Give the buttons a
      minimum visible style so the user can always click Reload. */
   padding: 8px 14px;
-  background: rgba(255, 216, 132, 0.15);
-  border: 1px solid rgba(255, 216, 132, 0.50);
-  color: #ffd884;
+  background: rgba(194, 164, 107, 0.15);
+  border: 1px solid rgba(194, 164, 107, 0.50);
+  color: #C2A46B;
   border-radius: 8px;
   cursor: pointer;
   font: inherit;
   font-weight: 600;
 }
 .error-boundary-actions button:hover {
-  background: rgba(255, 216, 132, 0.25);
+  background: rgba(194, 164, 107, 0.25);
 }

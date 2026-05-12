@@ -539,7 +539,7 @@ export default function Lobby({ user, profile, inRoom, onEnterRoom, onPresenceCh
           <div className="account-card">
             <h2 className="account-title">Challenge from {incoming.from_nickname}</h2>
             <p className="account-intro">
-              {incoming.from_nickname} invited you to play 3phor. Room{' '}
+              {incoming.from_nickname} invited you to play Skyflag. Room{' '}
               <strong className="mp-code">{incoming.room_code}</strong>.
             </p>
             <div className="account-actions">

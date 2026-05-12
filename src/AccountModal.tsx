@@ -207,11 +207,21 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
   // form (pre-filled). For new users without a saved profile, also
   // restore any in-progress draft from localStorage so a refresh
   // mid-typing doesn't lose work.
+  //
+  // The cancelled flag guards against a stale resolution overwriting a
+  // newer one: if the user switches accounts (sign-out + sign-back-in
+  // as someone else, or anon→email upgrade) while the first loadProfile
+  // is in flight, its resolution lands AFTER the second loadProfile
+  // started — without this guard the modal would show the wrong
+  // profile, and saveProfile in this closure would update the wrong
+  // user.id. Matches the pattern App.tsx uses for the same reason.
   useEffect(() => {
     if (!open || !user) return;
+    let cancelled = false;
     setLoadingProfile(true);
     setMessage(null);
     loadProfile(user.id).then((p) => {
+      if (cancelled) return;
       setProfile(p);
       if (p) {
         setNickname(p.nickname);
@@ -240,6 +250,9 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
       setLoadingProfile(false);
       onProfileChange(p);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [open, user, onProfileChange, draftRestored]);
 
   // Autosave the draft as the user types. Only persist when the user
@@ -264,7 +277,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
         <div className="account-overlay" role="dialog" aria-modal="true">
           <div className="account-card account-card--narrow">
             <div className="account-header">
-              <h2 className="account-title">Welcome to 3phor</h2>
+              <h2 className="account-title">Welcome to Thresan: Skyflag</h2>
               <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
             </div>
 
@@ -396,8 +409,8 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               onSubmit={async (e) => {
                 e.preventDefault();
                 const code = codeInput.replace(/[^0-9]/g, '');
-                if (code.length !== 6) {
-                  setMessage('Code should be 6 digits — check the email.');
+                if (code.length < 6 || code.length > 8) {
+                  setMessage('Code should be 6–8 digits — check the email.');
                   return;
                 }
                 setVerifying(true);
@@ -416,16 +429,16 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
               </p>
               <input
                 id="account-otp"
-                className="account-input"
+                className="account-input account-otp-input"
                 type="text"
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 pattern="[0-9 \-]*"
-                maxLength={9}
+                maxLength={11}
                 value={codeInput}
                 onChange={(e) => setCodeInput(e.target.value)}
-                placeholder="123456"
-                aria-label="6-digit sign-in code"
+                placeholder="• • • • • • • •"
+                aria-label="Sign-in code from the email"
                 autoFocus
               />
               <button
@@ -736,10 +749,11 @@ function GuestUpgradePanel() {
       <div className="account-upgrade-panel account-upgrade-sent">
         <strong className="account-upgrade-title">Check your email</strong>
         <p className="account-upgrade-body">
-          We sent a confirmation to <strong>{sentTo}</strong>. Either click
-          the link in the email (must be the same browser as this tab),
-          {' '}<strong>or</strong> type the 6-digit code below — that
-          works from any device.
+          We sent a confirmation to <strong>{sentTo}</strong>. Enter the
+          6-digit code from that email below — works from any device,
+          and keeps your guest account intact. (The email also contains
+          a clickable link; if you use it, open it in <em>this same
+          browser tab</em>, otherwise your guest profile won't merge.)
         </p>
         <form
           className="account-email-form"
@@ -747,8 +761,8 @@ function GuestUpgradePanel() {
             e.preventDefault();
             if (!sentTo) return;
             const code = codeInput.replace(/[^0-9]/g, '');
-            if (code.length !== 6) {
-              setMsg('Code should be 6 digits — check the email.');
+            if (code.length < 6 || code.length > 8) {
+              setMsg('Code should be 6–8 digits — check the email.');
               return;
             }
             setVerifying(true);
@@ -764,16 +778,16 @@ function GuestUpgradePanel() {
         >
           <input
             id="account-upgrade-otp"
-            className="account-input"
+            className="account-input account-otp-input"
             type="text"
             inputMode="numeric"
             autoComplete="one-time-code"
             pattern="[0-9 \-]*"
-            maxLength={9}
+            maxLength={11}
             value={codeInput}
             onChange={(e) => setCodeInput(e.target.value)}
-            placeholder="123456"
-            aria-label="6-digit confirmation code"
+            placeholder="• • • • • • • •"
+            aria-label="Confirmation code from the email"
           />
           <button
             type="submit"
@@ -847,8 +861,11 @@ function GuestUpgradePanel() {
         </button>
       </form>
       <p className="account-upgrade-foot">
-        We'll send a confirmation link. <strong>Click it in this same
-        browser</strong> to merge your guest account with the email.
+        We'll send a 6-digit code to that address. Type it in here to
+        link your guest profile — works from any device. (The email
+        also includes a clickable link; if you use it, it must be opened
+        in <em>this same browser tab</em> or your guest profile gets
+        orphaned.)
       </p>
       {msg && <p className="account-message">{msg}</p>}
     </div>
@@ -1110,7 +1127,7 @@ function AccountDataSection({
   );
 }
 
-// 3phor Plus subscription panel — shown to signed-in users on web who
+// Skyflag Plus subscription panel — shown to signed-in users on web who
 // don't yet have the entitlement. Hidden on iOS native builds because
 // Apple's App Store policy requires in-app digital subscriptions to use
 // IAP, not external payment processors. iOS support is a separate
@@ -1131,15 +1148,15 @@ function PlusPanel() {
   if (hasPlus) {
     return (
       <div className="account-plus-panel account-plus-active">
-        <strong>★ 3phor Plus active</strong>
-        <p>Thanks for supporting 3phor. All Plus features unlocked.</p>
+        <strong>★ Skyflag Plus active</strong>
+        <p>Thanks for supporting Skyflag. All Plus features unlocked.</p>
       </div>
     );
   }
 
   return (
     <div className="account-plus-panel">
-      <strong className="account-plus-title">3phor Plus</strong>
+      <strong className="account-plus-title">Skyflag Plus</strong>
       <p className="account-plus-body">
         Unlock advanced AI difficulty, puzzle archive with analysis,
         custom themes, ad-free play, and unlimited tournaments.
@@ -1277,6 +1294,10 @@ function RecoveryCodesSection({ user }: { user: User }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  // True once the user has either downloaded or copied the codes. Gates
+  // the "I've saved them" button so a stray click can't permanently
+  // dismiss codes that were never captured anywhere.
+  const [savedAck, setSavedAck] = useState(false);
 
   useEffect(() => {
     countRemainingCodes(user.id).then(setRemaining);
@@ -1290,29 +1311,45 @@ function RecoveryCodesSection({ user }: { user: User }) {
     setConfirming(false);
     if (r.ok) {
       setShown(r.codes);
+      setSavedAck(false); // fresh codes require a fresh save acknowledgement
       setRemaining(r.codes.length);
     } else {
       setErr(r.message);
     }
   };
 
+  const codesAsText = (codes: string[]): string =>
+    `Skyflag recovery codes — generated ${new Date().toLocaleString()}\n` +
+    `Account: ${user.email}\n\n` +
+    codes.map((c, i) => `${i + 1}.  ${c}`).join('\n') +
+    `\n\nStore these somewhere safe. Each code can only be used once,\n` +
+    `and you'll need both the code and your email to recover access.\n`;
+
   const downloadCodes = () => {
     if (!shown) return;
-    const text =
-      `3phor recovery codes — generated ${new Date().toLocaleString()}\n` +
-      `Account: ${user.email}\n\n` +
-      shown.map((c, i) => `${i + 1}.  ${c}`).join('\n') +
-      `\n\nStore these somewhere safe. Each code can only be used once,\n` +
-      `and you'll need both the code and your email to recover access.\n`;
-    const blob = new Blob([text], { type: 'text/plain' });
+    const blob = new Blob([codesAsText(shown)], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `3phor-recovery-codes-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.download = `skyflag-recovery-codes-${new Date().toISOString().slice(0, 10)}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setSavedAck(true);
+  };
+
+  const copyCodes = async () => {
+    if (!shown) return;
+    try {
+      await navigator.clipboard.writeText(codesAsText(shown));
+      setSavedAck(true);
+    } catch {
+      // Older browsers / iOS Safari in some contexts reject clipboard
+      // writes silently. Don't pretend the save happened in that case —
+      // user should fall back to Download.
+      setErr('Copy failed — use Download instead.');
+    }
   };
 
   return (
@@ -1340,14 +1377,29 @@ function RecoveryCodesSection({ user }: { user: User }) {
             <button type="button" className="hud-btn" onClick={downloadCodes}>
               ↓ Download as text file
             </button>
+            <button type="button" className="hud-btn" onClick={copyCodes}>
+              ⧉ Copy to clipboard
+            </button>
             <button
               type="button"
               className="hud-btn hud-btn-subtle"
+              disabled={!savedAck}
+              title={
+                savedAck
+                  ? "Hide the codes — make sure you've actually stored them somewhere safe."
+                  : 'Download or copy the codes first.'
+              }
               onClick={() => setShown(null)}
             >
               I've saved them
             </button>
           </div>
+          {!savedAck && (
+            <p className="account-recovery-hint">
+              Download or copy the codes before dismissing — they won't
+              be shown again.
+            </p>
+          )}
         </div>
       ) : confirming ? (
         <div className="account-delete-confirm">

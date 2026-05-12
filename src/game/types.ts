@@ -1,4 +1,4 @@
-// Shape of every game-state thing in 3phor. Pure types — no runtime values
+// Shape of every game-state thing in Skyflag. Pure types — no runtime values
 // here. Pair with constants.ts for fixed positions and the initial-state factory.
 
 // ─── Geometry ──────────────────────────────────────────────────────────────

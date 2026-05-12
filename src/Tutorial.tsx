@@ -22,7 +22,7 @@ const TOTAL_STAGES = 5;
 const FINAL_STAGE = TOTAL_STAGES - 1;
 
 const STAGE_TITLES: Record<number, string> = {
-  0: 'Welcome to 3phor',
+  0: 'Welcome to Thresan: Skyflag',
   1: 'How to win',
   2: 'Try your first activation',
   3: 'Now your second activation',

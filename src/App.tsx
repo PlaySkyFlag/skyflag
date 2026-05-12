@@ -20,7 +20,7 @@ import {
   teardownLobbyChannel,
 } from './game/lobbyChannel';
 import { loadProfile, type Profile } from './game/profile';
-import { recordGame, totalGameCount, type StatsMode } from './game/stats';
+import { recordGame, syncGameToServer, syncStatsForUser, totalGameCount, type StatsMode } from './game/stats';
 import {
   applyThemeToCssVars,
   loadThemeId,
@@ -209,7 +209,7 @@ function computeThreats(state: GameState): Record<Layer, ThreatCell[]> {
 // square in its legal-move set. Returns the flag coord per layer so
 // the Board renderer knows exactly where to draw the alert overlay.
 //
-// This is the highest-priority defensive signal in 3phor — a Captain
+// This is the highest-priority defensive signal in Skyflag — a Captain
 // adjacent to your flag is closer to losing the game than a Soldier
 // hanging in capture range.
 function computeFlagThreats(state: GameState): Record<Layer, { row: number; col: number } | null> {
@@ -387,6 +387,16 @@ export default function App() {
     };
   }, [authUser]);
 
+  // Stats sync — on every authUser change (sign-in, anon→email upgrade,
+  // refresh-token recovery), push any local-only games to the server
+  // and pull the user's full server history back into the local cache.
+  // Idempotent and best-effort; failures leave localStorage as the
+  // authoritative view for this device.
+  useEffect(() => {
+    if (!authUser) return;
+    void syncStatsForUser(authUser.id);
+  }, [authUser]);
+
   const [statsOpen, setStatsOpen] = useState(false);
   const [themeId, setThemeId] = useState<ThemeId>(() => loadThemeId());
   // Resolve the effective theme — falls back to the default if the
@@ -469,16 +479,24 @@ export default function App() {
           | 'turn-limit'
           | 'stalemate'
           | 'agreement' = state.status.reason;
-        recordGame({
+        const written = recordGame({
           when: new Date().toISOString(),
           mode,
           result,
           reason,
           turns: state.turnNumber,
         });
+        // Fire-and-forget server write. If the user has any Supabase
+        // session (anonymous or email), the row goes to personal_games
+        // and survives device switches / cache clears. On failure
+        // (network, RLS), the row stays in localStorage and the next
+        // sign-in's syncStatsForUser picks it up via backfill.
+        if (authUser) {
+          void syncGameToServer(written, authUser.id);
+        }
       }
     }
-  }, [state.status, state.turnNumber, aiPlayer, room]);
+  }, [state.status, state.turnNumber, aiPlayer, room, authUser]);
 
   // Tutorial is shown once for first-time users — gated by a localStorage
   // flag. The "Tutorial" button in the help row re-opens it any time.
@@ -1265,11 +1283,11 @@ export default function App() {
       )}
       <header className="app-header">
         <img
-          src="/3phor-mark.png"
-          alt="3phor"
+          src="/skyflag-banner.png"
+          alt="Thresan: Skyflag"
           className="app-logo"
-          width={120}
-          height={120}
+          width={560}
+          height={315}
         />
         <div className="app-header-actions">
           {/* Live "who's available" pill — sticky and always visible
@@ -1683,16 +1701,20 @@ export default function App() {
         onClose={() => setAccountOpen(false)}
         onProfileChange={setProfile}
       />
-      <StatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
+      <StatsModal
+        open={statsOpen}
+        onClose={() => setStatsOpen(false)}
+        userId={authUser?.id ?? null}
+      />
       <footer className="app-footer">
         {/* Handwritten signature-style tagline above the legal
             line — quiet brand presence on every page of /play
             without crowding the HUD. */}
-        <p className="app-footer-rally tagline-script">3phor the win!</p>
-        <p>© 2026 Limnology Research Corp. · 3phor™ Kaleo Edition.</p>
+        <p className="app-footer-rally tagline-script">Three worlds. One proof.</p>
+        <p>© 2026 Limnology Research Corp. · Thresan: Skyflag™ — Kaleo Edition.</p>
         <p>
           Test feedback:{' '}
-          <a href="mailto:njatel@limnology.ca?subject=3phor%20Test%20Feedback">
+          <a href="mailto:njatel@limnology.ca?subject=Thresan%3A%20Skyflag%20Test%20Feedback">
             njatel@limnology.ca
           </a>
         </p>

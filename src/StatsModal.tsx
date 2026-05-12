@@ -1,9 +1,21 @@
 import { useEffect, useState } from 'react';
-import { clearStats, modeLabel, summarize, type StatsSummary } from './game/stats';
+import {
+  clearStats,
+  clearStatsEverywhere,
+  modeLabel,
+  summarize,
+  syncStatsForUser,
+  type StatsSummary,
+} from './game/stats';
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  // Logged-in user id (or null for guests). When present, "Clear stats"
+  // wipes the server rows in addition to localStorage, and opening the
+  // modal triggers a fresh server hydrate so the summary reflects any
+  // games played on other devices.
+  userId: string | null;
 };
 
 const REASON_GLYPH: Record<
@@ -19,12 +31,21 @@ const REASON_GLYPH: Record<
   agreement: '🤝',
 };
 
-export default function StatsModal({ open, onClose }: Props) {
+export default function StatsModal({ open, onClose, userId }: Props) {
   const [stats, setStats] = useState<StatsSummary | null>(null);
 
   useEffect(() => {
-    if (open) setStats(summarize());
-  }, [open]);
+    if (!open) return;
+    // Show whatever's in the local cache immediately so the modal
+    // doesn't flash empty while the server round-trip runs.
+    setStats(summarize());
+    // Then, if signed in, refresh from the server in case games were
+    // played on another device since this device last synced. The
+    // refresh re-runs summarize once it lands.
+    if (userId) {
+      void syncStatsForUser(userId).then(() => setStats(summarize()));
+    }
+  }, [open, userId]);
 
   if (!open || !stats) return null;
 
@@ -135,11 +156,17 @@ export default function StatsModal({ open, onClose }: Props) {
               <button
                 type="button"
                 className="end-game-btn end-game-btn--subtle"
-                onClick={() => {
-                  if (confirm('Clear all locally-stored game stats? This cannot be undone.')) {
+                onClick={async () => {
+                  const msg = userId
+                    ? 'Clear all your game stats on every device? This cannot be undone.'
+                    : 'Clear all locally-stored game stats? This cannot be undone.';
+                  if (!confirm(msg)) return;
+                  if (userId) {
+                    await clearStatsEverywhere(userId);
+                  } else {
                     clearStats();
-                    setStats(summarize());
                   }
+                  setStats(summarize());
                 }}
               >
                 Clear stats

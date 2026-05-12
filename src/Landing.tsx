@@ -1,5 +1,5 @@
 // Landing page. Marketing surface for new visitors —
-// what 3phor is, why to play, where to start. The game itself lives
+// what Skyflag is, why to play, where to start. The game itself lives
 // at /play; this page links there.
 //
 // Design notes:
@@ -114,13 +114,13 @@ function Header() {
   return (
     <header className="landing-header">
       <div className="landing-header-inner">
-        <a href="/" className="landing-logo" aria-label="3phor — home">
+        <a href="/" className="landing-logo" aria-label="Skyflag — home">
           <img
             src="/3phor-mark.png"
             alt=""
             className="landing-logo-img"
           />
-          <span className="landing-logo-text">3phor</span>
+          <span className="landing-logo-text">Skyflag</span>
         </a>
         <nav className="landing-nav">
           <a href="#features" className="landing-nav-link">Features</a>
@@ -139,13 +139,13 @@ function Hero() {
       <div className="landing-hero-inner">
         <img
           src="/3phor-logo.png"
-          alt="3phor"
+          alt="Thresan: Skyflag"
           className="landing-hero-logo"
         />
-        <h1 className="landing-hero-title">3phor</h1>
-        <p className="landing-hero-tagline tagline-script">3phor the win!</p>
+        <h1 className="landing-hero-title">Thresan: Skyflag</h1>
+        <p className="landing-hero-tagline tagline-script">Three worlds. One proof.</p>
         <p className="landing-hero-subtitle">
-          Where strategists gather. Three boards. Four Lifts. One Nexus.
+          Kaleo Edition. Where strategists gather. Three boards. Four Lifts.
         </p>
         {/* Numeric hero strip — leans on the three-board hook the
             rest of the design is built around. Pure typography, no
@@ -156,11 +156,11 @@ function Hero() {
           <li><strong>2</strong> ways to win</li>
         </ul>
         <p className="landing-hero-pitch">
-          A turn-based strategy game from the <em>Caelum Chronicles</em>{' '}
-          universe. Set in Kaleo, the three-layer arcology where the Aetheri
-          lifted what remained of civilization. Lead the Grey Ravens or the
-          White Stags. Neutralize the opposing clan's three claim-seals, or
-          guide your Captain to the Caelum Nexus.
+          A turn-based strategy game from the <em>Thresan</em> universe.
+          Set in Kaleo, the three-layer arcology where the Aetheri lifted
+          what remained of civilization. Lead the Grey Ravens or the
+          White Stags. Neutralize the opposing clan's three claim-seals,
+          or guide your Captain to the Caelum Nexus.
         </p>
         <div className="landing-hero-actions">
           <a href="/play" className="landing-cta-button landing-cta-primary">
@@ -183,7 +183,7 @@ function FeaturesSection() {
   return (
     <section id="features" className="landing-section">
       <div className="landing-section-inner">
-        <h2 className="landing-section-title">What makes 3phor different</h2>
+        <h2 className="landing-section-title">What makes Skyflag different</h2>
         <div className="landing-features-grid">
           <Feature
             icon="◇◆◇"
@@ -298,7 +298,7 @@ function PricingSection() {
           </div>
           <div className="landing-pricing-tier landing-pricing-featured">
             <div className="landing-tier-badge">Plus</div>
-            <div className="landing-tier-name">3phor Plus</div>
+            <div className="landing-tier-name">Skyflag Plus</div>
             <div className="landing-tier-price">
               <span className="landing-tier-price-num">$4.99</span>
               <span className="landing-tier-price-period">/ month</span>
@@ -337,8 +337,8 @@ function DemoSection() {
           Every match plays out simultaneously across three 6×6 boards —
           Ground, Sky, Space. Pieces lift between layers, threats compound
           vertically, and a position that's safe on one board can be one
-          activation away from collapse on the next. <strong>3phor the
-          win!</strong>
+          activation away from collapse on the next.{' '}
+          <strong>Three worlds. One proof.</strong>
         </p>
 
         {/* Optional asset slot — gameplay GIF or short MP4. Drop a file
@@ -395,7 +395,7 @@ function DemoAsset() {
       <img
         className="landing-demo-gif"
         src="/demo.gif"
-        alt="3phor gameplay demo"
+        alt="Skyflag gameplay demo"
         style={{ display: 'none' }}
         onError={(e) => {
           // No demo.gif either — hide entirely, leaving just the live
@@ -412,8 +412,8 @@ function Footer() {
     <footer className="landing-footer">
       <div className="landing-footer-inner">
         <div className="landing-footer-brand">
-          <strong>3phor</strong>
-          <p className="landing-footer-tagline">3phor the win!</p>
+          <strong>Thresan: Skyflag</strong>
+          <p className="landing-footer-tagline">Three worlds. One proof.</p>
           <p>By Limnology Research Corp.</p>
         </div>
         <div className="landing-footer-links">

@@ -1,6 +1,8 @@
-# 3phor
+# Thresan: Skyflag
 
 A two-player tactical race played across a three-layer arcology — Ground (Terran), Sky (Meridian), and Space (Empyrean). Each player commands four pieces (Captain, Soldier, Rover, Pilot) and must capture the opponent's three claim-flags, then land their Captain on the Caelum Nexus at Space(3,3) to win.
+
+Brand: **Thresan** is the universe (the threefold proof of the Aetheri Law of Three). **Skyflag** is the playable contest within that world. The **Kaleo Edition** is the first setting.
 
 This repository contains the **web prototype** — a React + TypeScript + Vite implementation of the v19.1 *Cross-Board* rulebook, intended to wrap into a Capacitor-based iOS app once Phase 1 (single-player and hot-seat) is solid.
 

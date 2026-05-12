@@ -1,4 +1,4 @@
-// 3phor service worker — installed lazily on first push-permission grant.
+// Skyflag service worker — installed lazily on first push-permission grant.
 // Handles incoming Web Push events and shows a system notification. Tapping
 // the notification focuses an existing tab (or opens a new one).
 
@@ -13,7 +13,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('push', (event) => {
-  let payload = { title: '3phor', body: 'It’s your move.', url: '/' };
+  let payload = { title: 'Skyflag', body: 'It’s your move.', url: '/' };
   if (event.data) {
     try {
       payload = { ...payload, ...event.data.json() };
@@ -26,7 +26,7 @@ self.addEventListener('push', (event) => {
       body: payload.body,
       icon: '/3phor-mark.png',
       badge: '/3phor-mark.png',
-      tag: '3phor-turn',
+      tag: 'skyflag-turn',
       // Replace any existing notification for the same room rather than
       // stacking up — the player only needs to know it's their turn.
       renotify: true,

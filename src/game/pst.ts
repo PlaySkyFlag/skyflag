@@ -4,7 +4,7 @@
 // table lookup adds strategic intuition that the search would otherwise have
 // to discover the hard way (by burning depth on positional shuffles).
 //
-// 3phor's existing evaluation already handles material, threats, and the
+// Skyflag's existing evaluation already handles material, threats, and the
 // distance to the next target flag. PSTs add the things that distance-to-
 // target doesn't capture: center control, lift proximity, avoiding back
 // ranks, and the layer-specific value of the Nexus square.

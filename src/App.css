@@ -88,7 +88,7 @@
   animation: presence-pulse 2s ease-in-out infinite;
 }
 .app-header-presence-friends {
-  color: #ffd884;
+  color: #C2A46B;
   font-weight: 700;
 }
 @keyframes presence-pulse {
@@ -103,7 +103,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   padding: 8px 16px;
-  background: #0a1224;
+  background: #111826;
   border: 1px solid rgba(168, 184, 216, 0.45);
   color: #ffffff;
 }
@@ -168,7 +168,7 @@
 
 .stats-w   { color: #6fff8a; }
 .stats-l   { color: #ff8a8a; }
-.stats-d   { color: #ffd884; }
+.stats-d   { color: #C2A46B; }
 .stats-sep { opacity: 0.45; padding: 0 4px; }
 
 .stats-subtitle {
@@ -235,7 +235,7 @@
 
 .stats-result-win  .stats-recent-result { background: rgba(111, 255, 138, 0.20); color: #6fff8a; }
 .stats-result-loss .stats-recent-result { background: rgba(255, 138, 138, 0.20); color: #ff8a8a; }
-.stats-result-draw .stats-recent-result { background: rgba(255, 216, 132, 0.20); color: #ffd884; }
+.stats-result-draw .stats-recent-result { background: rgba(194, 164, 107, 0.20); color: #C2A46B; }
 
 .stats-recent-meta,
 .stats-recent-when {
@@ -245,7 +245,11 @@
 }
 
 .app-logo {
-  width: clamp(96px, 14vw, 140px);
+  /* Horizontal banner lockup (sigil + THRESAN / SKYFLAG wordmark).
+     Source is ~16:9, so the height is determined by width / aspect.
+     Width caps at 520px on big screens and shrinks to 280px on
+     phones — the wordmark stays legible at that size. */
+  width: clamp(280px, 50vw, 520px);
   height: auto;
   display: block;
   filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
@@ -273,9 +277,9 @@
 .app-footer-rally {
   margin: 0 0 6px;
   font-size: 1.6rem;
-  color: #ffd884;
+  color: #C2A46B;
   opacity: 0.92;
-  text-shadow: 0 1px 10px rgba(255, 216, 132, 0.25);
+  text-shadow: 0 1px 10px rgba(194, 164, 107, 0.25);
 }
 
 .app-footer p {
@@ -283,9 +287,9 @@
 }
 
 .app-footer a {
-  color: #ffd884;
+  color: #C2A46B;
   text-decoration: none;
-  border-bottom: 1px solid rgba(255, 216, 132, 0.55);
+  border-bottom: 1px solid rgba(194, 164, 107, 0.55);
   font-weight: 600;
 }
 
@@ -316,7 +320,7 @@
   gap: 12px;
   padding: 10px 20px;
   border-radius: 16px;
-  background: #0a1224;
+  background: #111826;
   border: 1px solid rgba(168, 184, 216, 0.35);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
   color: #ffffff;
@@ -568,7 +572,7 @@
 }
 
 .help-rulebook a {
-  color: #ffd884;
+  color: #C2A46B;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -809,7 +813,7 @@
   text-transform: none;
   padding: 4px 14px;
   border-radius: 999px;
-  background: #0a1224;
+  background: #111826;
   border: 1px solid rgba(168, 184, 216, 0.45);
   color: #ffffff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
@@ -820,7 +824,7 @@
    "X activations left" pops next to inactive trays. */
 .tray:not(.tray-inactive) .tray-note {
   background: #b88c1e;
-  border-color: #ffd884;
+  border-color: #C2A46B;
   color: #ffffff;
 }
 
@@ -842,9 +846,9 @@
 }
 
 .tray-clock-active {
-  background: rgba(255, 216, 132, 0.20);
-  border-color: rgba(255, 216, 132, 0.65);
-  color: #ffd884;
+  background: rgba(194, 164, 107, 0.20);
+  border-color: rgba(194, 164, 107, 0.65);
+  color: #C2A46B;
 }
 
 .tray-clock-low {
@@ -900,9 +904,9 @@
 
 .tray-flag-slot-taken {
   border-style: solid;
-  border-color: rgba(255, 216, 132, 0.85);
-  background: rgba(255, 216, 132, 0.18);
-  color: #ffd884;
+  border-color: rgba(194, 164, 107, 0.85);
+  background: rgba(194, 164, 107, 0.18);
+  color: #C2A46B;
 }
 
 .tray-flag-layer {
@@ -1041,7 +1045,7 @@ button.tray-piece:hover {
 }
 
 .board-cell:active {
-  fill: rgba(255, 216, 132, 0.45) !important;
+  fill: rgba(194, 164, 107, 0.45) !important;
 }
 
 /* Multiplayer lobby controls — sit inside the Multiplayer disclosure
@@ -1122,7 +1126,7 @@ button.tray-piece:hover {
 .mp-notify-pref input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #ffd884;
+  accent-color: #C2A46B;
 }
 
 /* Layer-flow overlay: SVG positioned to cover the entire .board-stack so
@@ -1161,7 +1165,7 @@ button.tray-piece:hover {
 }
 
 .end-game-card {
-  background: #0a1224;
+  background: #111826;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   padding: 32px 44px 26px;
@@ -1202,8 +1206,8 @@ button.tray-piece:hover {
 .end-game-rally {
   margin: 14px 0 4px;
   font-size: 2.2rem;
-  color: #ffd884;
-  text-shadow: 0 2px 16px rgba(255, 216, 132, 0.45);
+  color: #C2A46B;
+  text-shadow: 0 2px 16px rgba(194, 164, 107, 0.45);
 }
 
 .end-game-actions {
@@ -1255,7 +1259,7 @@ button.tray-piece:hover {
   right: max(16px, env(safe-area-inset-right));
   bottom: max(16px, env(safe-area-inset-bottom));
   width: min(340px, calc(100vw - 32px));
-  background: #0a1224;
+  background: #111826;
   border: 1px solid rgba(245, 195, 67, 0.55);
   border-radius: 14px;
   padding: 14px 16px 14px;
@@ -1283,7 +1287,7 @@ button.tray-piece:hover {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ffd884;
+  color: #C2A46B;
   font-weight: 700;
 }
 
@@ -1342,7 +1346,7 @@ button.tray-piece:hover {
 .tut-glyph {
   display: inline-block;
   font-size: 1em;
-  color: #ffd884;
+  color: #C2A46B;
   font-weight: 700;
 }
 
@@ -1366,7 +1370,7 @@ button.tray-piece:hover {
   left: 50%;
   transform: translateX(-50%);
   background: rgba(8, 14, 28, 0.94);
-  border: 1px solid rgba(255, 216, 132, 0.55);
+  border: 1px solid rgba(194, 164, 107, 0.55);
   color: #ffffff;
   padding: 10px 18px;
   border-radius: 999px;
@@ -1402,7 +1406,7 @@ button.tray-piece:hover {
 }
 
 .account-card {
-  background: #0a1224;
+  background: #111826;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 14px;
   padding: 22px 26px 20px;
@@ -1462,7 +1466,7 @@ button.tray-piece:hover {
 }
 
 .account-required {
-  color: #ffd884;
+  color: #C2A46B;
 }
 
 .account-input {
@@ -1479,8 +1483,31 @@ button.tray-piece:hover {
 
 .account-input:focus {
   outline: none;
-  border-color: #ffd884;
-  box-shadow: 0 0 0 2px rgba(255, 216, 132, 0.25);
+  border-color: #C2A46B;
+  box-shadow: 0 0 0 2px rgba(194, 164, 107, 0.25);
+}
+
+/* OTP code input — wider, taller, monospaced and letter-spaced so the
+   6–8 digit sign-in code is comfortable to read AND to type. Pairs
+   with .account-input (variant, not replacement) so border / focus
+   behaviour stays consistent with other form inputs. */
+.account-otp-input {
+  font-family: 'SF Mono', Menlo, Consolas, 'Courier New', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-align: center;
+  padding: 14px 16px;
+  /* Slight extra width via min-height keeps the box feeling like a
+     dedicated code field, not just a text input. */
+  min-height: 56px;
+}
+
+.account-otp-input::placeholder {
+  /* Faded so the dots read as a hint, not as content the user has to
+     clear. Letter-spacing inherited from the rule above. */
+  color: rgba(255, 255, 255, 0.22);
+  font-weight: 400;
 }
 
 .account-row {
@@ -1546,7 +1573,7 @@ button.tray-piece:hover {
 
 .account-rating-cell {
   background: #050a16;
-  border: 1px solid rgba(255, 216, 132, 0.35);
+  border: 1px solid rgba(194, 164, 107, 0.35);
   border-radius: 10px;
   padding: 10px 8px;
   text-align: center;
@@ -1555,7 +1582,7 @@ button.tray-piece:hover {
 .account-rating-num {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #ffd884;
+  color: #C2A46B;
   letter-spacing: 0.02em;
 }
 
@@ -1642,7 +1669,7 @@ button.tray-piece:hover {
 .account-text-btn {
   background: transparent;
   border: none;
-  color: #ffd884;
+  color: #C2A46B;
   cursor: pointer;
   padding: 4px 6px;
   font: inherit;
@@ -1749,13 +1776,13 @@ button.tray-piece:hover {
   }
 }
 
-/* 3phor Plus subscription panel — gold-accented because this is the
+/* Skyflag Plus subscription panel — gold-accented because this is the
    primary monetization surface in the modal. Active state (user has
    the entitlement) shows a calmer confirmation; inactive state is the
    sales pitch with the subscribe button. */
 .account-plus-panel {
-  background: linear-gradient(135deg, rgba(255, 216, 132, 0.16), rgba(255, 216, 132, 0.04));
-  border: 1px solid rgba(255, 216, 132, 0.55);
+  background: linear-gradient(135deg, rgba(194, 164, 107, 0.16), rgba(194, 164, 107, 0.04));
+  border: 1px solid rgba(194, 164, 107, 0.55);
   border-radius: 10px;
   padding: 14px 16px;
   margin: 10px 0 14px;
@@ -1782,7 +1809,7 @@ button.tray-piece:hover {
 .account-plus-title {
   display: block;
   font-size: 1rem;
-  color: #ffd884;
+  color: #C2A46B;
   margin-bottom: 4px;
   letter-spacing: 0.02em;
 }
@@ -1802,8 +1829,8 @@ button.tray-piece:hover {
 /* Upgrade panel — shown to signed-in guests, prompts them to link an
    email so their rating/profile is portable across devices. */
 .account-upgrade-panel {
-  background: rgba(255, 216, 132, 0.08);
-  border: 1px solid rgba(255, 216, 132, 0.4);
+  background: rgba(194, 164, 107, 0.08);
+  border: 1px solid rgba(194, 164, 107, 0.4);
   border-radius: 10px;
   padding: 12px 14px;
   margin: 10px 0 14px;
@@ -1812,7 +1839,7 @@ button.tray-piece:hover {
 .account-upgrade-title {
   display: block;
   font-size: 0.92rem;
-  color: #ffd884;
+  color: #C2A46B;
   margin-bottom: 4px;
 }
 
@@ -1835,7 +1862,7 @@ button.tray-piece:hover {
 /* Post-send waiting state — slightly different chrome so it reads as
    a status panel rather than a CTA. */
 .account-upgrade-sent {
-  background: rgba(255, 216, 132, 0.06);
+  background: rgba(194, 164, 107, 0.06);
 }
 
 /* The load-bearing "click in this browser" warning. High-contrast
@@ -1853,7 +1880,17 @@ button.tray-piece:hover {
   border-radius: 6px;
 }
 .account-upgrade-warning strong {
-  color: #ffd884;
+  color: #C2A46B;
+}
+
+/* Hint shown under the recovery-code action buttons when the user
+   hasn't yet downloaded or copied the codes. Same family as the
+   amber warning above but muted — this is a nudge, not a klaxon. */
+.account-recovery-hint {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  color: rgba(230, 226, 216, 0.65);
+  font-style: italic;
 }
 
 /* Lobby — embedded in the Multiplayer panel above the code-based create
@@ -1888,7 +1925,7 @@ button.tray-piece:hover {
 .lobby-toggle input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #ffd884;
+  accent-color: #C2A46B;
 }
 
 .lobby-count {
@@ -1939,8 +1976,8 @@ button.tray-piece:hover {
   flex-wrap: wrap;
   margin: 4px 0 8px;
   padding: 8px 10px;
-  background: rgba(255, 216, 132, 0.06);
-  border: 1px solid rgba(255, 216, 132, 0.20);
+  background: rgba(194, 164, 107, 0.06);
+  border: 1px solid rgba(194, 164, 107, 0.20);
   border-radius: 8px;
 }
 
@@ -1999,9 +2036,9 @@ button.tray-piece:hover {
 }
 
 .tournament-fee {
-  background: rgba(255, 216, 132, 0.15);
-  color: #ffd884;
-  border: 1px solid rgba(255, 216, 132, 0.4);
+  background: rgba(194, 164, 107, 0.15);
+  color: #C2A46B;
+  border: 1px solid rgba(194, 164, 107, 0.4);
 }
 
 .tournament-meta {
@@ -2034,7 +2071,7 @@ button.tray-piece:hover {
 }
 
 .tournament-self td {
-  background: rgba(255, 216, 132, 0.10);
+  background: rgba(194, 164, 107, 0.10);
   font-weight: 700;
 }
 
@@ -2042,7 +2079,7 @@ button.tray-piece:hover {
    start → current readout below. Locked state shows a teaser CTA. */
 .rating-history {
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 216, 132, 0.20);
+  border: 1px solid rgba(194, 164, 107, 0.20);
   border-radius: 10px;
   padding: 10px 12px;
   margin: 10px 0 14px;
@@ -2058,7 +2095,7 @@ button.tray-piece:hover {
   font-size: 0.9rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #ffd884;
+  color: #C2A46B;
 }
 .rating-history-delta {
   font-size: 0.78rem;
@@ -2087,7 +2124,7 @@ button.tray-piece:hover {
   opacity: 0.85;
 }
 .rating-history-footer strong {
-  color: #ffd884;
+  color: #C2A46B;
   font-size: 1.0rem;
 }
 /* Locked Plus-teaser variant — dimmer + a Plus pill in the header. */
@@ -2095,7 +2132,7 @@ button.tray-piece:hover {
   opacity: 0.85;
 }
 .rating-history-plus {
-  background: #ffd884;
+  background: #C2A46B;
   color: #1a1004;
   font-size: 0.65rem;
   font-weight: 800;
@@ -2119,8 +2156,8 @@ button.tray-piece:hover {
   color: inherit;
 }
 .spectator-row:hover {
-  background: rgba(255, 216, 132, 0.08);
-  border-color: rgba(255, 216, 132, 0.35);
+  background: rgba(194, 164, 107, 0.08);
+  border-color: rgba(194, 164, 107, 0.35);
 }
 .spectator-players {
   display: flex;
@@ -2154,7 +2191,7 @@ button.tray-piece:hover {
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #ffd884;
+  color: #C2A46B;
   margin: 0;
 }
 .watch-app .watch-sub {
@@ -2181,8 +2218,8 @@ button.tray-piece:hover {
   min-width: 180px;
 }
 .watch-player-active {
-  border-color: rgba(255, 216, 132, 0.55);
-  background: rgba(255, 216, 132, 0.08);
+  border-color: rgba(194, 164, 107, 0.55);
+  background: rgba(194, 164, 107, 0.08);
 }
 .watch-player strong {
   color: #f0f4f8;
@@ -2196,7 +2233,7 @@ button.tray-piece:hover {
   font-family: ui-monospace, SFMono-Regular, monospace;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
-  color: #ffd884 !important;
+  color: #C2A46B !important;
   opacity: 1 !important;
   font-size: 0.95rem !important;
 }
@@ -2215,8 +2252,8 @@ button.tray-piece:hover {
 /* Plus badge — small gold star shown next to nicknames of paid users.
    Two sizes: inline (default, matches text) and large (profile header). */
 .plus-badge {
-  color: #ffd884;
-  text-shadow: 0 0 6px rgba(255, 216, 132, 0.6);
+  color: #C2A46B;
+  text-shadow: 0 0 6px rgba(194, 164, 107, 0.6);
   margin-left: 4px;
   vertical-align: baseline;
   cursor: help;
@@ -2245,8 +2282,8 @@ button.tray-piece:hover {
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
-  border: 2px solid rgba(255, 216, 132, 0.45);
-  background: #0a1224;
+  border: 2px solid rgba(194, 164, 107, 0.45);
+  background: #111826;
   display: block;
 }
 .account-avatar-circle img {
@@ -2272,7 +2309,7 @@ button.tray-piece:hover {
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.55);
-  color: #ffd884;
+  color: #C2A46B;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -2309,7 +2346,7 @@ button.tray-piece:hover {
   font-family: ui-monospace, SFMono-Regular, monospace;
   font-size: 0.92rem;
   letter-spacing: 0.02em;
-  color: #ffd884;
+  color: #C2A46B;
 }
 
 /* "Locked out?" link + form on the signed-out modal. */
@@ -2322,7 +2359,7 @@ button.tray-piece:hover {
 .account-link-button {
   background: none;
   border: none;
-  color: #ffd884;
+  color: #C2A46B;
   font-size: inherit;
   cursor: pointer;
   padding: 0;
@@ -2338,7 +2375,7 @@ button.tray-piece:hover {
   gap: 8px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 216, 132, 0.30);
+  border: 1px solid rgba(194, 164, 107, 0.30);
   border-radius: 10px;
 }
 
@@ -2422,7 +2459,7 @@ button.tray-piece:hover {
   opacity: 0.7;
 }
 .session-current {
-  color: #ffd884;
+  color: #C2A46B;
   font-weight: 600;
 }
 
@@ -2473,8 +2510,8 @@ button.tray-piece:hover {
 
 .review-progress {
   padding: 10px 14px;
-  background: rgba(255, 216, 132, 0.06);
-  border: 1px solid rgba(255, 216, 132, 0.20);
+  background: rgba(194, 164, 107, 0.06);
+  border: 1px solid rgba(194, 164, 107, 0.20);
   border-radius: 10px;
   font-size: 0.92rem;
 }
@@ -2487,7 +2524,7 @@ button.tray-piece:hover {
 }
 .review-progress-fill {
   height: 100%;
-  background: #ffd884;
+  background: #C2A46B;
   transition: width 120ms ease-out;
 }
 
@@ -2515,7 +2552,7 @@ button.tray-piece:hover {
   pointer-events: none;
 }
 .eval-graph-axis-top { color: var(--slate-fill, #a8b8d8); }
-.eval-graph-axis-bot { color: var(--ivory-fill, #ffd884); }
+.eval-graph-axis-bot { color: var(--ivory-fill, #C2A46B); }
 .eval-graph-svg {
   display: block;
   width: 100%;
@@ -2573,7 +2610,7 @@ button.tray-piece:hover {
 .review-slider {
   flex: 1;
   min-width: 160px;
-  accent-color: #ffd884;
+  accent-color: #C2A46B;
 }
 .review-ply-counter {
   font-size: 0.85rem;
@@ -2615,8 +2652,8 @@ button.tray-piece:hover {
   background: rgba(255, 255, 255, 0.04);
 }
 .review-move-row-active {
-  background: rgba(255, 216, 132, 0.10);
-  outline: 1px solid rgba(255, 216, 132, 0.30);
+  background: rgba(194, 164, 107, 0.10);
+  outline: 1px solid rgba(194, 164, 107, 0.30);
 }
 .review-move-pip {
   width: 10px;
@@ -2656,7 +2693,7 @@ button.tray-piece:hover {
   font-size: 0.85rem;
   line-height: 1.5;
   margin: 0;
-  color: #ffd884;
+  color: #C2A46B;
 }
 .account-delete-warning strong {
   color: #ff8a8a;
@@ -2678,8 +2715,8 @@ button.tray-piece:hover {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: linear-gradient(90deg, rgba(255, 216, 132, 0.16), rgba(255, 216, 132, 0.10));
-  border-bottom: 1px solid rgba(255, 216, 132, 0.35);
+  background: linear-gradient(90deg, rgba(194, 164, 107, 0.16), rgba(194, 164, 107, 0.10));
+  border-bottom: 1px solid rgba(194, 164, 107, 0.35);
   color: #fff5d6;
   font-size: 0.9rem;
 }
@@ -2695,7 +2732,7 @@ button.tray-piece:hover {
   font-family: inherit;
 }
 .save-banner-message strong {
-  color: #ffd884;
+  color: #C2A46B;
   font-weight: 700;
 }
 .save-banner-message:hover {
@@ -2703,8 +2740,8 @@ button.tray-piece:hover {
 }
 .save-banner-dismiss {
   background: none;
-  border: 1px solid rgba(255, 216, 132, 0.40);
-  color: #ffd884;
+  border: 1px solid rgba(194, 164, 107, 0.40);
+  color: #C2A46B;
   width: 28px;
   height: 28px;
   border-radius: 6px;
@@ -2713,7 +2750,7 @@ button.tray-piece:hover {
   cursor: pointer;
 }
 .save-banner-dismiss:hover {
-  background: rgba(255, 216, 132, 0.16);
+  background: rgba(194, 164, 107, 0.16);
 }
 
 /* "Yours" badge on tournaments owned by the signed-in user — same gold
@@ -2726,8 +2763,8 @@ button.tray-piece:hover {
   padding: 2px 8px;
   border-radius: 10px;
   margin-left: 6px;
-  background: rgba(255, 216, 132, 0.18);
-  color: #ffd884;
+  background: rgba(194, 164, 107, 0.18);
+  color: #C2A46B;
 }
 
 /* Create-tournament row sits above the list. The form expands inline
@@ -2777,8 +2814,8 @@ button.tray-piece:hover {
 }
 
 .friends-input:focus {
-  outline: 2px solid rgba(255, 216, 132, 0.5);
-  border-color: rgba(255, 216, 132, 0.6);
+  outline: 2px solid rgba(194, 164, 107, 0.5);
+  border-color: rgba(194, 164, 107, 0.6);
 }
 
 .friends-section-title {
@@ -2832,9 +2869,9 @@ button.tray-piece:hover {
   text-transform: uppercase;
   padding: 2px 6px;
   border-radius: 999px;
-  background: rgba(255, 216, 132, 0.12);
-  color: #ffd884;
-  border: 1px solid rgba(255, 216, 132, 0.3);
+  background: rgba(194, 164, 107, 0.12);
+  color: #C2A46B;
+  border: 1px solid rgba(194, 164, 107, 0.3);
 }
 
 .friends-actions {
@@ -2917,7 +2954,7 @@ button.tray-piece:hover {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ffd884;
+  color: #C2A46B;
   font-weight: 700;
 }
 .game-toolbar-clock-select {
@@ -2931,7 +2968,7 @@ button.tray-piece:hover {
   background: rgba(255, 255, 255, 0.10);
   border-color: rgba(255, 255, 255, 0.28);
   opacity: 1;
-  color: #f5f7fb;
+  color: #E6E2D8;
 }
 
 .game-toolbar .hud-btn:hover:not(:disabled) {
@@ -2947,14 +2984,14 @@ button.tray-piece:hover {
 /* The first un-spaced button in the bar gets primary emphasis (it's
    currently New game, anchored on the right). */
 .game-toolbar .hud-btn:not(.hud-btn-subtle):not(.hud-btn-warn) {
-  background: rgba(255, 216, 132, 0.16);
-  border-color: rgba(255, 216, 132, 0.55);
-  color: #ffd884;
+  background: rgba(194, 164, 107, 0.16);
+  border-color: rgba(194, 164, 107, 0.55);
+  color: #C2A46B;
 }
 
 .game-toolbar .hud-btn:not(.hud-btn-subtle):not(.hud-btn-warn):hover {
-  background: rgba(255, 216, 132, 0.26);
-  border-color: rgba(255, 216, 132, 0.8);
+  background: rgba(194, 164, 107, 0.26);
+  border-color: rgba(194, 164, 107, 0.8);
 }
 
 .game-toolbar-spacer {
@@ -3010,7 +3047,7 @@ button.tray-piece:hover {
 .settings-label {
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: #f5f7fb;
+  color: #E6E2D8;
 }
 
 /* Selects inside the popover get a darker fill so the white text stays
@@ -3072,8 +3109,8 @@ button.tray-piece:hover {
 
 .chat-msg-mine {
   align-self: flex-end;
-  background: rgba(255, 216, 132, 0.16);
-  border-color: rgba(255, 216, 132, 0.55);
+  background: rgba(194, 164, 107, 0.16);
+  border-color: rgba(194, 164, 107, 0.55);
 }
 
 .chat-msg-name {
@@ -3105,8 +3142,8 @@ button.tray-piece:hover {
 }
 
 .chat-input:focus {
-  outline: 2px solid rgba(255, 216, 132, 0.5);
-  border-color: rgba(255, 216, 132, 0.6);
+  outline: 2px solid rgba(194, 164, 107, 0.5);
+  border-color: rgba(194, 164, 107, 0.6);
 }
 
 .chat-input:disabled {
@@ -3135,11 +3172,11 @@ button.tray-piece:hover {
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   background: rgba(20, 30, 52, 0.96);
-  border: 1px solid rgba(255, 216, 132, 0.45);
+  border: 1px solid rgba(194, 164, 107, 0.45);
   border-radius: 14px;
   padding: 18px 20px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
-  color: #f5f7fb;
+  color: #E6E2D8;
 }
 
 /* Briefing phase — shown before the user begins the puzzle. Gives them
@@ -3159,8 +3196,8 @@ button.tray-piece:hover {
 }
 
 .daily-briefing-tips {
-  background: rgba(255, 216, 132, 0.06);
-  border: 1px solid rgba(255, 216, 132, 0.18);
+  background: rgba(194, 164, 107, 0.06);
+  border: 1px solid rgba(194, 164, 107, 0.18);
   border-radius: 10px;
   padding: 12px 14px;
 }
@@ -3171,7 +3208,7 @@ button.tray-piece:hover {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #ffd884;
+  color: #C2A46B;
   opacity: 0.85;
 }
 
@@ -3213,7 +3250,7 @@ button.tray-piece:hover {
 .daily-title {
   margin: 0;
   font-size: 1.1rem;
-  color: #ffd884;
+  color: #C2A46B;
 }
 
 .daily-date {
@@ -3331,13 +3368,13 @@ button.tray-piece:hover {
 }
 
 .sidebar-tab-active {
-  background: rgba(255, 216, 132, 0.18);
-  border-color: rgba(255, 216, 132, 0.55);
-  color: #ffd884;
+  background: rgba(194, 164, 107, 0.18);
+  border-color: rgba(194, 164, 107, 0.55);
+  color: #C2A46B;
 }
 
 .sidebar-tab-active:hover {
-  background: rgba(255, 216, 132, 0.25);
+  background: rgba(194, 164, 107, 0.25);
 }
 
 .sidebar-tab-badge {

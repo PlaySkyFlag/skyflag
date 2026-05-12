@@ -17,7 +17,7 @@
 // Deployment:
 //   supabase functions deploy weekly-report --no-verify-jwt
 //   supabase secrets set RESEND_API_KEY=re_xxx \
-//                        REPORT_FROM_EMAIL='3phor reports <reports@3phor.io>' \
+//                        REPORT_FROM_EMAIL='Skyflag reports <reports@playskyflag.com>' \
 //                        REPORT_TO_EMAIL=njatel@limnology.ca
 
 // @ts-expect-error — Deno-only.
@@ -30,7 +30,7 @@ const SUPABASE_URL = env('SUPABASE_URL') as string;
 const SUPABASE_SERVICE_ROLE_KEY = env('SUPABASE_SERVICE_ROLE_KEY') as string;
 const SUPABASE_ANON_KEY = env('SUPABASE_ANON_KEY') as string;
 const RESEND_API_KEY = env('RESEND_API_KEY') ?? '';
-const REPORT_FROM_EMAIL = env('REPORT_FROM_EMAIL') ?? '3phor reports <reports@3phor.io>';
+const REPORT_FROM_EMAIL = env('REPORT_FROM_EMAIL') ?? 'Skyflag reports <reports@playskyflag.com>';
 const REPORT_TO_EMAIL = env('REPORT_TO_EMAIL') ?? 'njatel@limnology.ca';
 
 const CORS = {
@@ -103,7 +103,7 @@ Deno.serve(async (req: Request) => {
     return json({ ok: true, snapshot, report_markdown: md, email_sent: false, reason: 'no-resend-key' });
   }
 
-  const subject = `3phor weekly report · ${formatDateOnly(snapshot.period.window_end)}`;
+  const subject = `Skyflag weekly report · ${formatDateOnly(snapshot.period.window_end)}`;
   const html = markdownToHtml(md);
 
   const emailRes = await fetch('https://api.resend.com/emails', {
@@ -148,7 +148,7 @@ function renderReport(s: KpiSnapshot): string {
       : 0;
 
   return [
-    `# 3phor weekly report`,
+    `# Skyflag weekly report`,
     `**Period:** ${start} → ${end}`,
     `**Generated:** ${s.generated_at}`,
     ``,

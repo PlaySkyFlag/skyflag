@@ -10,7 +10,7 @@
 //   - how much eval was lost by the choice (≥ 0)
 //   - a classification (best / good / inaccuracy / mistake / blunder)
 //
-// Classification thresholds are calibrated to 3phor's current eval
+// Classification thresholds are calibrated to Skyflag's current eval
 // scale (Captain=700, flag=200, soldier=120). Starting values; tunable
 // once we have real game data to look at.
 //
@@ -111,7 +111,7 @@ export function replayGame(history: HistoryEntry[]): GameState[] {
   return positions;
 }
 
-// Move classification. Thresholds are 3phor-tuned (smaller pieces
+// Move classification. Thresholds are Skyflag-tuned (smaller pieces
 // than chess): a 200-point loss is genuinely a mistake, 500+ usually
 // means hanging a Captain or letting through a final flag.
 export function classify(evalLoss: number, isEngineMatch: boolean): Classification {
@@ -276,7 +276,7 @@ export const CLASSIFICATION_LABEL: Record<Classification, string> = {
 export const CLASSIFICATION_COLOR: Record<Classification, string> = {
   best: '#7be0a3',
   good: '#a8c8ff',
-  inaccuracy: '#ffd884',
+  inaccuracy: '#C2A46B',
   mistake: '#ff9a5a',
   blunder: '#ff6b6b',
 };
