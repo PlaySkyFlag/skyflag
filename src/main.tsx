@@ -49,6 +49,7 @@ function lazyWithRetry<T extends ComponentType<unknown>>(
 // every modal — keeping that ~600kB out of the / bundle is the
 // biggest single perf win available without further restructuring.
 const App = lazyWithRetry(() => import('./App.tsx'))
+const AshtapadaSplash = lazyWithRetry(() => import('./AshtapadaSplash.tsx'))
 const Landing = lazyWithRetry(() => import('./Landing.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
@@ -67,12 +68,14 @@ const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
 const isReview = path.startsWith('/review');
+const isAshtapada = path.startsWith('/ashtapada');
 
 let rendered;
 if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
 else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
+else if (isAshtapada) rendered = <AshtapadaSplash />;
 else rendered = <Landing />;
 
 // Mark the root so index.html's pre-mount error catcher knows
