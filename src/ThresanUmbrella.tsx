@@ -10,6 +10,7 @@ import './ThresanUmbrella.css';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-com';
 const STORE_URL = 'https://thresan.store';
+const STUDIO_URL = 'https://thresan.studio';
 const ORIGINS_URL = 'https://www.playskyflag.com/origins?ref=thresan-com';
 
 export default function ThresanUmbrella() {
@@ -53,6 +54,9 @@ export default function ThresanUmbrella() {
           </a>
           <a href={ORIGINS_URL} className="thresan-link">
             The origins of Skyflag →
+          </a>
+          <a href={STUDIO_URL} className="thresan-link">
+            Meet the studio →
           </a>
         </div>
         <p className="thresan-fineprint">

@@ -457,6 +457,7 @@ function Footer() {
           <a href="/story">The Story</a>
           <a href="#pricing">Pricing</a>
           <a href="/press">Press</a>
+          <a href="https://thresan.studio">Studio</a>
         </div>
         <div className="landing-footer-meta">
           © {new Date().getFullYear()} Limnology Research Corp.

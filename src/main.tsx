@@ -56,6 +56,7 @@ const Press = lazyWithRetry(() => import('./Press.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
 const ThresanStore = lazyWithRetry(() => import('./ThresanStore.tsx'))
+const ThresanStudio = lazyWithRetry(() => import('./ThresanStudio.tsx'))
 const ThresanUmbrella = lazyWithRetry(() => import('./ThresanUmbrella.tsx'))
 const Watch = lazyWithRetry(() => import('./Watch.tsx'))
 
@@ -81,10 +82,14 @@ const isThresanStoreHost =
   hostname === 'thresan.store' || hostname === 'www.thresan.store';
 // thresan.com — universe-level brand umbrella. Short content page
 // pointing visitors to the current product (Skyflag) and other
-// surfaces. Vercel-level redirects for the .io/.studio defensive
-// domains stay in vercel.json; thresan.com no longer redirects.
+// surfaces. Vercel-level redirect for the .io defensive domain stays
+// in vercel.json; thresan.com and thresan.studio no longer redirect.
 const isThresanHost =
   hostname === 'thresan.com' || hostname === 'www.thresan.com';
+// thresan.studio — creator surface. Short note from Nelson + outward
+// CTAs. Same brand palette as thresan.com, distinct content.
+const isThresanStudioHost =
+  hostname === 'thresan.studio' || hostname === 'www.thresan.studio';
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
@@ -93,13 +98,16 @@ const isOrigins = path.startsWith('/origins');
 const isPress = path.startsWith('/press');
 const isAshtapadaPath = path.startsWith('/ashtapada');
 const isThresanStorePath = path.startsWith('/thresan-store');
+const isThresanStudioPath = path.startsWith('/thresan-studio');
 // /thresan path for iterating on the umbrella page from the main domain.
-// Matched on exact path or trailing slash so it doesn't swallow /thresan-store.
+// Matched on exact path or trailing slash so it doesn't swallow
+// /thresan-store or /thresan-studio.
 const isThresanPath = path === '/thresan' || path.startsWith('/thresan/');
 
 let rendered;
 if (isAshtapadaHost) rendered = <AshtapadaSplash />;
 else if (isThresanStoreHost) rendered = <ThresanStore />;
+else if (isThresanStudioHost) rendered = <ThresanStudio />;
 else if (isThresanHost) rendered = <ThresanUmbrella />;
 else if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
@@ -109,6 +117,7 @@ else if (isOrigins) rendered = <Origins />;
 else if (isPress) rendered = <Press />;
 else if (isAshtapadaPath) rendered = <AshtapadaSplash />;
 else if (isThresanStorePath) rendered = <ThresanStore />;
+else if (isThresanStudioPath) rendered = <ThresanStudio />;
 else if (isThresanPath) rendered = <ThresanUmbrella />;
 else rendered = <Landing />;
 

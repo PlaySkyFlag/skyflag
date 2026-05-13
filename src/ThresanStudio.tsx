@@ -1,0 +1,85 @@
+// ThresanStudio — served at thresan.studio. The "who's behind this"
+// surface: short note from the creator, the brothers/holiday-table
+// origin story that became Skyflag, and two outward CTAs. Same shape
+// as ThresanUmbrella (one screen, gold-on-dark) so the brand reads
+// consistently across thresan.com / .store / .studio.
+
+import { useEffect } from 'react';
+import './ThresanStudio.css';
+
+const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-studio';
+const STORE_URL = 'https://thresan.store';
+const LINKEDIN_URL = 'https://ca.linkedin.com/in/nelsonjatel';
+
+export default function ThresanStudio() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const prevTitle = document.title;
+    document.title = 'The studio — Thresan™ by Nelson Jatel';
+    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    const prevDesc = desc?.content ?? null;
+    if (desc) {
+      desc.content =
+        'Thresan is built by Nelson Jatel — a water researcher in Kelowna, BC. Three brothers, a holiday table, and the game that came out of it.';
+    }
+    return () => {
+      document.title = prevTitle;
+      if (desc && prevDesc !== null) desc.content = prevDesc;
+    };
+  }, []);
+
+  return (
+    <div className="studio">
+      <main className="studio-inner">
+        <img src="/3phor-logo.png" alt="" className="studio-sigil" />
+        <p className="studio-eyebrow">A note from the studio</p>
+        <h1 className="studio-name">Nelson Jatel</h1>
+        <p className="studio-where">Kelowna, British Columbia</p>
+
+        <div className="studio-prose">
+          <p>
+            By day I'm a water researcher at UBC Okanagan — Doctor of
+            Social Sciences, working on water governance and the social
+            networks that shape it. <em>Limnology Research Corp</em> is
+            my day-job shingle and has been since 2001.
+          </p>
+          <p>
+            Thresan™ came out of somewhere else entirely. My two
+            brothers and I have spent every holiday for as long as I
+            can remember gathered around a board game. Three of us, the
+            same table, the same long afternoons. <em>Three worlds.
+            One proof.</em> is, in the end, a sentence about us.
+          </p>
+          <p>
+            Skyflag is the first game in the Thresan universe — three
+            stacked boards, four clans, an ancient proof of reach.
+            Built solo, on evenings and weekends, with my brothers and
+            friends as the first playtesters. A physical edition
+            follows when the Kickstarter lines up.
+          </p>
+        </div>
+
+        <a href={GAME_URL} className="studio-cta">
+          Play Skyflag →
+        </a>
+        <div className="studio-secondary">
+          <a href={STORE_URL} className="studio-link">
+            The physical edition →
+          </a>
+          <a
+            href={LINKEDIN_URL}
+            className="studio-link"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Day-job résumé (LinkedIn) →
+          </a>
+        </div>
+
+        <p className="studio-fineprint">
+          Thresan™ is a project of Limnology Research Corp.
+        </p>
+      </main>
+    </div>
+  );
+}

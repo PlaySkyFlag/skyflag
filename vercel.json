@@ -20,18 +20,6 @@
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "thresan.studio" }],
-      "destination": "https://playskyflag.com/$1",
-      "permanent": true
-    },
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "www.thresan.studio" }],
-      "destination": "https://playskyflag.com/$1",
-      "permanent": true
-    },
-    {
-      "source": "/(.*)",
       "has": [{ "type": "host", "value": "playskyflag.io" }],
       "destination": "https://playskyflag.com/$1",
       "permanent": true

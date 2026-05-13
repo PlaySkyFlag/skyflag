@@ -1,0 +1,141 @@
+/* ThresanStudio — creator surface at thresan.studio. Mirrors the
+   ThresanUmbrella palette and layout so .com / .studio / .store feel
+   like one brand. Slightly wider inner column to fit the three-paragraph
+   note without forcing tall, narrow text on desktop. */
+
+.studio {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 18%, rgba(194, 164, 107, 0.14), transparent 70%),
+    radial-gradient(ellipse 60% 80% at 50% 100%, rgba(120, 80, 200, 0.06), transparent 70%),
+    #06090f;
+  color: #E6E2D8;
+  display: grid;
+  place-items: center;
+  padding: 56px 24px;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.55;
+}
+
+.studio-inner {
+  max-width: 620px;
+  text-align: center;
+}
+
+.studio-sigil {
+  width: clamp(96px, 22vw, 140px);
+  height: auto;
+  display: block;
+  margin: 0 auto 24px;
+  filter: drop-shadow(0 12px 48px rgba(194, 164, 107, 0.18));
+}
+
+.studio-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  color: rgba(194, 164, 107, 0.78);
+  font-size: 0.78rem;
+  margin: 0 0 12px;
+}
+
+.studio-name {
+  font-size: clamp(2.1rem, 5.5vw, 3rem);
+  letter-spacing: 0.04em;
+  color: #C2A46B;
+  margin: 0 0 6px;
+  font-weight: 700;
+  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+}
+
+.studio-where {
+  margin: 0 0 32px;
+  font-size: 0.95rem;
+  color: rgba(245, 247, 251, 0.65);
+  letter-spacing: 0.04em;
+}
+
+.studio-prose {
+  text-align: left;
+  margin: 0 auto 36px;
+  max-width: 540px;
+  font-size: clamp(1rem, 1.8vw, 1.08rem);
+  color: rgba(245, 247, 251, 0.9);
+  line-height: 1.7;
+}
+
+.studio-prose p {
+  margin: 0 0 18px;
+}
+
+.studio-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.studio-prose em {
+  color: #C2A46B;
+  font-style: italic;
+}
+
+.studio-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 40px;
+  border-radius: 999px;
+  background: #C2A46B;
+  color: #111826;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 6px 24px rgba(194, 164, 107, 0.25);
+}
+
+.studio-cta:hover {
+  background: #ffe4a3;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(194, 164, 107, 0.35);
+}
+
+.studio-secondary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0 0;
+}
+
+.studio-link {
+  color: #C2A46B;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  opacity: 0.88;
+  transition: opacity 0.15s ease;
+}
+
+.studio-link:hover {
+  opacity: 1;
+}
+
+.studio-fineprint {
+  margin: 36px 0 0;
+  font-size: 0.82rem;
+  color: rgba(245, 247, 251, 0.55);
+}
+
+@media (max-width: 540px) {
+  .studio {
+    padding: 40px 16px;
+  }
+  .studio-prose {
+    font-size: 1rem;
+  }
+}
