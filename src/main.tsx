@@ -55,6 +55,7 @@ const Origins = lazyWithRetry(() => import('./Origins.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
 const ThresanStore = lazyWithRetry(() => import('./ThresanStore.tsx'))
+const ThresanUmbrella = lazyWithRetry(() => import('./ThresanUmbrella.tsx'))
 const Watch = lazyWithRetry(() => import('./Watch.tsx'))
 
 // Run the one-shot rebrand storage migration before anything else reads
@@ -74,11 +75,15 @@ const hostname = window.location.hostname.toLowerCase();
 const isAshtapadaHost =
   hostname === 'ashtapada.com' || hostname === 'www.ashtapada.com';
 // thresan.store — physical edition waitlist. Every URL on this host
-// lands on the store, same pattern as ashtapada.com. Defensive
-// redirects from thresan.com/.io/.studio and playskyflag.io/.studio/.store
-// are handled by vercel.json before traffic ever reaches this app.
+// lands on the store, same pattern as ashtapada.com.
 const isThresanStoreHost =
   hostname === 'thresan.store' || hostname === 'www.thresan.store';
+// thresan.com — universe-level brand umbrella. Short content page
+// pointing visitors to the current product (Skyflag) and other
+// surfaces. Vercel-level redirects for the .io/.studio defensive
+// domains stay in vercel.json; thresan.com no longer redirects.
+const isThresanHost =
+  hostname === 'thresan.com' || hostname === 'www.thresan.com';
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
@@ -86,10 +91,14 @@ const isReview = path.startsWith('/review');
 const isOrigins = path.startsWith('/origins');
 const isAshtapadaPath = path.startsWith('/ashtapada');
 const isThresanStorePath = path.startsWith('/thresan-store');
+// /thresan path for iterating on the umbrella page from the main domain.
+// Matched on exact path or trailing slash so it doesn't swallow /thresan-store.
+const isThresanPath = path === '/thresan' || path.startsWith('/thresan/');
 
 let rendered;
 if (isAshtapadaHost) rendered = <AshtapadaSplash />;
 else if (isThresanStoreHost) rendered = <ThresanStore />;
+else if (isThresanHost) rendered = <ThresanUmbrella />;
 else if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
 else if (isApp) rendered = <App />;
@@ -97,6 +106,7 @@ else if (isStory) rendered = <Story />;
 else if (isOrigins) rendered = <Origins />;
 else if (isAshtapadaPath) rendered = <AshtapadaSplash />;
 else if (isThresanStorePath) rendered = <ThresanStore />;
+else if (isThresanPath) rendered = <ThresanUmbrella />;
 else rendered = <Landing />;
 
 // Mark the root so index.html's pre-mount error catcher knows

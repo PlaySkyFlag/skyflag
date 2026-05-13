@@ -121,7 +121,7 @@ function Header() {
             alt=""
             className="landing-logo-img"
           />
-          <span className="landing-logo-text">Thresan: Skyflag</span>
+          <span className="landing-logo-text">Thresan™: Skyflag</span>
         </a>
         <nav className="landing-nav">
           <a href="#features" className="landing-nav-link">Features</a>
@@ -448,7 +448,7 @@ function Footer() {
     <footer className="landing-footer">
       <div className="landing-footer-inner">
         <div className="landing-footer-brand">
-          <strong>Thresan: Skyflag</strong>
+          <strong>Thresan™: Skyflag</strong>
           <p className="landing-footer-tagline">Three worlds. One proof.</p>
           <p>By Limnology Research Corp.</p>
         </div>

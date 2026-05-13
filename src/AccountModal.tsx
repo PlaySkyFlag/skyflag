@@ -277,7 +277,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
         <div className="account-overlay" role="dialog" aria-modal="true">
           <div className="account-card account-card--narrow">
             <div className="account-header">
-              <h2 className="account-title">Welcome to Thresan: Skyflag</h2>
+              <h2 className="account-title">Welcome to Thresan™: Skyflag</h2>
               <button type="button" className="account-close" onClick={onClose} aria-label="Close">×</button>
             </div>
 

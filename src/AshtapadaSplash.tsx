@@ -24,7 +24,7 @@ export default function AshtapadaSplash() {
   // unmount so SPA navigation away from this route is clean.
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = 'Ashtapada, lifted. — Thresan: Skyflag';
+    document.title = 'Ashtapada, lifted. — Thresan™: Skyflag';
     const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     const prevDesc = desc?.content ?? null;
     if (desc) {
@@ -44,7 +44,7 @@ export default function AshtapadaSplash() {
           <div className="ashtapada-inner">
             <img src="/3phor-logo.png" alt="" className="ashtapada-sigil" />
             <p className="ashtapada-eyebrow">Ashtapada, lifted.</p>
-            <h1 className="ashtapada-title">Thresan: Skyflag</h1>
+            <h1 className="ashtapada-title">Thresan™: Skyflag</h1>
             <p className="ashtapada-tagline tagline-script">
               Three worlds. One proof.
             </p>

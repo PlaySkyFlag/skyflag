@@ -39,7 +39,7 @@ export default function ThresanStore() {
   useEffect(() => {
     window.scrollTo(0, 0);
     const prevTitle = document.title;
-    document.title = 'Thresan: Skyflag — The Physical Edition';
+    document.title = 'Thresan™: Skyflag — The Physical Edition';
     const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     const prevDesc = desc?.content ?? null;
     if (desc) {
@@ -75,7 +75,7 @@ function Header() {
     <header className="store-header">
       <div className="store-header-inner">
         <a href="https://playskyflag.com" className="store-back">
-          ← Thresan: Skyflag
+          ← Thresan™: Skyflag
         </a>
         <div className="store-header-meta">The Physical Edition</div>
         <a href={GAME_URL} className="store-cta-button store-cta-small">
@@ -94,7 +94,7 @@ function Hero() {
     <section className="store-hero">
       <div className="store-hero-inner">
         <p className="store-hero-eyebrow">
-          Thresan: Skyflag · The Physical Edition
+          Thresan™: Skyflag · The Physical Edition
         </p>
         <h1 className="store-hero-title">
           Three worlds.
@@ -476,7 +476,7 @@ function Footer() {
   return (
     <footer className="store-footer">
       <div className="store-footer-inner">
-        <p className="store-footer-mark">Thresan: Skyflag</p>
+        <p className="store-footer-mark">Thresan™: Skyflag</p>
         <p className="store-footer-tagline tagline-script">
           Three worlds. One proof.
         </p>

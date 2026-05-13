@@ -58,7 +58,7 @@ function StoryFooter() {
   return (
     <footer className="story-footer">
       <div className="story-footer-inner">
-        <p className="story-footer-mark">Thresan: Skyflag — The Three Seals of Kaleo</p>
+        <p className="story-footer-mark">Thresan™: Skyflag — The Three Seals of Kaleo</p>
         <p className="story-footer-meta">
           Storybook v3 · Kaleo Edition · © {new Date().getFullYear()} Limnology Research Corp.
         </p>
@@ -80,7 +80,7 @@ function Cover() {
       <div className="story-cover-glyph" aria-hidden="true">
         <ThreeLayersGlyph />
       </div>
-      <p className="story-cover-eyebrow">Thresan: Skyflag · Volume One</p>
+      <p className="story-cover-eyebrow">Thresan™: Skyflag · Volume One</p>
       <h1 className="story-cover-title">The Three Seals<br />of Kaleo</h1>
       <p className="story-cover-subtitle">A story of the First Reclamation</p>
       <div className="story-cover-divider" aria-hidden="true">· · ·</div>

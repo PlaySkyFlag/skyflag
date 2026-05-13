@@ -11,7 +11,7 @@ export default function Origins() {
   useEffect(() => {
     window.scrollTo(0, 0);
     const prevTitle = document.title;
-    document.title = 'Origins — Thresan: Skyflag';
+    document.title = 'Origins — Thresan™: Skyflag';
     const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     const prevDesc = desc?.content ?? null;
     if (desc) {
@@ -217,7 +217,7 @@ function Footer() {
   return (
     <footer className="origins-footer">
       <div className="origins-footer-inner">
-        <p className="origins-footer-mark">Thresan: Skyflag</p>
+        <p className="origins-footer-mark">Thresan™: Skyflag</p>
         <p className="origins-footer-tagline tagline-script">
           Three worlds. One proof.
         </p>

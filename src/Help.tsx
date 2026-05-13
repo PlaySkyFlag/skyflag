@@ -73,7 +73,7 @@ export default function Help({ inline = false }: Props) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Download the Thresan: Skyflag rulebook (PDF)
+            Download the Thresan™: Skyflag rulebook (PDF)
           </a>
           .
         </p>
