@@ -508,6 +508,29 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
     }
   }
 
+  // Captain shelter — count friendly pieces within chebyshev 1 of each
+  // Captain on its own layer. Each neighbor is a defender that can
+  // interpose, recapture an attacker, or share the threat surface.
+  // Cap at 3 (more is clustered piece-soup, not added safety). +5
+  // per neighbor for my Captains, -5 for opp Captains. Kill-related —
+  // matters more when the stance is aggressive.
+  for (const bp of state.onBoard) {
+    if (bp.piece.kind !== 'captain') continue;
+    let neighbors = 0;
+    for (const other of state.onBoard) {
+      if (other.piece.id === bp.piece.id) continue;
+      if (other.piece.owner !== bp.piece.owner) continue;
+      if (other.coord.layer !== bp.coord.layer) continue;
+      const d = Math.max(
+        Math.abs(other.coord.row - bp.coord.row),
+        Math.abs(other.coord.col - bp.coord.col),
+      );
+      if (d === 1) neighbors++;
+    }
+    const shelter = Math.min(neighbors, 3) * 5 * killMul;
+    score += bp.piece.owner === aiPlayer ? shelter : -shelter;
+  }
+
   // 2-ply flag-threat: opponent Captains within striking distance of
   // one of my uncaptured flags (and the symmetric pattern for me on
   // opp flags). Flags are win-paths; the existing threat loop catches
@@ -915,7 +938,11 @@ function minimax(
   return value;
 }
 
-export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEARCH_DEPTH): Action | null {
+export function chooseAction(
+  state: GameState,
+  searchDepth: number = DEFAULT_SEARCH_DEPTH,
+  timeBudgetMs?: number,
+): Action | null {
   // Opening book: hand back a known-strong move for the first 1–2 deploys
   // without burning search time on positions whose answer is the same
   // every game. Falls through to search past move 2, where position-
@@ -981,10 +1008,19 @@ export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEA
   // instead of after most of the tree has been explored). The cost of
   // the shallow searches is negligible compared to the savings.
   // Transposition table carries cached scores between iterations.
+  //
+  // Time budget: if timeBudgetMs is passed, we bail out between
+  // iterations once the projected cost of the next iteration exceeds
+  // the remaining budget. Next-iteration cost is estimated as ~5×
+  // current (the typical branching-factor expansion). Always complete
+  // at least depth 2 before we let the time check fire, so a starved
+  // search still returns a defensible move.
   let lastBestAction: Action | undefined;
   let scored: Array<{ action: Action; value: number }> = [];
+  const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
   for (let depth = 1; depth <= effectiveDepth; depth++) {
+    const iterStart = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const ordered = orderActionsWithPriority(state, actions, lastBestAction, 0);
     let bestValue = -Infinity;
     let alpha = -Infinity;
@@ -1003,6 +1039,15 @@ export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEA
     }
 
     scored = iterScored;
+
+    if (timeBudgetMs !== undefined && depth >= 2) {
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      const iterTime = now - iterStart;
+      const elapsed = now - startTime;
+      const remaining = timeBudgetMs - elapsed;
+      const projectedNext = iterTime * 5;
+      if (remaining < projectedNext) break;
+    }
   }
 
   if (scored.length === 0) return null;

@@ -904,11 +904,24 @@ export default function App() {
             : difficulty === 'expert'
               ? 6
               : 4;
+      // Time budget per difficulty. depth is the hard cap; budget is
+      // the soft cap. Generous enough that the engine usually finishes
+      // its target depth on calm positions, tight enough that
+      // pathological tactical positions don't hang the worker.
+      const timeBudgetMs =
+        difficulty === 'easy'
+          ? 500
+          : difficulty === 'medium'
+            ? 1000
+            : difficulty === 'expert'
+              ? 4000
+              : 2000;
       const req: AiWorkerRequest = {
         id: requestId,
         type: 'choose',
         state: stateRef.current,
         searchDepth,
+        timeBudgetMs,
       };
       worker.postMessage(req);
     }, AI_THINK_DELAY_MS);

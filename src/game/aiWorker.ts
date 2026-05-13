@@ -27,6 +27,12 @@ export type AiWorkerRequest = {
       // Optional search-depth override from the difficulty selector.
       // Falls back to chooseAction's default if omitted.
       searchDepth?: number;
+      // Optional time budget in milliseconds. The engine bails between
+      // iterative-deepening iterations once the projected cost of the
+      // next iteration exceeds the remaining budget — depth is the
+      // hard cap, time is the soft cap, and the engine returns
+      // whatever depth it actually reached.
+      timeBudgetMs?: number;
     }
   | {
       type: 'analyze';
@@ -52,7 +58,7 @@ self.addEventListener('message', (event: MessageEvent<AiWorkerRequest>) => {
   const msg = event.data;
 
   if (msg.type === 'choose') {
-    const action = chooseAction(msg.state, msg.searchDepth);
+    const action = chooseAction(msg.state, msg.searchDepth, msg.timeBudgetMs);
     const response: AiWorkerResponse = { id: msg.id, type: 'action', action };
     (self as unknown as Worker).postMessage(response);
     return;
