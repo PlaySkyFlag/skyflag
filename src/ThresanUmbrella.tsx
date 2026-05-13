@@ -12,6 +12,7 @@ import { applySurfaceMeta } from './socialMeta';
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-com';
 const STORE_URL = 'https://thresan.store';
 const STUDIO_URL = 'https://thresan.studio';
+const GAMES_URL = 'https://thresan.games';
 const ORIGINS_URL = 'https://www.playskyflag.com/origins?ref=thresan-com';
 
 export default function ThresanUmbrella() {
@@ -51,6 +52,9 @@ export default function ThresanUmbrella() {
           Play Skyflag →
         </a>
         <div className="thresan-secondary">
+          <a href={GAMES_URL} className="thresan-link">
+            The editions of Thresan →
+          </a>
           <a href={STORE_URL} className="thresan-link">
             The physical edition →
           </a>

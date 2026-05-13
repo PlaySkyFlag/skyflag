@@ -57,6 +57,7 @@ const Privacy = lazyWithRetry(() => import('./Privacy.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
 const Terms = lazyWithRetry(() => import('./Terms.tsx'))
+const ThresanGames = lazyWithRetry(() => import('./ThresanGames.tsx'))
 const ThresanIO = lazyWithRetry(() => import('./ThresanIO.tsx'))
 const ThresanStore = lazyWithRetry(() => import('./ThresanStore.tsx'))
 const ThresanStudio = lazyWithRetry(() => import('./ThresanStudio.tsx'))
@@ -98,6 +99,11 @@ const isThresanStudioHost =
 // an Aether Copper accent on the .io suffix.
 const isThresanIOHost =
   hostname === 'thresan.io' || hostname === 'www.thresan.io';
+// thresan.games — catalog of Thresan editions. Skyflag is the active
+// entry; future editions slot in beside it. Terran Sand accent on
+// the .games suffix.
+const isThresanGamesHost =
+  hostname === 'thresan.games' || hostname === 'www.thresan.games';
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
@@ -110,9 +116,10 @@ const isAshtapadaPath = path.startsWith('/ashtapada');
 const isThresanStorePath = path.startsWith('/thresan-store');
 const isThresanStudioPath = path.startsWith('/thresan-studio');
 const isThresanIOPath = path.startsWith('/thresan-io');
+const isThresanGamesPath = path.startsWith('/thresan-games');
 // /thresan path for iterating on the umbrella page from the main domain.
 // Matched on exact path or trailing slash so it doesn't swallow
-// /thresan-store, /thresan-studio, or /thresan-io.
+// /thresan-store, /thresan-studio, /thresan-io, or /thresan-games.
 const isThresanPath = path === '/thresan' || path.startsWith('/thresan/');
 
 let rendered;
@@ -120,6 +127,7 @@ if (isAshtapadaHost) rendered = <AshtapadaSplash />;
 else if (isThresanStoreHost) rendered = <ThresanStore />;
 else if (isThresanStudioHost) rendered = <ThresanStudio />;
 else if (isThresanIOHost) rendered = <ThresanIO />;
+else if (isThresanGamesHost) rendered = <ThresanGames />;
 else if (isThresanHost) rendered = <ThresanUmbrella />;
 else if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
@@ -133,6 +141,7 @@ else if (isAshtapadaPath) rendered = <AshtapadaSplash />;
 else if (isThresanStorePath) rendered = <ThresanStore />;
 else if (isThresanStudioPath) rendered = <ThresanStudio />;
 else if (isThresanIOPath) rendered = <ThresanIO />;
+else if (isThresanGamesPath) rendered = <ThresanGames />;
 else if (isThresanPath) rendered = <ThresanUmbrella />;
 else rendered = <Landing />;
 
