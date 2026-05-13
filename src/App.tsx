@@ -332,7 +332,7 @@ export default function App() {
   const [pushFailed, setPushFailed] = useState(false);
   const [pushNonce, setPushNonce] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>(
-    INITIAL_SESSION?.difficulty ?? 'hard',
+    INITIAL_SESSION?.difficulty ?? 'expert',
   );
   // Time control selection — persisted in session. `'off'` means no
   // clock; `'5'` / `'10'` / `'30'` are minutes per side per game.
