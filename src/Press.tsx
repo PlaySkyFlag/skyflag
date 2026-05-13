@@ -476,7 +476,8 @@ function Footer() {
         <p className="press-footer-links">
           <a href="/">Home</a> · <a href="/origins">Origins</a> ·{' '}
           <a href="/story">The Story</a> ·{' '}
-          <a href="https://thresan.store">Edition</a>
+          <a href="https://thresan.store">Edition</a> ·{' '}
+          <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
         </p>
         <p className="press-footer-meta">
           © {new Date().getFullYear()} Nelson Jatel · Limnology Research Corp.

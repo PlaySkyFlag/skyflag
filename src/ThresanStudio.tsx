@@ -20,6 +20,8 @@ export default function ThresanStudio() {
       description:
         'Thresan is built by Nelson Jatel — a water researcher in Kelowna, BC. Three brothers, a holiday table, and the game that came out of it.',
       canonicalUrl: 'https://thresan.studio/',
+      ogImage: 'https://thresan.studio/thresan-og-studio.jpg',
+      ogImageAlt: 'Portrait of Nelson Jatel — the creator behind Thresan.',
     });
   }, []);
 
@@ -82,7 +84,9 @@ export default function ThresanStudio() {
         </div>
 
         <p className="studio-fineprint">
-          Thresan™ is a project of Limnology Research Corp.
+          Thresan™ is a project of Limnology Research Corp. ·{' '}
+          <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
+          <a href="https://playskyflag.com/terms">Terms</a>
         </p>
       </main>
     </div>

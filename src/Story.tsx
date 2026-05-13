@@ -74,7 +74,8 @@ function StoryFooter() {
         <p className="story-footer-links">
           <a href="/">Home</a> · <a href="/play">Play</a> ·{' '}
           <a href="/origins">Origins</a> ·{' '}
-          <a href="https://thresan.store">Edition</a>
+          <a href="https://thresan.store">Edition</a> ·{' '}
+          <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
         </p>
       </div>
     </footer>
