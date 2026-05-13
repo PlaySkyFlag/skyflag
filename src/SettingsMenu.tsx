@@ -34,9 +34,10 @@ type Props = {
   // Players + AI difficulty pickers so AI can't be re-introduced
   // into a 2-human game by accident.
   inMpRoom: boolean;
-  // True when the user holds the feature.plus entitlement. Unlocks
-  // the Expert difficulty option; without it the option is disabled
-  // with a "Plus subscription required" tooltip.
+  // True when the user holds the feature.plus entitlement. Still used
+  // by the theme picker (premium themes remain Plus-gated); the Expert
+  // difficulty option was ungated 2026-05-13 — the strongest AI is
+  // available to every player, free.
   hasPlus: boolean;
 };
 
@@ -126,9 +127,7 @@ export default function SettingsMenu({
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
-              <option value="expert" disabled={!hasPlus}>
-                {hasPlus ? 'Expert' : 'Expert — Plus required'}
-              </option>
+              <option value="expert">Expert</option>
             </select>
           </label>
           <label className="settings-row">

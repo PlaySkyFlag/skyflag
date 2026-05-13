@@ -360,18 +360,12 @@ export default function App() {
   // and the first-time profile form; this component just keeps a local
   // copy of the loaded profile for the footer label and downstream use.
   const { user: authUser } = useAuthUser();
-  // Plus entitlement gates the Expert AI difficulty. The hook subscribes
-  // to realtime entitlement changes, so a fresh subscription unlocks
-  // Expert mid-session and a cancellation re-locks it.
+  // Plus entitlement still gates other premium features (themes,
+  // rating history). The Expert AI difficulty used to be gated here
+  // too but was ungated 2026-05-13: the strongest engine is available
+  // to every player, free. The hook subscribes to realtime entitlement
+  // changes for the features that ARE still gated.
   const { hasIt: hasPlus } = useEntitlement('feature.plus');
-  // If a session was saved at Expert and the user has since lost (or
-  // never had) the Plus entitlement, silently fall back to Hard so the
-  // AI doesn't run at depth 6 for someone outside the gate.
-  useEffect(() => {
-    if (difficulty === 'expert' && !hasPlus) {
-      setDifficulty('hard');
-    }
-  }, [difficulty, hasPlus]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [accountOpen, setAccountOpen] = useState(false);
   useEffect(() => {
