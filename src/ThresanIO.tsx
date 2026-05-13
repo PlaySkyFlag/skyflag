@@ -168,23 +168,189 @@ export default function ThresanIO() {
           </div>
         </article>
 
+        <article className="lab-post">
+          <header className="lab-post-header">
+            <p className="lab-post-meta">Lab note · 2026-05-13 · Nelson</p>
+            <h2 className="lab-post-title">Why the Nexus has one column</h2>
+            <p className="lab-post-subtitle">
+              The decision-tree behind the single vertical axis, and
+              what happens to the search space when you add a second.
+            </p>
+          </header>
+
+          <div className="lab-post-body">
+            <p>
+              The Caelum Nexus sits at <em>space(3,3)</em> — a single
+              square, at the top of a single column running through
+              all three boards. It's one of the two ways to win
+              Thresan: get your Captain there.
+            </p>
+            <p>
+              When I sketched early versions of the rules, the Nexus
+              had more than one location. Two columns, sometimes
+              four, once a ring of six. Every version felt worse.
+              Three planes already make strategy complex; adding
+              redundant win-paths made it noisy.
+            </p>
+            <p>
+              The single column makes the game tighter for three reasons.
+            </p>
+
+            <h3>1. It forces commitment</h3>
+            <p>
+              With multiple Nexus columns, a Captain in trouble could
+              pivot to a different column mid-game. With one column,
+              the decision <em>I'm racing to the Nexus</em> is made
+              once, and the rest of the game tests whether you can
+              defend that commitment. The contest gets sharper.
+            </p>
+
+            <h3>2. The branching factor stays sane</h3>
+            <p>
+              Each Nexus column the AI has to evaluate adds a
+              multiplier to the search space at every ply. Two
+              columns roughly doubles the strategic possibilities the
+              engine has to consider. Four columns quadruples it.
+              With one column, the engine can search the <em>actual</em>{' '}
+              tactical depth instead of spending budget on positional
+              shuffles between equivalent goals.
+            </p>
+
+            <h3>3. It clarifies the proof</h3>
+            <p>
+              <em>Three worlds. One proof.</em> — the win condition
+              is a single demonstration of vertical reach. With four
+              Nexus columns, the proof would be "any one of four
+              reaches." That's a different kind of statement. Cleaner
+              geometry, weaker meaning.
+            </p>
+
+            <p>
+              The single column is also what makes flag-capture a
+              meaningful alternative win path. With multiple Nexus
+              columns, flag-capture would feel like a side quest.
+              With one column, flag-capture is the <em>defensive</em>{' '}
+              win path: you can't get to the top, so you sweep the
+              bottom. Two paths, balanced against each other —
+              because there's exactly one of each.
+            </p>
+
+            <p className="lab-post-signoff">— Nelson</p>
+          </div>
+        </article>
+
+        <article className="lab-post">
+          <header className="lab-post-header">
+            <p className="lab-post-meta">Lab note · 2026-05-13 · Nelson</p>
+            <h2 className="lab-post-title">From Ashtapada to Thresan</h2>
+            <p className="lab-post-subtitle">
+              The thirteen centuries between the eighth-century
+              pattern and the three-board lift. With the math.
+            </p>
+          </header>
+
+          <div className="lab-post-body">
+            <p>
+              The eight-by-eight board predates chess by several
+              hundred years. <em>Ashtapada</em> — Sanskrit for
+              "eight-footed," the eight squares on each side — was a
+              race game played in India well before Chaturanga
+              (chess's direct ancestor) appeared in the sixth century.
+              The board itself was older than the rules anyone now
+              plays on it.
+            </p>
+            <p>
+              Chess took the eight-by-eight floor and added six piece
+              types, a turn-based structure, and a single win
+              condition. The game became one of the most-played
+              strategic systems in human history. The board didn't
+              change.
+            </p>
+            <p>
+              Thresan asks a different question: what happens if we
+              keep the board's <em>idea</em> (the disciplined grid)
+              but lift it into three dimensions?
+            </p>
+            <p>
+              The naive answer is "you get 3D chess" — and the
+              history of that suggests it doesn't work. Most 3D-chess
+              variants end up unplayable: too many pieces, too many
+              planes, the rules ramify until the game stops being
+              legible. Star Trek 3D chess is famous, but it's famous
+              because it looks cool on a coffee table, not because
+              anyone seriously plays it.
+            </p>
+
+            <h3>The trick Thresan tries to thread</h3>
+            <ul className="lab-post-list">
+              <li>
+                <strong>Smaller grid.</strong> 6×6 instead of 8×8.
+                Three 36-square boards give 108 squares total —
+                meaningfully larger than chess's 64, but each plane
+                stays small enough that a human can read it at a
+                glance.
+              </li>
+              <li>
+                <strong>Fewer pieces.</strong> Four per player
+                instead of sixteen. The game stays positionally
+                legible: every piece matters, every move counts.
+              </li>
+              <li>
+                <strong>Constrained vertical movement.</strong> Lifts
+                at fixed positions (1,1), (1,4), (4,1), (4,4).
+                Pieces can only change planes via these — no free
+                transit. The third dimension is a strategic asset,
+                not noise.
+              </li>
+            </ul>
+
+            <h3>The math, loosely</h3>
+            <p>
+              <strong>Chess:</strong> 64 squares × 16 pieces × ~30
+              average legal moves per turn — a search space measured
+              in roughly 10^120 possible games.
+            </p>
+            <p>
+              <strong>Thresan:</strong> 108 squares × 8 pieces × ~20
+              average legal moves per turn. The branching factor is
+              lower (fewer pieces), the board is larger (more
+              squares), and the layer dimension adds a{' '}
+              <em>qualitative</em> primitive — <em>do I go up?</em> —
+              that chess doesn't have.
+            </p>
+            <p>
+              The end position-count for Thresan is hard to estimate
+              without running it, but the game-tree complexity is
+              probably in the same neighbourhood as chess — possibly
+              slightly higher because of the layer transitions,
+              possibly lower because of the smaller piece count.
+              Either way, it's deep enough to be a real strategy
+              game and shallow enough that an engine can actually
+              evaluate positions meaningfully.
+            </p>
+
+            <p>
+              The thirteen centuries from Ashtapada to Thresan aren't
+              about getting to a better game than chess. Chess is one
+              of the great inventions of human strategic culture.
+              Thresan is about asking a question chess never had to:{' '}
+              <em>what does strategy look like when the floor lifts?</em>
+            </p>
+            <p>
+              Three boards. Four piece types. One Nexus. One question.
+            </p>
+
+            <p className="lab-post-signoff">— Nelson</p>
+          </div>
+        </article>
+
         <section className="lab-roadmap">
           <h2 className="lab-roadmap-title">In the works</h2>
           <ul className="lab-roadmap-list">
             <li>
-              <strong>Why the Nexus has one column.</strong> The
-              decision-tree behind the single vertical axis, and what
-              happens to the search space when you add a second.
-            </li>
-            <li>
               <strong>Curriculum of openings.</strong> How the engine
               learns positional fundamentals — and the first dozen
               openings worth knowing.
-            </li>
-            <li>
-              <strong>From Ashtapada to Thresan.</strong> The thirteen
-              centuries between the eighth-century pattern and the
-              three-board lift. With the math.
             </li>
             <li>
               <strong>Build journal — weeks 1 to 12.</strong> Honest
