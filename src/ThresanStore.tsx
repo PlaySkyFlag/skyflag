@@ -34,6 +34,115 @@ const FOUNDERS_TOTAL_SLOTS = 500;
 const ORIGINS_URL = 'https://playskyflag.com/origins?ref=thresan-store';
 const GAME_URL = 'https://playskyflag.com/play?ref=thresan-store';
 
+// ─── Reward tier preview ───────────────────────────────────────────
+// Preliminary Kickstarter reward ladder. Prices, slot counts, and
+// inclusions are placeholders — they'll be re-tuned once manufacturer
+// quotes come back and the funding goal is locked. The Founders
+// Edition tier is the only one currently with a live pre-launch
+// reservation (FOUNDERS_RESERVATION_URL above). Each tier inherits
+// everything in the tier below it (additive structure).
+
+type RewardTier = {
+  id: string;
+  name: string;
+  priceUSD: number;
+  pitch: string;
+  includes: string[];
+  live?: boolean;
+  limited?: boolean;
+  reserveHref?: string;
+};
+
+const REWARD_TIERS: RewardTier[] = [
+  {
+    id: 'supporter',
+    name: 'Three Worlds Supporter',
+    priceUSD: 5,
+    pitch: 'Help build Thresan.',
+    includes: [
+      'Name in the digital credits on playskyflag.com',
+      'Build updates from inside the studio',
+      'Printable PDF of the world of Kaleo (lore brief)',
+    ],
+  },
+  {
+    id: 'digital-founder',
+    name: 'Digital Founder',
+    priceUSD: 25,
+    pitch: 'For the screen, with respect.',
+    includes: [
+      'Everything in Three Worlds Supporter',
+      'Exclusive "Founder" badge on your playskyflag.com profile',
+      'Custom Aether Copper board theme',
+      'Lifetime Plus on the digital game (premium themes, rating history)',
+    ],
+  },
+  {
+    id: 'skyflag',
+    name: 'Skyflag Edition',
+    priceUSD: 75,
+    pitch: 'The standard physical game.',
+    includes: [
+      'Everything in Digital Founder',
+      'One copy of Thresan: Skyflag — three boards, eight pieces, rulebook',
+      'Standard packaging, full-colour print',
+    ],
+  },
+  {
+    id: 'founders',
+    name: 'Founders Edition',
+    priceUSD: FOUNDERS_PRICE_USD,
+    pitch: 'The first 500. Numbered.',
+    live: true,
+    limited: true,
+    reserveHref: FOUNDERS_RESERVATION_URL || undefined,
+    includes: [
+      'Everything in Skyflag Edition',
+      'Numbered box (#001–#500), weighted brass pieces',
+      'Gold-foiled rulebook cover, linen-finish components',
+      'Name in the rulebook acknowledgments',
+      'Founders Discord — early playtests, build updates, decision input',
+    ],
+  },
+  {
+    id: 'deluxe',
+    name: 'Deluxe Edition',
+    priceUSD: 175,
+    pitch: 'The Aetheri set.',
+    includes: [
+      'Everything in Founders Edition',
+      'Second piece set in Empyrean Indigo (alternate colourway)',
+      'Signed Storybook v3 (the in-world narrative, softcover)',
+      'A3 heraldic art print of your chosen clan',
+    ],
+  },
+  {
+    id: 'patron',
+    name: 'Studio Patron',
+    priceUSD: 400,
+    pitch: 'For people who want to be in the room.',
+    limited: true,
+    includes: [
+      'Deluxe Edition × 2 (yours + one to gift or playtest)',
+      '1-hour video call with Nelson — design conversation, watch you play, whatever fits',
+      'Your name on the Patrons page at thresan.studio',
+    ],
+  },
+  {
+    id: 'creators-circle',
+    name: "Creator's Circle",
+    priceUSD: 1500,
+    pitch: 'For the believers.',
+    limited: true,
+    includes: [
+      'Everything in Studio Patron',
+      'A piece in the next edition of Thresan named after you, with your input on its lore role',
+      'Limited bronze-cast Caelum Nexus sigil (80mm display piece)',
+      'Acknowledgment in the rulebook front matter',
+    ],
+  },
+];
+
 // ─── Page ──────────────────────────────────────────────────────────
 
 export default function ThresanStore() {
@@ -56,6 +165,7 @@ export default function ThresanStore() {
         <Hero />
         <Showcase />
         <Prototype />
+        <Tiers />
         <Founders />
         <Waitlist />
         <Faq />
@@ -252,6 +362,71 @@ function Prototype() {
             The first prototype — kitchen, cardboard, dowels.
           </figcaption>
         </figure>
+      </div>
+    </section>
+  );
+}
+
+// ─── Reward tiers (preview) ────────────────────────────────────────
+
+function Tiers() {
+  return (
+    <section id="tiers" className="store-section store-section-alt">
+      <div className="store-section-inner">
+        <p className="store-section-eyebrow">Preview</p>
+        <h2 className="store-section-title">Reward tiers</h2>
+        <p className="store-founders-lead">
+          A preview of the Kickstarter reward ladder. Prices, slot
+          counts, and inclusions are <em>preliminary</em> — they'll
+          be locked once manufacturing quotes return and the funding
+          goal is set. The Founders Edition is the only tier with a
+          live pre-launch reservation today; the rest preview here so
+          backers know what's coming.
+        </p>
+
+        <div className="store-tier-grid">
+          {REWARD_TIERS.map((tier) => (
+            <article
+              key={tier.id}
+              className={`store-tier${tier.live ? ' store-tier--live' : ''}`}
+            >
+              <div className="store-tier-flags">
+                {tier.live && <span className="store-tier-flag store-tier-flag--live">Live now</span>}
+                {tier.limited && (
+                  <span className="store-tier-flag store-tier-flag--limited">Limited</span>
+                )}
+              </div>
+              <h3 className="store-tier-name">{tier.name}</h3>
+              <p className="store-tier-price">
+                ${tier.priceUSD}
+                <span className="store-tier-price-unit"> USD</span>
+              </p>
+              <p className="store-tier-pitch">{tier.pitch}</p>
+              <ul className="store-tier-includes">
+                {tier.includes.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+              {tier.live && tier.reserveHref && (
+                <a
+                  href={tier.reserveHref}
+                  className="store-cta-button store-cta-primary store-tier-cta"
+                >
+                  Reserve · ${tier.priceUSD} refundable deposit
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
+
+        <p className="store-section-fineprint">
+          <strong>Subject to change.</strong> Manufacturing quotes are
+          still in progress — final prices, slot counts, and
+          inclusions will be re-tuned before the campaign launches.{' '}
+          <strong>Shipping</strong> is not included in physical tiers
+          and is expected at <em>$20–40 USD</em> depending on region
+          (locked at pledge management after the campaign closes).
+        </p>
       </div>
     </section>
   );

@@ -223,6 +223,144 @@
   line-height: 1.55;
 }
 
+.store-section-eyebrow {
+  margin: 0 0 8px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: 0.78rem;
+  color: rgba(194, 164, 107, 0.78);
+}
+
+/* ─── Reward tiers (preview) ──────────────────────────────────── */
+
+.store-tier-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin: 28px 0 0;
+}
+
+@media (min-width: 720px) {
+  .store-tier-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1080px) {
+  .store-tier-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.store-tier {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 22px 24px;
+  border: 1px solid rgba(194, 164, 107, 0.20);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.store-tier--live {
+  border-color: rgba(194, 164, 107, 0.55);
+  box-shadow: 0 6px 28px rgba(194, 164, 107, 0.18);
+  background: rgba(194, 164, 107, 0.04);
+}
+
+.store-tier-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 18px;
+  margin: 0 0 12px;
+}
+
+.store-tier-flag {
+  display: inline-block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.store-tier-flag--live {
+  background: #C2A46B;
+  color: #111826;
+}
+
+.store-tier-flag--limited {
+  background: rgba(139, 106, 72, 0.22);
+  color: #CBB79A;
+  border: 1px solid rgba(139, 106, 72, 0.45);
+}
+
+.store-tier-name {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #C2A46B;
+  letter-spacing: -0.005em;
+}
+
+.store-tier-price {
+  margin: 0 0 4px;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #E6E2D8;
+  letter-spacing: -0.01em;
+}
+
+.store-tier-price-unit {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(245, 247, 251, 0.55);
+  letter-spacing: 0.06em;
+}
+
+.store-tier-pitch {
+  margin: 0 0 14px;
+  font-size: 0.95rem;
+  color: rgba(245, 247, 251, 0.78);
+  font-style: italic;
+}
+
+.store-tier-includes {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  font-size: 0.92rem;
+  color: rgba(245, 247, 251, 0.85);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.store-tier-includes li {
+  position: relative;
+  padding: 4px 0 4px 18px;
+}
+
+.store-tier-includes li::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  color: #C2A46B;
+  font-weight: 800;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.store-tier-cta {
+  margin-top: auto;
+  font-size: 0.92rem !important;
+  padding: 12px 18px !important;
+}
+
 /* ─── Showcase (side-by-side renders) ──────────────────────────── */
 
 .store-showcase {
