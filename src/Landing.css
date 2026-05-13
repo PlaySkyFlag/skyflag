@@ -317,6 +317,30 @@
   text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
 }
 
+/* Cinematic render placed at the bottom of the hero. Caps width so it
+   doesn't dwarf the type on ultra-wide displays; the gold border and
+   drop-shadow lift it off the dark gradient without competing for the
+   eye against the CTAs above. */
+.landing-hero-render {
+  margin: 36px auto 0;
+  max-width: 920px;
+  text-align: center;
+}
+.landing-hero-render img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid rgba(194, 164, 107, 0.22);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.55);
+}
+.landing-hero-render-caption {
+  margin: 14px 0 0;
+  font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+  color: var(--landing-gold, #C2A46B);
+  opacity: 0.85;
+}
+
 .landing-hero-tagline {
   /* Sized up because the handwriting font (Caveat) reads smaller
      at the same point size than a sans-serif. The .tagline-script

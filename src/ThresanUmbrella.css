@@ -73,6 +73,20 @@
   font-style: italic;
 }
 
+/* Atmospheric render placed between the lead and the primary CTA.
+   Compositionally pulls focus toward the wordmark and tagline without
+   stealing it from the CTA. */
+.thresan-render {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  margin: 0 auto 32px;
+  border-radius: 6px;
+  border: 1px solid rgba(194, 164, 107, 0.22);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.55);
+}
+
 .thresan-cta {
   display: inline-flex;
   align-items: center;

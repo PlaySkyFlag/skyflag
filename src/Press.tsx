@@ -76,6 +76,11 @@ function Hero() {
         A turn-based strategy game played simultaneously across three
         stacked boards.
       </p>
+      <img
+        src="/thresan-hero-clans.jpg"
+        alt="Thresan: Skyflag — three stacked boards with Grey Ravens and White Stags arrayed across all three planes."
+        className="press-hero-render"
+      />
       <p className="press-hero-fineprint">
         Everything on this page is free to use in coverage. Take what
         you need.
@@ -330,22 +335,52 @@ function Assets() {
         </figure>
 
         <figure className="press-asset">
-          <a href="/skyflag-render-tower.jpg" download>
-            <img src="/skyflag-render-tower.jpg" alt="Transparent terrace tower — physical edition concept render" />
+          <a href="/thresan-hero-clans.jpg" download>
+            <img src="/thresan-hero-clans.jpg" alt="Three stacked boards with Grey Ravens and White Stags arrayed across all three planes" />
           </a>
           <figcaption>
-            <strong>Render — transparent terrace tower</strong>
-            <span>Concept art for the manufactured premium edition</span>
+            <strong>Render — clans on three planes</strong>
+            <span>1920px JPG · both clans in starting positions</span>
           </figcaption>
         </figure>
 
         <figure className="press-asset">
-          <a href="/skyflag-render-fan.jpg" download>
-            <img src="/skyflag-render-fan.jpg" alt="Fan-spread array — physical edition concept render" />
+          <a href="/thresan-hero-lift.jpg" download>
+            <img src="/thresan-hero-lift.jpg" alt="Figurine being lifted between planes on a column of gold light" />
           </a>
           <figcaption>
-            <strong>Render — fan-spread array</strong>
-            <span>Concept art for the manufactured premium edition</span>
+            <strong>Render — the Lift, mid-arc</strong>
+            <span>1920px JPG · piece transiting between planes</span>
+          </figcaption>
+        </figure>
+
+        <figure className="press-asset">
+          <a href="/thresan-hero-nexus.jpg" download>
+            <img src="/thresan-hero-nexus.jpg" alt="Glowing Aether figure suspended above the topmost board in the Nexus column" />
+          </a>
+          <figcaption>
+            <strong>Render — the Caelum Nexus</strong>
+            <span>1920px JPG · Aether figure in the Nexus column</span>
+          </figcaption>
+        </figure>
+
+        <figure className="press-asset">
+          <a href="/thresan-hero-stack.jpg" download>
+            <img src="/thresan-hero-stack.jpg" alt="Three stacked boards rising as a column, no figures" />
+          </a>
+          <figcaption>
+            <strong>Render — stack, no figures</strong>
+            <span>1920px JPG · architectural / brand-card variant</span>
+          </figcaption>
+        </figure>
+
+        <figure className="press-asset">
+          <a href="/thresan-card.jpg" download>
+            <img src="/thresan-card.jpg" alt="Brand card — sigil, Thresan wordmark, Skyflag subhead, 'Three worlds. One proof.', thresan.com" />
+          </a>
+          <figcaption>
+            <strong>Brand card</strong>
+            <span>1920px JPG · sigil + wordmark lockup, dark background</span>
           </figcaption>
         </figure>
 

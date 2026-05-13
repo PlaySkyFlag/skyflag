@@ -125,8 +125,8 @@ function Hero() {
           )}
         </div>
         <img
-          src="/skyflag-render-tower.jpg"
-          alt="Thresan: Skyflag physical edition — three transparent stacked boards on an illuminated base, brass and acrylic pieces."
+          src="/thresan-hero-nexus.jpg"
+          alt="Thresan: Skyflag — three stacked boards with figurines arrayed across all three planes, gold Nexus column rising through the center."
           className="store-hero-render"
         />
       </div>

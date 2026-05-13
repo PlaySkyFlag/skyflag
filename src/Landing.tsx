@@ -177,6 +177,16 @@ function Hero() {
           No account required to start. Solo vs AI, 2P hot-seat, and online
           multiplayer all work in the browser.
         </p>
+        <figure className="landing-hero-render">
+          <img
+            src="/thresan-hero-lift.jpg"
+            alt="Three stacked boards with figurines arrayed across all three planes; a piece lifts between planes on a column of gold light."
+            loading="lazy"
+          />
+          <figcaption className="landing-hero-render-caption tagline-script">
+            The Lift, mid-arc.
+          </figcaption>
+        </figure>
       </div>
     </section>
   );

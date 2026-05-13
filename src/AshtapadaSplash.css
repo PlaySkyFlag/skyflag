@@ -27,6 +27,20 @@
   padding: 48px 24px;
 }
 
+/* Cinematic stacked-boards render below the CTA. Doubles as the visual
+   bridge from "Ashtapada, lifted." to the Origins excerpt that
+   follows. */
+.ashtapada-render {
+  display: block;
+  width: 100%;
+  max-width: 880px;
+  height: auto;
+  margin: 36px auto 0;
+  border-radius: 6px;
+  border: 1px solid rgba(194, 164, 107, 0.22);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.55);
+}
+
 .ashtapada-inner {
   max-width: 520px;
   text-align: center;

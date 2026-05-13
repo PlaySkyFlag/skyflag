@@ -54,6 +54,12 @@ export default function AshtapadaSplash() {
             <p className="ashtapada-fineprint">
               A turn-based strategy game from the <em>Thresan</em> universe.
             </p>
+            <img
+              src="/thresan-hero-stack.jpg"
+              alt="Three stacked boards rising as a column — the Ashtapada lifted."
+              className="ashtapada-render"
+              loading="lazy"
+            />
           </div>
         </section>
 

@@ -45,6 +45,12 @@ export default function ThresanUmbrella() {
           arcologies, four clans, and an ancient proof of reach. The
           first game is <em>Skyflag</em>.
         </p>
+        <img
+          src="/thresan-hero-stack.jpg"
+          alt="Three stacked boards forming a column — Terran, Meridian, Empyrean."
+          className="thresan-render"
+          loading="lazy"
+        />
         <a href={GAME_URL} className="thresan-cta">
           Play Skyflag →
         </a>
