@@ -476,7 +476,11 @@ function Footer() {
         <p className="press-footer-links">
           <a href="/">Home</a> · <a href="/origins">Origins</a> ·{' '}
           <a href="/story">The Story</a> ·{' '}
+          <a href="https://thresan.com">Universe</a> ·{' '}
+          <a href="https://thresan.games">Editions</a> ·{' '}
           <a href="https://thresan.store">Edition</a> ·{' '}
+          <a href="https://thresan.studio">Studio</a> ·{' '}
+          <a href="https://thresan.io">Lab</a> ·{' '}
           <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
         </p>
         <p className="press-footer-meta">

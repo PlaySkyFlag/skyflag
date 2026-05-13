@@ -445,6 +445,92 @@
   }
 }
 
+.landing-section-subtitle {
+  text-align: center;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  color: var(--landing-text-muted);
+  max-width: 620px;
+  margin: -16px auto 32px;
+  line-height: 1.6;
+}
+
+/* ─── Universe grid (cross-links to the brand surfaces) ────────── */
+
+.landing-universe-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .landing-universe-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-universe-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.landing-universe-card {
+  position: relative;
+  display: block;
+  padding: 22px 24px;
+  border: 1px solid rgba(194, 164, 107, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.landing-universe-card:hover {
+  border-color: rgba(194, 164, 107, 0.55);
+  background: rgba(194, 164, 107, 0.045);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(194, 164, 107, 0.18);
+}
+
+.landing-universe-card-domain {
+  margin: 0 0 8px;
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 0.72rem;
+  color: rgba(194, 164, 107, 0.78);
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+}
+
+.landing-universe-card-title {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--landing-gold, #C2A46B);
+  letter-spacing: -0.005em;
+}
+
+.landing-universe-card-desc {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--landing-text-muted);
+  line-height: 1.5;
+}
+
+.landing-universe-card-arrow {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  font-size: 1.1rem;
+  color: rgba(194, 164, 107, 0.55);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.landing-universe-card:hover .landing-universe-card-arrow {
+  color: #C2A46B;
+  transform: translateX(2px);
+}
+
 /* ─── Features grid ────────────────────────────────────────────── */
 
 .landing-features-grid {

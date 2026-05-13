@@ -106,6 +106,7 @@ export default function Landing() {
       <HowItWorksSection />
       <PricingSection />
       <PhysicalEditionSection />
+      <UniverseSection />
       <Footer />
     </div>
   );
@@ -367,6 +368,60 @@ function PhysicalEditionSection() {
   );
 }
 
+function UniverseSection() {
+  // Coda after the physical edition pitch — for visitors who want to
+  // go deeper than the digital game. Four sister-surfaces, each
+  // anchoring a different register: brand universe, edition catalog,
+  // creator, engine/lab. The physical edition is omitted (already
+  // pitched directly above; including a fifth card would be visual
+  // double-pitching).
+  return (
+    <section className="landing-section">
+      <div className="landing-section-inner">
+        <h2 className="landing-section-title">More of the project</h2>
+        <p className="landing-section-subtitle">
+          Thresan is a game, a universe, a studio, and a build
+          journal. Four ways to explore it beyond the digital edition.
+        </p>
+        <div className="landing-universe-grid">
+          <a href="https://thresan.com" className="landing-universe-card">
+            <p className="landing-universe-card-domain">thresan.com</p>
+            <h3 className="landing-universe-card-title">The universe</h3>
+            <p className="landing-universe-card-desc">
+              A strategy game and the world around it.
+            </p>
+            <span className="landing-universe-card-arrow" aria-hidden="true">→</span>
+          </a>
+          <a href="https://thresan.games" className="landing-universe-card">
+            <p className="landing-universe-card-domain">thresan.games</p>
+            <h3 className="landing-universe-card-title">The editions</h3>
+            <p className="landing-universe-card-desc">
+              The catalog. Skyflag is the current edition.
+            </p>
+            <span className="landing-universe-card-arrow" aria-hidden="true">→</span>
+          </a>
+          <a href="https://thresan.studio" className="landing-universe-card">
+            <p className="landing-universe-card-domain">thresan.studio</p>
+            <h3 className="landing-universe-card-title">The studio</h3>
+            <p className="landing-universe-card-desc">
+              A note from the creator.
+            </p>
+            <span className="landing-universe-card-arrow" aria-hidden="true">→</span>
+          </a>
+          <a href="https://thresan.io" className="landing-universe-card">
+            <p className="landing-universe-card-domain">thresan.io</p>
+            <h3 className="landing-universe-card-title">The lab</h3>
+            <p className="landing-universe-card-desc">
+              Engine notes and build journal.
+            </p>
+            <span className="landing-universe-card-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function DemoSection() {
   // Use whatever theme is first in the registry. THEMES is a record so
   // ordering is insertion-order; the project's "default" theme is
@@ -467,7 +522,11 @@ function Footer() {
           <a href="/story">The Story</a>
           <a href="#pricing">Pricing</a>
           <a href="/press">Press</a>
+          <a href="https://thresan.com">Universe</a>
+          <a href="https://thresan.games">Editions</a>
           <a href="https://thresan.studio">Studio</a>
+          <a href="https://thresan.io">Lab</a>
+          <a href="https://thresan.store">Physical edition</a>
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
         </div>
