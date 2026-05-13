@@ -3045,6 +3045,114 @@ button.tray-piece:hover {
   opacity: 0.85;
 }
 
+/* ─── Post-game Kickstarter waitlist (Stegmaier-style email build) ──
+   Sits at the bottom of the end-game card, calm and dismissable.
+   The hierarchy reads: celebration → actions → friend → waitlist —
+   waitlist is the LAST beat, never competes with the result. */
+
+.end-game-waitlist {
+  margin: 16px 0 0;
+  padding: 14px 16px 12px;
+  border-top: 1px solid rgba(194, 164, 107, 0.18);
+  text-align: center;
+}
+
+.end-game-waitlist-lead {
+  margin: 0 0 12px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(245, 247, 251, 0.78);
+}
+
+.end-game-waitlist-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 360px;
+  margin: 0 auto 8px;
+}
+
+@media (min-width: 480px) {
+  .end-game-waitlist-form {
+    flex-direction: row;
+  }
+}
+
+.end-game-waitlist-input {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(194, 164, 107, 0.32);
+  background: rgba(255, 255, 255, 0.04);
+  color: #E6E2D8;
+  font-size: 0.92rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.end-game-waitlist-input::placeholder {
+  color: rgba(245, 247, 251, 0.4);
+}
+
+.end-game-waitlist-input:focus {
+  border-color: #C2A46B;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.end-game-waitlist-input:disabled {
+  opacity: 0.55;
+}
+
+.end-game-waitlist-submit {
+  /* Reuses .end-game-btn base styles; this is just the size
+     override so it sits next to the input nicely. */
+  padding: 9px 22px;
+  font-size: 0.92rem;
+}
+
+.end-game-waitlist-error {
+  margin: 4px 0 8px;
+  font-size: 0.82rem;
+  color: #ff9a9a;
+}
+
+.end-game-waitlist-dismiss {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  color: rgba(245, 247, 251, 0.55);
+  font-size: 0.8rem;
+  font-family: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.end-game-waitlist-dismiss:hover {
+  color: rgba(245, 247, 251, 0.85);
+}
+
+.end-game-waitlist--done {
+  padding: 14px 16px;
+}
+
+.end-game-waitlist--done p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(245, 247, 251, 0.85);
+}
+
+.end-game-waitlist--done strong {
+  display: block;
+  color: #C2A46B;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
 /* Game-context toolbar — thin row of in-game actions (Hint / Draw /
    Resign / New game) pinned just above the boards. Uses a solid dark
    panel so white-on-rgba buttons stay readable against any theme. */
