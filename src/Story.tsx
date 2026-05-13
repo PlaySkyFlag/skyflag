@@ -8,10 +8,17 @@
 
 import { useEffect } from 'react';
 import './Story.css';
+import { applySurfaceMeta } from './socialMeta';
 
 export default function Story() {
   useEffect(() => {
     window.scrollTo(0, 0);
+    return applySurfaceMeta({
+      title: 'The Story — Thresan™: Skyflag',
+      description:
+        'Volume One of the Skyflag edition: the Three Seals of Kaleo. A narrative account of the campaign across Terran, Meridian, and Empyrean.',
+      canonicalUrl: 'https://playskyflag.com/story',
+    });
   }, []);
 
   return (

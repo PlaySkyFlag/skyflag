@@ -7,6 +7,7 @@
 
 import { useEffect } from 'react';
 import './ThresanUmbrella.css';
+import { applySurfaceMeta } from './socialMeta';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-com';
 const STORE_URL = 'https://thresan.store';
@@ -16,18 +17,12 @@ const ORIGINS_URL = 'https://www.playskyflag.com/origins?ref=thresan-com';
 export default function ThresanUmbrella() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    const prevTitle = document.title;
-    document.title = 'Thresan — a strategy game and the universe around it';
-    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const prevDesc = desc?.content ?? null;
-    if (desc) {
-      desc.content =
-        'Thresan is a strategy game with a layered fictional universe. Three boards, four piece types, ancient roots. The current edition is Skyflag.';
-    }
-    return () => {
-      document.title = prevTitle;
-      if (desc && prevDesc !== null) desc.content = prevDesc;
-    };
+    return applySurfaceMeta({
+      title: 'Thresan — a strategy game and the universe around it',
+      description:
+        'Thresan is a strategy game with a layered fictional universe. Three boards, four piece types, ancient roots. The current edition is Skyflag.',
+      canonicalUrl: 'https://thresan.com/',
+    });
   }, []);
 
   return (

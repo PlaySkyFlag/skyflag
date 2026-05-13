@@ -53,8 +53,10 @@ const AshtapadaSplash = lazyWithRetry(() => import('./AshtapadaSplash.tsx'))
 const Landing = lazyWithRetry(() => import('./Landing.tsx'))
 const Origins = lazyWithRetry(() => import('./Origins.tsx'))
 const Press = lazyWithRetry(() => import('./Press.tsx'))
+const Privacy = lazyWithRetry(() => import('./Privacy.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
+const Terms = lazyWithRetry(() => import('./Terms.tsx'))
 const ThresanIO = lazyWithRetry(() => import('./ThresanIO.tsx'))
 const ThresanStore = lazyWithRetry(() => import('./ThresanStore.tsx'))
 const ThresanStudio = lazyWithRetry(() => import('./ThresanStudio.tsx'))
@@ -102,6 +104,8 @@ const isWatch = path.startsWith('/watch');
 const isReview = path.startsWith('/review');
 const isOrigins = path.startsWith('/origins');
 const isPress = path.startsWith('/press');
+const isPrivacy = path.startsWith('/privacy');
+const isTerms = path.startsWith('/terms');
 const isAshtapadaPath = path.startsWith('/ashtapada');
 const isThresanStorePath = path.startsWith('/thresan-store');
 const isThresanStudioPath = path.startsWith('/thresan-studio');
@@ -123,6 +127,8 @@ else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
 else if (isOrigins) rendered = <Origins />;
 else if (isPress) rendered = <Press />;
+else if (isPrivacy) rendered = <Privacy />;
+else if (isTerms) rendered = <Terms />;
 else if (isAshtapadaPath) rendered = <AshtapadaSplash />;
 else if (isThresanStorePath) rendered = <ThresanStore />;
 else if (isThresanStudioPath) rendered = <ThresanStudio />;

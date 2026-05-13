@@ -6,22 +6,17 @@
 
 import { useEffect } from 'react';
 import './Origins.css';
+import { applySurfaceMeta } from './socialMeta';
 
 export default function Origins() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    const prevTitle = document.title;
-    document.title = 'Origins — Thresan™: Skyflag';
-    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const prevDesc = desc?.content ?? null;
-    if (desc) {
-      desc.content =
-        'How Ashtapada — one of the oldest known board games — became Thresan: the eight-by-eight grid lifted into three boards. Currently in its Skyflag edition.';
-    }
-    return () => {
-      document.title = prevTitle;
-      if (desc && prevDesc !== null) desc.content = prevDesc;
-    };
+    return applySurfaceMeta({
+      title: 'Origins — Thresan™: Skyflag',
+      description:
+        'How Ashtapada — one of the oldest known board games — became Thresan: the eight-by-eight grid lifted into three boards. Currently in its Skyflag edition.',
+      canonicalUrl: 'https://playskyflag.com/origins',
+    });
   }, []);
 
   return (

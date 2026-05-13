@@ -10,6 +10,7 @@
 // primary CTA to "Back us on Kickstarter →" without further code.
 
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
 import './ThresanStore.css';
 
@@ -38,18 +39,12 @@ const GAME_URL = 'https://playskyflag.com/play?ref=thresan-store';
 export default function ThresanStore() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    const prevTitle = document.title;
-    document.title = 'Thresan™: Skyflag — The Physical Edition';
-    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const prevDesc = desc?.content ?? null;
-    if (desc) {
-      desc.content =
-        'The physical edition of Thresan: Skyflag — three boards, lifted. Coming to Kickstarter. Reserve your Founders Edition or join the waitlist.';
-    }
-    return () => {
-      document.title = prevTitle;
-      if (desc && prevDesc !== null) desc.content = prevDesc;
-    };
+    return applySurfaceMeta({
+      title: 'Thresan™: Skyflag — The Physical Edition',
+      description:
+        'The physical edition of Thresan: Skyflag — three boards, lifted. Coming to Kickstarter. Reserve your Founders Edition or join the waitlist.',
+      canonicalUrl: 'https://thresan.store/',
+    });
   }, []);
 
   return (
@@ -375,7 +370,12 @@ function Waitlist() {
           thing the list is for.
         </p>
         {status === 'success' ? (
-          <div className="store-waitlist-success">
+          <div
+            className="store-waitlist-success"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <strong>You're on the list.</strong> We'll be in touch when
             the campaign launches.
           </div>
@@ -483,7 +483,9 @@ function Footer() {
         <p className="store-footer-links">
           <a href="https://playskyflag.com">Home</a> ·{' '}
           <a href={ORIGINS_URL}>Origins</a> ·{' '}
-          <a href={GAME_URL}>Play digital</a>
+          <a href={GAME_URL}>Play digital</a> ·{' '}
+          <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
+          <a href="https://playskyflag.com/terms">Terms</a>
         </p>
         <p className="store-footer-meta">
           © {new Date().getFullYear()} Limnology Research Corp.

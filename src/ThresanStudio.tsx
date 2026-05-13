@@ -6,6 +6,7 @@
 
 import { useEffect } from 'react';
 import './ThresanStudio.css';
+import { applySurfaceMeta } from './socialMeta';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-studio';
 const STORE_URL = 'https://thresan.store';
@@ -14,18 +15,12 @@ const LINKEDIN_URL = 'https://ca.linkedin.com/in/nelsonjatel';
 export default function ThresanStudio() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    const prevTitle = document.title;
-    document.title = 'The studio — Thresan™ by Nelson Jatel';
-    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const prevDesc = desc?.content ?? null;
-    if (desc) {
-      desc.content =
-        'Thresan is built by Nelson Jatel — a water researcher in Kelowna, BC. Three brothers, a holiday table, and the game that came out of it.';
-    }
-    return () => {
-      document.title = prevTitle;
-      if (desc && prevDesc !== null) desc.content = prevDesc;
-    };
+    return applySurfaceMeta({
+      title: 'The studio — Thresan™ by Nelson Jatel',
+      description:
+        'Thresan is built by Nelson Jatel — a water researcher in Kelowna, BC. Three brothers, a holiday table, and the game that came out of it.',
+      canonicalUrl: 'https://thresan.studio/',
+    });
   }, []);
 
   return (

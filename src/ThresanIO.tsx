@@ -7,6 +7,7 @@
 
 import { useEffect } from 'react';
 import './ThresanIO.css';
+import { applySurfaceMeta } from './socialMeta';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-io';
 const UMBRELLA_URL = 'https://thresan.com';
@@ -16,18 +17,12 @@ const CONTACT_EMAIL = 'njatel@limnology.ca';
 export default function ThresanIO() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    const prevTitle = document.title;
-    document.title = 'The Lab — Thresan.io';
-    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const prevDesc = desc?.content ?? null;
-    if (desc) {
-      desc.content =
-        'Engine notes, opening theory, and the build journal behind Thresan™: Skyflag. The math behind the boards.';
-    }
-    return () => {
-      document.title = prevTitle;
-      if (desc && prevDesc !== null) desc.content = prevDesc;
-    };
+    return applySurfaceMeta({
+      title: 'The Lab — Thresan.io',
+      description:
+        'Engine notes, opening theory, and the build journal behind Thresan™: Skyflag. The math behind the boards.',
+      canonicalUrl: 'https://thresan.io/',
+    });
   }, []);
 
   return (

@@ -7,6 +7,7 @@
 
 import { useEffect } from 'react';
 import './Press.css';
+import { applySurfaceMeta } from './socialMeta';
 
 const PRESS_EMAIL = 'njatel@limnology.ca';
 const PRESS_SUBJECT = '[Press] Thresan: Skyflag';
@@ -14,18 +15,12 @@ const PRESS_SUBJECT = '[Press] Thresan: Skyflag';
 export default function Press() {
   useEffect(() => {
     window.scrollTo(0, 0);
-    const prevTitle = document.title;
-    document.title = 'Press kit — Thresan™: Skyflag';
-    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const prevDesc = desc?.content ?? null;
-    if (desc) {
-      desc.content =
-        'Press kit for Thresan™: Skyflag — fact sheet, descriptions, logos, renders, and contact for journalists and content creators.';
-    }
-    return () => {
-      document.title = prevTitle;
-      if (desc && prevDesc !== null) desc.content = prevDesc;
-    };
+    return applySurfaceMeta({
+      title: 'Press kit — Thresan™: Skyflag',
+      description:
+        'Press kit for Thresan™: Skyflag — fact sheet, descriptions, logos, renders, trailer, and contact for journalists and content creators.',
+      canonicalUrl: 'https://playskyflag.com/press',
+    });
   }, []);
 
   return (

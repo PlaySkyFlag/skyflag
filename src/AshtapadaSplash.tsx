@@ -10,6 +10,7 @@
 
 import { useEffect } from 'react';
 import './AshtapadaSplash.css';
+import { applySurfaceMeta } from './socialMeta';
 
 const PLAY_URL = 'https://playskyflag.com/play?ref=ashtapada';
 // Absolute URL so the link works from both ashtapada.com (where the
@@ -22,20 +23,12 @@ export default function AshtapadaSplash() {
   // /ashtapada (or ashtapada.com once the domain is live) reads as
   // Ashtapada-branded rather than the Skyflag defaults. Restored on
   // unmount so SPA navigation away from this route is clean.
-  useEffect(() => {
-    const prevTitle = document.title;
-    document.title = 'Ashtapada, lifted. — Thresan™: Skyflag';
-    const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const prevDesc = desc?.content ?? null;
-    if (desc) {
-      desc.content =
-        'Ashtapada, lifted. Three worlds. One proof. Thresan: a strategy game, currently in its Skyflag edition.';
-    }
-    return () => {
-      document.title = prevTitle;
-      if (desc && prevDesc !== null) desc.content = prevDesc;
-    };
-  }, []);
+  useEffect(() => applySurfaceMeta({
+    title: 'Ashtapada, lifted. — Thresan™: Skyflag',
+    description:
+      'Ashtapada, lifted. Three worlds. One proof. Thresan: a strategy game, currently in its Skyflag edition.',
+    canonicalUrl: 'https://ashtapada.com/',
+  }), []);
 
   return (
     <div className="ashtapada">
