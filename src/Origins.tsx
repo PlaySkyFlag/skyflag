@@ -16,7 +16,7 @@ export default function Origins() {
     const prevDesc = desc?.content ?? null;
     if (desc) {
       desc.content =
-        'How Ashtapada — one of the oldest known board games — becomes Skyflag, lifted into three boards across the Thresan universe.';
+        'How Ashtapada — one of the oldest known board games — became Thresan: the eight-by-eight grid lifted into three boards. Currently in its Skyflag edition.';
     }
     return () => {
       document.title = prevTitle;

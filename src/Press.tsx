@@ -70,7 +70,7 @@ function Header() {
 function Hero() {
   return (
     <section className="press-hero">
-      <p className="press-hero-eyebrow">Press Kit · Kaleo Edition</p>
+      <p className="press-hero-eyebrow">Press Kit</p>
       <h1 className="press-hero-title">Thresan™: Skyflag</h1>
       <p className="press-hero-tagline">
         A turn-based strategy game played simultaneously across three
@@ -142,7 +142,7 @@ function QuickFacts() {
       <h2 className="press-section-title">At a glance</h2>
       <table className="press-facts">
         <tbody>
-          <tr><th>Title</th><td>Thresan™: Skyflag (Kaleo Edition)</td></tr>
+          <tr><th>Title</th><td>Thresan™: Skyflag</td></tr>
           <tr><th>Designer</th><td>Dr. Nelson Jatel</td></tr>
           <tr><th>Publisher</th><td>Limnology Research Corp.</td></tr>
           <tr><th>Genre</th><td>Turn-based strategy · abstract · 3-board chess descendant</td></tr>

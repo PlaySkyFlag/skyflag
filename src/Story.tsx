@@ -47,7 +47,7 @@ function StoryHeader() {
     <header className="story-header">
       <div className="story-header-inner">
         <a href="/" className="story-back">← Skyflag</a>
-        <div className="story-header-meta">Volume One · Kaleo Edition</div>
+        <div className="story-header-meta">Volume One</div>
         <a href="/play" className="story-cta-button">Play</a>
       </div>
     </header>
@@ -60,7 +60,7 @@ function StoryFooter() {
       <div className="story-footer-inner">
         <p className="story-footer-mark">Thresan™: Skyflag — The Three Seals of Kaleo</p>
         <p className="story-footer-meta">
-          Storybook v3 · Kaleo Edition · © {new Date().getFullYear()} Limnology Research Corp.
+          Storybook v3 · © {new Date().getFullYear()} Limnology Research Corp.
         </p>
         <p className="story-footer-links">
           <a href="/">Home</a> · <a href="/play">Play</a> ·{' '}

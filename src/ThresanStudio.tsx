@@ -59,11 +59,13 @@ export default function ThresanStudio() {
             One proof.</em> is, in the end, a sentence about us.
           </p>
           <p>
-            Skyflag is the first game in the Thresan universe — three
-            stacked boards, four clans, an ancient proof of reach.
-            Built solo, on evenings and weekends, with my brothers and
-            friends as the first playtesters. A physical edition
-            follows when the Kickstarter lines up.
+            Thresan is the game — three stacked boards, four piece
+            types, an ancient proof of reach. <em>Skyflag</em> is its
+            current edition: the clans, the boards, the storyboard set
+            in the world of Kaleo. Built solo, on evenings and
+            weekends, with my brothers and friends as the first
+            playtesters. A physical edition of Skyflag follows when
+            the Kickstarter lines up.
           </p>
         </div>
 

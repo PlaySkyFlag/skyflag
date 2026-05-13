@@ -1,0 +1,194 @@
+/* ThresanIO — lab/engine surface at thresan.io. Same gold-on-dark
+   skeleton as the other thresan.* surfaces; the differentiator is the
+   Aether Copper (#8B6A48) accent on the .io suffix and the roadmap
+   markers, which is the brand color reserved for "machinery, lifts,
+   forged metal" — i.e. the engineering register. */
+
+.lab {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 20%, rgba(194, 164, 107, 0.12), transparent 70%),
+    radial-gradient(ellipse 60% 80% at 50% 100%, rgba(139, 106, 72, 0.07), transparent 70%),
+    #06090f;
+  color: #E6E2D8;
+  display: grid;
+  place-items: center;
+  padding: 56px 24px;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.55;
+}
+
+.lab-inner {
+  max-width: 680px;
+  text-align: center;
+}
+
+.lab-sigil {
+  width: clamp(96px, 22vw, 140px);
+  height: auto;
+  display: block;
+  margin: 0 auto 24px;
+  filter: drop-shadow(0 12px 48px rgba(194, 164, 107, 0.18));
+}
+
+.lab-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  color: rgba(194, 164, 107, 0.78);
+  font-size: 0.78rem;
+  margin: 0 0 14px;
+}
+
+/* Wordmark mirrors the official THRESAN/SKYFLAG lockup: big
+   wide-tracked primary, smaller subhead below. Here the subhead is
+   ".io" in Aether Copper to signal the engineering surface without
+   leaving the brand system. */
+.lab-wordmark {
+  font-size: clamp(2.4rem, 6.5vw, 3.8rem);
+  letter-spacing: 0.22em;
+  color: #C2A46B;
+  margin: 0 0 8px;
+  font-weight: 800;
+  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+}
+
+.lab-suffix {
+  display: block;
+  font-size: 0.28em;
+  letter-spacing: 0.4em;
+  color: #8B6A48;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.lab-tagline {
+  font-size: clamp(1.5rem, 3.6vw, 2rem);
+  color: #C2A46B;
+  margin: 16px 0 28px;
+  text-shadow: 0 2px 18px rgba(194, 164, 107, 0.3);
+}
+
+.lab-lead {
+  font-size: clamp(1rem, 1.9vw, 1.1rem);
+  color: rgba(245, 247, 251, 0.88);
+  margin: 0 auto 44px;
+  max-width: 540px;
+  line-height: 1.7;
+}
+
+/* ─── Roadmap — the visible "table of contents" until real posts ship */
+
+.lab-roadmap {
+  text-align: left;
+  margin: 0 auto 44px;
+  max-width: 580px;
+}
+
+.lab-roadmap-title {
+  font-size: clamp(1.05rem, 2.2vw, 1.2rem);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #8B6A48;
+  margin: 0 0 18px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(139, 106, 72, 0.25);
+  font-weight: 700;
+}
+
+.lab-roadmap-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+}
+
+.lab-roadmap-list li {
+  padding: 14px 0 14px 22px;
+  position: relative;
+  border-bottom: 1px solid rgba(245, 247, 251, 0.06);
+  font-size: 0.98rem;
+  color: rgba(245, 247, 251, 0.86);
+  line-height: 1.6;
+}
+
+.lab-roadmap-list li:last-child {
+  border-bottom: 0;
+}
+
+/* Copper bullet marker — small forged-metal dot, on-brand for the
+   engineering surface. */
+.lab-roadmap-list li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 22px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8B6A48;
+  box-shadow: 0 0 8px rgba(139, 106, 72, 0.55);
+}
+
+.lab-roadmap-list strong {
+  color: #C2A46B;
+  display: inline;
+  margin-right: 4px;
+  font-weight: 700;
+}
+
+.lab-roadmap-foot {
+  margin: 18px 0 0;
+  font-size: 0.88rem;
+  color: rgba(245, 247, 251, 0.6);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.lab-mail {
+  color: #C2A46B;
+  text-decoration: none;
+  font-style: normal;
+  border-bottom: 1px solid rgba(194, 164, 107, 0.35);
+}
+
+.lab-mail:hover {
+  color: #ffe4a3;
+  border-bottom-color: rgba(255, 228, 163, 0.55);
+}
+
+/* ─── Outbound links to the rest of the universe */
+
+.lab-outbound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 32px;
+}
+
+.lab-link {
+  color: #C2A46B;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  opacity: 0.88;
+  transition: opacity 0.15s ease;
+}
+
+.lab-link:hover {
+  opacity: 1;
+}
+
+.lab-fineprint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(245, 247, 251, 0.55);
+}
+
+@media (max-width: 540px) {
+  .lab {
+    padding: 40px 16px;
+  }
+}

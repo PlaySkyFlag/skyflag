@@ -8,18 +8,6 @@
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "thresan.io" }],
-      "destination": "https://playskyflag.com/$1",
-      "permanent": true
-    },
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "www.thresan.io" }],
-      "destination": "https://playskyflag.com/$1",
-      "permanent": true
-    },
-    {
-      "source": "/(.*)",
       "has": [{ "type": "host", "value": "playskyflag.io" }],
       "destination": "https://playskyflag.com/$1",
       "permanent": true

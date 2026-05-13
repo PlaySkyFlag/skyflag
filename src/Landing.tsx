@@ -148,7 +148,7 @@ function Hero() {
         <h1 className="landing-hero-title">Thresan: Skyflag</h1>
         <p className="landing-hero-tagline tagline-script">Three worlds. One proof.</p>
         <p className="landing-hero-subtitle">
-          Kaleo Edition. Where strategists gather. Three boards. Four Lifts.
+          Where strategists gather. Three boards. Four Lifts.
         </p>
         {/* Numeric hero strip — leans on the three-board hook the
             rest of the design is built around. Pure typography, no

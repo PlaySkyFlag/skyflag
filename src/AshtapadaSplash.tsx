@@ -29,7 +29,7 @@ export default function AshtapadaSplash() {
     const prevDesc = desc?.content ?? null;
     if (desc) {
       desc.content =
-        'Ashtapada, lifted. Three worlds. One proof. A turn-based strategy game from the Thresan universe.';
+        'Ashtapada, lifted. Three worlds. One proof. Thresan: a strategy game, currently in its Skyflag edition.';
     }
     return () => {
       document.title = prevTitle;
@@ -52,7 +52,8 @@ export default function AshtapadaSplash() {
               Play
             </a>
             <p className="ashtapada-fineprint">
-              A turn-based strategy game from the <em>Thresan</em> universe.
+              <em>Thresan</em> — a strategy game. Currently in its{' '}
+              <em>Skyflag</em> edition.
             </p>
             <img
               src="/thresan-hero-stack.jpg"

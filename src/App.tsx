@@ -1718,7 +1718,7 @@ export default function App() {
             line — quiet brand presence on every page of /play
             without crowding the HUD. */}
         <p className="app-footer-rally tagline-script">Three worlds. One proof.</p>
-        <p>© 2026 Limnology Research Corp. · Thresan™: Skyflag — Kaleo Edition.</p>
+        <p>© 2026 Limnology Research Corp. · Thresan™: Skyflag.</p>
         <div className="app-footer-feedback">
           <button
             type="button"

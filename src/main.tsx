@@ -55,6 +55,7 @@ const Origins = lazyWithRetry(() => import('./Origins.tsx'))
 const Press = lazyWithRetry(() => import('./Press.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
+const ThresanIO = lazyWithRetry(() => import('./ThresanIO.tsx'))
 const ThresanStore = lazyWithRetry(() => import('./ThresanStore.tsx'))
 const ThresanStudio = lazyWithRetry(() => import('./ThresanStudio.tsx'))
 const ThresanUmbrella = lazyWithRetry(() => import('./ThresanUmbrella.tsx'))
@@ -90,6 +91,11 @@ const isThresanHost =
 // CTAs. Same brand palette as thresan.com, distinct content.
 const isThresanStudioHost =
   hostname === 'thresan.studio' || hostname === 'www.thresan.studio';
+// thresan.io — lab / engine surface. Engine notes, opening theory,
+// build journal. Same palette as the other thresan.* surfaces with
+// an Aether Copper accent on the .io suffix.
+const isThresanIOHost =
+  hostname === 'thresan.io' || hostname === 'www.thresan.io';
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
@@ -99,15 +105,17 @@ const isPress = path.startsWith('/press');
 const isAshtapadaPath = path.startsWith('/ashtapada');
 const isThresanStorePath = path.startsWith('/thresan-store');
 const isThresanStudioPath = path.startsWith('/thresan-studio');
+const isThresanIOPath = path.startsWith('/thresan-io');
 // /thresan path for iterating on the umbrella page from the main domain.
 // Matched on exact path or trailing slash so it doesn't swallow
-// /thresan-store or /thresan-studio.
+// /thresan-store, /thresan-studio, or /thresan-io.
 const isThresanPath = path === '/thresan' || path.startsWith('/thresan/');
 
 let rendered;
 if (isAshtapadaHost) rendered = <AshtapadaSplash />;
 else if (isThresanStoreHost) rendered = <ThresanStore />;
 else if (isThresanStudioHost) rendered = <ThresanStudio />;
+else if (isThresanIOHost) rendered = <ThresanIO />;
 else if (isThresanHost) rendered = <ThresanUmbrella />;
 else if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
@@ -118,6 +126,7 @@ else if (isPress) rendered = <Press />;
 else if (isAshtapadaPath) rendered = <AshtapadaSplash />;
 else if (isThresanStorePath) rendered = <ThresanStore />;
 else if (isThresanStudioPath) rendered = <ThresanStudio />;
+else if (isThresanIOPath) rendered = <ThresanIO />;
 else if (isThresanPath) rendered = <ThresanUmbrella />;
 else rendered = <Landing />;
 

@@ -17,12 +17,12 @@ export default function ThresanUmbrella() {
   useEffect(() => {
     window.scrollTo(0, 0);
     const prevTitle = document.title;
-    document.title = 'Thresan — a universe of strategy games and stories';
+    document.title = 'Thresan — a strategy game and the universe around it';
     const desc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     const prevDesc = desc?.content ?? null;
     if (desc) {
       desc.content =
-        'Thresan is a layered fictional world. Its first game is Skyflag — three stacked boards, ancient roots, ongoing campaign.';
+        'Thresan is a strategy game with a layered fictional universe. Three boards, four piece types, ancient roots. The current edition is Skyflag.';
     }
     return () => {
       document.title = prevTitle;
@@ -41,9 +41,10 @@ export default function ThresanUmbrella() {
           Three worlds. One proof.
         </p>
         <p className="thresan-lead">
-          A universe of strategy games and stories. Three stacked
-          arcologies, four clans, and an ancient proof of reach. The
-          first game is <em>Skyflag</em>.
+          Thresan is a strategy game with a layered universe around
+          it. Three stacked boards, four piece types, an ancient
+          proof of reach. The current edition is <em>Skyflag</em> —
+          the clans, the boards, the world of Kaleo.
         </p>
         <img
           src="/thresan-hero-stack.jpg"
