@@ -1,5 +1,5 @@
-import { DEPLOY_COORDS, FLAG_COORDS, NEXUS_COORD } from './constants';
-import { legalMovesFor } from './moves';
+import { DEPLOY_COORDS, FLAG_COORDS, LIFT_CELLS, NEXUS_COORD } from './constants';
+import { legalMovesFor, pieceAt } from './moves';
 import { bookActionFor } from './openingBook';
 import { pstScore } from './pst';
 import { reduce, type Action } from './reducer';
@@ -144,6 +144,10 @@ const QUIESCENCE_DEPTH = 4;
 
 const WIN_SCORE = 1_000_000;
 const LAYER_INDEX: Record<Layer, number> = { ground: 0, sky: 1, space: 2 };
+// Inverse of LAYER_INDEX — used by the lift-aware distance metric to
+// step through the intermediate layers between source and target when
+// checking for blocked lift destinations.
+const LAYER_BY_INDEX: Layer[] = ['ground', 'sky', 'space'];
 
 function pieceValue(kind: PieceKind): number {
   switch (kind) {
@@ -195,11 +199,51 @@ export function legalActions(state: GameState): Action[] {
   return actions;
 }
 
-// Distance metric tuned for Skyflag: Chebyshev within a layer (Captain king-
-// move) + heavy layer-change cost (lifts take two activations).
-function strategicDist(a: Coord, b: Coord): number {
-  const layerCost = Math.abs(LAYER_INDEX[a.layer] - LAYER_INDEX[b.layer]) * 4;
-  return layerCost + Math.max(Math.abs(a.row - b.row), Math.abs(a.col - b.col));
+// Distance metric tuned for Skyflag: Chebyshev within a layer (Captain
+// king-move) + lift-routed cost across layers. Cross-layer paths must
+// route through one of the four lift cells; we try every lift, pick
+// the cheapest, and (when given the state) penalise each intermediate-
+// layer lift destination that's currently occupied by +6 — modelling
+// the detour cost of a blocked lift. Without this, the AI's Captain
+// races toward the Nexus assuming a flat 4-cost layer hop and only
+// discovers the lift is parked with an opponent piece in the eval at
+// the next ply — too late to re-route in late-game positions.
+function strategicDist(a: Coord, b: Coord, state?: GameState): number {
+  if (a.layer === b.layer) {
+    return Math.max(Math.abs(a.row - b.row), Math.abs(a.col - b.col));
+  }
+  const srcIdx = LAYER_INDEX[a.layer];
+  const tgtIdx = LAYER_INDEX[b.layer];
+  const layerHops = Math.abs(srcIdx - tgtIdx);
+  const baseLayerCost = layerHops * 4;
+  const step = srcIdx < tgtIdx ? 1 : -1;
+  let bestCost = Infinity;
+  for (const lift of LIFT_CELLS) {
+    const toLift = Math.max(
+      Math.abs(a.row - lift.row),
+      Math.abs(a.col - lift.col),
+    );
+    const fromLift = Math.max(
+      Math.abs(b.row - lift.row),
+      Math.abs(b.col - lift.col),
+    );
+    let blockedCost = 0;
+    if (state) {
+      // Walk every layer the piece would land on while transiting via
+      // this lift (the destination layers of each lift step). If any
+      // is occupied, the lift is functionally blocked at that hop and
+      // the piece would need to detour — model the detour as +6.
+      for (let i = srcIdx + step; i !== tgtIdx + step; i += step) {
+        const layer = LAYER_BY_INDEX[i];
+        if (pieceAt(state, { layer, row: lift.row, col: lift.col })) {
+          blockedCost += 6;
+        }
+      }
+    }
+    const cost = toLift + baseLayerCost + fromLift + blockedCost;
+    if (cost < bestCost) bestCost = cost;
+  }
+  return bestCost;
 }
 
 // Player p's next strategic target: the next un-captured opponent flag
@@ -224,7 +268,7 @@ function closestDistToTarget(state: GameState, p: Player): number {
   for (const bp of state.onBoard) {
     if (bp.piece.owner !== p) continue;
     if (bp.piece.kind !== 'captain' && bp.piece.kind !== 'soldier') continue;
-    const d = strategicDist(bp.coord, target);
+    const d = strategicDist(bp.coord, target, state);
     if (d < best) best = d;
   }
   return best;
@@ -348,6 +392,39 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   if (myCaptainsThreatened > 1) score -= 300 * (myCaptainsThreatened - 1);
   if (oppCaptainsThreatened > 1) score += 300 * (oppCaptainsThreatened - 1);
 
+  // 2-ply flag-threat: opponent Captains within striking distance of
+  // one of my uncaptured flags (and the symmetric pattern for me on
+  // opp flags). Flags are win-paths; the existing threat loop catches
+  // pieces-under-attack-next-ply but missed "Captain is two squares
+  // from my undefended flag" — the most common late-game blunder. We
+  // use the lift-aware strategicDist so cross-layer threats blocked
+  // by a parked piece don't trip the alarm. Threshold 3 covers
+  // same-layer chebyshev ≤ 3 (1–2 turns to capture for a Captain).
+  for (const layer of ['ground', 'sky', 'space'] as const) {
+    if (!state.flags[layer][aiPlayer]) {
+      const myFlagXY = FLAG_COORDS[aiPlayer][layer];
+      const myFlag: Coord = { layer, row: myFlagXY.row, col: myFlagXY.col };
+      for (const bp of state.onBoard) {
+        if (bp.piece.owner !== opp || bp.piece.kind !== 'captain') continue;
+        if (strategicDist(bp.coord, myFlag, state) <= 3) {
+          score -= 50;
+          break;
+        }
+      }
+    }
+    if (!state.flags[layer][opp]) {
+      const oppFlagXY = FLAG_COORDS[opp][layer];
+      const oppFlag: Coord = { layer, row: oppFlagXY.row, col: oppFlagXY.col };
+      for (const bp of state.onBoard) {
+        if (bp.piece.owner !== aiPlayer || bp.piece.kind !== 'captain') continue;
+        if (strategicDist(bp.coord, oppFlag, state) <= 3) {
+          score += 50;
+          break;
+        }
+      }
+    }
+  }
+
   return score;
 }
 
@@ -360,6 +437,8 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
 // Captures and flag-captures stay top-priority regardless of killer/history
 // — those are tactical, the heuristics only refine quiet-move ordering.
 function orderingHeuristic(state: GameState, action: Action, ply: number): number {
+  let score = 0;
+
   if (action.type === 'move') {
     const target = state.onBoard.find(
       (bp) =>
@@ -368,31 +447,53 @@ function orderingHeuristic(state: GameState, action: Action, ply: number): numbe
         bp.coord.col === action.to.col &&
         bp.piece.owner !== state.currentPlayer,
     );
-    if (target) return 1000 + pieceValue(target.piece.kind);
-
-    const piece = state.onBoard.find((bp) => bp.piece.id === action.pieceId)?.piece;
-    if (piece?.kind === 'captain') {
-      const opp = opponentOf(state.currentPlayer);
-      const flag = FLAG_COORDS[opp][action.to.layer];
-      if (
-        action.to.row === flag.row &&
-        action.to.col === flag.col &&
-        !state.flags[action.to.layer][opp]
-      ) {
-        return 900;
+    if (target) {
+      score = 1000 + pieceValue(target.piece.kind);
+    } else {
+      const piece = state.onBoard.find((bp) => bp.piece.id === action.pieceId)?.piece;
+      if (piece?.kind === 'captain') {
+        const opp = opponentOf(state.currentPlayer);
+        const flag = FLAG_COORDS[opp][action.to.layer];
+        if (
+          action.to.row === flag.row &&
+          action.to.col === flag.col &&
+          !state.flags[action.to.layer][opp]
+        ) {
+          score = 900;
+        }
       }
     }
   }
 
-  // Killer slots — quiet moves that recently caused beta cutoffs at this ply.
-  const slot = killers[ply];
-  if (slot) {
-    if (slot[0] && actionsEqual(slot[0], action)) return 500;
-    if (slot[1] && actionsEqual(slot[1], action)) return 400;
+  if (score === 0) {
+    // Quiet move (no capture, no flag-capture). Killer slots first,
+    // then the history-heuristic tiebreaker.
+    const slot = killers[ply];
+    if (slot) {
+      if (slot[0] && actionsEqual(slot[0], action)) score = 500;
+      else if (slot[1] && actionsEqual(slot[1], action)) score = 400;
+    }
+    if (score === 0) {
+      score = historyTable.get(historyKey(action)) ?? 0;
+    }
   }
 
-  // History tiebreaker for everything else.
-  return historyTable.get(historyKey(action)) ?? 0;
+  // Lift-move bonus: a move whose destination is a lift cell is
+  // tactically significant in 3D play — either prepping a future
+  // lift step or denying the opponent's vertical mobility. +50
+  // compounds atop whatever the move scored above so captures-on-
+  // lifts still sort top and quiet lift-moves rank above generic
+  // history-tiebroken quiet moves.
+  if (
+    action.type === 'move' &&
+    LIFT_CELLS.some(
+      (c) => c.row === action.to.row && c.col === action.to.col,
+    )
+  ) {
+    score += 50;
+  }
+
+  return score;
 }
 
 function orderActions(state: GameState, actions: Action[], ply: number): Action[] {
