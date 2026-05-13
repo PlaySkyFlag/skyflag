@@ -316,7 +316,10 @@
 
 /* Handwritten "elsewhere" line at the very bottom of the footer —
    invites the curious to wander to the heritage / studio / edition
-   sites without crowding the focused gameplay HUD. */
+   sites without crowding the focused gameplay HUD. Overrides the
+   .tagline-script rotation + inline-block because three full
+   sentences need to wrap as normal flowing text; the -2deg tilt
+   only looks signed on a single short phrase. */
 .app-footer-elsewhere {
   margin-top: 14px !important;
   font-size: 1.2rem;
@@ -324,6 +327,8 @@
   opacity: 0.82;
   text-shadow: 0 1px 8px rgba(194, 164, 107, 0.18);
   line-height: 1.4;
+  transform: none;
+  display: block;
 }
 
 .app-footer-elsewhere a {
