@@ -20,6 +20,8 @@ export default function Press() {
       description:
         'Press kit for Thresan™: Skyflag — fact sheet, descriptions, logos, renders, trailer, and contact for journalists and content creators.',
       canonicalUrl: 'https://playskyflag.com/press',
+      ogImage: 'https://playskyflag.com/thresan-og-clans.jpg',
+      ogImageAlt: 'Three stacked boards with Grey Ravens and White Stags arrayed across all three planes.',
     });
   }, []);
 

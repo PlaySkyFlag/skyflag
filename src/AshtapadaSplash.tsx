@@ -28,6 +28,8 @@ export default function AshtapadaSplash() {
     description:
       'Ashtapada, lifted. Three worlds. One proof. Thresan: a strategy game, currently in its Skyflag edition.',
     canonicalUrl: 'https://ashtapada.com/',
+    ogImage: 'https://ashtapada.com/thresan-og-stack.jpg',
+    ogImageAlt: 'Three stacked boards rising as a column — Ashtapada lifted into Thresan.',
   }), []);
 
   return (

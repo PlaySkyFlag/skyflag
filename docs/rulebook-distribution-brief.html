@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Thresan: Skyflag — Rulebook Distribution Brief</title>
+<style>
+  @page {
+    size: Letter;
+    margin: 0.85in 0.85in 1.0in 0.85in;
+  }
+  @page :first { margin: 0; }
+
+  :root {
+    --gold:        #C2A46B;
+    --gold-deep:   #8B6A48;
+    --ink:         #111826;
+    --ink-soft:    #2B3138;
+    --paper:       #fdfaf4;
+    --paper-dim:   #f4eedf;
+    --bone:        #E6E2D8;
+    --teal:        #4A6D6F;
+    --sand:        #CBB79A;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Crimson Pro', 'EB Garamond', 'Georgia', serif;
+    color: var(--ink);
+    background: var(--paper);
+    font-size: 11.5pt;
+    line-height: 1.55;
+  }
+
+  /* ─── Cover ─────────────────────────────────────────────────── */
+  .cover {
+    page-break-after: always;
+    height: 11in;
+    padding: 1.2in 0.85in 1in;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(194, 164, 107, 0.10), transparent 70%),
+      var(--paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .cover-top {
+    text-align: center;
+  }
+
+  .cover-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    color: var(--gold-deep);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10pt;
+    margin: 0 0 18px;
+  }
+
+  .cover-title {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--gold);
+    font-size: 42pt;
+    letter-spacing: 0.18em;
+    font-weight: 800;
+    margin: 0 0 6px;
+    line-height: 1.05;
+  }
+
+  .cover-subtitle {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--gold-deep);
+    font-size: 14pt;
+    letter-spacing: 0.32em;
+    font-weight: 600;
+    margin: 0 0 28px;
+  }
+
+  .cover-context {
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 12.5pt;
+    max-width: 5.5in;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .cover-bottom {
+    text-align: center;
+    color: var(--ink-soft);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10pt;
+    letter-spacing: 0.18em;
+  }
+
+  .cover-tagline {
+    font-style: italic;
+    color: var(--gold-deep);
+    font-size: 13pt;
+    letter-spacing: 0.12em;
+    margin: 0 0 18px;
+    font-family: 'Crimson Pro', serif;
+  }
+
+  /* ─── Body sections ─────────────────────────────────────────── */
+  .body {
+    padding: 0 0 0 0;
+  }
+
+  section {
+    margin: 0 0 24pt;
+  }
+
+  h1 {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--gold);
+    font-size: 22pt;
+    letter-spacing: 0.04em;
+    margin: 0 0 6pt;
+    font-weight: 800;
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 6pt;
+    page-break-after: avoid;
+  }
+
+  h2 {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--gold-deep);
+    font-size: 14pt;
+    letter-spacing: 0.02em;
+    margin: 18pt 0 8pt;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--ink-soft);
+    font-size: 11.5pt;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 14pt 0 6pt;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+
+  p, li {
+    margin: 0 0 8pt;
+  }
+
+  ul, ol {
+    padding-left: 20pt;
+    margin: 0 0 12pt;
+  }
+
+  li {
+    margin: 0 0 4pt;
+  }
+
+  strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  em {
+    color: var(--gold-deep);
+    font-style: italic;
+  }
+
+  code, .mono {
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+    font-size: 10pt;
+    background: var(--paper-dim);
+    padding: 1pt 4pt;
+    border-radius: 2pt;
+    color: var(--ink-soft);
+  }
+
+  .callout {
+    background: var(--paper-dim);
+    border-left: 3pt solid var(--gold);
+    padding: 8pt 14pt;
+    margin: 12pt 0;
+    font-size: 10.5pt;
+    color: var(--ink-soft);
+  }
+
+  .callout strong { color: var(--gold-deep); }
+
+  .checklist {
+    list-style: none;
+    padding-left: 0;
+  }
+  .checklist li {
+    padding: 3pt 0 3pt 22pt;
+    position: relative;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  .checklist li:last-child { border-bottom: 0; }
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    top: 3pt;
+    color: var(--gold-deep);
+    font-size: 12pt;
+  }
+
+  table.swatches {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 8pt 0 12pt;
+    font-size: 10pt;
+  }
+  table.swatches td {
+    padding: 4pt 6pt;
+    border-bottom: 1px solid var(--paper-dim);
+  }
+  .swatch {
+    display: inline-block;
+    width: 14pt;
+    height: 14pt;
+    vertical-align: middle;
+    border: 1px solid rgba(0,0,0,0.15);
+    margin-right: 8pt;
+  }
+
+  .meta-line {
+    margin: 18pt 0 0;
+    padding-top: 8pt;
+    border-top: 1px solid var(--paper-dim);
+    font-size: 9pt;
+    color: var(--ink-soft);
+    font-style: italic;
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  /* Avoid orphan/widow lines splitting badly */
+  p { orphans: 2; widows: 2; }
+</style>
+</head>
+<body>
+
+<!-- ─── Cover ─────────────────────────────────────────────────── -->
+<section class="cover">
+  <div class="cover-top">
+    <p class="cover-eyebrow">Production Brief</p>
+    <h1 class="cover-title">THRESAN<sup style="font-size:0.4em;vertical-align:super;font-weight:600;opacity:0.85;letter-spacing:0;">™</sup></h1>
+    <p class="cover-subtitle">Skyflag · Rulebook v21</p>
+    <p class="cover-context">
+      Instructions for producing the final distributable rulebook
+      from <em>v19.1</em>. Incorporates every brand, naming, and
+      design-of-rules lesson learned during the construction of the
+      web prototype and the surrounding brand surfaces.
+    </p>
+  </div>
+  <div class="cover-bottom">
+    <p class="cover-tagline">Three worlds. One proof.</p>
+    <p>Limnology Research Corp. &nbsp;·&nbsp; 2026-05-13</p>
+  </div>
+</section>
+
+<!-- ─── §0 Purpose ────────────────────────────────────────────── -->
+<section>
+  <h1>0 · Purpose</h1>
+  <p>
+    This document is the build brief, not the rulebook. Read it
+    once, then use it as a working checklist while editing the
+    source text into a print- and web-ready edition.
+  </p>
+  <p>
+    Estimated effort: one editor working focused, 5–10 days from
+    source-text edit to print-ready PDF, plus 2–3 days for cover
+    and illustrations if those are produced fresh rather than
+    licensed from existing brand assets.
+  </p>
+</section>
+
+<!-- ─── §1 Source materials ───────────────────────────────────── -->
+<section>
+  <h1>1 · Source materials</h1>
+  <ul>
+    <li>
+      <strong>v19.1 source</strong> — <code>docs/rulebook-v19.1.pdf</code>.
+      Canonical text reference. Most rule content carries forward
+      unchanged.
+    </li>
+    <li>
+      <strong>v20 interim</strong> — <code>scripts/rulebook-v20.html</code>.
+      Most recent text pass; already incorporates the 4-pieces-per-side
+      clarification, the Cross-Board Rule, and the trademark-pivot
+      sweep (Kaleo Edition references removed as of 2026-05-13).
+      <em>Start from this.</em>
+    </li>
+    <li>
+      <strong>Brand reference</strong> — the canonical brand-system
+      image (sigil, palette, wordmark, clans, piece templates). The
+      master copy lives at{' '}
+      <code>/Users/nelson/Documents/SkyFlag/LOGO - Tresan/Thresan Font, colour palette, typography.png</code>.
+    </li>
+    <li>
+      <strong>Brand surfaces (for tone/voice consistency)</strong> —
+      <code>thresan.com</code>, <code>thresan.studio</code>,
+      <code>thresan.games</code>, <code>thresan.io</code>,
+      <code>thresan.store</code>. Each anchors a register; the
+      rulebook should read as a sibling to these, not a third-party
+      document.
+    </li>
+  </ul>
+</section>
+
+<!-- ─── §2 Brand and naming changes ──────────────────────────── -->
+<section>
+  <h1>2 · Brand and naming changes</h1>
+  <p>
+    This is the load-bearing section. Apply throughout the rulebook;
+    nothing else in the brief matters if this sweep is incomplete.
+  </p>
+
+  <h2>2.1 The framing pivot</h2>
+  <div class="callout">
+    <strong>Old framing:</strong> "Thresan is the universe; Skyflag
+    is the game within it; Kaleo Edition is the first setting."<br/>
+    <strong>New framing:</strong> <em>Thresan™</em> is the game
+    (rules-level identity, like chess). <em>Skyflag</em> is its
+    current edition — the pieces, the boards, and the storyboard set
+    in the world of <em>Kaleo</em>. Future editions of Thresan keep
+    the rules and change the storyboard.
+  </div>
+  <p>
+    Locked 2026-05-13 across every public-facing surface. Reflect
+    the same framing throughout the rulebook.
+  </p>
+
+  <h2>2.2 Title-form usage</h2>
+  <ul>
+    <li><strong>Long form</strong>: <em>Thresan: Skyflag</em>.</li>
+    <li><strong>Short form</strong>: <em>Thresan</em> (when context is clear), or <em>Skyflag</em> (when specifically the edition).</li>
+    <li><strong>Trademark</strong>: ™ goes on <em>Thresan</em> only. Never on <em>Skyflag</em> alone. Apply ™ to the first prominent occurrence per major section (cover, front-matter, foreword), not to every instance.</li>
+  </ul>
+
+  <h2>2.3 Sweep targets</h2>
+  <p>Drop every instance of "Kaleo Edition" as a subtitle. Three places it commonly appears:</p>
+  <ul>
+    <li>Title page lockup → replace with <em>Thresan: Skyflag — Rulebook v21</em>.</li>
+    <li>Running footer → replace with <em>Thresan: Skyflag · Rulebook v21 · §N</em>.</li>
+    <li>"About this edition" / colophon page → rewrite per §2.4.</li>
+  </ul>
+  <p>
+    In running prose, replace any "first game in the Thresan
+    universe" phrasing with "current edition of Thresan."
+  </p>
+
+  <h2>2.4 New colophon paragraph (front matter)</h2>
+  <div class="callout">
+    Recommended draft text — edit as needed:
+    <p style="margin-top:8pt;">
+      <em>"Thresan is a strategy game. Skyflag is its current
+      edition — the pieces, the boards, and the storyboard set in
+      the world of Kaleo. The rules in this book describe Thresan;
+      the names, art, and narrative describe Skyflag. Future
+      editions of Thresan may rename the pieces, redress the boards,
+      and rewrite the world. The rules will not change."</em>
+    </p>
+  </div>
+</section>
+
+<!-- ─── §3 Lessons learned ───────────────────────────────────── -->
+<section>
+  <h1>3 · Lessons learned during the build</h1>
+  <p>
+    Surfaced during construction of the web prototype, brand
+    surfaces, and physical-edition concept work. Most are already
+    folded into v20; verify before final layout.
+  </p>
+
+  <h2>3.1 Piece count (the v19.1 ambiguity that burned testers)</h2>
+  <p>
+    v19.1 was ambiguous about piece counts. Make it explicit on the
+    setup page:
+  </p>
+  <ul>
+    <li><strong>4 pieces per player</strong> (8 total): one Captain, one Soldier, one Rover, one Pilot.</li>
+    <li>Each piece is distinct in role, movement, and starting position. Pieces are not interchangeable tokens.</li>
+  </ul>
+
+  <h2>3.2 Cross-Board Rule edge cases</h2>
+  <p>
+    Several edge cases emerged during app development that should be
+    codified into the rulebook proper rather than living in errata:
+  </p>
+  <ul>
+    <li><strong>Lift-during-capture sequencing</strong> — define which resolves first.</li>
+    <li><strong>Simultaneous claim-seal threat resolution</strong> — when one move threatens multiple seals in a single turn.</li>
+    <li><strong>Nexus capture preconditions</strong> — required state of the Captain piece for the Nexus-win path to be legal.</li>
+  </ul>
+
+  <h2>3.3 Win condition language</h2>
+  <p>Clarify both win paths with sentence-level precision. Recommended phrasing:</p>
+  <ol>
+    <li><strong>Path of seals</strong>: capture all three of the opposing clan's claim-seals — one on each plane (Terran, Meridian, Empyrean).</li>
+    <li><strong>Path of the Nexus</strong>: land your Captain on the Caelum Nexus at Space(3,3).</li>
+  </ol>
+  <p>Specify what happens if both conditions are achieved on the same turn (default: seals resolve first; document it).</p>
+
+  <h2>3.4 Terminology consistency</h2>
+  <p>Choose one term per concept and stick to it across the rulebook:</p>
+  <ul>
+    <li><em>"claim-seal"</em> in lore prose; <em>"flag"</em> in mechanical rules sections. Acceptable to use both if labeled clearly; pick one if a single voice is preferred.</li>
+    <li><em>"Lift"</em> with capital L when naming a Lift mechanism; lowercase when used as a verb.</li>
+    <li><em>"Nexus"</em> always capitalized when referring to the Caelum Nexus square.</li>
+  </ul>
+
+  <h2>3.5 Time control note</h2>
+  <p>
+    If supporting tournament play (or even friendly online
+    multiplayer with optional clocks), add a one-page appendix on
+    time controls: per-move budget, per-game budget, increment.
+    Currently absent from v19.1.
+  </p>
+
+  <h2>3.6 Promotion lore sidebar</h2>
+  <p>
+    Add the medical-event flavor framing for Soldier-to-Captain
+    promotion (Durren → Dantec transformation) as a lore sidebar.
+    Surfaced during app development as a memorable narrative beat
+    that strengthens the constructive-proof framing.
+  </p>
+</section>
+
+<!-- ─── §4 Look and feel ─────────────────────────────────────── -->
+<section>
+  <h1>4 · Look and feel</h1>
+
+  <h2>4.1 Palette (canonical hex codes — use these exactly)</h2>
+  <table class="swatches">
+    <tr><td><span class="swatch" style="background:#C2A46B"></span> <strong>Aether Gold</strong> #C2A46B</td><td>Primary accent: section headings, sigil overlays, decorative rules.</td></tr>
+    <tr><td><span class="swatch" style="background:#8B6A48"></span> <strong>Aether Copper</strong> #8B6A48</td><td>Lift mechanisms in diagrams. "Machinery, lifts, forged metal."</td></tr>
+    <tr><td><span class="swatch" style="background:#CBB79A"></span> <strong>Terran Sand</strong> #CBB79A</td><td>Terran-plane illustrative elements.</td></tr>
+    <tr><td><span class="swatch" style="background:#4A6D6F"></span> <strong>Meridian Teal</strong> #4A6D6F</td><td>Meridian-plane diagrams.</td></tr>
+    <tr><td><span class="swatch" style="background:#111826"></span> <strong>Empyrean Indigo</strong> #111826</td><td>Primary text on light bg; primary background on covers/section breaks.</td></tr>
+    <tr><td><span class="swatch" style="background:#E6E2D8"></span> <strong>Stag Bone</strong> #E6E2D8</td><td>Body text on dark backgrounds; White Stags / P2 surfaces.</td></tr>
+    <tr><td><span class="swatch" style="background:#2B3138"></span> <strong>Raven Slate</strong> #2B3138</td><td>Grey Ravens / P1 surfaces.</td></tr>
+  </table>
+
+  <h2>4.2 Typography</h2>
+  <ul>
+    <li><strong>Wordmark</strong>: refined geometric type, wide tracking (0.22em on THRESAN, 0.04em on SKYFLAG subhead). Currently raster only; commissioning a proper font file is flagged in §8.</li>
+    <li><strong>Body</strong>: Crimson Pro (serif) or Inter (sans). Pick one for the print rulebook. Inter recommended for clarity in mechanical rules; Crimson Pro for lore sidebars and the story foreword.</li>
+    <li><strong>Section headings</strong>: Inter Bold, Aether Gold, with a 2pt rule underline in Aether Gold.</li>
+    <li><strong>Monospace</strong> (for coordinate notation like <code>Space(3,3)</code>): JetBrains Mono or Menlo.</li>
+  </ul>
+
+  <h2>4.3 Sigil placement</h2>
+  <ul>
+    <li><strong>Cover</strong> — large sigil centered above wordmark lockup.</li>
+    <li><strong>Section breaks</strong> — small sigil decorative element, centered.</li>
+    <li><strong>Running footer</strong> — minimal: sigil glyph + page number.</li>
+  </ul>
+
+  <h2>4.4 Page layout</h2>
+  <ul>
+    <li><strong>Trim size</strong>: Letter (8.5×11) for first print. Switch to A5 if going to a games-specific publisher later.</li>
+    <li><strong>Margins</strong>: 0.85in all around, 1.0in bottom for footer.</li>
+    <li><strong>Binding</strong>: saddle-stitch for ≤40 pages; perfect bind for ≥48.</li>
+    <li><strong>Cover material</strong>: matte black with gold foil for the sigil — fits the "monastery, not tech" aesthetic. Sample on press before full run.</li>
+  </ul>
+
+  <h2>4.5 Diagrams</h2>
+  <ul>
+    <li>Every diagram uses the brand palette.</li>
+    <li>Each diagram annotated with the relevant rule section number (e.g., <code>see §4.2</code>).</li>
+    <li>Board representations: choose isometric or top-down — pick one and use it throughout. Recommended: top-down for mechanical rules (cleaner), isometric for chapter openers (more evocative).</li>
+  </ul>
+</section>
+
+<!-- ─── §5 Concept framing ───────────────────────────────────── -->
+<section>
+  <h1>5 · Concept framing</h1>
+
+  <h2>5.1 Tagline placement</h2>
+  <p><em>"Three worlds. One proof."</em> appears in three places:</p>
+  <ul>
+    <li>Cover (lower third, scripted/handwritten font for warmth).</li>
+    <li>Last page (centered, restrained).</li>
+    <li>Each section divider as a small footer mark.</li>
+  </ul>
+
+  <h2>5.2 Constructive-proof framing</h2>
+  <p>
+    In the introduction, frame the game as a <em>constructive
+    proof</em> — distinct from chess's contradiction proof. Both
+    Thresan win conditions are positive demonstrations of reach
+    across the three planes, not eliminations of the opponent. This
+    is the conceptual hook that distinguishes Thresan from its
+    eight-by-eight ancestor. Cross-reference{' '}
+    <em>thresan.io / "The proof of three"</em> for full
+    framing — but condense to one paragraph for the rulebook intro.
+  </p>
+
+  <h2>5.3 Tone</h2>
+  <ul>
+    <li>Authoritative but warm. This is a rulebook, but written by one person, for two people sitting across a table.</li>
+    <li>Avoid corporate plural ("we") in rule text. First-person OK in foreword and acknowledgments.</li>
+    <li>Lore sidebars set in italic Crimson Pro, visually distinct from rule text. Never blur the line between rule and lore — readers need to know which is binding.</li>
+  </ul>
+</section>
+
+<!-- ─── §6 Distribution ──────────────────────────────────────── -->
+<section>
+  <h1>6 · Distribution</h1>
+
+  <h2>6.1 File deliverables</h2>
+  <ul>
+    <li><strong>Print-ready PDF</strong> — CMYK, 300 DPI, embedded fonts, 0.125in bleed, crop marks.</li>
+    <li><strong>Web PDF</strong> — RGB, 150 DPI, hyperlinked TOC, smaller file size for fast download.</li>
+    <li><strong>EPUB</strong> — optional for v2; v1 can skip if scope is tight.</li>
+  </ul>
+
+  <h2>6.2 Hosting</h2>
+  <ul>
+    <li>Print-ready: not on website; sent to printer directly.</li>
+    <li>Web PDF: linked from <code>playskyflag.com/help</code> ("Download the rulebook").</li>
+    <li>Press kit: include web PDF in the assets grid at <code>playskyflag.com/press</code>.</li>
+  </ul>
+
+  <h2>6.3 Version control</h2>
+  <ul>
+    <li>Repository copy: <code>docs/rulebook-v21.pdf</code>.</li>
+    <li>Source HTML: keep <code>scripts/rulebook-v21.html</code> updated in lockstep.</li>
+    <li>Markdown source: consider extracting if this becomes a living document with regular edits.</li>
+  </ul>
+</section>
+
+<!-- ─── §7 Production checklist ──────────────────────────────── -->
+<section>
+  <h1>7 · Production checklist</h1>
+  <p>In order — don't skip ahead, especially on §2.</p>
+  <ol class="checklist">
+    <li>Pull <code>scripts/rulebook-v20.html</code> as starting copy.</li>
+    <li>Brand sweep — confirm zero "Kaleo Edition" instances remain (already done in v20 as of 2026-05-13; re-verify).</li>
+    <li>Apply framing pivot — write the new colophon paragraph (§2.4); edit the intro to lead with the Thresan-as-game framing.</li>
+    <li>Verify all lessons-learned edits (§3.1–§3.6) are reflected in the text.</li>
+    <li>Add Cross-Board Rule edge cases (§3.2) as numbered subsections of the relevant rule.</li>
+    <li>Add appendix: time controls (§3.5).</li>
+    <li>Add lore sidebar: Soldier-to-Captain promotion (§3.6).</li>
+    <li>Visual pass — verify palette, typography, sigil placement per §4.</li>
+    <li>Diagram audit — every diagram uses brand palette; rule cross-references present.</li>
+    <li>Cover design — gold-foil sigil mockup; review on press sample before full run.</li>
+    <li>External proof reader — one fresh pair of eyes (the brothers, who've been playtesters, are the natural pick).</li>
+    <li>Generate print-ready PDF (CMYK, 300 DPI, embedded fonts, bleed, crop marks).</li>
+    <li>Generate web PDF (RGB, 150 DPI, hyperlinked TOC).</li>
+    <li>Upload web PDF to <code>playskyflag.com/help</code> and press kit.</li>
+    <li>Send print-ready to print shop with sample request.</li>
+  </ol>
+</section>
+
+<!-- ─── §8 Open decisions ────────────────────────────────────── -->
+<section>
+  <h1>8 · Open decisions (flag for Nelson)</h1>
+  <ul>
+    <li><strong>Final version number</strong> — v21 (continues sequence) or v1.0 (resets to "first distributable edition" numbering)?</li>
+    <li><strong>Print run size</strong> — depends on Kickstarter pledge targets; gating input.</li>
+    <li><strong>Trim size</strong> — Letter (US default) vs A5 (games-publisher convention)?</li>
+    <li><strong>Cover material</strong> — matte black + gold foil for all tiers, or upgrade material at premium tiers (cloth bind, leather, etc.)?</li>
+    <li><strong>Translations</strong> — English-only for v1; flag a v2 for German/French/Japanese if Kickstarter signal supports it.</li>
+    <li><strong>Custom font commission</strong> — the THRESAN wordmark currently lives only as raster art. Commissioning a proper font file would future-proof every brand surface (rulebook, packaging, future editions). Estimate $2k–6k via a designer.</li>
+    <li><strong>Illustration licensing</strong> — if external illustrators are hired, contract for commercial print + digital + derivative-edition use up front.</li>
+  </ul>
+</section>
+
+<!-- ─── §9 What this brief does not include ─────────────────── -->
+<section>
+  <h1>9 · What this brief deliberately does <em>not</em> include</h1>
+  <ul>
+    <li><strong>Specific rule text edits</strong> — these live in the source documents and are referenced by section number.</li>
+    <li><strong>Pricing / distribution business decisions</strong> — separate plan; covered in <code>project_thresan_store</code> notes.</li>
+    <li><strong>Back-cover marketing copy</strong> — drafted separately by Nelson.</li>
+    <li><strong>Legal text</strong> (ISBN, copyright notice, country-of-print) — handled at the printer's intake step.</li>
+  </ul>
+</section>
+
+<p class="meta-line">
+  Brief generated 2026-05-13 · Limnology Research Corp. · Thresan™ ·
+  Skyflag · Three worlds. One proof.
+</p>
+
+</body>
+</html>

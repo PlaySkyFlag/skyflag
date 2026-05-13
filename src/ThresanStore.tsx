@@ -44,6 +44,8 @@ export default function ThresanStore() {
       description:
         'The physical edition of Thresan: Skyflag — three boards, lifted. Coming to Kickstarter. Reserve your Founders Edition or join the waitlist.',
       canonicalUrl: 'https://thresan.store/',
+      ogImage: 'https://thresan.store/thresan-og-nexus.jpg',
+      ogImageAlt: 'The Caelum Nexus column glowing through three stacked boards — Thresan: Skyflag physical edition.',
     });
   }, []);
 

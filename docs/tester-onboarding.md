@@ -30,7 +30,7 @@ I've been building a strategy game I'd love your read on — **Thresan: Skyflag*
 Thanks for being on this. The game's mechanics are locked in (those are in the rulebook on the Help page), but UI polish, balance, and copy are all going to get reshaped based on what you say.
 
 — Nelson
-*Thresan™: Skyflag — Kaleo Edition*
+*Thresan™: Skyflag*
 
 ---
 

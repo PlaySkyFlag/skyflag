@@ -18,6 +18,8 @@ export default function Story() {
       description:
         'Volume One of the Skyflag edition: the Three Seals of Kaleo. A narrative account of the campaign across Terran, Meridian, and Empyrean.',
       canonicalUrl: 'https://playskyflag.com/story',
+      ogImage: 'https://playskyflag.com/thresan-og-clans.jpg',
+      ogImageAlt: 'Three stacked boards with Grey Ravens and White Stags arrayed across all three planes.',
     });
   }, []);
 

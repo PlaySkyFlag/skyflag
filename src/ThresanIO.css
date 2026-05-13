@@ -78,6 +78,92 @@
   line-height: 1.7;
 }
 
+/* ─── Lab post — published long-form article inline on the index.
+   When a second post ships we'll split posts to /lab/<slug>; until
+   then a single inline post keeps the surface live without needing
+   a router. Left-aligned, narrower measure than the centered hero
+   for long-prose readability. */
+
+.lab-post {
+  text-align: left;
+  margin: 0 auto 48px;
+  max-width: 640px;
+  padding: 32px 0 8px;
+  border-top: 1px solid rgba(194, 164, 107, 0.18);
+}
+
+.lab-post-header {
+  margin: 0 0 24px;
+}
+
+.lab-post-meta {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.72rem;
+  color: #8B6A48;
+  font-weight: 600;
+}
+
+.lab-post-title {
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 3.8vw, 2.1rem);
+  letter-spacing: 0.01em;
+  color: #C2A46B;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.lab-post-subtitle {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.12rem);
+  color: rgba(245, 247, 251, 0.7);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.lab-post-body {
+  font-size: 1rem;
+  color: rgba(245, 247, 251, 0.92);
+  line-height: 1.8;
+}
+
+.lab-post-body p {
+  margin: 0 0 16px;
+}
+
+.lab-post-body em {
+  color: #C2A46B;
+  font-style: italic;
+}
+
+.lab-post-body strong {
+  color: #E6E2D8;
+}
+
+.lab-post-body h3 {
+  margin: 32px 0 14px;
+  font-size: clamp(1.15rem, 2.4vw, 1.3rem);
+  letter-spacing: 0;
+  color: #C2A46B;
+  font-weight: 700;
+}
+
+.lab-post-list {
+  padding-left: 24px;
+  margin: 0 0 18px;
+}
+
+.lab-post-list li {
+  margin: 0 0 12px;
+}
+
+.lab-post-signoff {
+  margin: 28px 0 0 !important;
+  color: rgba(245, 247, 251, 0.65);
+  font-style: italic;
+}
+
 /* ─── Roadmap — the visible "table of contents" until real posts ship */
 
 .lab-roadmap {

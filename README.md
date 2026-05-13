@@ -2,7 +2,7 @@
 
 A two-player tactical race played across a three-layer arcology — Ground (Terran), Sky (Meridian), and Space (Empyrean). Each player commands four pieces (Captain, Soldier, Rover, Pilot) and must capture the opponent's three claim-flags, then land their Captain on the Caelum Nexus at Space(3,3) to win.
 
-Brand: **Thresan** is the universe (the threefold proof of the Aetheri Law of Three). **Skyflag** is the playable contest within that world. The **Kaleo Edition** is the first setting.
+Brand: **Thresan** is the game (the threefold proof of the Aetheri Law of Three; rules-level identity, like chess). **Skyflag** is its current edition — the pieces, the boards, and the storyboard set in the world of **Kaleo**. Future editions keep the rules of Thresan and change the storyboard.
 
 This repository contains the **web prototype** — a React + TypeScript + Vite implementation of the v19.1 *Cross-Board* rulebook, intended to wrap into a Capacitor-based iOS app once Phase 1 (single-player and hot-seat) is solid.
 
@@ -40,7 +40,7 @@ Other scripts:
 
 ```
 docs/
-  rulebook-v19.1.pdf      Canonical rulebook (Kaleo Edition · Edition 1.0)
+  rulebook-v20.pdf        Canonical rulebook (Skyflag edition)
 src/
   App.tsx                 Top-level layout: HUD, boards, trays
   Board.tsx               One 6×6 SVG board with markers and deploy cells

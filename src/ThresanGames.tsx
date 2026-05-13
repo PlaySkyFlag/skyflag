@@ -25,6 +25,8 @@ export default function ThresanGames() {
       description:
         'The catalog of Thresan editions. The rules are Thresan; each edition brings a new storyboard, new pieces, new boards. Skyflag is the current edition.',
       canonicalUrl: 'https://thresan.games/',
+      ogImage: 'https://thresan.games/thresan-og-clans.jpg',
+      ogImageAlt: 'Three stacked boards with Grey Ravens and White Stags arrayed across all three planes.',
     });
   }, []);
 

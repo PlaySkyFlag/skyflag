@@ -23,6 +23,8 @@ export default function ThresanUmbrella() {
       description:
         'Thresan is a strategy game with a layered fictional universe. Three boards, four piece types, ancient roots. The current edition is Skyflag.',
       canonicalUrl: 'https://thresan.com/',
+      ogImage: 'https://thresan.com/thresan-og-stack.jpg',
+      ogImageAlt: 'Three stacked boards forming a column — Terran, Meridian, Empyrean.',
     });
   }, []);
 

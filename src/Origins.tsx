@@ -16,6 +16,8 @@ export default function Origins() {
       description:
         'How Ashtapada — one of the oldest known board games — became Thresan: the eight-by-eight grid lifted into three boards. Currently in its Skyflag edition.',
       canonicalUrl: 'https://playskyflag.com/origins',
+      ogImage: 'https://playskyflag.com/thresan-og-stack.jpg',
+      ogImageAlt: 'Three stacked boards forming a column — the eighth-century board lifted.',
     });
   }, []);
 
