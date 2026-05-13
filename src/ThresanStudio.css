@@ -50,10 +50,27 @@
 }
 
 .studio-where {
-  margin: 0 0 32px;
+  margin: 0 0 24px;
   font-size: 0.95rem;
   color: rgba(245, 247, 251, 0.65);
   letter-spacing: 0.04em;
+}
+
+/* Round portrait medallion. The source is portrait-oriented with the
+   face in the upper-middle, so object-position: center top keeps the
+   face centered after the square crop rather than the chest/shoulders. */
+.studio-portrait {
+  width: clamp(140px, 30vw, 180px);
+  height: clamp(140px, 30vw, 180px);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+  margin: 0 auto 32px;
+  border: 2px solid rgba(194, 164, 107, 0.45);
+  box-shadow:
+    0 0 0 6px rgba(194, 164, 107, 0.08),
+    0 12px 36px rgba(0, 0, 0, 0.45);
 }
 
 .studio-prose {

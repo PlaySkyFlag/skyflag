@@ -36,6 +36,14 @@ export default function ThresanStudio() {
         <h1 className="studio-name">Nelson Jatel</h1>
         <p className="studio-where">Kelowna, British Columbia</p>
 
+        <img
+          src="/nelson-jatel.jpg"
+          alt="Portrait of Nelson Jatel"
+          className="studio-portrait"
+          width={160}
+          height={160}
+        />
+
         <div className="studio-prose">
           <p>
             By day I support watershed management and am an adjunct
