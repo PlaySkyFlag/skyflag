@@ -405,7 +405,7 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
             </>
           ) : (
             <form
-              className="account-email-form"
+              className="account-feedback-form"
               onSubmit={async (e) => {
                 e.preventDefault();
                 const code = codeInput.replace(/[^0-9]/g, '');
