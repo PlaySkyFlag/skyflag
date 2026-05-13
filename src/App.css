@@ -314,6 +314,28 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Handwritten "elsewhere" line at the very bottom of the footer —
+   invites the curious to wander to the heritage / studio / edition
+   sites without crowding the focused gameplay HUD. */
+.app-footer-elsewhere {
+  margin-top: 14px !important;
+  font-size: 1.2rem;
+  color: #C2A46B;
+  opacity: 0.82;
+  text-shadow: 0 1px 8px rgba(194, 164, 107, 0.18);
+  line-height: 1.4;
+}
+
+.app-footer-elsewhere a {
+  border-bottom: none;
+  font-weight: 400;
+}
+
+.app-footer-elsewhere a:hover {
+  color: #ffe9b5;
+  border-bottom: 1px solid rgba(255, 233, 181, 0.55);
+}
+
 .hud {
   display: flex;
   align-items: center;

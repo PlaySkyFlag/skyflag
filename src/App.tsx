@@ -1765,6 +1765,21 @@ export default function App() {
             })}
           </span>
         </p>
+        <p className="app-footer-elsewhere tagline-script">
+          The heritage at{' '}
+          <a href="https://ashtapada.com" target="_blank" rel="noopener noreferrer">
+            ashtapada.com
+          </a>
+          . The studio at{' '}
+          <a href="https://thresan.studio" target="_blank" rel="noopener noreferrer">
+            thresan.studio
+          </a>
+          . The edition at{' '}
+          <a href="https://thresan.store" target="_blank" rel="noopener noreferrer">
+            thresan.store
+          </a>
+          .
+        </p>
       </footer>
     </main>
   );
