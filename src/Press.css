@@ -140,6 +140,28 @@
   color: #C2A46B;
   font-style: normal;
 }
+.press-section-note a {
+  color: #C2A46B;
+  font-style: normal;
+}
+
+/* ─── Trailer ──────────────────────────────────────────────────── */
+
+.press-trailer {
+  margin: 0 0 20px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #06090f;
+  border: 1px solid rgba(194, 164, 107, 0.22);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+}
+.press-trailer-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  background: #06090f;
+}
 
 /* ─── Quick-facts table ────────────────────────────────────────── */
 

@@ -35,6 +35,7 @@ export default function Press() {
         <Hero />
         <article className="press-article">
           <QuickFacts />
+          <Trailer />
           <Descriptions />
           <Features />
           <History />
@@ -78,6 +79,51 @@ function Hero() {
       <p className="press-hero-fineprint">
         Everything on this page is free to use in coverage. Take what
         you need.
+      </p>
+    </section>
+  );
+}
+
+// ─── Trailer ───────────────────────────────────────────────────────
+
+function Trailer() {
+  return (
+    <section className="press-section">
+      <h2 className="press-section-title">Trailer</h2>
+      <div className="press-trailer">
+        <video
+          className="press-trailer-video"
+          src="/thresan-skyflag-trailer.mp4"
+          controls
+          preload="metadata"
+          playsInline
+        >
+          Your browser doesn't support inline video.{' '}
+          <a href="/thresan-skyflag-trailer.mp4" download>
+            Download the trailer
+          </a>{' '}
+          instead.
+        </video>
+      </div>
+      <p className="press-section-note">
+        <strong>What you'll see.</strong> The trailer opens on a single
+        round of stone — the eighth-century <em>Ashtapada</em> board,
+        weathered, rotating under amber light. The Ashtapada lifts; a
+        second board fades in beneath it, then a third. Three planes
+        stacked like the floors of an arcology — Terran, Meridian,
+        Empyrean. The clans assemble across all three: Grey Ravens and
+        White Stags, four pieces per side. A short sequence of moves
+        follows — a Captain crossing a Lift, a Pilot threading the
+        Empyrean, a Nexus capture decided in three dimensions — set
+        against tactile foley and a single low cello. Pieces freeze in
+        their final position; the three boards become a single column
+        of light. Cards: <strong>Three worlds. One proof.</strong>{' '}
+        <strong>Thresan™: Skyflag.</strong> <em>playskyflag.com</em>.
+      </p>
+      <p className="press-section-note">
+        <a href="/thresan-skyflag-trailer.mp4" download>
+          Download the trailer (MP4) →
+        </a>
       </p>
     </section>
   );
@@ -274,6 +320,16 @@ function Assets() {
         </figure>
 
         <figure className="press-asset">
+          <a href="/skyflag-screenshot-home.png" download>
+            <img src="/skyflag-screenshot-home.png" alt="Thresan: Skyflag app home view — branded splash above the game controls" />
+          </a>
+          <figcaption>
+            <strong>App — home view</strong>
+            <span>1400px PNG · in-app lobby with brand splash</span>
+          </figcaption>
+        </figure>
+
+        <figure className="press-asset">
           <a href="/skyflag-render-tower.jpg" download>
             <img src="/skyflag-render-tower.jpg" alt="Transparent terrace tower — physical edition concept render" />
           </a>
@@ -318,9 +374,8 @@ function Assets() {
       </div>
 
       <p className="press-section-note">
-        <strong>Coming soon:</strong> in-game screenshots, gameplay
-        video, photographs of the 3D-printed prototype. Email for
-        early access to any of these.
+        <strong>Coming soon:</strong> board / gameplay screenshots and
+        photographs of the 3D-printed prototype. Email for early access.
       </p>
     </section>
   );
