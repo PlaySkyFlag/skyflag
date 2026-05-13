@@ -38,10 +38,10 @@ export default function ThresanStudio() {
 
         <div className="studio-prose">
           <p>
-            By day I'm a water researcher at UBC Okanagan — Doctor of
-            Social Sciences, working on water governance and the social
-            networks that shape it. <em>Limnology Research Corp</em> is
-            my day-job shingle and has been since 2001.
+            By day I support watershed management and am an adjunct
+            professor at UBCO — Limnologist and Doctor of Social
+            Sciences, working on water governance and the social
+            networks that shape it.
           </p>
           <p>
             Thresan™ came out of somewhere else entirely. My two
