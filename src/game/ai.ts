@@ -151,6 +151,56 @@ const QUIESCENCE_DEPTH = 6;
 // produce 30+ continuation captures).
 const QSEARCH_NODE_CAP = 50_000;
 
+// ─── Strategic stance ──────────────────────────────────────────────
+// A high-level objective the AI commits to at the start of each game,
+// then biases its eval toward for the rest of the game. The previous
+// engine evaluated every position from a neutral mix of capture vs.
+// flag-progression signals, which led to wishy-washy play — sometimes
+// the AI declined a safe capture because the eval was barely favouring
+// a flag-advance move, and the result was a half-committed game that
+// did neither well.
+//
+// Three stances:
+//   aggressive  — piece-capture focused. Material multiplied 1.30,
+//                 flag-related terms multiplied 0.85. Captures
+//                 dominate; flag-races are de-prioritised.
+//   positional  — flag-capture focused. Material × 0.85, flag-
+//                 related × 1.30. Flag advancement dominates; piece
+//                 trades are de-prioritised.
+//   balanced    — no bias (rare; ~5% of games for variety).
+//
+// Picked once per game in chooseAction; persists across all
+// evaluate() calls inside that game via module state. Detected by
+// state.turnNumber going backward (new game / restart) — the first
+// chooseAction call ever also picks.
+type StrategicStance = 'aggressive' | 'positional' | 'balanced';
+
+const STANCE_KILL_MUL: Record<StrategicStance, number> = {
+  aggressive: 1.30,
+  positional: 0.85,
+  balanced:   1.00,
+};
+
+const STANCE_FLAG_MUL: Record<StrategicStance, number> = {
+  aggressive: 0.85,
+  positional: 1.30,
+  balanced:   1.00,
+};
+
+let strategicStance: StrategicStance = 'balanced';
+let stanceLastTurnSeen: number = Infinity;
+
+function pickStanceIfNewGame(state: GameState): void {
+  const turn = state.turnNumber;
+  if (turn < stanceLastTurnSeen) {
+    const r = Math.random();
+    if (r < 0.5) strategicStance = 'aggressive';
+    else if (r < 0.95) strategicStance = 'positional';
+    else strategicStance = 'balanced';
+  }
+  stanceLastTurnSeen = turn;
+}
+
 const WIN_SCORE = 1_000_000;
 const LAYER_INDEX: Record<Layer, number> = { ground: 0, sky: 1, space: 2 };
 // Inverse of LAYER_INDEX — used by the lift-aware distance metric to
@@ -321,6 +371,14 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   const opp = opponentOf(aiPlayer);
   let score = 0;
 
+  // Stance multipliers — see pickStanceIfNewGame. Material and threat
+  // terms are scaled by killMul; flag bonuses, final-flag-rush,
+  // distance-to-target, and 2-ply flag-threat by flagMul. PSTs,
+  // mobility, and lift-pair coordination are positional/structural and
+  // unaffected by stance.
+  const killMul = STANCE_KILL_MUL[strategicStance];
+  const flagMul = STANCE_FLAG_MUL[strategicStance];
+
   // Material + positional — board pieces score for material AND for where
   // they're standing. The PST lookup encodes "where pieces want to be"
   // (center control, lift proximity, advanced rows for soldiers, Nexus
@@ -328,11 +386,11 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   // target or mobility. In-hand pieces are discounted material only.
   for (const bp of state.onBoard) {
     const sign = bp.piece.owner === aiPlayer ? 1 : -1;
-    score += pieceValue(bp.piece.kind) * sign;
+    score += pieceValue(bp.piece.kind) * sign * killMul;
     score += pstScore(bp.piece, bp.coord) * sign;
   }
-  for (const piece of state.inHand[aiPlayer]) score += pieceValue(piece.kind) * 0.7;
-  for (const piece of state.inHand[opp])      score -= pieceValue(piece.kind) * 0.7;
+  for (const piece of state.inHand[aiPlayer]) score += pieceValue(piece.kind) * 0.7 * killMul;
+  for (const piece of state.inHand[opp])      score -= pieceValue(piece.kind) * 0.7 * killMul;
 
   // Flag progress — opponent flags I've captured are good; mine they
   // took, bad. Per-flag bonus dropped 500 → 200 so flag-grabbing
@@ -341,23 +399,23 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   let myFlagsCaptured = 0;
   let oppFlagsCaptured = 0;
   for (const layer of ['ground', 'sky', 'space'] as const) {
-    if (state.flags[layer][opp])      { score += 200; myFlagsCaptured++; }
-    if (state.flags[layer][aiPlayer]) { score -= 200; oppFlagsCaptured++; }
+    if (state.flags[layer][opp])      { score += 200 * flagMul; myFlagsCaptured++; }
+    if (state.flags[layer][aiPlayer]) { score -= 200 * flagMul; oppFlagsCaptured++; }
   }
 
   // Final-flag rush — once a side has 2 of 3 flags, the third is
   // decisive. Add a meaningful bonus for whichever side is one flag
   // away so the AI doesn't dawdle on side-quests when it's about to
   // win, and defends harder when the opponent is about to win.
-  if (myFlagsCaptured === 2)  score += 300;
-  if (oppFlagsCaptured === 2) score -= 300;
+  if (myFlagsCaptured === 2)  score += 300 * flagMul;
+  if (oppFlagsCaptured === 2) score -= 300 * flagMul;
 
   // Strategic positioning — closer is better for me, opponent farther is also
   // better for me. Each square of distance worth ~3 score points.
   const myDist  = closestDistToTarget(state, aiPlayer);
   const oppDist = closestDistToTarget(state, opp);
-  if (myDist  !== Infinity) score -= myDist * 3;
-  if (oppDist !== Infinity) score += oppDist * 3;
+  if (myDist  !== Infinity) score -= myDist * 3 * flagMul;
+  if (oppDist !== Infinity) score += oppDist * 3 * flagMul;
 
   // Threats and mobility — computed in one sweep per side.
   const myInfo  = attackInfo(state, aiPlayer);
@@ -383,7 +441,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
     const owner = bp.piece.owner;
     const value = pieceValue(bp.piece.kind);
     if (owner === aiPlayer && oppInfo.squares.has(key)) {
-      score -= value * 0.40;
+      score -= value * 0.40 * killMul;
       // Multi-attacker penalty: if the threatened piece is hit by
       // more than one opponent attacker (fork), I likely can't
       // defend it by interposition — only by moving or trading. -20
@@ -391,24 +449,24 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
       // extra -30/attacker on top, since losing the last Captain
       // ends the game outright.
       const n = oppInfo.attackers.get(key) ?? 1;
-      if (n > 1) score -= 20 * (n - 1);
+      if (n > 1) score -= 20 * (n - 1) * killMul;
       if (bp.piece.kind === 'captain') {
         // Bumped 250 → 400 to match the higher Captain material value.
         // A threatened Captain is the single most urgent thing on the
         // board; the AI should retreat or interpose hard.
-        score -= 400;
-        if (n > 1) score -= 30 * (n - 1);
+        score -= 400 * killMul;
+        if (n > 1) score -= 30 * (n - 1) * killMul;
         myCaptainsThreatened++;
       }
     } else if (owner === opp && myInfo.squares.has(key)) {
-      score += value * 0.40;
+      score += value * 0.40 * killMul;
       const n = myInfo.attackers.get(key) ?? 1;
-      if (n > 1) score += 20 * (n - 1);
+      if (n > 1) score += 20 * (n - 1) * killMul;
       if (bp.piece.kind === 'captain') {
         // Symmetric — opponent's threatened Captain is the most
         // valuable target the AI can chase.
-        score += 400;
-        if (n > 1) score += 30 * (n - 1);
+        score += 400 * killMul;
+        if (n > 1) score += 30 * (n - 1) * killMul;
         oppCaptainsThreatened++;
       }
     }
@@ -419,8 +477,8 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   // extra fork-style penalty per threatened Captain past the first
   // (the first one already lost 400 above). Bumped 200 → 300 to match
   // the higher Captain weight.
-  if (myCaptainsThreatened > 1) score -= 300 * (myCaptainsThreatened - 1);
-  if (oppCaptainsThreatened > 1) score += 300 * (oppCaptainsThreatened - 1);
+  if (myCaptainsThreatened > 1) score -= 300 * (myCaptainsThreatened - 1) * killMul;
+  if (oppCaptainsThreatened > 1) score += 300 * (oppCaptainsThreatened - 1) * killMul;
 
   // Lift-pair coordination: a Skyflag-specific synergy term. If two
   // friendly pieces sit on / near the same lift column on adjacent
@@ -465,7 +523,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
       for (const bp of state.onBoard) {
         if (bp.piece.owner !== opp || bp.piece.kind !== 'captain') continue;
         if (strategicDist(bp.coord, myFlag, state) <= 3) {
-          score -= 50;
+          score -= 50 * flagMul;
           break;
         }
       }
@@ -476,7 +534,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
       for (const bp of state.onBoard) {
         if (bp.piece.owner !== aiPlayer || bp.piece.kind !== 'captain') continue;
         if (strategicDist(bp.coord, oppFlag, state) <= 3) {
-          score += 50;
+          score += 50 * flagMul;
           break;
         }
       }
@@ -891,6 +949,11 @@ export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEA
   // chooseAction calls would mis-prioritize moves for a stale board.
   killers.length = 0;
   historyTable.clear();
+
+  // Pick / refresh the strategic stance once per game. Detected by
+  // state.turnNumber going backward (new game) — first ever call
+  // also picks. Stance influences which eval terms dominate.
+  pickStanceIfNewGame(state);
 
   const actions = legalActions(state);
   if (actions.length === 0) return null;
