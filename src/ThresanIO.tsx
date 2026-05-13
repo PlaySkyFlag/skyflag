@@ -344,6 +344,156 @@ export default function ThresanIO() {
           </div>
         </article>
 
+        <article className="lab-post">
+          <header className="lab-post-header">
+            <p className="lab-post-meta">Lab note · 2026-05-13 · Nelson</p>
+            <h2 className="lab-post-title">Thresan in the 3D-chess lineage</h2>
+            <p className="lab-post-subtitle">
+              Where this game sits in 175 years of multi-board chess
+              variants.
+            </p>
+          </header>
+
+          <div className="lab-post-body">
+            <p>
+              The 3D-chess tradition is older than most people
+              realise. The first attempt — Kubicschach — was published
+              in 1851, when Lionel Kieseritzky stacked eight 8×8
+              boards on top of each other and tried to play. The
+              result was unplayable, but the <em>idea</em> persisted.
+              Every few decades since, someone has taken another
+              swing.
+            </p>
+            <p>
+              Thresan is the newest entry in that tradition, and the
+              first to balance the game through computational
+              simulation rather than design intuition. Here's where
+              it fits.
+            </p>
+
+            <h3>The lineage</h3>
+            <table className="lab-post-table">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Game</th>
+                  <th>Geometry</th>
+                  <th>Designer</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1851</td><td>Kubicschach</td><td>8 × (8×8)</td><td>Lionel Kieseritzky</td></tr>
+                <tr><td>1907</td><td>Raumschach</td><td>5 × (5×5)</td><td>Ferdinand Maack</td></tr>
+                <tr><td>1967</td><td>The Original 3D Chess</td><td>3 × (8×8)</td><td>Lynn R. Johnson (NASA)</td></tr>
+                <tr><td>1973</td><td>Strato Chess</td><td>3 × (8×8)</td><td>Dynamic Games</td></tr>
+                <tr><td>1975</td><td>Tri-Dimensional Chess</td><td>3 × (4×4) + 4 × (2×2) movable</td><td>Franz Joseph Schnaubelt</td></tr>
+                <tr><td>1985</td><td>Dragonchess</td><td>3 × (8×12)</td><td>Gary Gygax</td></tr>
+                <tr><td>1996</td><td>Hyperchess</td><td>helical</td><td>Max Chappell</td></tr>
+                <tr><td>2001</td><td>Millennium 3D Chess</td><td>3 × (8×8)</td><td>William d'Agostino</td></tr>
+                <tr><td>2026</td><td><strong>Thresan: Skyflag</strong></td><td>3 × (6×6)</td><td>Nelson Regan Jatel</td></tr>
+              </tbody>
+            </table>
+            <p>
+              <em>(Dates and designers per BGG's 3D-Chess family
+              entry; not independently verified against primary
+              sources.)</em>
+            </p>
+
+            <h3>What Thresan does differently</h3>
+            <ul className="lab-post-list">
+              <li>
+                <strong>Smallest playable 3D geometry.</strong> 3 ×
+                (6×6) = 108 cells, versus Raumschach's 125 and
+                Strato/Millennium's 192. Sub-hour games and
+                single-session learnability.
+              </li>
+              <li>
+                <strong>No checkmate.</strong> Thresan replaces the
+                contradiction-style win condition with two
+                constructive paths: capture all three claim-seals, or
+                land the Captain on the Caelum Nexus.
+              </li>
+              <li>
+                <strong>Cross-Board Rule.</strong> Captures route
+                through opposite-side Lifts. Parallel boards become
+                integrated geometry; Lift control becomes the central
+                positional question.
+              </li>
+              <li>
+                <strong>Simulation-balanced.</strong> Around 6,700
+                Monte Carlo self-play games converged the current
+                ruleset. Empirical balance rather than design
+                intuition.
+              </li>
+              <li>
+                <strong>Optional narrative frame.</strong> The
+                world of Kaleo (Aetheri, clans, the lift) doesn't
+                affect play. Pieces and boards carry it; rules don't.
+              </li>
+            </ul>
+
+            <h3>The arc that got us here</h3>
+            <p>
+              Thresan's design has gone through twelve numbered
+              iterations across roughly three years. The central
+              event was the <em>v17 → v19</em> arc — the Cross-Board
+              Rule transforming the game from parallel three-board
+              race to integrated three-dimensional position game.
+            </p>
+            <ul className="lab-post-list">
+              <li>
+                <strong>v10–v13</strong> (2024 to early 2025).
+                Foundation. Three-layer 6×6 geometry, Lifts at the
+                four current positions, the four-piece roster.
+              </li>
+              <li>
+                <strong>v14</strong> (mid-2025). Tightest measured
+                balance gap in the series (1.9%). Established the
+                simulation methodology.
+              </li>
+              <li>
+                <strong>v16</strong> (late 2025). Raid mechanic.
+                Corner flags, isolated Lifts, cross-board capture
+                concept introduced.
+              </li>
+              <li>
+                <strong>v17</strong> (early 2026). First Cross-Board
+                Rule implementation. Surfaced the "RoverLock"
+                exploit.
+              </li>
+              <li>
+                <strong>v19</strong> (April 2026). Cross-Board Rule
+                v2 — RoverLock eliminated. Revealed a 31.5% P1
+                advantage gap.
+              </li>
+              <li>
+                <strong>v20</strong> (May 2026). Format expansion:
+                solo, two-player hot-seat, and online play. No
+                mechanical change.
+              </li>
+              <li>
+                <strong>v21</strong> (current). Brand pivot —
+                Exedra / 3phor → Thresan: Skyflag. No rule change.
+              </li>
+            </ul>
+
+            <h3>What this isn't</h3>
+            <p>
+              A claim that Thresan is better than chess. Chess is one
+              of the great inventions of human strategic culture.
+              Thresan is asking a different question — <em>what does
+              strategy look like when the floor lifts?</em> — and
+              trying to answer it in the smallest, cleanest geometry
+              that holds together.
+            </p>
+            <p>
+              Three boards. Four piece types. One Nexus. One proof.
+            </p>
+
+            <p className="lab-post-signoff">— Nelson</p>
+          </div>
+        </article>
+
         <section className="lab-roadmap">
           <h2 className="lab-roadmap-title">In the works</h2>
           <ul className="lab-roadmap-list">
