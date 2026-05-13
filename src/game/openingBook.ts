@@ -72,7 +72,42 @@ export function bookActionFor(state: GameState): Action | null {
     }
   }
 
-  // Past move 2: fall through to search. Position-specific judgment
+  // ── Move 3: two attackers on board, both transports in hand, deploy
+  // slot free ──────────────────────────────────────────────────────
+  // Completes the four-piece commitment: Soldier + Captain are
+  // already on the board, now bring out a Transport. Rover slightly
+  // favoured (55%) over Pilot because orthogonal movement aligns
+  // better with the column-aligned deploy launch; the 45% Pilot
+  // branch keeps openings from being fully predictable.
+  if (myOnBoard.length === 2 && myHand.length === 2) {
+    const deployCoord = DEPLOY_COORDS[player];
+    const slotOccupied = state.onBoard.some(
+      (bp) =>
+        bp.coord.layer === deployCoord.layer &&
+        bp.coord.row === deployCoord.row &&
+        bp.coord.col === deployCoord.col,
+    );
+    if (slotOccupied) return null;
+
+    // Only fire if the two on-board pieces are the attackers — if
+    // the user deployed a transport first (off-book), the book has
+    // no canned answer for what to do next.
+    const onBoardKinds = new Set(myOnBoard.map((bp) => bp.piece.kind));
+    if (!onBoardKinds.has('soldier') || !onBoardKinds.has('captain')) {
+      return null;
+    }
+
+    const rover = myHand.find((p) => p.kind === 'rover');
+    const pilot = myHand.find((p) => p.kind === 'pilot');
+    if (rover && pilot) {
+      const pick = Math.random() < 0.55 ? rover : pilot;
+      return { type: 'deploy', pieceId: pick.id };
+    }
+    if (rover) return { type: 'deploy', pieceId: rover.id };
+    if (pilot) return { type: 'deploy', pieceId: pilot.id };
+  }
+
+  // Past move 3: fall through to search. Position-specific judgment
   // matters too much to hardcode further.
   return null;
 }

@@ -140,7 +140,16 @@ function hashState(s: GameState): string {
 // Quiescence search extends beyond SEARCH_DEPTH but only follows capture
 // moves, so the AI can't be tricked by the "horizon effect" — walking into
 // a capture because the regular search stopped one ply before the trap.
-const QUIESCENCE_DEPTH = 4;
+// Bumped 4 → 6 to catch multi-move capture chains across planes (lift +
+// capture + lift + capture); paired with QSEARCH_NODE_CAP below so a
+// pathological capture-rich position can't blow up search time.
+const QUIESCENCE_DEPTH = 6;
+// Per-entry cap on quiescence nodes. Each minimax leaf gets a fresh
+// budget of this many qsearch nodes; once exhausted, qsearch returns
+// the static eval rather than recursing further. Keeps search time
+// bounded when a capture chain explodes (cross-board pin tactics can
+// produce 30+ continuation captures).
+const QSEARCH_NODE_CAP = 50_000;
 
 const WIN_SCORE = 1_000_000;
 const LAYER_INDEX: Record<Layer, number> = { ground: 0, sky: 1, space: 2 };
@@ -161,9 +170,9 @@ function pieceValue(kind: PieceKind): number {
     // cost. Rovers and Pilots are minor utility but each adds a
     // useful threat vector — 60 keeps them above noise.
     case 'captain': return 700;
-    case 'soldier': return 120;
-    case 'rover':   return 60;
-    case 'pilot':   return 60;
+    case 'soldier': return 130;
+    case 'rover':   return 70;
+    case 'pilot':   return 70;
   }
 }
 
@@ -274,22 +283,31 @@ function closestDistToTarget(state: GameState, p: Player): number {
   return best;
 }
 
-// Computes both the "attack set" (squares the player could move a piece
-// onto, i.e. capture targets) and the raw mobility count in one pass.
-// Used together inside evaluate() so we don't iterate pieces twice.
+// Computes the "attack set" (squares the player could move a piece onto,
+// i.e. capture targets), the raw mobility count, AND a per-square attacker
+// count — how many of `player`'s pieces could capture on that square — in
+// one pass. The attacker count lets evaluate() distinguish "a piece is
+// attacked once" from "a piece is double-attacked" (fork), which is
+// strategically very different even though both have the same one-ply
+// outcome in the existing threat loop.
 function attackInfo(
   state: GameState,
   player: Player,
-): { squares: Set<string>; mobility: number } {
+): { squares: Set<string>; mobility: number; attackers: Map<string, number> } {
   const squares = new Set<string>();
+  const attackers = new Map<string, number>();
   let mobility = 0;
   for (const bp of state.onBoard) {
     if (bp.piece.owner !== player) continue;
     const moves = legalMovesFor(bp, state);
     mobility += moves.length;
-    for (const t of moves) squares.add(`${t.layer}:${t.row}:${t.col}`);
+    for (const t of moves) {
+      const key = `${t.layer}:${t.row}:${t.col}`;
+      squares.add(key);
+      attackers.set(key, (attackers.get(key) ?? 0) + 1);
+    }
   }
-  return { squares, mobility };
+  return { squares, mobility, attackers };
 }
 
 // Static evaluation of `state` from `aiPlayer`'s perspective. Higher = better
@@ -366,19 +384,31 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
     const value = pieceValue(bp.piece.kind);
     if (owner === aiPlayer && oppInfo.squares.has(key)) {
       score -= value * 0.40;
+      // Multi-attacker penalty: if the threatened piece is hit by
+      // more than one opponent attacker (fork), I likely can't
+      // defend it by interposition — only by moving or trading. -20
+      // per extra attacker on quiet pieces; Captain forks get an
+      // extra -30/attacker on top, since losing the last Captain
+      // ends the game outright.
+      const n = oppInfo.attackers.get(key) ?? 1;
+      if (n > 1) score -= 20 * (n - 1);
       if (bp.piece.kind === 'captain') {
         // Bumped 250 → 400 to match the higher Captain material value.
         // A threatened Captain is the single most urgent thing on the
         // board; the AI should retreat or interpose hard.
         score -= 400;
+        if (n > 1) score -= 30 * (n - 1);
         myCaptainsThreatened++;
       }
     } else if (owner === opp && myInfo.squares.has(key)) {
       score += value * 0.40;
+      const n = myInfo.attackers.get(key) ?? 1;
+      if (n > 1) score += 20 * (n - 1);
       if (bp.piece.kind === 'captain') {
         // Symmetric — opponent's threatened Captain is the most
         // valuable target the AI can chase.
         score += 400;
+        if (n > 1) score += 30 * (n - 1);
         oppCaptainsThreatened++;
       }
     }
@@ -391,6 +421,34 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   // the higher Captain weight.
   if (myCaptainsThreatened > 1) score -= 300 * (myCaptainsThreatened - 1);
   if (oppCaptainsThreatened > 1) score += 300 * (oppCaptainsThreatened - 1);
+
+  // Lift-pair coordination: a Skyflag-specific synergy term. If two
+  // friendly pieces sit on / near the same lift column on adjacent
+  // layers, they form a transport pair — one can lift, the other can
+  // pick up, capture, or contest the destination square. The current
+  // PST scores lift squares positively in isolation but doesn't
+  // reward the pair, so the search has to discover the synergy by
+  // burning depth on coordinated sequences. +10 per pair on my side,
+  // -10 for opp; the size is intentionally below piece-value scale so
+  // it nudges positional choice rather than overriding tactical eval.
+  for (const bp of state.onBoard) {
+    if (!LIFT_CELLS.some((c) => c.row === bp.coord.row && c.col === bp.coord.col)) continue;
+    const lift = bp.coord;
+    const srcIdx = LAYER_INDEX[lift.layer];
+    for (const other of state.onBoard) {
+      if (other.piece.id === bp.piece.id) continue;
+      if (other.piece.owner !== bp.piece.owner) continue;
+      const otherIdx = LAYER_INDEX[other.coord.layer];
+      if (Math.abs(otherIdx - srcIdx) !== 1) continue;
+      const d = Math.max(
+        Math.abs(other.coord.row - lift.row),
+        Math.abs(other.coord.col - lift.col),
+      );
+      if (d <= 1) {
+        score += bp.piece.owner === aiPlayer ? 10 : -10;
+      }
+    }
+  }
 
   // 2-ply flag-threat: opponent Captains within striking distance of
   // one of my uncaptured flags (and the symmetric pattern for me on
@@ -554,13 +612,20 @@ function isCapture(state: GameState, action: Action): boolean {
 // worsen its position (the standing eval is treated as a lower bound for
 // the maximiser, upper bound for the minimiser). Bounded by a small extra
 // depth to prevent runaway recursion in capture-rich positions.
+type QBudget = { count: number };
+
 function quiescence(
   state: GameState,
   alpha: number,
   beta: number,
   aiPlayer: Player,
   depth: number,
+  budget: QBudget,
 ): number {
+  budget.count++;
+  if (budget.count > QSEARCH_NODE_CAP) {
+    return evaluate(state, aiPlayer);
+  }
   if (depth === 0 || state.status.kind !== 'in-progress') {
     return evaluate(state, aiPlayer);
   }
@@ -588,7 +653,7 @@ function quiescence(
     let value = standPat;
     for (const action of ordered) {
       const next = reduce(state, action);
-      value = Math.max(value, quiescence(next, alpha, beta, aiPlayer, depth - 1));
+      value = Math.max(value, quiescence(next, alpha, beta, aiPlayer, depth - 1, budget));
       alpha = Math.max(alpha, value);
       if (alpha >= beta) break;
     }
@@ -598,7 +663,7 @@ function quiescence(
   let value = standPat;
   for (const action of ordered) {
     const next = reduce(state, action);
-    value = Math.min(value, quiescence(next, alpha, beta, aiPlayer, depth - 1));
+    value = Math.min(value, quiescence(next, alpha, beta, aiPlayer, depth - 1, budget));
     beta = Math.min(beta, value);
     if (alpha >= beta) break;
   }
@@ -648,7 +713,7 @@ function minimax(
     return evaluate(state, aiPlayer);
   }
   if (depth === 0) {
-    return quiescence(state, alpha, beta, aiPlayer, QUIESCENCE_DEPTH);
+    return quiescence(state, alpha, beta, aiPlayer, QUIESCENCE_DEPTH, { count: 0 });
   }
 
   // Save originals — needed below to know whether the final score is an
@@ -832,7 +897,21 @@ export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEA
 
   const aiPlayer = state.currentPlayer;
 
-  // Iterative deepening: search depth 1, 2, ..., SEARCH_DEPTH. At each
+  // Dynamic depth: when branching is very high (tactical mid-game
+  // with many legal actions per ply), the nominal depth may not
+  // actually be reachable within reasonable time — depth 4 against
+  // branching 35 explodes to millions of nodes even with pruning,
+  // and the user gets a wait without a corresponding strength gain.
+  // Drop the nominal depth by 1 (down to a floor of 3) when
+  // branching is high; the deeper quiescence handles tactical
+  // sequences from the shallower frontier. Conservative — only
+  // triggers in genuinely complex positions.
+  let effectiveDepth = searchDepth;
+  if (actions.length > 35 && effectiveDepth > 3) {
+    effectiveDepth -= 1;
+  }
+
+  // Iterative deepening: search depth 1, 2, ..., effectiveDepth. At each
   // iteration the best action found so far is moved to the front of the
   // ordering for the next iteration, which gives alpha-beta much better
   // cuts (the strongest move tried first → pruning happens immediately
@@ -842,7 +921,7 @@ export function chooseAction(state: GameState, searchDepth: number = DEFAULT_SEA
   let lastBestAction: Action | undefined;
   let scored: Array<{ action: Action; value: number }> = [];
 
-  for (let depth = 1; depth <= searchDepth; depth++) {
+  for (let depth = 1; depth <= effectiveDepth; depth++) {
     const ordered = orderActionsWithPriority(state, actions, lastBestAction, 0);
     let bestValue = -Infinity;
     let alpha = -Infinity;
