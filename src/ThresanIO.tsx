@@ -63,7 +63,7 @@ export default function ThresanIO() {
             </p>
             <p>
               The temptation was four. Four feels deliberate — four
-              directions, four piece types, four corners. But every
+              directions, four corners. But every
               time I sketched a four-plane version, the middle two
               planes became transit space. Pieces moved <em>through</em>{' '}
               them on the way somewhere else, but the planes themselves
@@ -444,9 +444,7 @@ export default function ThresanIO() {
               <li>
                 <strong>v10–v13</strong> (2024 to early 2025).
                 Foundation. Three-layer 6×6 geometry, Lifts at the
-                four current positions, the original four-piece
-                roster (later expanded to five with the Promoted
-                Soldier Captain).
+                four current positions, the five-piece roster.
               </li>
               <li>
                 <strong>v14</strong> (mid-2025). Tightest measured
