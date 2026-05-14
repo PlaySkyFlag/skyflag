@@ -5,10 +5,10 @@ import { supabase } from './game/supabase';
 import type { GameState, GameStatus, Player, RoomState } from './game/types';
 import { stashReviewSession } from './game/reviewSession';
 
-// Persists the user's response to the post-game waitlist offer (signed up
-// OR explicitly dismissed). Either way: don't ask again. Per Stegmaier's
-// "value first, ask once" principle — pestering after a dismiss converts
-// nothing and damages the brand.
+// Persists the user's response to the post-game funnel (waitlist signup
+// AND optional testimonial quote). Either is dismissable; once the user
+// has been through the funnel once — submitted, skipped, or "not now"'d
+// — don't ask again. Per Stegmaier's "value first, ask once" principle.
 const WAITLIST_HANDLED_KEY = 'skyflag.thresan-waitlist.postgame-handled';
 
 function getInitialWaitlistStatus(): 'idle' | 'dismissed' {
@@ -174,45 +174,81 @@ export default function EndGameOverlay({ state, user, room, onPlayAgain }: Props
           </button>
         </div>
         {friendNote && <p className="end-game-friend-note">{friendNote}</p>}
-        <PostGameWaitlist user={user} />
+        <PostGameWaitlist
+          user={user}
+          gameOutcome={status.kind === 'won' ? 'won' : status.kind === 'draw' ? 'draw' : 'unknown'}
+        />
       </div>
     </div>
   );
 }
 
-// Quiet email-list offer after a game ends. Per Stegmaier's playbook:
-// (1) deliver value first — by definition the user just finished a
-// game, so the value is delivered; (2) single specific promise — the
-// Kickstarter launch email, not "newsletter"; (3) one ask, dismissable
-// forever. Submits to the same Supabase thresan_waitlist table that
-// thresan.store uses; differentiated by source='skyflag-postgame' so
-// acquisition channels can be measured at launch time.
-function PostGameWaitlist({ user }: { user: User | null }) {
-  const [status, setStatus] = useState<
-    'idle' | 'submitting' | 'success' | 'error' | 'dismissed'
-  >(getInitialWaitlistStatus);
+// Post-game funnel: two sequential asks after a finished game.
+//   Stage 1 — waitlist. Quiet email-list offer per Stegmaier's playbook.
+//     Submits to public.thresan_waitlist with source='skyflag-postgame'.
+//   Stage 2 — testimonial quote. After email signup succeeds we chain
+//     into an optional quote capture. The "just finished a satisfying
+//     game" moment is the only one where a player will write a quote
+//     they actually mean. An hour later they won't. A week later, never.
+//     Quotes feed the Landing hero rotation, reviewer outreach, and
+//     pre-Kickstarter social proof. Without explicit consent the row
+//     stays admin-only — RLS enforces approved + featured + consent
+//     before any public read.
+//
+// User can dismiss at either stage; the funnel is marked handled and
+// won't ask again on the same browser/profile.
+
+type FunnelPhase =
+  | 'waitlist-idle'
+  | 'waitlist-submitting'
+  | 'waitlist-error'
+  | 'quote-idle'
+  | 'quote-submitting'
+  | 'quote-error'
+  | 'done'
+  | 'dismissed';
+
+type Outcome = 'won' | 'lost' | 'draw' | 'unknown';
+
+function PostGameWaitlist({
+  user,
+  gameOutcome,
+}: {
+  user: User | null;
+  gameOutcome: Outcome;
+}) {
+  const [phase, setPhase] = useState<FunnelPhase>(() =>
+    getInitialWaitlistStatus() === 'dismissed' ? 'dismissed' : 'waitlist-idle',
+  );
   const userEmail =
     typeof user?.email === 'string' && user.email.includes('@') ? user.email : '';
   const [email, setEmail] = useState(userEmail);
-  const [error, setError] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  if (status === 'dismissed') return null;
+  // Quote-stage state — first name + city are optional, consent gates
+  // public surfacing.
+  const [quote, setQuote] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [city, setCity] = useState('');
+  const [consent, setConsent] = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
+  if (phase === 'dismissed') return null;
+
+  const handleWaitlistSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const trimmed = email.trim().toLowerCase();
     if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
-      setStatus('error');
-      setError('Please enter a valid email.');
+      setPhase('waitlist-error');
+      setErrorMsg('Please enter a valid email.');
       return;
     }
     if (!supabase) {
-      setStatus('error');
-      setError("Couldn't reach the list right now. Try again later.");
+      setPhase('waitlist-error');
+      setErrorMsg("Couldn't reach the list right now. Try again later.");
       return;
     }
-    setStatus('submitting');
-    setError('');
+    setPhase('waitlist-submitting');
+    setErrorMsg('');
     const { error: insertError } = await supabase
       .from('thresan_waitlist')
       .insert({
@@ -221,61 +257,192 @@ function PostGameWaitlist({ user }: { user: User | null }) {
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,
       });
-    // 23505 unique-violation = already on the list. Treat as success
-    // to avoid surfacing "you already signed up" (signup-status timing
-    // leak). Same convention as the thresan.store form.
+    // 23505 unique-violation = already on the list. Treat as success to
+    // avoid surfacing "you already signed up" (signup-status timing leak).
     if (insertError && insertError.code !== '23505') {
-      setStatus('error');
-      setError("Couldn't save your email. Try again.");
+      setPhase('waitlist-error');
+      setErrorMsg("Couldn't save your email. Try again.");
+      return;
+    }
+    // Don't mark handled yet — give the quote ask its turn first.
+    setPhase('quote-idle');
+  };
+
+  const handleQuoteSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const trimmedQuote = quote.trim();
+    if (!trimmedQuote) {
+      setPhase('quote-error');
+      setErrorMsg('Please write something, even a few words.');
+      return;
+    }
+    if (!supabase) {
+      setPhase('quote-error');
+      setErrorMsg("Couldn't reach the server right now. Try again later.");
+      return;
+    }
+    setPhase('quote-submitting');
+    setErrorMsg('');
+    const { error: insertError } = await supabase.from('quotes').insert({
+      quote: trimmedQuote,
+      name: firstName.trim() || null,
+      city: city.trim() || null,
+      email: email.trim().toLowerCase() || null,
+      consent_to_share: consent,
+      user_id: user?.id ?? null,
+      source: 'postgame',
+      referrer: document.referrer || null,
+      user_agent: navigator.userAgent,
+      game_outcome: gameOutcome,
+    });
+    if (insertError) {
+      setPhase('quote-error');
+      setErrorMsg("Couldn't save your reaction. Try again.");
       return;
     }
     markWaitlistHandled();
-    setStatus('success');
+    setPhase('done');
   };
 
   const dismiss = () => {
     markWaitlistHandled();
-    setStatus('dismissed');
+    setPhase('dismissed');
   };
 
-  if (status === 'success') {
+  const skipQuote = () => {
+    markWaitlistHandled();
+    setPhase('done');
+  };
+
+  // ─── Stage 2 (quote) — after waitlist success or in error retry ───
+  if (
+    phase === 'quote-idle' ||
+    phase === 'quote-submitting' ||
+    phase === 'quote-error'
+  ) {
+    return (
+      <section className="end-game-quote" aria-label="Share a reaction">
+        <p className="end-game-quote-thanks">
+          <strong>You're on the list.</strong> One email when the
+          Kickstarter launches — that's it.
+        </p>
+        <p className="end-game-quote-lead">
+          Got ten more seconds? How would you describe Skyflag to a friend?
+        </p>
+        <form
+          className="end-game-quote-form"
+          onSubmit={handleQuoteSubmit}
+          noValidate
+        >
+          <textarea
+            value={quote}
+            onChange={(e) => setQuote(e.target.value)}
+            placeholder="One sentence is plenty."
+            className="end-game-quote-textarea"
+            disabled={phase === 'quote-submitting'}
+            rows={2}
+            maxLength={500}
+            aria-label="Your reaction"
+          />
+          <div className="end-game-quote-fields">
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First name (optional)"
+              className="end-game-quote-input"
+              disabled={phase === 'quote-submitting'}
+              maxLength={40}
+              aria-label="First name"
+            />
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="City (optional)"
+              className="end-game-quote-input"
+              disabled={phase === 'quote-submitting'}
+              maxLength={60}
+              aria-label="City"
+            />
+          </div>
+          <label className="end-game-quote-consent">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              disabled={phase === 'quote-submitting'}
+            />
+            <span>OK to share publicly with my first name + city.</span>
+          </label>
+          <div className="end-game-quote-actions">
+            <button
+              type="submit"
+              className="end-game-btn end-game-waitlist-submit"
+              disabled={phase === 'quote-submitting'}
+            >
+              {phase === 'quote-submitting' ? 'Sending…' : 'Share'}
+            </button>
+            <button
+              type="button"
+              className="end-game-waitlist-dismiss"
+              onClick={skipQuote}
+              disabled={phase === 'quote-submitting'}
+            >
+              Skip
+            </button>
+          </div>
+        </form>
+        {phase === 'quote-error' && (
+          <p className="end-game-waitlist-error">{errorMsg}</p>
+        )}
+      </section>
+    );
+  }
+
+  // ─── Done — both stages handled ───────────────────────────────
+  if (phase === 'done') {
     return (
       <div className="end-game-waitlist end-game-waitlist--done">
         <p>
-          <strong>You're on the list.</strong> One email when the
-          Kickstarter launches — that's it.
+          <strong>Thank you.</strong> Every reaction shapes the launch.
         </p>
       </div>
     );
   }
 
+  // ─── Stage 1 (waitlist idle / submitting / error) ─────────────
   return (
     <section className="end-game-waitlist" aria-label="Kickstarter waitlist">
       <p className="end-game-waitlist-lead">
         Liked the game? Get the email when the physical edition
         launches on Kickstarter. One email. That's it.
       </p>
-      <form className="end-game-waitlist-form" onSubmit={handleSubmit} noValidate>
+      <form
+        className="end-game-waitlist-form"
+        onSubmit={handleWaitlistSubmit}
+        noValidate
+      >
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           className="end-game-waitlist-input"
-          disabled={status === 'submitting'}
+          disabled={phase === 'waitlist-submitting'}
           required
           aria-label="Email address"
         />
         <button
           type="submit"
           className="end-game-btn end-game-waitlist-submit"
-          disabled={status === 'submitting'}
+          disabled={phase === 'waitlist-submitting'}
         >
-          {status === 'submitting' ? 'Joining…' : 'Join'}
+          {phase === 'waitlist-submitting' ? 'Joining…' : 'Join'}
         </button>
       </form>
-      {status === 'error' && (
-        <p className="end-game-waitlist-error">{error}</p>
+      {phase === 'waitlist-error' && (
+        <p className="end-game-waitlist-error">{errorMsg}</p>
       )}
       <button
         type="button"

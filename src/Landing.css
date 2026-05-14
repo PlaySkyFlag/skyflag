@@ -454,6 +454,53 @@
   line-height: 1.6;
 }
 
+/* ─── Quotes (testimonials captured from the post-game funnel) ─── */
+
+.landing-quotes-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (min-width: 640px) {
+  .landing-quotes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-quotes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.landing-quote {
+  position: relative;
+  padding: 22px 24px 20px;
+  border: 1px solid rgba(194, 164, 107, 0.22);
+  border-left: 3px solid rgba(194, 164, 107, 0.55);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.landing-quote-body {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--landing-text, #E6E2D8);
+  font-style: italic;
+}
+
+.landing-quote-attribution {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--landing-text-muted);
+  letter-spacing: 0.02em;
+}
+
 /* ─── Universe grid (cross-links to the brand surfaces) ────────── */
 
 .landing-universe-grid {

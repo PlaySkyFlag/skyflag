@@ -19,6 +19,7 @@ import {
   LAYER_ORDER,
   NEXUS_COORD,
 } from './game/constants';
+import { supabase } from './game/supabase';
 import { THEMES, type ThemeId } from './game/themes';
 import type { Layer, PieceKind, Player } from './game/types';
 import './Landing.css';
@@ -103,6 +104,7 @@ export default function Landing() {
       <Hero />
       <DemoSection />
       <FeaturesSection />
+      <QuotesSection />
       <HowItWorksSection />
       <PricingSection />
       <PhysicalEditionSection />
@@ -242,6 +244,64 @@ function Feature({ icon, title, body }: { icon: string; title: string; body: str
       <h3 className="landing-feature-title">{title}</h3>
       <p className="landing-feature-body">{body}</p>
     </div>
+  );
+}
+
+// Social-proof section. Reads from public.quotes — RLS only returns rows
+// that are approved + featured + consent_to_share, so anything that hits
+// the client is publish-ready. If the fetch fails or there are zero
+// featured quotes yet, the whole section silently returns null. The pre-
+// Kickstarter goal is to populate this surface from the post-game funnel:
+// every game is a chance to capture a quote that convinces the next
+// visitor to try the game.
+type FeaturedQuote = {
+  id: string;
+  quote: string;
+  name: string | null;
+  city: string | null;
+};
+
+function QuotesSection() {
+  const [quotes, setQuotes] = useState<FeaturedQuote[]>([]);
+
+  useEffect(() => {
+    if (!supabase) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from('quotes')
+        .select('id, quote, name, city')
+        .order('created_at', { ascending: false })
+        .limit(6);
+      if (cancelled || error || !data) return;
+      setQuotes(data as FeaturedQuote[]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (quotes.length === 0) return null;
+
+  return (
+    <section className="landing-section">
+      <div className="landing-section-inner">
+        <h2 className="landing-section-title">What players are saying</h2>
+        <ul className="landing-quotes-grid">
+          {quotes.map((q) => (
+            <li key={q.id} className="landing-quote">
+              <blockquote className="landing-quote-body">"{q.quote}"</blockquote>
+              {(q.name || q.city) && (
+                <p className="landing-quote-attribution">
+                  {q.name || 'Anonymous'}
+                  {q.city ? `, ${q.city}` : ''}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 

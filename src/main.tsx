@@ -48,6 +48,7 @@ function lazyWithRetry<T extends ComponentType<unknown>>(
 // stays light; /play (App) drags in the AI worker, the board, and
 // every modal — keeping that ~600kB out of the / bundle is the
 // biggest single perf win available without further restructuring.
+const AdminQuotes = lazyWithRetry(() => import('./AdminQuotes.tsx'))
 const App = lazyWithRetry(() => import('./App.tsx'))
 const AshtapadaSplash = lazyWithRetry(() => import('./AshtapadaSplash.tsx'))
 const Landing = lazyWithRetry(() => import('./Landing.tsx'))
@@ -104,6 +105,7 @@ const isThresanIOHost =
 // the .games suffix.
 const isThresanGamesHost =
   hostname === 'thresan.games' || hostname === 'www.thresan.games';
+const isAdminQuotes = path.startsWith('/admin/quotes');
 const isApp = path.startsWith('/play') || path.startsWith('/app');
 const isStory = path.startsWith('/story');
 const isWatch = path.startsWith('/watch');
@@ -129,6 +131,7 @@ else if (isThresanStudioHost) rendered = <ThresanStudio />;
 else if (isThresanIOHost) rendered = <ThresanIO />;
 else if (isThresanGamesHost) rendered = <ThresanGames />;
 else if (isThresanHost) rendered = <ThresanUmbrella />;
+else if (isAdminQuotes) rendered = <AdminQuotes />;
 else if (isReview) rendered = <Review />;
 else if (isWatch) rendered = <Watch />;
 else if (isApp) rendered = <App />;
