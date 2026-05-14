@@ -44,6 +44,9 @@
     }
   ],
   "rewrites": [
-    { "source": "/((?!api|assets|.*\\..*).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api|assets|.*\\..*).*)",
+      "destination": "/api/seo"
+    }
   ]
 }

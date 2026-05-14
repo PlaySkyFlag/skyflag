@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Single canonical sitemap for the Thresan ecosystem. Lists URLs across
+  all 7 brand domains; each domain serves the same Vite SPA, which
+  switches surface based on hostname (see src/main.tsx). For Google to
+  honor cross-domain entries, every hostname must be verified in the
+  same Search Console property. Path-based mirrors at playskyflag.com
+  (/thresan-store, /thresan-studio, …) are deliberately EXCLUDED to
+  prevent duplicate-content conflicts with the subdomain canonical URL.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- playskyflag.com — the game itself and its primary marketing     -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+
   <!-- Marketing landing — primary entry point for new visitors and SEO. -->
   <url>
     <loc>https://playskyflag.com/</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-05-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -13,7 +27,7 @@
        Higher value for fan / world-name searches than /play. -->
   <url>
     <loc>https://playskyflag.com/story</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-05-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -23,8 +37,103 @@
        click-through, not a search target. -->
   <url>
     <loc>https://playskyflag.com/play</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-05-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- Origins — Ashtapada heritage and the chess-lineage bridge. Strong
+       SEO target for board-game-history queries; canonical historical
+       framing of Thresan as "what happens if we never left Ashtapada
+       and went vertical instead." -->
+  <url>
+    <loc>https://playskyflag.com/origins</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Press kit — media kit for journalists, streamers, reviewers. -->
+  <url>
+    <loc>https://playskyflag.com/press</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Legal pages — included for completeness; bots index them
+       regardless but explicit priority signals we don't expect search
+       traffic here. -->
+  <url>
+    <loc>https://playskyflag.com/privacy</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>https://playskyflag.com/terms</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- Thresan universe — subdomain-routed brand surfaces              -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+
+  <!-- thresan.com — universe-level brand hub linking to all sister sites. -->
+  <url>
+    <loc>https://thresan.com/</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- thresan.store — physical-edition pre-launch / Founders Reservation
+       / Kickstarter funnel. Higher priority because conversion path. -->
+  <url>
+    <loc>https://thresan.store/</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- thresan.studio — creator bio, origin story, contact. -->
+  <url>
+    <loc>https://thresan.studio/</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- thresan.io — Lab: engineering notes, opening theory, build journal.
+       Compounds in value as more posts ship; bump priority once cadence
+       is established. -->
+  <url>
+    <loc>https://thresan.io/</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- thresan.games — edition catalog. Skyflag is the current edition;
+       ghost slot for future editions. -->
+  <url>
+    <loc>https://thresan.games/</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <!-- ashtapada.com — heritage splash bridging Ashtapada → Thresan    -->
+  <!-- ─────────────────────────────────────────────────────────────── -->
+
+  <url>
+    <loc>https://ashtapada.com/</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
 </urlset>
