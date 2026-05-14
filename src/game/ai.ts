@@ -21,6 +21,47 @@ import { opponentOf } from './types';
 // UI stays smooth even when search takes longer.
 const DEFAULT_SEARCH_DEPTH = 4;
 
+// ─── Search feature toggles ────────────────────────────────────────────────
+// Production defaults below. The selfplay harness flips these per-engine
+// (via setSearchOptions) to isolate which features help vs. hurt
+// strength. App code shouldn't touch these directly.
+export type SearchOptions = {
+  enableNullMove: boolean;
+  enableLMR: boolean;
+  enableTT: boolean;
+  enableQuiescence: boolean;
+  // When true, skip the strategic-stance random picker and force
+  // 'balanced'. Removes the stance multiplier as a confound during
+  // benchmark A/B testing.
+  forceBalancedStance: boolean;
+};
+
+// Null-move pruning is off by default after self-play benchmarking
+// (scripts/selfplay.ts) found it loses head-to-head at every production
+// depth (d3 through d6). The mechanism: at the depths we actually
+// search, the R=2 reduction puts the post-pass minimax at depth 0–2,
+// which drops into quiescence almost immediately. Quiescence only
+// follows captures, so the score returned for the "passed turn"
+// position misses non-capture threats — and Skyflag has many of those
+// thanks to layer-transit tactics. The resulting null-move score is
+// systematically wrong, triggering bogus fail-high prunes that drop
+// the moves which would have refuted the assumed-good action.
+// Leaving the toggle in place so we can revisit (e.g. with verified
+// null-move) without restoring the regression.
+const DEFAULT_SEARCH_OPTIONS: SearchOptions = {
+  enableNullMove: false,
+  enableLMR: true,
+  enableTT: true,
+  enableQuiescence: true,
+  forceBalancedStance: false,
+};
+
+let activeSearchOptions: SearchOptions = { ...DEFAULT_SEARCH_OPTIONS };
+
+export function setSearchOptions(opts: Partial<SearchOptions> = {}): void {
+  activeSearchOptions = { ...DEFAULT_SEARCH_OPTIONS, ...opts };
+}
+
 // ─── Transposition table ───────────────────────────────────────────────────
 // Caches search results so the same position reached via different move
 // orders doesn't get re-searched. Bound on size — Map iteration order is
@@ -191,6 +232,11 @@ let strategicStance: StrategicStance = 'balanced';
 let stanceLastTurnSeen: number = Infinity;
 
 function pickStanceIfNewGame(state: GameState): void {
+  if (activeSearchOptions.forceBalancedStance) {
+    strategicStance = 'balanced';
+    stanceLastTurnSeen = state.turnNumber;
+    return;
+  }
   const turn = state.turnNumber;
   if (turn < stanceLastTurnSeen) {
     const r = Math.random();
@@ -794,7 +840,9 @@ function minimax(
     return evaluate(state, aiPlayer);
   }
   if (depth === 0) {
-    return quiescence(state, alpha, beta, aiPlayer, QUIESCENCE_DEPTH, { count: 0 });
+    return activeSearchOptions.enableQuiescence
+      ? quiescence(state, alpha, beta, aiPlayer, QUIESCENCE_DEPTH, { count: 0 })
+      : evaluate(state, aiPlayer);
   }
 
   // Save originals — needed below to know whether the final score is an
@@ -805,8 +853,8 @@ function minimax(
   // Transposition-table probe: if we already searched this exact position
   // to at least the depth we need, reuse the cached result (or tighten
   // alpha/beta from the cached bound).
-  const ttKey = hashState(state);
-  const ttHit = transTable.get(ttKey);
+  const ttKey = activeSearchOptions.enableTT ? hashState(state) : '';
+  const ttHit = activeSearchOptions.enableTT ? transTable.get(ttKey) : undefined;
   if (ttHit && ttHit.depth >= depth) {
     if (ttHit.flag === 'exact') return ttHit.score;
     if (ttHit.flag === 'lower' && ttHit.score >= beta) return ttHit.score;
@@ -829,6 +877,7 @@ function minimax(
   // = losing Captain), or we just nulled (no double-nulls).
   const R_NULL = 2;
   if (
+    activeSearchOptions.enableNullMove &&
     allowNull &&
     depth >= 3 &&
     ply > 0 &&
@@ -880,7 +929,7 @@ function minimax(
 
     const isLate = i >= LMR_LATE_THRESHOLD;
     const isQuiet = !isCapture(state, action);
-    const canReduce = depth >= 3 && isLate && isQuiet;
+    const canReduce = activeSearchOptions.enableLMR && depth >= 3 && isLate && isQuiet;
 
     let childValue: number;
     if (canReduce) {
@@ -933,7 +982,9 @@ function minimax(
   if (value <= alphaOrig) flag = 'upper';
   else if (value >= betaOrig) flag = 'lower';
 
-  ttSet(ttKey, { depth, score: value, flag, bestAction });
+  if (activeSearchOptions.enableTT) {
+    ttSet(ttKey, { depth, score: value, flag, bestAction });
+  }
 
   return value;
 }
