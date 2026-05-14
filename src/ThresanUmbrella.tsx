@@ -21,7 +21,7 @@ export default function ThresanUmbrella() {
     return applySurfaceMeta({
       title: 'Thresan — a strategy game and the universe around it',
       description:
-        'Thresan is a strategy game with a layered fictional universe. Three boards, four piece types, ancient roots. The current edition is Skyflag.',
+        'Thresan is a strategy game with a layered fictional universe. Three boards, five piece types, ancient roots. The current edition is Skyflag.',
       canonicalUrl: 'https://thresan.com/',
       ogImage: 'https://thresan.com/thresan-og-stack.jpg',
       ogImageAlt: 'Three stacked boards forming a column — Terran, Meridian, Empyrean.',
@@ -40,7 +40,7 @@ export default function ThresanUmbrella() {
         </p>
         <p className="thresan-lead">
           Thresan is a strategy game with a layered universe around
-          it. Three stacked boards, four piece types, an ancient
+          it. Three stacked boards, five piece types, an ancient
           proof of reach. The current edition is <em>Skyflag</em> —
           the clans, the boards, the world of Kaleo.
         </p>

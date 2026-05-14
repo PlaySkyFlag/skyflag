@@ -207,9 +207,9 @@ function FeaturesSection() {
             body="Every game plays out simultaneously across the Terran, Meridian, and Empyrean. Lifts move pieces between layers but cost two activations — vertical momentum has to be earned."
           />
           <Feature
-            icon="♚♟♜♝"
-            title="Four pieces, distinct roles"
-            body="Captains neutralize claim-seals. Soldiers advance and promote. Rovers and Pilots transport between layers and leap-capture in close quarters. No piece is interchangeable."
+            icon="♚♟♛♜♝"
+            title="Five pieces, distinct roles"
+            body="Captains neutralize claim-seals. Soldiers advance and promote into Promoted Soldier Captains. Rovers and Pilots transport between layers and leap-capture in close quarters. No piece is interchangeable."
           />
           <Feature
             icon="∞"
@@ -312,7 +312,7 @@ function HowItWorksSection() {
         <h2 className="landing-section-title">How a game flows</h2>
         <ol className="landing-howto-list">
           <li>
-            <strong>Deploy.</strong> Each clan starts with four pieces in
+            <strong>Deploy.</strong> Each clan starts with five pieces in
             hand and one fixed deploy square on the Terran. Bring them
             onto the board, one activation at a time.
           </li>

@@ -64,7 +64,7 @@ The Thresan voice (Origins, Story, all current copy) is contemplative, mythic, p
 
 ## 4. Pieces
 
-Per the rulebook **v20** (and v19.1 — unchanged across versions): **4 pieces per player**, one of each type. Total 8 player pieces across both clans.
+Per the rulebook **v20** (and v19.1 — unchanged across versions): **5 pieces per player**, one of each type. Total 10 player pieces across both clans (Captain, Soldier, Promoted Soldier Captain, Rover, Pilot — the Promoted Soldier Captain is a swap-in piece that enters play when a Soldier promotes at the far rank).
 
 **Silhouettes — distinct enough to read at table distance:**
 | Piece | Height | Form | Read |
@@ -73,15 +73,17 @@ Per the rulebook **v20** (and v19.1 — unchanged across versions): **4 pieces p
 | Pilot | 50mm | Swept aerodynamic profile, asymmetric — leans forward | Diagonal transit, ≤2 sq |
 | Rover | 45mm | Lower wide-base body with banded cylinder — grounded | Orthogonal transit, ≤2 sq |
 | Soldier | 40mm | Squat geometric body, simple cap | Forward-only mass, promotes |
+| Promoted Soldier Captain | 55mm | Soldier base, Captain crown — clear "soldier who became captain" silhouette | Soldier that has promoted at the far rank |
 
 Each piece is monochrome. **Player 1 (Grey Ravens) in slate gray PLA; Player 2 (White Stags) in ivory PLA.** Bottom of each piece has a 12mm × 2mm-deep recess for an M10 steel washer ballast.
 
 **Confirmed count per side (per rulebook v20):**
 - Captain ×1
-- Pilot ×1
-- Rover ×1
 - Soldier ×1
-- Total ×4 per side, **×8 across the game**
+- Promoted Soldier Captain ×1 (swap-in piece — enters play when a Soldier promotes)
+- Rover ×1
+- Pilot ×1
+- Total ×5 per side, **×10 across the game**
 
 **Starting positions** (from rulebook v20, all pieces start in hand and deploy onto Ground):
 - P1 Captain deploys at Ground(0,3)
@@ -122,25 +124,27 @@ Each piece is monochrome. **Player 1 (Grey Ravens) in slate gray PLA; Player 2 (
 | Pillar | 4 | PLA matte | Charcoal | 170mm long, 16mm OD, 8mm tenons |
 | Base | 1 | PLA matte | Charcoal | Sigil deboss, pillar sockets |
 | Captain (P1) | 1 | PLA matte | Slate | Steel washer ballast; raven glyph |
-| Pilot (P1) | 1 | PLA matte | Slate | Steel washer ballast; raven glyph |
-| Rover (P1) | 1 | PLA matte | Slate | Steel washer ballast; raven glyph |
 | Soldier (P1) | 1 | PLA matte | Slate | Steel washer ballast; raven glyph |
+| Promoted Soldier Captain (P1) | 1 | PLA matte | Slate | Steel washer ballast; raven glyph + promotion mark |
+| Rover (P1) | 1 | PLA matte | Slate | Steel washer ballast; raven glyph |
+| Pilot (P1) | 1 | PLA matte | Slate | Steel washer ballast; raven glyph |
 | Captain (P2) | 1 | PLA matte | Ivory | Steel washer ballast; stag glyph |
-| Pilot (P2) | 1 | PLA matte | Ivory | Steel washer ballast; stag glyph |
-| Rover (P2) | 1 | PLA matte | Ivory | Steel washer ballast; stag glyph |
 | Soldier (P2) | 1 | PLA matte | Ivory | Steel washer ballast; stag glyph |
+| Promoted Soldier Captain (P2) | 1 | PLA matte | Ivory | Steel washer ballast; stag glyph + promotion mark |
+| Rover (P2) | 1 | PLA matte | Ivory | Steel washer ballast; stag glyph |
+| Pilot (P2) | 1 | PLA matte | Ivory | Steel washer ballast; stag glyph |
 | Flag token (P1) | 3 | PLA matte | Slate | Pennant form, ~15mm tall |
 | Flag token (P2) | 3 | PLA matte | Ivory | Pennant form, ~15mm tall |
-| **Total parts:** | **22** | | | + 8 × M10 washers (hardware) |
+| **Total parts:** | **24** | | | + 10 × M10 washers (hardware) |
 
-**Build plate fit (Bambu A1 / Prusa MK4 / similar, 256×256mm):** Each board fits comfortably; one board per plate. Pillars print 4-up. All 4 P1 pieces + 3 P1 flag tokens fit on one plate (slate filament); same for P2 (ivory).
+**Build plate fit (Bambu A1 / Prusa MK4 / similar, 256×256mm):** Each board fits comfortably; one board per plate. Pillars print 4-up. All 5 P1 pieces + 3 P1 flag tokens fit on one plate (slate filament); same for P2 (ivory).
 
 **Estimated total print time:** 14–18 hrs on a fast FDM (Bambu A1 0.2mm layers). Filament: ~500g charcoal + ~60g slate + ~60g ivory + ~5g gold (for accents, optional) = ~$20 in materials.
 
 **Four print runs (single-extruder workflow):**
 1. **Charcoal:** Ground + Sky + Space boards + 4 Pillars + Base (~8 hrs, one filament)
-2. **Slate:** 4 P1 pieces + 3 P1 flag tokens (~3 hrs)
-3. **Ivory:** 4 P2 pieces + 3 P2 flag tokens (~3 hrs)
+2. **Slate:** 5 P1 pieces + 3 P1 flag tokens (~3.5 hrs)
+3. **Ivory:** 5 P2 pieces + 3 P2 flag tokens (~3.5 hrs)
 4. **(Optional) Gold accent:** small post-print painting pass on Lifts/Nexus/Sigil/Layer names, ~30 min
 
 ---

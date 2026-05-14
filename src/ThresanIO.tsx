@@ -311,7 +311,7 @@ export default function ThresanIO() {
               in roughly 10^120 possible games.
             </p>
             <p>
-              <strong>Thresan:</strong> 108 squares × 8 pieces × ~20
+              <strong>Thresan:</strong> 108 squares × 10 pieces × ~20
               average legal moves per turn. The branching factor is
               lower (fewer pieces), the board is larger (more
               squares), and the layer dimension adds a{' '}
@@ -444,7 +444,9 @@ export default function ThresanIO() {
               <li>
                 <strong>v10–v13</strong> (2024 to early 2025).
                 Foundation. Three-layer 6×6 geometry, Lifts at the
-                four current positions, the four-piece roster.
+                four current positions, the original four-piece
+                roster (later expanded to five with the Promoted
+                Soldier Captain).
               </li>
               <li>
                 <strong>v14</strong> (mid-2025). Tightest measured

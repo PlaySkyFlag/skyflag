@@ -84,7 +84,7 @@ const REWARD_TIERS: RewardTier[] = [
     pitch: 'The standard physical game.',
     includes: [
       'Everything in Digital Founder',
-      'One copy of Thresan: Skyflag — three boards, eight pieces, rulebook',
+      'One copy of Thresan: Skyflag — three boards, ten pieces, rulebook',
       'Standard packaging, full-colour print',
     ],
   },
@@ -307,8 +307,9 @@ function Showcase() {
             <strong>Three 6×6 boards</strong> — Terran, Meridian, Empyrean
           </li>
           <li>
-            <strong>Four pieces per side</strong> — Captain, Soldier,
-            Rover, Pilot — slate and ivory finishes
+            <strong>Five pieces per side</strong> — Captain, Soldier,
+            Promoted Soldier Captain, Rover, Pilot — slate and ivory
+            finishes (ten pieces total in the box)
           </li>
           <li>
             <strong>Illuminated base</strong> with the Thresan sigil

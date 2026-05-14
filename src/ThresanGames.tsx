@@ -42,7 +42,7 @@ export default function ThresanGames() {
           The editions of Thresan.
         </p>
         <p className="games-lead">
-          Thresan is the game — three boards, four piece types, an
+          Thresan is the game — three boards, five piece types, an
           ancient proof of reach. Each edition brings new pieces, new
           board art, and a new storyboard. The rules stay the same.
           This is the catalog.
@@ -66,8 +66,9 @@ export default function ThresanGames() {
                 Nexus.
               </p>
               <p className="games-edition-features">
-                Pieces: Captain Dantec, Soldier Durren, Rover Thandiwe,
-                Pilot Voss. Boards: Terran, Meridian, Empyrean.
+                Pieces: Captain Dantec, Soldier Durren (promoted to
+                Captain Durren on promotion), Rover Thandiwe, Pilot
+                Voss. Boards: Terran, Meridian, Empyrean.
               </p>
               <div className="games-edition-actions">
                 <a href={SKYFLAG_URL} className="games-cta">

@@ -114,7 +114,7 @@ function Trailer() {
         second board fades in beneath it, then a third. Three planes
         stacked like the floors of an arcology — Terran, Meridian,
         Empyrean. The clans assemble across all three: Grey Ravens and
-        White Stags, four pieces per side. A short sequence of moves
+        White Stags, five pieces per side. A short sequence of moves
         follows — a Captain crossing a Lift, a Pilot threading the
         Empyrean, a Nexus capture decided in three dimensions — set
         against tactile foley and a single low cello. Pieces freeze in
@@ -183,8 +183,8 @@ function Descriptions() {
         <p className="press-desc-body">
           Thresan™: Skyflag is a free turn-based strategy game from
           designer Dr. Nelson Jatel and Limnology Research Corp. Two
-          players command four pieces — Captain, Soldier, Rover, Pilot —
-          across three stacked 6×6 boards. Capture the opposing clan's
+          players command five pieces — Captain, Soldier, Promoted
+          Soldier Captain, Rover, Pilot — across three stacked 6×6 boards. Capture the opposing clan's
           three claim-seals, then guide your Captain to the Caelum
           Nexus to win. No dice. No cards. Pure geometry.
         </p>
@@ -196,9 +196,9 @@ function Descriptions() {
           Thresan™: Skyflag is a free, browser-based turn-based strategy
           game played simultaneously across three stacked 6×6 boards —
           the Terran, Meridian, and Empyrean layers of an arcology
-          called Kaleo. Each of the two players commands four pieces —
-          Captain, Soldier, Rover, Pilot — and pursues the opposing
-          clan's three claim-flags, one on each layer. Once all three
+          called Kaleo. Each of the two players commands five pieces —
+          Captain, Soldier, Promoted Soldier Captain, Rover, Pilot — and
+          pursues the opposing clan's three claim-flags, one on each layer. Once all three
           opposing flags are claimed, the Captain must land on the
           Caelum Nexus at Space(3,3) to win.
         </p>
@@ -232,9 +232,10 @@ function Features() {
           move pieces between layers but cost two activations.
         </li>
         <li>
-          <strong>Four pieces, distinct roles.</strong> Captains
-          neutralize claim-seals. Soldiers advance and promote. Rovers
-          and Pilots transport between layers.
+          <strong>Five pieces, distinct roles.</strong> Captains
+          neutralize claim-seals. Soldiers advance and promote into
+          Promoted Soldier Captains. Rovers and Pilots transport between
+          layers.
         </li>
         <li>
           <strong>Two ways to win.</strong> Neutralize the opposing
@@ -455,7 +456,7 @@ function Contact() {
       <p className="press-desc-body press-boilerplate">
         Thresan™: Skyflag is a free, browser-based, turn-based strategy
         game from designer Dr. Nelson Jatel and Limnology Research
-        Corp. Players command four pieces across three stacked 6×6
+        Corp. Players command five pieces across three stacked 6×6
         boards (Terran, Meridian, Empyrean), pursuing the opposing
         clan's three claim-seals and the Caelum Nexus. The game
         descends from Ashtapada — the ancient Indian board that, via
