@@ -78,8 +78,23 @@ export default function Privacy() {
           </ul>
 
           <p>
-            No analytics pixels. No advertising cookies. No third-party
-            tracking scripts.
+            Privacy-friendly analytics, no advertising cookies, no
+            third-party tracking scripts.{' '}
+            <a
+              href="https://vercel.com/docs/analytics/privacy-policy"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Vercel Web Analytics
+            </a>{' '}
+            and Speed Insights are enabled to count pageviews and
+            measure load performance. They are cookieless, do not
+            identify individual visitors, do not use a fingerprint, and
+            beacon only to this site's own domain — never to a
+            third-party tracker. The data collected is the URL path,
+            referrer, country, and broad device class (desktop /
+            mobile), aggregated for traffic and Core Web Vitals
+            reporting only.
           </p>
 
           <h2>Where it lives</h2>

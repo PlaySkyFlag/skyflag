@@ -1,5 +1,7 @@
 import { StrictMode, Suspense, lazy, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import './index.css'
 import ErrorBoundary from './ErrorBoundary.tsx'
 import { migrateLocalStorage } from './game/migrate.ts'
@@ -161,5 +163,16 @@ createRoot(rootEl).render(
         {rendered}
       </Suspense>
     </ErrorBoundary>
+    {/* Vercel Analytics + Speed Insights. Mounted as siblings of the
+        ErrorBoundary so pageviews and Core Web Vitals still report
+        even if the app surface crashes. Both components are cookieless
+        and only beacon to /_vercel/* on the same origin, so no third-
+        party requests and no GDPR consent banner needed.
+
+        All 7 brand domains roll up into a single Vercel project
+        dashboard with a hostname filter — go to Vercel → Project →
+        Analytics → filter by host to see per-domain stats. */}
+    <Analytics />
+    <SpeedInsights />
   </StrictMode>,
 )
