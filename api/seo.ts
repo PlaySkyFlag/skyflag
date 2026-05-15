@@ -216,31 +216,23 @@ export default async function handler(req: Request): Promise<Response> {
   const canonicalHost = host.replace(/^www\./, '');
   const canonicalUrl = `https://${canonicalHost}${path === '/' ? '/' : path}`;
 
-  // Fetch the static template. The build renames dist/index.html to
-  // dist/_template.html post-build so Vercel doesn't auto-serve the
-  // unrewritten HTML at /. The vercel.json SPA rewrite excludes paths
-  // with dots, so /_template.html serves the raw static file when we
-  // fetch it — no rewrite loop.
-  const indexUrl = `${url.origin}/_template.html`;
+  // Fetch the static index.html. The vercel.json SPA rewrite excludes
+  // /index.html (regex skips paths with dots), so the response is the
+  // raw static file — no rewrite loop.
+  const indexUrl = `${url.origin}/index.html`;
   let indexResp: Response;
   try {
     indexResp = await fetch(indexUrl);
   } catch {
-    // Edge fetch failure (network blip, deploy in flight, etc.). Serve
-    // a minimal placeholder so the request still completes with HTML.
-    // The SPA can't hydrate from this, but at least the page isn't a
-    // 500 — and this branch should only fire under genuine failure.
-    return new Response(
-      `<!doctype html><title>${escapeText(surface.title)}</title><meta http-equiv="refresh" content="0;url=/_template.html">`,
-      { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
-    );
+    // Edge fetch failure (network blip, deploy in flight, etc.).
+    // Fall back to redirecting the client to the static asset so they
+    // still land on a working page, just without the per-surface meta.
+    return Response.redirect(indexUrl, 302);
   }
 
   if (!indexResp.ok) {
-    return new Response(
-      `<!doctype html><title>${escapeText(surface.title)}</title><meta http-equiv="refresh" content="0;url=/_template.html">`,
-      { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
-    );
+    // Same fallback: better to serve the unmodified SPA than to 500.
+    return Response.redirect(indexUrl, 302);
   }
 
   const html = await indexResp.text();
