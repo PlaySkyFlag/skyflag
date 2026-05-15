@@ -1,4 +1,6 @@
 {
+  "//": "Vercel-only build: rename index.html to _template.html post-build so Vercel doesn't auto-serve the unrewritten HTML at /. The SEO edge function fetches _template.html, rewrites per-host meta, and returns it. Local builds and Capacitor iOS sync keep using the default `npm run build` which leaves index.html in place.",
+  "buildCommand": "npm run build && mv dist/index.html dist/_template.html",
   "redirects": [
     {
       "source": "/(.*)",
