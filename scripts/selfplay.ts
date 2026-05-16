@@ -13,6 +13,8 @@
  *   npm run selfplay -- --time-a 800 --time-b 400 --games 20
  *   npm run selfplay -- --seed 42 --no-swap
  *   npm run selfplay -- --games 500 --record data/selfplay.jsonl --record-min-turn 4
+ *   npm run selfplay -- --games 400 --bal --eval-params-a data/tuned-params.json
+ *       (tuned weights A vs shipped-default B — the trust-but-verify A/B)
  *
  * Both sides start the game; `--swap` (default on) alternates which engine
  * plays P1 across games so neither config gets a free first-mover advantage.
@@ -28,9 +30,16 @@
  * given --seed. Restored after each call so app-side randomness is unaffected.
  */
 
-import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { basename } from 'node:path';
 import { dirname } from 'node:path';
-import { chooseAction, setSearchOptions, type SearchOptions } from '../src/game/ai';
+import {
+  chooseAction,
+  setSearchOptions,
+  setEvalParams,
+  type SearchOptions,
+  type EvalParams,
+} from '../src/game/ai';
 import { createInitialGameState } from '../src/game/constants';
 import { reduce, type Action } from '../src/game/reducer';
 import type { Player } from '../src/game/types';
@@ -59,7 +68,34 @@ type Args = {
   recordStride: number;
   recordMinTurn: number;
   recordAppend: boolean;
+  // Per-engine eval weights. null = shipped DEFAULT_EVAL_PARAMS. The
+  // loaded object accepts the texel-tune output ({tuned:{…}}) or a bare
+  // EvalParams. This is the A/B path for validating tuned weights:
+  // tuned A vs default B, head-to-head — the only trustworthy signal.
+  evalParamsA: Partial<EvalParams> | null;
+  evalParamsB: Partial<EvalParams> | null;
+  evalParamsAPath: string | null;
+  evalParamsBPath: string | null;
 };
+
+// Accepts the texel-tune JSON ({tuned:EvalParams,…}) or a bare
+// EvalParams. Loaded at parse time so a bad path fails fast.
+function loadEvalParams(path: string): Partial<EvalParams> {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(path, 'utf8'));
+  } catch (e) {
+    console.error(`Cannot read eval-params file ${path}: ${(e as Error).message}`);
+    process.exit(1);
+  }
+  const obj = parsed as { tuned?: unknown };
+  const params = (obj && typeof obj === 'object' && obj.tuned ? obj.tuned : parsed);
+  if (!params || typeof params !== 'object') {
+    console.error(`Eval-params file ${path} is not an object / has no "tuned".`);
+    process.exit(1);
+  }
+  return params as Partial<EvalParams>;
+}
 
 function parseArgs(argv: string[]): Args {
   const args: Args = {
@@ -78,6 +114,10 @@ function parseArgs(argv: string[]): Args {
     recordStride: 1,
     recordMinTurn: 1,
     recordAppend: false,
+    evalParamsA: null,
+    evalParamsB: null,
+    evalParamsAPath: null,
+    evalParamsBPath: null,
   };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
@@ -96,6 +136,13 @@ function parseArgs(argv: string[]): Args {
       case '--record-stride':  args.recordStride  = Math.max(1, parseInt(v, 10)); i++; break;
       case '--record-min-turn':args.recordMinTurn = Math.max(1, parseInt(v, 10)); i++; break;
       case '--record-append':  args.recordAppend  = true; break;
+      case '--eval-params-a':
+        args.evalParamsAPath = v; args.evalParamsA = loadEvalParams(v); i++; break;
+      case '--eval-params-b':
+        args.evalParamsBPath = v; args.evalParamsB = loadEvalParams(v); i++; break;
+      case '--eval-params':
+        args.evalParamsAPath = args.evalParamsBPath = v;
+        args.evalParamsA = args.evalParamsB = loadEvalParams(v); i++; break;
       // Per-engine feature toggles. --no-X-a forces X off for A;
       // --X-a forces X on for A; same for B; bare --X / --no-X applies
       // to both. Forcing ON is useful now that null-move is OFF by
@@ -130,7 +177,10 @@ function parseArgs(argv: string[]): Args {
           '         [--record FILE]            write JSONL training set (Texel tuning)\n' +
           '         [--record-stride N]        keep every Nth eligible position (default 1)\n' +
           '         [--record-min-turn N]      skip plies before turn N (default 1)\n' +
-          '         [--record-append]          append instead of truncating the file',
+          '         [--record-append]          append instead of truncating the file\n' +
+          '         [--eval-params-a FILE]     load tuned EvalParams for engine A\n' +
+          '         [--eval-params-b FILE]     load tuned EvalParams for engine B\n' +
+          '         [--eval-params FILE]       same file for both engines',
         );
         process.exit(0);
     }
@@ -263,6 +313,7 @@ type EngineConfig = {
   depth: number;
   timeBudgetMs: number | null;
   opts: Partial<SearchOptions>;
+  evalParams: Partial<EvalParams> | null;
 };
 
 type GameResult = {
@@ -300,6 +351,9 @@ function playGame(
     const cfg = useA ? engineA : engineB;
 
     setSearchOptions(cfg.opts);
+    // Per-engine eval weights. null ⇒ reset to shipped defaults, so the
+    // other engine's custom params never leak across the move boundary.
+    setEvalParams(cfg.evalParams);
     const picked = withSeededRandom(prng, () =>
       chooseAction(state, cfg.depth, cfg.timeBudgetMs ?? undefined),
     );
@@ -364,17 +418,20 @@ type Summary = {
 };
 
 function runSelfplay(args: Args): Summary {
+  const epTag = (p: string | null) => (p ? `,ep=${basename(p)}` : '');
   const engineA: EngineConfig = {
-    name: `A(d=${args.depthA}${args.timeAMs ? `,t=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)})`,
+    name: `A(d=${args.depthA}${args.timeAMs ? `,t=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}${epTag(args.evalParamsAPath)})`,
     depth: args.depthA,
     timeBudgetMs: args.timeAMs,
     opts: args.optsA,
+    evalParams: args.evalParamsA,
   };
   const engineB: EngineConfig = {
-    name: `B(d=${args.depthB}${args.timeBMs ? `,t=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)})`,
+    name: `B(d=${args.depthB}${args.timeBMs ? `,t=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}${epTag(args.evalParamsBPath)})`,
     depth: args.depthB,
     timeBudgetMs: args.timeBMs,
     opts: args.optsB,
+    evalParams: args.evalParamsB,
   };
 
   const summary: Summary = {
@@ -458,8 +515,9 @@ function pct(x: number): string {
 }
 
 function printSummary(args: Args, s: Summary): void {
-  const engineA = `A: depth=${args.depthA}${args.timeAMs ? `, time=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}`;
-  const engineB = `B: depth=${args.depthB}${args.timeBMs ? `, time=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}`;
+  const epDesc = (p: string | null) => (p ? `, eval-params=${p}` : '');
+  const engineA = `A: depth=${args.depthA}${args.timeAMs ? `, time=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}${epDesc(args.evalParamsAPath)}`;
+  const engineB = `B: depth=${args.depthB}${args.timeBMs ? `, time=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}${epDesc(args.evalParamsBPath)}`;
   console.log('');
   console.log('═══════════════════════════════════════════════════════════');
   console.log(' Skyflag self-play summary');
