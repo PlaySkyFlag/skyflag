@@ -1,0 +1,219 @@
+/* VolumeZeroReader — page-based comic reader. Dark cinematic stage so
+   the art carries the screen; gold #C2A46B chrome shared with the rest
+   of the thresan.* brand. NOT a webtoon column — one page at a time,
+   centred, with side navigation. */
+
+.vz {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 40%, rgba(20, 26, 38, 0.6), transparent 75%),
+    #04060a;
+  color: #e6e2d8;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Embedded inside the landing — no full-viewport min-height, no own bg. */
+.vz--embed {
+  min-height: 0;
+  background: none;
+}
+
+.vz-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px clamp(16px, 4vw, 32px);
+  background: rgba(4, 6, 10, 0.86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(194, 164, 107, 0.18);
+}
+
+.vz-bar-back {
+  color: #c2a46b;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.9;
+}
+
+.vz-bar-back:hover {
+  opacity: 1;
+}
+
+.vz-bar-cta,
+.vz-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #c2a46b;
+  color: #111826;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.vz-bar-cta {
+  padding: 9px 20px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.vz-cta {
+  padding: 14px 30px;
+  font-size: 1rem;
+}
+
+.vz-bar-cta:hover,
+.vz-cta:hover {
+  background: #ffe4a3;
+  transform: translateY(-1px);
+}
+
+.vz-cta--ghost {
+  background: transparent;
+  color: #c2a46b;
+  border: 1px solid rgba(194, 164, 107, 0.5);
+}
+
+.vz-cta--ghost:hover {
+  background: rgba(194, 164, 107, 0.1);
+  color: #ffe4a3;
+}
+
+/* Reading stage: page centred, nav arrows flanking it. */
+.vz-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 2vw, 20px);
+  padding: clamp(16px, 3vw, 32px) clamp(8px, 2vw, 24px);
+}
+
+.vz-figure {
+  margin: 0;
+  flex: 0 1 auto;
+}
+
+.vz-page {
+  display: block;
+  max-width: min(820px, 92vw);
+  max-height: 86vh;
+  width: auto;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}
+
+.vz--embed .vz-page {
+  max-height: 78vh;
+}
+
+.vz-nav {
+  flex: 0 0 auto;
+  width: clamp(40px, 6vw, 56px);
+  height: clamp(40px, 6vw, 56px);
+  border-radius: 50%;
+  border: 1px solid rgba(194, 164, 107, 0.35);
+  background: rgba(255, 255, 255, 0.03);
+  color: #c2a46b;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.vz-nav:hover:not(:disabled) {
+  background: rgba(194, 164, 107, 0.14);
+}
+
+.vz-nav:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.vz-counter {
+  text-align: center;
+  padding: 0 0 20px;
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 247, 251, 0.55);
+}
+
+/* End-of-issue conversion hinge + in-production state. */
+.vz-end,
+.vz-soon {
+  text-align: center;
+  padding: clamp(40px, 7vw, 72px) clamp(20px, 5vw, 40px);
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.vz-end-eyebrow,
+.vz-soon-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: rgba(194, 164, 107, 0.78);
+  font-size: 0.76rem;
+  margin: 0 0 14px;
+}
+
+.vz-end-title,
+.vz-soon-title {
+  font-size: clamp(1.4rem, 3.6vw, 2rem);
+  color: #c2a46b;
+  font-weight: 700;
+  margin: 0 0 18px;
+  line-height: 1.25;
+}
+
+.vz-soon-lead {
+  font-size: clamp(1rem, 1.8vw, 1.08rem);
+  color: rgba(245, 247, 251, 0.85);
+  line-height: 1.7;
+  margin: 0 0 16px;
+}
+
+.vz-soon-note {
+  font-size: 0.95rem;
+  color: rgba(245, 247, 251, 0.6);
+  margin: 0 0 26px;
+}
+
+.vz-end-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+@media (max-width: 600px) {
+  .vz-nav {
+    position: fixed;
+    bottom: 16px;
+    z-index: 5;
+  }
+  .vz-nav--prev {
+    left: 16px;
+  }
+  .vz-nav--next {
+    right: 16px;
+  }
+  .vz-bar-back {
+    max-width: 60vw;
+  }
+}

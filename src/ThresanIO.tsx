@@ -291,7 +291,7 @@ export default function ThresanIO() {
                 glance.
               </li>
               <li>
-                <strong>Fewer pieces.</strong> Four per player
+                <strong>Fewer pieces.</strong> Five per player
                 instead of sixteen. The game stays positionally
                 legible: every piece matters, every move counts.
               </li>
@@ -337,7 +337,7 @@ export default function ThresanIO() {
               <em>what does strategy look like when the floor lifts?</em>
             </p>
             <p>
-              Three boards. Four piece types. One Nexus. One question.
+              Three boards. Five piece types. One Nexus. One question.
             </p>
 
             <p className="lab-post-signoff">— Nelson</p>
@@ -487,7 +487,7 @@ export default function ThresanIO() {
               that holds together.
             </p>
             <p>
-              Three boards. Four piece types. One Nexus. One proof.
+              Three boards. Five piece types. One Nexus. One proof.
             </p>
 
             <p className="lab-post-signoff">— Nelson</p>

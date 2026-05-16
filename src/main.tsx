@@ -65,6 +65,17 @@ const ThresanIO = lazyWithRetry(() => import('./ThresanIO.tsx'))
 const ThresanStore = lazyWithRetry(() => import('./ThresanStore.tsx'))
 const ThresanStudio = lazyWithRetry(() => import('./ThresanStudio.tsx'))
 const ThresanUmbrella = lazyWithRetry(() => import('./ThresanUmbrella.tsx'))
+const VolumeZeroLanding = lazyWithRetry(() => import('./VolumeZeroLanding.tsx'))
+// VolumeZeroReader takes an optional `embedded` prop; the route renders
+// it prop-less (embedded defaults false), so assert the prop-less shape
+// the lazy wrapper expects. The embedded use is a direct import in
+// VolumeZeroLanding, not this lazy route.
+const VolumeZeroReader = lazyWithRetry(
+  () =>
+    import('./VolumeZeroReader.tsx') as Promise<{
+      default: ComponentType<unknown>
+    }>,
+)
 const Watch = lazyWithRetry(() => import('./Watch.tsx'))
 
 // Run the one-shot rebrand storage migration before anything else reads
@@ -121,6 +132,18 @@ const isThresanStorePath = path.startsWith('/thresan-store');
 const isThresanStudioPath = path.startsWith('/thresan-studio');
 const isThresanIOPath = path.startsWith('/thresan-io');
 const isThresanGamesPath = path.startsWith('/thresan-games');
+// Volume Zero landing — /volume-zero (canonical) and the
+// /the-eight-footed-mark alias. Lives under thresan.studio in
+// production; also reachable on the main domain for iteration, same
+// convention as /thresan-studio.
+const isVolumeZeroPath =
+  path === '/volume-zero' ||
+  path.startsWith('/volume-zero/') ||
+  path === '/the-eight-footed-mark' ||
+  path.startsWith('/the-eight-footed-mark/');
+// /read — standalone full-screen page-based reader. Exact-or-subpath
+// match so a future /readme-style path can't be swallowed.
+const isReadPath = path === '/read' || path.startsWith('/read/');
 // /thresan path for iterating on the umbrella page from the main domain.
 // Matched on exact path or trailing slash so it doesn't swallow
 // /thresan-store, /thresan-studio, /thresan-io, or /thresan-games.
@@ -129,7 +152,11 @@ const isThresanPath = path === '/thresan' || path.startsWith('/thresan/');
 let rendered;
 if (isAshtapadaHost) rendered = <AshtapadaSplash />;
 else if (isThresanStoreHost) rendered = <ThresanStore />;
-else if (isThresanStudioHost) rendered = <ThresanStudio />;
+else if (isThresanStudioHost) rendered = isReadPath
+  ? <VolumeZeroReader />
+  : isVolumeZeroPath
+    ? <VolumeZeroLanding />
+    : <ThresanStudio />;
 else if (isThresanIOHost) rendered = <ThresanIO />;
 else if (isThresanGamesHost) rendered = <ThresanGames />;
 else if (isThresanHost) rendered = <ThresanUmbrella />;
@@ -147,6 +174,8 @@ else if (isThresanStorePath) rendered = <ThresanStore />;
 else if (isThresanStudioPath) rendered = <ThresanStudio />;
 else if (isThresanIOPath) rendered = <ThresanIO />;
 else if (isThresanGamesPath) rendered = <ThresanGames />;
+else if (isVolumeZeroPath) rendered = <VolumeZeroLanding />;
+else if (isReadPath) rendered = <VolumeZeroReader />;
 else if (isThresanPath) rendered = <ThresanUmbrella />;
 else rendered = <Landing />;
 

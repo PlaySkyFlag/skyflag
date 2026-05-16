@@ -1,0 +1,284 @@
+/* VolumeZeroLanding — the prequel conversion surface. Same gold-on-dark
+   thresan.* brand; cinematic, dark-fantasy / industrial sci-fi tone. */
+
+.vzl {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(194, 164, 107, 0.1), transparent 70%),
+    radial-gradient(ellipse 60% 80% at 50% 100%, rgba(120, 80, 200, 0.06), transparent 70%),
+    #06090f;
+  color: #e6e2d8;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.vzl-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vw, 80px) clamp(20px, 5vw, 40px) 60px;
+}
+
+.vzl-hero {
+  text-align: center;
+}
+
+.vzl-eyebrow {
+  font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+  color: rgba(245, 247, 251, 0.85);
+  margin: 0 0 16px;
+}
+
+.vzl-title {
+  font-size: clamp(1.7rem, 4.6vw, 2.9rem);
+  color: #c2a46b;
+  font-weight: 700;
+  line-height: 1.18;
+  margin: 0 0 12px;
+  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+}
+
+.vzl-subtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: rgba(245, 247, 251, 0.75);
+  margin: 0 0 32px;
+}
+
+.vzl-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.vzl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(194, 164, 107, 0.45);
+  background: transparent;
+  color: #c2a46b;
+  font-weight: 600;
+  font-size: 0.98rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
+}
+
+.vzl-btn:hover {
+  background: rgba(194, 164, 107, 0.12);
+  color: #ffe4a3;
+  transform: translateY(-1px);
+}
+
+.vzl-btn--primary {
+  background: #c2a46b;
+  color: #111826;
+  border-color: #c2a46b;
+  font-weight: 700;
+}
+
+.vzl-btn--primary:hover {
+  background: #ffe4a3;
+  color: #111826;
+}
+
+.vzl-btn--disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+.vzl-h2 {
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  color: #c2a46b;
+  font-weight: 700;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+/* Overview: cover + synopsis. */
+.vzl-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(20px, 4vw, 40px);
+  align-items: flex-start;
+  margin: clamp(48px, 8vw, 80px) 0;
+}
+
+.vzl-cover {
+  flex: 1 1 240px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.vzl-cover-img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
+.vzl-cover-placeholder {
+  aspect-ratio: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 1px dashed rgba(194, 164, 107, 0.35);
+  border-radius: 6px;
+  color: rgba(245, 247, 251, 0.5);
+  font-size: 0.88rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.vzl-cover-sigil {
+  width: 72px;
+  height: auto;
+  opacity: 0.5;
+}
+
+.vzl-synopsis {
+  flex: 2 1 320px;
+}
+
+.vzl-synopsis .vzl-h2 {
+  text-align: left;
+}
+
+.vzl-synopsis p {
+  font-size: 1.04rem;
+  color: rgba(245, 247, 251, 0.88);
+  margin: 0 0 16px;
+}
+
+.vzl-imprint {
+  font-size: 0.92rem !important;
+  color: rgba(245, 247, 251, 0.6) !important;
+}
+
+.vzl-reader,
+.vzl-play,
+.vzl-ks {
+  margin: clamp(48px, 8vw, 80px) 0;
+}
+
+.vzl-play {
+  text-align: center;
+}
+
+/* Kickstarter signup. */
+.vzl-ks {
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.vzl-ks-lead {
+  font-size: 0.98rem;
+  color: rgba(245, 247, 251, 0.78);
+  margin: 0 0 20px;
+}
+
+.vzl-ks-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.vzl-ks-input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 14px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(194, 164, 107, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+  color: #e6e2d8;
+  font-size: 1rem;
+}
+
+.vzl-ks-input::placeholder {
+  color: rgba(245, 247, 251, 0.4);
+}
+
+.vzl-ks-input:focus {
+  outline: none;
+  border-color: #c2a46b;
+}
+
+.vzl-ks-success {
+  font-size: 0.98rem;
+  color: rgba(245, 247, 251, 0.9);
+}
+
+.vzl-ks-success strong {
+  color: #c2a46b;
+}
+
+.vzl-ks-error {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  color: #e3a08a;
+}
+
+/* Footer: AI-use, colophon, copyright. */
+.vzl-foot {
+  margin-top: clamp(48px, 8vw, 80px);
+  padding-top: 32px;
+  border-top: 1px solid rgba(194, 164, 107, 0.18);
+  text-align: center;
+}
+
+.vzl-draft {
+  display: inline-block;
+  margin: 0 auto 16px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(227, 160, 138, 0.12);
+  border: 1px solid rgba(227, 160, 138, 0.4);
+  color: #e3a08a;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.vzl-aiuse {
+  max-width: 640px;
+  margin: 0 auto 28px;
+  font-size: 0.95rem;
+  color: rgba(245, 247, 251, 0.78);
+}
+
+.vzl-colophon,
+.vzl-copyright,
+.vzl-fineprint {
+  font-size: 0.84rem;
+  color: rgba(245, 247, 251, 0.55);
+  margin: 0 0 8px;
+}
+
+.vzl-colophon em {
+  color: rgba(245, 247, 251, 0.7);
+  font-style: italic;
+}
+
+.vzl-fineprint a,
+.vzl-copyright a {
+  color: rgba(245, 247, 251, 0.72);
+}
+
+@media (max-width: 560px) {
+  .vzl-ks-form {
+    flex-direction: column;
+  }
+  .vzl-overview {
+    flex-direction: column;
+  }
+}

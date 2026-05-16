@@ -1,6 +1,6 @@
 # Thresan: Skyflag
 
-A two-player tactical race played across a three-layer arcology — Ground (Terran), Sky (Meridian), and Space (Empyrean). Each player commands four pieces (Captain, Soldier, Rover, Pilot) and must capture the opponent's three claim-flags, then land their Captain on the Caelum Nexus at Space(3,3) to win.
+A two-player tactical race played across a three-layer arcology — Ground (Terran), Sky (Meridian), and Space (Empyrean). Each player commands five pieces (Captain, Soldier, Promoted Soldier Captain, Rover, Pilot) and must capture the opponent's three claim-flags, then land their Captain on the Caelum Nexus at Space(3,3) to win.
 
 Brand: **Thresan** is the game (the threefold proof of the Aetheri Law of Three; rules-level identity, like chess). **Skyflag** is its current edition — the pieces, the boards, and the storyboard set in the world of **Kaleo**. Future editions keep the rules of Thresan and change the storyboard.
 

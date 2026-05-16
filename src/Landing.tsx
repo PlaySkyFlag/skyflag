@@ -158,7 +158,7 @@ function Hero() {
             extra art needed. */}
         <ul className="landing-hero-stats" aria-label="At a glance">
           <li><strong>3</strong> boards</li>
-          <li><strong>4</strong> piece types</li>
+          <li><strong>5</strong> piece types</li>
           <li><strong>2</strong> ways to win</li>
         </ul>
         <p className="landing-hero-pitch">
