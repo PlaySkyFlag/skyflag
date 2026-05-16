@@ -31,6 +31,7 @@ type Surface = {
   title: string;
   description: string;
   ogImage: string;          // absolute https URL
+  ogImageAlt?: string;      // falls back to title if unset
   loadingHeadline: string;  // shown in the loading-shell div before JS
   loadingTagline?: string;  // optional smaller subtitle below the headline
 };
@@ -46,11 +47,12 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
     loadingTagline: 'Three worlds. One proof.',
   },
   'thresan.studio': {
-    title: 'Thresan Studio — designed by Nelson Jatel',
-    description: 'The studio behind Thresan, designed in British Columbia by Nelson Jatel. Free turn-based abstract strategy played across three stacked boards.',
-    ogImage: 'https://playskyflag.com/thresan-og-studio.jpg',
-    loadingHeadline: 'Thresan Studio',
-    loadingTagline: 'Designed in British Columbia.',
+    title: 'Read Chapter 1 free — Thresan: Skyflag',
+    description: 'Get Chapter 1 of the Thresan: Skyflag graphic prequel free. Enter your email and read it online, on GlobalComix, or as a PDF — then play the game.',
+    ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
+    ogImageAlt: 'Cover of Thresan: Skyflag, Chapter 1: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian.',
+    loadingHeadline: 'Read Chapter 1 free',
+    loadingTagline: 'The Thresan: Skyflag prequel — your email, the comic.',
   },
   'thresan.io': {
     title: 'Thresan Lab — engine notes, opening theory, build journal',
@@ -140,9 +142,36 @@ const PATH_SURFACES: Record<string, Surface> = {
 
 const DEFAULT_SURFACE: Surface = PATH_SURFACES['/'];
 
+// The Chapter 1 comic. Served for the comic paths on ANY host
+// (thresan.studio/the-eight-footed-mark, /volume-zero, /read, and the
+// playskyflag.com path mirrors) so shared comic links preview the
+// actual cover + title instead of the per-hostname default. og:image
+// is the cover itself — a comic link should show the comic.
+const CHAPTER_ONE_SURFACE: Surface = {
+  title: 'Read Chapter 1 free — Thresan: Skyflag',
+  description: 'Chapter 1: The Eight-Footed Mark — the graphic prequel to Thresan: Skyflag. Read it free online, on GlobalComix, or as a PDF, then play the game.',
+  ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
+  ogImageAlt: 'Cover of Thresan: Skyflag, Chapter 1: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
+  loadingHeadline: 'Chapter 1: The Eight-Footed Mark',
+  loadingTagline: 'A graphic prequel — read it free.',
+};
+
+const COMIC_PATHS = new Set([
+  '/the-eight-footed-mark',
+  '/volume-zero',
+  '/read',
+]);
+
 // ─── Resolver ───────────────────────────────────────────────────────
 
 function resolveSurface(host: string, path: string): Surface {
+  // Normalize trailing slash and case first — path precedence (the
+  // comic) must win over the per-hostname default so a shared
+  // thresan.studio/the-eight-footed-mark link previews the comic, not
+  // the studio homepage card.
+  const normalized = path === '/' ? '/' : path.replace(/\/+$/, '').toLowerCase();
+  if (COMIC_PATHS.has(normalized)) return CHAPTER_ONE_SURFACE;
+
   // Strip leading "www." for hostname matching; the redirects in
   // vercel.json already canonicalize, but bare requests may still hit
   // this function before redirect resolution depending on order.
@@ -150,8 +179,7 @@ function resolveSurface(host: string, path: string): Surface {
   const hostSurface = HOSTNAME_SURFACES[hostKey];
   if (hostSurface) return hostSurface;
 
-  // Path-based lookup. Normalize trailing slash and case.
-  const normalized = path === '/' ? '/' : path.replace(/\/+$/, '').toLowerCase();
+  // Path-based lookup.
   return PATH_SURFACES[normalized] ?? DEFAULT_SURFACE;
 }
 
@@ -179,6 +207,7 @@ function injectMeta(html: string, surface: Surface, canonicalUrl: string): strin
   const titleAttr = escapeAttr(surface.title);
   const descAttr = escapeAttr(surface.description);
   const ogImageAttr = escapeAttr(surface.ogImage);
+  const ogImageAltAttr = escapeAttr(surface.ogImageAlt ?? surface.title);
   const canonicalAttr = escapeAttr(canonicalUrl);
 
   // Loading-shell replacement: the current static HTML has the literal
@@ -197,6 +226,8 @@ function injectMeta(html: string, surface: Surface, canonicalUrl: string): strin
     .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${descAttr}$2`)
     .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${canonicalAttr}$2`)
     .replace(/(<meta property="og:image" content=")[^"]*(")/, `$1${ogImageAttr}$2`)
+    .replace(/(<meta property="og:image:alt" content=")[^"]*(")/, `$1${ogImageAltAttr}$2`)
+    .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/, `$1${ogImageAltAttr}$2`)
     .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${titleAttr}$2`)
     .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${descAttr}$2`)
     .replace(/(<meta name="twitter:image" content=")[^"]*(")/, `$1${ogImageAttr}$2`)

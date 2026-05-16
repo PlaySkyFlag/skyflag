@@ -24,6 +24,8 @@ import {
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-studio';
 const READ_URL = '/volume-zero';
+const GLOBALCOMIX_URL =
+  'https://globalcomix.com/read/650af4e6-1570-4196-87b3-fa8072e25dfb/1?utm_source=Link&utm_medium=Referral&utm_campaign=thresan&utm_term=GCRID_370744';
 const STORE_URL = 'https://thresan.store';
 const GAMES_URL = 'https://thresan.games';
 const UMBRELLA_URL = 'https://thresan.com';
@@ -96,14 +98,15 @@ export default function ThresanStudio() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'Thresan™ — read Issue One free · Skyflag',
+      title: 'Read Chapter 1 free — Thresan: Skyflag',
       description:
-        'The reader’s home for Thresan: Skyflag. Read Issue One free, ' +
-        'meet the world of Kaleo, and play Skyflag now — built by ' +
-        'Nelson Jatel in Kelowna, BC.',
+        'Get Chapter 1 of the Thresan: Skyflag graphic prequel, free. ' +
+        'Enter your email and read it online, on GlobalComix, or as a ' +
+        'PDF — then play the game.',
       canonicalUrl: 'https://thresan.studio/',
-      ogImage: 'https://thresan.studio/thresan-og-studio.jpg',
-      ogImageAlt: 'The world of Thresan — Issue One, the studio behind Skyflag.',
+      ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
+      ogImageAlt:
+        'Cover of Thresan: Skyflag — Chapter 1: The Eight-Footed Mark. Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
     });
   }, []);
 
@@ -125,16 +128,16 @@ export default function ThresanStudio() {
           THRESAN<span className="studio-suffix">.studio</span>
         </h1>
         <p className="studio-tagline tagline-script">{VOLUME_ZERO.tagline}</p>
-        <p className="studio-lead">
-          The world of Kaleo behind the current edition of{' '}
-          <em>Thresan: Skyflag</em> — read it here, then play it.
-        </p>
 
-        {/* ── Issue One ─────────────────────────────────────────── */}
+        {/* Single above-the-fold job: capture the email in exchange for
+            the free comic. Everything else is below the fold. */}
+        <ChapterOneGate />
+
+        {/* ── Chapter 1 ─────────────────────────────────────────── */}
         <section className="studio-card" aria-labelledby="vz-title">
           <p className="studio-card-status">{issueStatus}</p>
           <h2 id="vz-title" className="studio-card-title">
-            {VOLUME_ZERO.shortTitle}
+            {VOLUME_ZERO.marketingTitle}
           </h2>
           <p className="studio-card-body">{VOLUME_ZERO.synopsis}</p>
           {VOLUME_ZERO_ISBN && (
@@ -145,7 +148,7 @@ export default function ThresanStudio() {
           )}
           <div className="studio-card-actions">
             <a href={READ_URL} className="studio-cta">
-              {hasPages ? 'Read Issue One free →' : 'Open Issue One →'}
+              {hasPages ? 'Read Chapter 1 free →' : 'Open Chapter 1 →'}
             </a>
             {VOLUME_ZERO_PDF && (
               <a href={VOLUME_ZERO_PDF} className="studio-link" download>
@@ -223,10 +226,9 @@ export default function ThresanStudio() {
               friends as the first playtesters.
             </p>
             <p className="studio-prose-note">
-              An AI-use disclosure ships with Issue One&rsquo;s first
-              pages — see <code>AI_USE_DISCLOSURE</code> in
-              ThresanStudio.tsx for the draft awaiting the creator&rsquo;s
-              sign-off.
+              Chapter 1 carries a full AI-use disclosure on its credits
+              page; it&rsquo;s reproduced on the{' '}
+              <a href={READ_URL}>Chapter 1 page</a>.
             </p>
           </div>
         </section>
@@ -359,18 +361,117 @@ function KickstarterList() {
   );
 }
 
-// ─── AI-use disclosure (DRAFT — not yet rendered) ──────────────────
-// Gated off the page until the creator finalizes it. GlobalComix and
-// Kickstarter both have AI-disclosure norms; publishing an inaccurate
-// statement is worse than deferring one. Nelson: edit this to match
-// your actual process, then wire it into the "From the studio" section
-// (replace the studio-prose-note paragraph) once it is true and final.
-// Intentionally exported-as-comment, not live copy, so nothing
-// unverified can ship by accident.
-export const AI_USE_DISCLOSURE = `
-[DRAFT — pending creator sign-off]
-Issue One was [written / thumbnailed / lettered / colored] by Nelson
-Jatel. AI tools were [used for: ... / not used for: ...]. Specifics:
-[name tools and the exact step each was used in]. Final creative
-decisions and the published pages are the author's.
-`;
+// ─── Chapter 1 gate ────────────────────────────────────────────────
+// The single above-the-fold job on thresan.studio: trade an email for
+// the free comic. Nothing sells yet — the list is the asset. Same
+// proven thresan_waitlist pattern, tagged source 'thresan-studio-
+// chapter1'. On success the read options are revealed (online,
+// GlobalComix, PDF) so the subscriber gets the comic immediately —
+// the email is the ask, not a wall.
+
+function ChapterOneGate() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] =
+    useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
+      setStatus('error');
+      setError('Please enter a valid email.');
+      return;
+    }
+    if (!supabase) {
+      setStatus('error');
+      setError("Couldn't reach the list right now. Please try again later.");
+      return;
+    }
+    setStatus('submitting');
+    setError('');
+    const { error: insertError } = await supabase
+      .from('thresan_waitlist')
+      .insert({
+        email: trimmed,
+        source: 'thresan-studio-chapter1',
+        referrer: document.referrer || null,
+        user_agent: navigator.userAgent,
+      });
+    if (insertError && insertError.code !== '23505') {
+      setStatus('error');
+      setError("Couldn't save your email. Please try again.");
+      return;
+    }
+    setStatus('success');
+  };
+
+  return (
+    <section className="studio-gate" aria-labelledby="gate-title">
+      <h2 id="gate-title" className="studio-gate-headline">
+        Read Chapter 1 free
+      </h2>
+      <p className="studio-gate-lead">
+        <em>{VOLUME_ZERO.marketingTitle}</em> — the graphic prequel to
+        Thresan: Skyflag. Enter your email and read it now. One email
+        when Chapter 2 and the Kickstarter land. Nothing else.
+      </p>
+      {status === 'success' ? (
+        <div
+          className="studio-gate-done"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <p>
+            <strong>You&rsquo;re in.</strong> Read Chapter 1:
+          </p>
+          <div className="studio-gate-actions">
+            <a href={READ_URL} className="studio-cta">
+              Read online →
+            </a>
+            <a
+              href={GLOBALCOMIX_URL}
+              className="studio-link"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Read on GlobalComix →
+            </a>
+            {VOLUME_ZERO_PDF && (
+              <a href={VOLUME_ZERO_PDF} className="studio-link" download>
+                Download PDF →
+              </a>
+            )}
+          </div>
+        </div>
+      ) : (
+        <form className="studio-ks-form" onSubmit={handleSubmit} noValidate>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="studio-ks-input"
+            disabled={status === 'submitting'}
+            required
+            aria-label="Email address"
+          />
+          <button
+            type="submit"
+            className="studio-cta"
+            disabled={status === 'submitting'}
+          >
+            {status === 'submitting' ? 'Sending…' : 'Get Chapter 1 free'}
+          </button>
+          {status === 'error' && (
+            <p className="studio-ks-error">{error}</p>
+          )}
+        </form>
+      )}
+      <a href={READ_URL} className="studio-gate-skip">
+        or just start reading →
+      </a>
+    </section>
+  );
+}

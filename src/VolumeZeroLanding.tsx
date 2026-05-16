@@ -42,7 +42,7 @@ export default function VolumeZeroLanding() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: `${VOLUME_ZERO.shortTitle} · Thresan: Skyflag`,
+      title: `${VOLUME_ZERO.marketingTitle} · Thresan: Skyflag`,
       description: VOLUME_ZERO.subtitle + ' ' + VOLUME_ZERO.synopsis,
       canonicalUrl: 'https://thresan.studio/volume-zero',
       // Shared comic links should preview the actual cover, not the
@@ -58,7 +58,7 @@ export default function VolumeZeroLanding() {
       <main className="vzl-inner">
         <header className="vzl-hero">
           <p className="vzl-eyebrow tagline-script">{VOLUME_ZERO.tagline}</p>
-          <h1 className="vzl-title">{VOLUME_ZERO.title}</h1>
+          <h1 className="vzl-title">{VOLUME_ZERO.marketingTitle}</h1>
           <p className="vzl-subtitle">{VOLUME_ZERO.subtitle}</p>
 
           <div className="vzl-buttons">
@@ -117,7 +117,7 @@ export default function VolumeZeroLanding() {
         </section>
 
         {/* Page-by-page reader (embedded, page-based — not webtoon). */}
-        <section id="reader" className="vzl-reader" aria-label="Read Issue One">
+        <section id="reader" className="vzl-reader" aria-label="Read Chapter 1">
           <h2 className="vzl-h2">Read it</h2>
           <VolumeZeroReader embedded />
         </section>
@@ -140,7 +140,12 @@ export default function VolumeZeroLanding() {
           <p className="vzl-colophon">
             {VOLUME_ZERO.author} · {VOLUME_ZERO.publisher} ·{' '}
             {VOLUME_ZERO.imprint}
-            {VOLUME_ZERO_ISBN && <> · ISBN {VOLUME_ZERO_ISBN}</>}
+            {VOLUME_ZERO_ISBN && (
+              <>
+                {' '}· ISBN {VOLUME_ZERO_ISBN}, registered as{' '}
+                <em>{VOLUME_ZERO.registeredTitle}</em>
+              </>
+            )}
           </p>
           <p className="vzl-copyright">{VOLUME_ZERO_COPYRIGHT}</p>
           <p className="vzl-fineprint">
@@ -201,7 +206,7 @@ function KickstarterSignup() {
         Join the Kickstarter list
       </h2>
       <p className="vzl-ks-lead">
-        One email when the campaign goes live, plus new Issue One
+        One email when the campaign goes live, plus new Chapter 1
         pages as they post. That&rsquo;s all the list is for.
       </p>
       {status === 'success' ? (

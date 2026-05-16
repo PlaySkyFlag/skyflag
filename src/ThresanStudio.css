@@ -360,6 +360,65 @@
   color: #e3a08a;
 }
 
+/* ── Chapter 1 gate (single above-the-fold job) ────────────────── */
+
+.studio-gate {
+  max-width: 520px;
+  margin: 8px auto 40px;
+}
+
+.studio-gate-headline {
+  font-size: clamp(1.7rem, 5vw, 2.6rem);
+  color: #c2a46b;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0 0 12px;
+  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+}
+
+.studio-gate-lead {
+  font-size: clamp(1rem, 1.9vw, 1.12rem);
+  line-height: 1.65;
+  color: rgba(245, 247, 251, 0.88);
+  margin: 0 0 24px;
+}
+
+.studio-gate-lead em {
+  color: #c2a46b;
+  font-style: italic;
+}
+
+.studio-gate-done p {
+  font-size: 1.05rem;
+  color: rgba(245, 247, 251, 0.9);
+  margin: 0 0 16px;
+}
+
+.studio-gate-done strong {
+  color: #c2a46b;
+}
+
+.studio-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.studio-gate-skip {
+  display: inline-block;
+  margin: 16px 0 0;
+  font-size: 0.9rem;
+  color: rgba(245, 247, 251, 0.55);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.studio-gate-skip:hover {
+  color: #c2a46b;
+}
+
 @media (max-width: 540px) {
   .studio {
     padding: 40px 16px;
@@ -368,6 +427,9 @@
     font-size: 1rem;
   }
   .studio-ks-form {
+    flex-direction: column;
+  }
+  .studio-gate-actions {
     flex-direction: column;
   }
 }

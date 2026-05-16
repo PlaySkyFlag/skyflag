@@ -58,14 +58,14 @@ export default function VolumeZeroReader({
     if (embedded) return;
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: `${VOLUME_ZERO.shortTitle} — read free · Thresan: Skyflag`,
+      title: `${VOLUME_ZERO.marketingTitle} — read free · Thresan: Skyflag`,
       description:
-        'Read Issue One free — the prequel to Thresan: Skyflag. ' +
+        'Read Chapter 1 free — the prequel to Thresan: Skyflag. ' +
         'Grey Ravens, White Stags, the Lifts, the Caelum Nexus.',
       canonicalUrl: 'https://thresan.studio/volume-zero',
       ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
       ogImageAlt:
-        'Cover of Thresan: Skyflag, Issue One: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
+        'Cover of Thresan: Skyflag, Chapter 1: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
     });
   }, [embedded]);
 
@@ -94,7 +94,7 @@ export default function VolumeZeroReader({
       <div className={embedded ? 'vz vz--embed' : 'vz'}>
         <section className="vz-soon">
           <p className="vz-soon-eyebrow">{VOLUME_ZERO.tagline}</p>
-          <h2 className="vz-soon-title">{VOLUME_ZERO.shortTitle} is in production.</h2>
+          <h2 className="vz-soon-title">{VOLUME_ZERO.marketingShort} is in production.</h2>
           <p className="vz-soon-lead">{VOLUME_ZERO.synopsis}</p>
           <p className="vz-soon-note">
             {VOLUME_ZERO.subtitle} The pages land here free. Until then,
@@ -115,7 +115,7 @@ export default function VolumeZeroReader({
       {!embedded && (
         <header className="vz-bar">
           <a href={LANDING_URL} className="vz-bar-back">
-            ← {VOLUME_ZERO.shortTitle}
+            ← {VOLUME_ZERO.marketingShort}
           </a>
           <a href={GAME_URL} className="vz-bar-cta">
             Play Skyflag →
@@ -164,7 +164,7 @@ export default function VolumeZeroReader({
           plan. */}
       {atEnd && (
         <section className="vz-end">
-          <p className="vz-end-eyebrow">That&rsquo;s Issue One.</p>
+          <p className="vz-end-eyebrow">That&rsquo;s Chapter 1.</p>
           <h2 className="vz-end-title">The world is a game you can play right now.</h2>
           <div className="vz-end-actions">
             <a href={GAME_URL} className="vz-cta">

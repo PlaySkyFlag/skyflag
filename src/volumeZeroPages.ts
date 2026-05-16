@@ -119,7 +119,16 @@ export const VOLUME_ZERO = {
   title: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
   /** Short form for cards/headers. */
   shortTitle: 'Issue One: The Eight-Footed Mark',
-  /** As registered against the ISBN — now identical to `title`. */
+  /**
+   * Marketed publicly as "Chapter 1" (creator decision 2026-05-16) —
+   * used on every funnel surface (homepage gate, landing, reader,
+   * studio card). The ISBN is registered as "Issue One" and cannot be
+   * changed, so the colophon still shows `registeredTitle` truthfully;
+   * marketing name and registry name intentionally differ.
+   */
+  marketingTitle: 'Chapter 1: The Eight-Footed Mark',
+  marketingShort: 'Chapter 1',
+  /** As registered against the ISBN — shown verbatim in the colophon. */
   registeredTitle: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
   subtitle: 'A graphic prequel to the Thresan strategy game.',
   author: 'Nelson Jatel',
