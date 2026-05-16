@@ -28,7 +28,7 @@ confirm before submitting anywhere public.
 
 ## Descriptions
 
-- **Short (≤ 200 chars):** A graphic prequel to the Skyflag strategy
+- **Short (≤ 200 chars):** A graphic prequel to the Thresan strategy
   game. Before the clans had names, the Aetheri lifted three arcologies
   off the Earth and the Lifts went quiet.
 - **Long:** Issue One is the world of Kaleo at its hinge — the Grey

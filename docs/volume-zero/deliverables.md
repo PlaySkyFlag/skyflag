@@ -54,4 +54,4 @@ references first. Common failure points to guard against:
 
 Issue One as published: cover + credits/indicia + 5 story pages +
 back cover (8 leaves total), rendered to public/volume-zero/.
-"A graphic prequel to the Skyflag strategy game."
+"A graphic prequel to the Thresan strategy game."

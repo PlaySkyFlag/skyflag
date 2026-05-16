@@ -121,7 +121,7 @@ export const VOLUME_ZERO = {
   shortTitle: 'Issue One: The Eight-Footed Mark',
   /** As registered against the ISBN — now identical to `title`. */
   registeredTitle: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
-  subtitle: 'A graphic prequel to the Skyflag strategy game.',
+  subtitle: 'A graphic prequel to the Thresan strategy game.',
   author: 'Dr. Nelson Jatel',
   publisher: 'Limnology Research Corp.',
   imprint: 'Thresan.studio',
