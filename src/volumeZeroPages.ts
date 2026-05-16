@@ -1,20 +1,20 @@
-// Volume Zero — page manifest. The reader (VolumeZeroReader.tsx) and the
+// Issue One — page manifest. The reader (VolumeZeroReader.tsx) and the
 // landing (VolumeZeroLanding.tsx) read from this single source of truth.
 // The comic art does not exist yet; this ships as an empty manifest so
 // the reader/landing render an honest "in production" state today and
 // light up the moment pages are dropped in — no component changes.
 //
-// ── Naming reconciliation (READ THIS) ──────────────────────────────
-// The public/marketing title is "Thresan: Skyflag — Volume Zero: The
-// Eight-Footed Mark" (latest creator direction: it's a prequel).
-// The ISBN 978-1-7388485-4-6 was registered against the title
-// "Thresan: Skyflag, Issue One: The Eight-Footed Mark". registeredTitle
-// keeps the registry-truthful string; do NOT change it to match the
-// display title — the ISBN record is external. The colophon shows the
-// registered title so the printed/ISBN record and the page agree.
-// Open question for Nelson: keep ISBN as "Issue One" with a note, or
-// re-register/amend with LAC to "Volume Zero". Until decided, both
-// strings are carried separately and truthfully.
+// ── Naming (RESOLVED 2026-05-15) ───────────────────────────────────
+// Decision: the public/display title is aligned to the ISBN-registered
+// title — "Thresan: Skyflag, Issue One: The Eight-Footed Mark". The
+// site and the ISBN record now read identically; no Library and
+// Archives Canada amendment is needed. `title` therefore equals
+// `registeredTitle` verbatim. The "volume-zero" string survives ONLY as
+// internal infra — the route slug (/volume-zero, alias
+// /the-eight-footed-mark), the module/identifier names (VOLUME_ZERO),
+// the public asset dir (public/volume-zero/), the export filename
+// convention (TH_VolumeZero_*), and docs/volume-zero/. None of those
+// are user-facing title text, so they intentionally stay put.
 //
 // ── Art deliverables ───────────────────────────────────────────────
 // Web-reader pages go in public/volume-zero/ named per the export
@@ -72,11 +72,11 @@ export const VOLUME_ZERO_PUBLICATION_READY = false;
 /** Issue framing — single source for every surface. */
 export const VOLUME_ZERO = {
   seriesTitle: 'Thresan: Skyflag',
-  /** Public display title. */
-  title: 'Thresan: Skyflag — Volume Zero: The Eight-Footed Mark',
+  /** Public display title — aligned verbatim to the ISBN registration. */
+  title: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
   /** Short form for cards/headers. */
-  shortTitle: 'Volume Zero: The Eight-Footed Mark',
-  /** Exactly as registered against the ISBN — do not edit to match display. */
+  shortTitle: 'Issue One: The Eight-Footed Mark',
+  /** As registered against the ISBN — now identical to `title`. */
   registeredTitle: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
   subtitle: 'A 16-page graphic prequel to the Skyflag strategy game.',
   author: 'Dr. Nelson Jatel',
@@ -87,7 +87,7 @@ export const VOLUME_ZERO = {
   tagline: 'Three worlds. One proof.',
   synopsis:
     'Before the clans had names, the Aetheri lifted three arcologies ' +
-    'off the Earth and the Lifts went quiet. Volume Zero is the world ' +
+    'off the Earth and the Lifts went quiet. Issue One is the world ' +
     'of Kaleo at that hinge — the Grey Ravens, the White Stags, and ' +
     'the Caelum Nexus they both reach for. It is the prequel to the ' +
     'current edition of Thresan: Skyflag.',

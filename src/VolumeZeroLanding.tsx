@@ -28,13 +28,13 @@ const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-volume-zero';
 // (use AI_USE_DRAFT as the starting point) and set AI_USE_FINAL = true.
 const AI_USE_FINAL = false;
 const AI_USE_PUBLIC =
-  'Volume Zero is an original story by Dr. Nelson Jatel, set in the ' +
+  'Issue One is an original story by Dr. Nelson Jatel, set in the ' +
   'original world of Thresan™. A full AI-use disclosure is published ' +
   'together with the issue’s pages.';
 // Draft kept in code only — contains a bracketed TODO, so it must not
 // render publicly until finalized.
 const AI_USE_DRAFT =
-  'Volume Zero is an original story written by Dr. Nelson Jatel. ' +
+  'Issue One is an original story written by Dr. Nelson Jatel. ' +
   'Artwork was produced with AI image-generation tools under the ' +
   'author’s art direction; the author made final selections, edits, ' +
   'lettering, and layout, and reviewed every page. [Nelson: confirm ' +
@@ -111,7 +111,7 @@ export default function VolumeZeroLanding() {
         </section>
 
         {/* Page-by-page reader (embedded, page-based — not webtoon). */}
-        <section id="reader" className="vzl-reader" aria-label="Read Volume Zero">
+        <section id="reader" className="vzl-reader" aria-label="Read Issue One">
           <h2 className="vzl-h2">Read it</h2>
           <VolumeZeroReader embedded />
         </section>
@@ -134,12 +134,7 @@ export default function VolumeZeroLanding() {
           <p className="vzl-colophon">
             {VOLUME_ZERO.author} · {VOLUME_ZERO.publisher} ·{' '}
             {VOLUME_ZERO.imprint}
-            {VOLUME_ZERO_ISBN && (
-              <>
-                {' '}· ISBN {VOLUME_ZERO_ISBN} (registered as{' '}
-                <em>{VOLUME_ZERO.registeredTitle}</em>)
-              </>
-            )}
+            {VOLUME_ZERO_ISBN && <> · ISBN {VOLUME_ZERO_ISBN}</>}
           </p>
           <p className="vzl-copyright">{VOLUME_ZERO_COPYRIGHT}</p>
           <p className="vzl-fineprint">
@@ -154,7 +149,7 @@ export default function VolumeZeroLanding() {
 }
 
 // ─── Kickstarter signup ────────────────────────────────────────────
-// Same proven thresan_waitlist pattern; tagged so Volume Zero signups
+// Same proven thresan_waitlist pattern; tagged so Issue One signups
 // are attributable. 23505 (duplicate) treated as success.
 
 function KickstarterSignup() {
@@ -200,7 +195,7 @@ function KickstarterSignup() {
         Join the Kickstarter list
       </h2>
       <p className="vzl-ks-lead">
-        One email when the campaign goes live, plus new Volume Zero
+        One email when the campaign goes live, plus new Issue One
         pages as they post. That&rsquo;s all the list is for.
       </p>
       {status === 'success' ? (

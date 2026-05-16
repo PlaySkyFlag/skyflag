@@ -1,21 +1,20 @@
-# Volume Zero — 04_Metadata
+# Issue One — 04_Metadata
 
 Single source for store/registry metadata. `[brackets]` = creator must
 confirm before submitting anywhere public.
 
 ## Titles
 
-- **Public / display:** Thresan: Skyflag — Volume Zero: The Eight-Footed Mark
+- **Public / display:** Thresan: Skyflag, Issue One: The Eight-Footed Mark
 - **Series:** Thresan: Skyflag
-- **Release:** Volume Zero: The Eight-Footed Mark
+- **Release:** Issue One: The Eight-Footed Mark
 - **Registered (ISBN) title:** Thresan: Skyflag, Issue One: The Eight-Footed Mark
-  - ⚠️ The ISBN was registered as **"Issue One"** but the work is now
-    presented publicly as **"Volume Zero."** Decide one of:
-    (a) keep ISBN as-is, display "Volume Zero," note the registered
-    title in the colophon (current behaviour); or
-    (b) amend/replace the record with Library and Archives Canada so
-    the ISBN title matches "Volume Zero." Until resolved, the site
-    truthfully shows both.
+  - ✅ **RESOLVED 2026-05-15:** the display title is aligned verbatim to
+    the ISBN registration. Site and registry now read identically — no
+    Library and Archives Canada amendment needed. "volume-zero" remains
+    only as internal infra (URL slug `/volume-zero`, alias
+    `/the-eight-footed-mark`, asset filenames `TH_VolumeZero_*`,
+    `docs/volume-zero/`), none of which is user-facing title text.
 
 ## Identifiers
 
@@ -32,7 +31,7 @@ confirm before submitting anywhere public.
 - **Short (≤ 200 chars):** A 16-page graphic prequel to the Skyflag
   strategy game. Before the clans had names, the Aetheri lifted three
   arcologies off the Earth and the Lifts went quiet.
-- **Long:** Volume Zero is the world of Kaleo at its hinge — the Grey
+- **Long:** Issue One is the world of Kaleo at its hinge — the Grey
   Ravens, the White Stags, and the Caelum Nexus they both reach for.
   It is the prequel to the current edition of Thresan: Skyflag, the
   three-board strategy game. Read it free, then play the game it leads
@@ -55,7 +54,7 @@ confirm before submitting anywhere public.
 
 ## AI-use statement
 
-- **Public baseline (live now, verifiably true):** "Volume Zero is an
+- **Public baseline (live now, verifiably true):** "Issue One is an
   original story by Dr. Nelson Jatel, set in the original world of
   Thresan™. A full AI-use disclosure is published together with the
   issue's pages."

@@ -1,4 +1,4 @@
-# Volume Zero — distribution plan
+# Issue One — distribution plan
 
 Conversion goal is **not** comic revenue. It is:
 **reader → player → email subscriber → Kickstarter backer.**
@@ -16,7 +16,7 @@ donations, reader-flow + acquisition analytics, crowdfunding support.
 Setup:
 
 - **Series title:** Thresan: Skyflag
-- **Release title:** Volume Zero: The Eight-Footed Mark
+- **Release title:** Issue One: The Eight-Footed Mark
 - **Format:** one release, full issue
 - **Price:** free to read; paid PDF download optional
 - **Purpose:** discovery + analytics
@@ -35,7 +35,7 @@ double-page spreads and Kindle Panel View.
 
 Prepare:
 
-- **Title:** Thresan: Skyflag — Volume Zero
+- **Title:** Thresan: Skyflag — Issue One
 - **Subtitle:** The Eight-Footed Mark
 - **Author:** Dr. Nelson Jatel
 - **Publisher:** Limnology Research Corp. / Thresan.studio

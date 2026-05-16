@@ -1,5 +1,5 @@
 // ThresanStudio — served at thresan.studio. Per the launch plan this is
-// the reader's home: the canonical place to find Volume Zero, meet the
+// the reader's home: the canonical place to find Issue One, meet the
 // world, hear from the creator, and convert into either playing Skyflag
 // now or joining the Kickstarter list. It is intentionally the deepest
 // of the thresan.* surfaces (.com stays the short universe umbrella;
@@ -31,16 +31,16 @@ const LINKEDIN_URL = 'https://ca.linkedin.com/in/nelsonjatel';
 
 // ─── World content (all grounded in existing repo canon: ThresanGames
 // for clans/pieces, ThresanIO for the Lifts / Ashtapada / Nexus). Kept
-// deliberately spare — the full bios arrive with Volume Zero's pages. ────
+// deliberately spare — the full bios arrive with Issue One's pages. ────
 
 const CLANS = [
   {
     name: 'The Grey Ravens',
-    line: 'One of the two clans of Kaleo contesting the Caelum Nexus. Full identity expands with Volume Zero.',
+    line: 'One of the two clans of Kaleo contesting the Caelum Nexus. Full identity expands with Issue One.',
   },
   {
     name: 'The White Stags',
-    line: 'The opposing clan. Same proof, opposite reach. Full identity expands with Volume Zero.',
+    line: 'The opposing clan. Same proof, opposite reach. Full identity expands with Issue One.',
   },
 ];
 
@@ -62,11 +62,11 @@ const PIECES = [
   },
   {
     name: 'Rover Thandiwe',
-    line: 'The Rover — a transport between layers, leap-captures up close. Full bio lands with Volume Zero.',
+    line: 'The Rover — a transport between layers, leap-captures up close. Full bio lands with Issue One.',
   },
   {
     name: 'Pilot Voss',
-    line: 'The Pilot — a transport between layers, leap-captures up close. Full bio lands with Volume Zero.',
+    line: 'The Pilot — a transport between layers, leap-captures up close. Full bio lands with Issue One.',
   },
 ];
 
@@ -89,14 +89,14 @@ export default function ThresanStudio() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'Thresan™ — read Volume Zero free · Skyflag',
+      title: 'Thresan™ — read Issue One free · Skyflag',
       description:
-        'The reader’s home for Thresan: Skyflag. Read Volume Zero free, ' +
+        'The reader’s home for Thresan: Skyflag. Read Issue One free, ' +
         'meet the world of Kaleo, and play Skyflag now — built by ' +
         'Nelson Jatel in Kelowna, BC.',
       canonicalUrl: 'https://thresan.studio/',
       ogImage: 'https://thresan.studio/thresan-og-studio.jpg',
-      ogImageAlt: 'The world of Thresan — Volume Zero, the studio behind Skyflag.',
+      ogImageAlt: 'The world of Thresan — Issue One, the studio behind Skyflag.',
     });
   }, []);
 
@@ -123,7 +123,7 @@ export default function ThresanStudio() {
           <em>Thresan: Skyflag</em> — read it here, then play it.
         </p>
 
-        {/* ── Volume Zero ─────────────────────────────────────────── */}
+        {/* ── Issue One ─────────────────────────────────────────── */}
         <section className="studio-card" aria-labelledby="vz-title">
           <p className="studio-card-status">{issueStatus}</p>
           <h2 id="vz-title" className="studio-card-title">
@@ -138,7 +138,7 @@ export default function ThresanStudio() {
           )}
           <div className="studio-card-actions">
             <a href={READ_URL} className="studio-cta">
-              {hasPages ? 'Read Volume Zero free →' : 'Open Volume Zero →'}
+              {hasPages ? 'Read Issue One free →' : 'Open Issue One →'}
             </a>
             {VOLUME_ZERO_PDF && (
               <a href={VOLUME_ZERO_PDF} className="studio-link" download>
@@ -216,7 +216,7 @@ export default function ThresanStudio() {
               friends as the first playtesters.
             </p>
             <p className="studio-prose-note">
-              An AI-use disclosure ships with Volume Zero&rsquo;s first
+              An AI-use disclosure ships with Issue One&rsquo;s first
               pages — see <code>AI_USE_DISCLOSURE</code> in
               ThresanStudio.tsx for the draft awaiting the creator&rsquo;s
               sign-off.
@@ -312,7 +312,7 @@ function KickstarterList() {
       </h2>
       <p className="studio-ks-lead">
         One email when the campaign goes live, plus first look at new
-        Volume Zero pages. That&rsquo;s all the list is for.
+        Issue One pages. That&rsquo;s all the list is for.
       </p>
       {status === 'success' ? (
         <div
@@ -362,7 +362,7 @@ function KickstarterList() {
 // unverified can ship by accident.
 export const AI_USE_DISCLOSURE = `
 [DRAFT — pending creator sign-off]
-Volume Zero was [written / thumbnailed / lettered / colored] by Nelson
+Issue One was [written / thumbnailed / lettered / colored] by Nelson
 Jatel. AI tools were [used for: ... / not used for: ...]. Specifics:
 [name tools and the exact step each was used in]. Final creative
 decisions and the published pages are the author's.

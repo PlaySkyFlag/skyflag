@@ -132,7 +132,7 @@ const isThresanStorePath = path.startsWith('/thresan-store');
 const isThresanStudioPath = path.startsWith('/thresan-studio');
 const isThresanIOPath = path.startsWith('/thresan-io');
 const isThresanGamesPath = path.startsWith('/thresan-games');
-// Volume Zero landing — /volume-zero (canonical) and the
+// Issue One landing — /volume-zero (canonical) and the
 // /the-eight-footed-mark alias. Lives under thresan.studio in
 // production; also reachable on the main domain for iteration, same
 // convention as /thresan-studio.

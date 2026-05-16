@@ -1,4 +1,4 @@
-# Volume Zero — art deliverables
+# Issue One — art deliverables
 
 Art direction: **cinematic, page-based, dark-fantasy / industrial
 sci-fi.** Proper comic-book pages — **not** vertical-scroll webtoon.

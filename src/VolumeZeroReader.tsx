@@ -59,7 +59,7 @@ export default function VolumeZeroReader({
     return applySurfaceMeta({
       title: `${VOLUME_ZERO.shortTitle} — read free · Thresan: Skyflag`,
       description:
-        'Read Volume Zero free — the prequel to Thresan: Skyflag. ' +
+        'Read Issue One free — the prequel to Thresan: Skyflag. ' +
         'Grey Ravens, White Stags, the Lifts, the Caelum Nexus.',
       canonicalUrl: 'https://thresan.studio/volume-zero',
       ogImage: 'https://thresan.studio/thresan-og-clans.jpg',
@@ -163,7 +163,7 @@ export default function VolumeZeroReader({
           plan. */}
       {atEnd && (
         <section className="vz-end">
-          <p className="vz-end-eyebrow">That&rsquo;s Volume Zero.</p>
+          <p className="vz-end-eyebrow">That&rsquo;s Issue One.</p>
           <h2 className="vz-end-title">The world is a game you can play right now.</h2>
           <div className="vz-end-actions">
             <a href={GAME_URL} className="vz-cta">
