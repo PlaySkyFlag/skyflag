@@ -12,9 +12,15 @@
  *   npm run selfplay -- --depth-a 5 --depth-b 4 --games 30
  *   npm run selfplay -- --time-a 800 --time-b 400 --games 20
  *   npm run selfplay -- --seed 42 --no-swap
+ *   npm run selfplay -- --games 500 --record data/selfplay.jsonl --record-min-turn 4
  *
  * Both sides start the game; `--swap` (default on) alternates which engine
  * plays P1 across games so neither config gets a free first-mover advantage.
+ *
+ * --record writes a JSONL training set for eval tuning: one line per
+ * decision position, each labelled with the eventual game result (Texel
+ * style). The full game state is snapshotted so a tuner can re-run the
+ * real evaluate() with varied weights. See the Recorder block below.
  *
  * The strategic-stance picker and the tiebreak among equal-value moves in
  * `chooseAction` use Math.random(). We monkey-patch Math.random with a
@@ -22,6 +28,8 @@
  * given --seed. Restored after each call so app-side randomness is unaffected.
  */
 
+import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { chooseAction, setSearchOptions, type SearchOptions } from '../src/game/ai';
 import { createInitialGameState } from '../src/game/constants';
 import { reduce, type Action } from '../src/game/reducer';
@@ -41,6 +49,16 @@ type Args = {
   quiet: boolean;
   optsA: Partial<SearchOptions>;
   optsB: Partial<SearchOptions>;
+  // Training-set recording (Texel-style eval tuning). recordPath null
+  // = disabled. stride subsamples (keep every Nth eligible position);
+  // minTurn skips early plies (the opening-book deploy phase is near-
+  // deterministic and low-information for eval tuning); append adds to
+  // an existing file instead of truncating, so multiple seeded runs
+  // accumulate into one dataset.
+  recordPath: string | null;
+  recordStride: number;
+  recordMinTurn: number;
+  recordAppend: boolean;
 };
 
 function parseArgs(argv: string[]): Args {
@@ -56,6 +74,10 @@ function parseArgs(argv: string[]): Args {
     quiet: false,
     optsA: {},
     optsB: {},
+    recordPath: null,
+    recordStride: 1,
+    recordMinTurn: 1,
+    recordAppend: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
@@ -70,6 +92,10 @@ function parseArgs(argv: string[]): Args {
       case '--max-turns': args.maxTurns = parseInt(v, 10); i++; break;
       case '--no-swap':   args.swap     = false; break;
       case '--quiet':     args.quiet    = true; break;
+      case '--record':         args.recordPath    = v; i++; break;
+      case '--record-stride':  args.recordStride  = Math.max(1, parseInt(v, 10)); i++; break;
+      case '--record-min-turn':args.recordMinTurn = Math.max(1, parseInt(v, 10)); i++; break;
+      case '--record-append':  args.recordAppend  = true; break;
       // Per-engine feature toggles. --no-X-a forces X off for A;
       // --X-a forces X on for A; same for B; bare --X / --no-X applies
       // to both. Forcing ON is useful now that null-move is OFF by
@@ -100,7 +126,11 @@ function parseArgs(argv: string[]): Args {
           '         [--no-null|--no-null-a|--no-null-b]   disable null-move pruning\n' +
           '         [--no-lmr |--no-lmr-a |--no-lmr-b ]   disable late-move reduction\n' +
           '         [--no-tt  |--no-tt-a  |--no-tt-b  ]   disable transposition table\n' +
-          '         [--no-qs  |--no-qs-a  |--no-qs-b  ]   disable quiescence search',
+          '         [--no-qs  |--no-qs-a  |--no-qs-b  ]   disable quiescence search\n' +
+          '         [--record FILE]            write JSONL training set (Texel tuning)\n' +
+          '         [--record-stride N]        keep every Nth eligible position (default 1)\n' +
+          '         [--record-min-turn N]      skip plies before turn N (default 1)\n' +
+          '         [--record-append]          append instead of truncating the file',
         );
         process.exit(0);
     }
@@ -145,6 +175,82 @@ function withSeededRandom<T>(prng: () => number, fn: () => T): T {
   }
 }
 
+// ─── Training-set recorder ─────────────────────────────────────────────────
+//
+// Writes a JSONL dataset for Texel-style eval tuning. One line per
+// decision position:
+//
+//   {"r":1,"reason":"nexus","stm":"p1","ply":27,"state":{…}}
+//
+//   r      game result from P1's perspective (1 win / 0.5 draw / 0 loss)
+//   stm    side to move at this position ('p1'|'p2')
+//   ply    state.turnNumber
+//   state  full game-state snapshot — the tuner reloads this and calls
+//          the real evaluate() with a candidate weight vector, then
+//          fits the weights so eval predicts `r` (oriented by `stm`).
+//
+// Positions are buffered per game and flushed once the result is known.
+// The snapshot is taken with JSON.stringify at capture time so the row
+// is correct regardless of whether the reducer is strictly immutable.
+
+class Recorder {
+  private buffer: string[] = [];
+  private eligible = 0;
+  total = 0;
+  games = 0;
+
+  constructor(
+    private readonly path: string,
+    private readonly stride: number,
+    private readonly minTurn: number,
+    append: boolean,
+  ) {
+    mkdirSync(dirname(path), { recursive: true });
+    if (!append) {
+      writeFileSync(
+        path,
+        JSON.stringify({
+          _meta: {
+            created: new Date().toISOString(),
+            note: 'skyflag self-play Texel dataset',
+            fields: ['r', 'reason', 'stm', 'ply', 'state'],
+          },
+        }) + '\n',
+      );
+    }
+  }
+
+  // Called for every in-progress decision position, before the move is
+  // applied. Skips the early opening (minTurn) and subsamples (stride).
+  record(turnNumber: number, stm: Player, state: unknown): void {
+    if (turnNumber < this.minTurn) return;
+    const keep = this.eligible % this.stride === 0;
+    this.eligible++;
+    if (!keep) return;
+    // Embed the state's JSON raw (not re-stringified) so `state` is an
+    // object in the row, not a quoted string.
+    this.buffer.push(
+      `{"r":__R__,"reason":__RE__,"stm":${JSON.stringify(stm)},` +
+        `"ply":${turnNumber},"state":${JSON.stringify(state)}}`,
+    );
+  }
+
+  // Result known: stamp every buffered row for this game and append.
+  flushGame(resultP1: 0 | 0.5 | 1, reason: string): void {
+    if (this.buffer.length > 0) {
+      const re = JSON.stringify(reason);
+      const lines = this.buffer
+        .map((row) => row.replace('__R__', String(resultP1)).replace('__RE__', re))
+        .join('\n');
+      appendFileSync(this.path, lines + '\n');
+      this.total += this.buffer.length;
+    }
+    this.buffer = [];
+    this.eligible = 0;
+    this.games++;
+  }
+}
+
 // ─── Single game ───────────────────────────────────────────────────────────
 
 type EngineConfig = {
@@ -170,6 +276,7 @@ function playGame(
   aSide: Player,
   gameSeed: number,
   maxTurns: number,
+  recorder?: Recorder,
 ): GameResult {
   // Fresh PRNG per game so engines under different configurations see
   // identical stance pairings — without this, the harness leaks
@@ -192,6 +299,8 @@ function playGame(
       chooseAction(state, cfg.depth, cfg.timeBudgetMs ?? undefined),
     );
 
+    if (recorder) recorder.record(state.turnNumber, current, state);
+
     const next: Action = picked ?? { type: 'end-turn' };
     state = reduce(state, next);
     actions++;
@@ -211,6 +320,16 @@ function playGame(
     // Hit maxTurns without a result — call it a draw with reason 'cap'.
     winner = 'draw';
     reason = 'max-turns-cap';
+  }
+
+  if (recorder) {
+    const rP1: 0 | 0.5 | 1 =
+      state.status.kind === 'won'
+        ? state.status.winner === 'p1'
+          ? 1
+          : 0
+        : 0.5;
+    recorder.flushGame(rP1, reason);
   }
 
   return {
@@ -270,6 +389,10 @@ function runSelfplay(args: Args): Summary {
     },
   };
 
+  const recorder = args.recordPath
+    ? new Recorder(args.recordPath, args.recordStride, args.recordMinTurn, args.recordAppend)
+    : undefined;
+
   let totalTurns = 0;
   let totalDuration = 0;
   let totalActions = 0;
@@ -277,7 +400,7 @@ function runSelfplay(args: Args): Summary {
   for (let i = 0; i < args.games; i++) {
     const aSide: Player = args.swap && i % 2 === 1 ? 'p2' : 'p1';
     const gameSeed = args.seed * 1_000_000 + i;
-    const res = playGame(engineA, engineB, aSide, gameSeed, args.maxTurns);
+    const res = playGame(engineA, engineB, aSide, gameSeed, args.maxTurns, recorder);
 
     if (res.winner === 'A') summary.aWins++;
     else if (res.winner === 'B') summary.bWins++;
@@ -309,6 +432,13 @@ function runSelfplay(args: Args): Summary {
   summary.avgTurns = totalTurns / summary.games;
   summary.avgDurationMs = totalDuration / summary.games;
   summary.avgActions = totalActions / summary.games;
+
+  if (recorder) {
+    console.log(
+      `\nRecorded ${recorder.total} positions from ${recorder.games} games ` +
+        `→ ${args.recordPath}`,
+    );
+  }
 
   return summary;
 }
