@@ -204,6 +204,7 @@ class Recorder {
     private readonly stride: number,
     private readonly minTurn: number,
     append: boolean,
+    selfplayArgs: string[],
   ) {
     mkdirSync(dirname(path), { recursive: true });
     if (!append) {
@@ -214,6 +215,10 @@ class Recorder {
             created: new Date().toISOString(),
             note: 'skyflag self-play Texel dataset',
             fields: ['r', 'reason', 'stm', 'ply', 'state'],
+            // Run provenance — the tuner reads this to check the games
+            // were generated with balanced stance (--bal). The shard
+            // runner writes the same key.
+            selfplayArgs,
           },
         }) + '\n',
       );
@@ -390,7 +395,10 @@ function runSelfplay(args: Args): Summary {
   };
 
   const recorder = args.recordPath
-    ? new Recorder(args.recordPath, args.recordStride, args.recordMinTurn, args.recordAppend)
+    ? new Recorder(
+        args.recordPath, args.recordStride, args.recordMinTurn,
+        args.recordAppend, process.argv.slice(2),
+      )
     : undefined;
 
   let totalTurns = 0;

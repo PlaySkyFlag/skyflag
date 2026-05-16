@@ -62,6 +62,71 @@ export function setSearchOptions(opts: Partial<SearchOptions> = {}): void {
   activeSearchOptions = { ...DEFAULT_SEARCH_OPTIONS, ...opts };
 }
 
+// ─── Tunable evaluation parameters ─────────────────────────────────────────
+// Every magic number evaluate() weighs is hoisted here so the offline
+// Texel tuner (scripts/texel-tune.ts) can fit them against self-play
+// outcomes. DEFAULT_EVAL_PARAMS holds the EXACT shipped constants — the
+// production engine reads these unless a tuning run calls setEvalParams,
+// so default behaviour is byte-identical. App code must not call
+// setEvalParams; it exists for the tuner / experiments only.
+export type EvalParams = {
+  material: Record<PieceKind, number>;
+  inHandDiscount: number;
+  flagBonus: number;
+  finalFlagRush: number;
+  distW: number;
+  mobilityW: number;
+  threatFrac: number;
+  forkPerAttacker: number;
+  captainThreat: number;
+  captainForkPer: number;
+  multiCaptain: number;
+  liftPair: number;
+  shelterPer: number;
+  flagThreat2ply: number;
+  pstScale: number;
+};
+
+export const DEFAULT_EVAL_PARAMS: EvalParams = {
+  material: { captain: 700, soldier: 130, rover: 70, pilot: 70 },
+  inHandDiscount: 0.7,
+  flagBonus: 200,
+  finalFlagRush: 300,
+  distW: 3,
+  mobilityW: 1.2,
+  threatFrac: 0.4,
+  forkPerAttacker: 20,
+  captainThreat: 400,
+  captainForkPer: 30,
+  multiCaptain: 300,
+  liftPair: 10,
+  shelterPer: 5,
+  flagThreat2ply: 50,
+  pstScale: 1,
+};
+
+function cloneEvalParams(p: EvalParams): EvalParams {
+  return { ...p, material: { ...p.material } };
+}
+
+let activeEvalParams: EvalParams = cloneEvalParams(DEFAULT_EVAL_PARAMS);
+
+// Pass a partial to override (merged over the shipped defaults), or
+// null/undefined to reset to defaults.
+export function setEvalParams(p?: Partial<EvalParams> | null): void {
+  activeEvalParams = p
+    ? {
+        ...cloneEvalParams(DEFAULT_EVAL_PARAMS),
+        ...p,
+        material: { ...DEFAULT_EVAL_PARAMS.material, ...(p.material ?? {}) },
+      }
+    : cloneEvalParams(DEFAULT_EVAL_PARAMS);
+}
+
+export function getEvalParams(): EvalParams {
+  return activeEvalParams;
+}
+
 // ─── Transposition table ───────────────────────────────────────────────────
 // Caches search results so the same position reached via different move
 // orders doesn't get re-searched. Bound on size — Map iteration order is
@@ -254,22 +319,12 @@ const LAYER_INDEX: Record<Layer, number> = { ground: 0, sky: 1, space: 2 };
 // checking for blocked lift destinations.
 const LAYER_BY_INDEX: Layer[] = ['ground', 'sky', 'space'];
 
+// Material value by kind. Backed by the tunable params (defaults:
+// captain 700, soldier 130, rover/pilot 70 — piece material kept
+// clearly above flag bonuses; a Captain outweighs all three opponent
+// flags). A promoted Soldier has kind 'captain', so it scores 'captain'.
 function pieceValue(kind: PieceKind): number {
-  switch (kind) {
-    // Aggressive-capture tuning pass: previous values let flag-rush
-    // dominate piece-trading decisions. The new scale puts piece
-    // material clearly above flag bonuses, especially for the
-    // Captain — capturing a Captain (700) is now worth more than
-    // sweeping all three opponent flags combined (3 × 200 = 600).
-    // Soldiers also bumped because they're the recruiting pool for
-    // promoted Captains, so trading them away has real strategic
-    // cost. Rovers and Pilots are minor utility but each adds a
-    // useful threat vector — 60 keeps them above noise.
-    case 'captain': return 700;
-    case 'soldier': return 130;
-    case 'rover':   return 70;
-    case 'pilot':   return 70;
-  }
+  return activeEvalParams.material[kind];
 }
 
 function isOccupied(state: GameState, c: Coord): boolean {
@@ -415,6 +470,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   if (state.status.kind === 'draw') return 0;
 
   const opp = opponentOf(aiPlayer);
+  const P = activeEvalParams;
   let score = 0;
 
   // Stance multipliers — see pickStanceIfNewGame. Material and threat
@@ -433,10 +489,10 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   for (const bp of state.onBoard) {
     const sign = bp.piece.owner === aiPlayer ? 1 : -1;
     score += pieceValue(bp.piece.kind) * sign * killMul;
-    score += pstScore(bp.piece, bp.coord) * sign;
+    score += pstScore(bp.piece, bp.coord) * P.pstScale * sign;
   }
-  for (const piece of state.inHand[aiPlayer]) score += pieceValue(piece.kind) * 0.7 * killMul;
-  for (const piece of state.inHand[opp])      score -= pieceValue(piece.kind) * 0.7 * killMul;
+  for (const piece of state.inHand[aiPlayer]) score += pieceValue(piece.kind) * P.inHandDiscount * killMul;
+  for (const piece of state.inHand[opp])      score -= pieceValue(piece.kind) * P.inHandDiscount * killMul;
 
   // Flag progress — opponent flags I've captured are good; mine they
   // took, bad. Per-flag bonus dropped 500 → 200 so flag-grabbing
@@ -445,23 +501,23 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   let myFlagsCaptured = 0;
   let oppFlagsCaptured = 0;
   for (const layer of ['ground', 'sky', 'space'] as const) {
-    if (state.flags[layer][opp])      { score += 200 * flagMul; myFlagsCaptured++; }
-    if (state.flags[layer][aiPlayer]) { score -= 200 * flagMul; oppFlagsCaptured++; }
+    if (state.flags[layer][opp])      { score += P.flagBonus * flagMul; myFlagsCaptured++; }
+    if (state.flags[layer][aiPlayer]) { score -= P.flagBonus * flagMul; oppFlagsCaptured++; }
   }
 
   // Final-flag rush — once a side has 2 of 3 flags, the third is
   // decisive. Add a meaningful bonus for whichever side is one flag
   // away so the AI doesn't dawdle on side-quests when it's about to
   // win, and defends harder when the opponent is about to win.
-  if (myFlagsCaptured === 2)  score += 300 * flagMul;
-  if (oppFlagsCaptured === 2) score -= 300 * flagMul;
+  if (myFlagsCaptured === 2)  score += P.finalFlagRush * flagMul;
+  if (oppFlagsCaptured === 2) score -= P.finalFlagRush * flagMul;
 
   // Strategic positioning — closer is better for me, opponent farther is also
   // better for me. Each square of distance worth ~3 score points.
   const myDist  = closestDistToTarget(state, aiPlayer);
   const oppDist = closestDistToTarget(state, opp);
-  if (myDist  !== Infinity) score -= myDist * 3 * flagMul;
-  if (oppDist !== Infinity) score += oppDist * 3 * flagMul;
+  if (myDist  !== Infinity) score -= myDist * P.distW * flagMul;
+  if (oppDist !== Infinity) score += oppDist * P.distW * flagMul;
 
   // Threats and mobility — computed in one sweep per side.
   const myInfo  = attackInfo(state, aiPlayer);
@@ -469,8 +525,8 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
 
   // Mobility: each legal move is worth ~1 point. More options = better
   // position. Helps the AI prefer flexible setups over cornered ones.
-  score += myInfo.mobility  * 1.2;
-  score -= oppInfo.mobility * 1.2;
+  score += myInfo.mobility  * P.mobilityW;
+  score -= oppInfo.mobility * P.mobilityW;
 
   // Threat detection — for every piece, check whether the opponent can
   // capture it next ply. Threatened pieces lose 40% of their value as a
@@ -487,7 +543,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
     const owner = bp.piece.owner;
     const value = pieceValue(bp.piece.kind);
     if (owner === aiPlayer && oppInfo.squares.has(key)) {
-      score -= value * 0.40 * killMul;
+      score -= value * P.threatFrac * killMul;
       // Multi-attacker penalty: if the threatened piece is hit by
       // more than one opponent attacker (fork), I likely can't
       // defend it by interposition — only by moving or trading. -20
@@ -495,24 +551,23 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
       // extra -30/attacker on top, since losing the last Captain
       // ends the game outright.
       const n = oppInfo.attackers.get(key) ?? 1;
-      if (n > 1) score -= 20 * (n - 1) * killMul;
+      if (n > 1) score -= P.forkPerAttacker * (n - 1) * killMul;
       if (bp.piece.kind === 'captain') {
-        // Bumped 250 → 400 to match the higher Captain material value.
         // A threatened Captain is the single most urgent thing on the
         // board; the AI should retreat or interpose hard.
-        score -= 400 * killMul;
-        if (n > 1) score -= 30 * (n - 1) * killMul;
+        score -= P.captainThreat * killMul;
+        if (n > 1) score -= P.captainForkPer * (n - 1) * killMul;
         myCaptainsThreatened++;
       }
     } else if (owner === opp && myInfo.squares.has(key)) {
-      score += value * 0.40 * killMul;
+      score += value * P.threatFrac * killMul;
       const n = myInfo.attackers.get(key) ?? 1;
-      if (n > 1) score += 20 * (n - 1) * killMul;
+      if (n > 1) score += P.forkPerAttacker * (n - 1) * killMul;
       if (bp.piece.kind === 'captain') {
         // Symmetric — opponent's threatened Captain is the most
         // valuable target the AI can chase.
-        score += 400 * killMul;
-        if (n > 1) score += 30 * (n - 1) * killMul;
+        score += P.captainThreat * killMul;
+        if (n > 1) score += P.captainForkPer * (n - 1) * killMul;
         oppCaptainsThreatened++;
       }
     }
@@ -523,8 +578,8 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
   // extra fork-style penalty per threatened Captain past the first
   // (the first one already lost 400 above). Bumped 200 → 300 to match
   // the higher Captain weight.
-  if (myCaptainsThreatened > 1) score -= 300 * (myCaptainsThreatened - 1) * killMul;
-  if (oppCaptainsThreatened > 1) score += 300 * (oppCaptainsThreatened - 1) * killMul;
+  if (myCaptainsThreatened > 1) score -= P.multiCaptain * (myCaptainsThreatened - 1) * killMul;
+  if (oppCaptainsThreatened > 1) score += P.multiCaptain * (oppCaptainsThreatened - 1) * killMul;
 
   // Lift-pair coordination: a Skyflag-specific synergy term. If two
   // friendly pieces sit on / near the same lift column on adjacent
@@ -549,7 +604,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
         Math.abs(other.coord.col - lift.col),
       );
       if (d <= 1) {
-        score += bp.piece.owner === aiPlayer ? 10 : -10;
+        score += bp.piece.owner === aiPlayer ? P.liftPair : -P.liftPair;
       }
     }
   }
@@ -573,7 +628,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
       );
       if (d === 1) neighbors++;
     }
-    const shelter = Math.min(neighbors, 3) * 5 * killMul;
+    const shelter = Math.min(neighbors, 3) * P.shelterPer * killMul;
     score += bp.piece.owner === aiPlayer ? shelter : -shelter;
   }
 
@@ -592,7 +647,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
       for (const bp of state.onBoard) {
         if (bp.piece.owner !== opp || bp.piece.kind !== 'captain') continue;
         if (strategicDist(bp.coord, myFlag, state) <= 3) {
-          score -= 50 * flagMul;
+          score -= P.flagThreat2ply * flagMul;
           break;
         }
       }
@@ -603,7 +658,7 @@ export function evaluate(state: GameState, aiPlayer: Player): number {
       for (const bp of state.onBoard) {
         if (bp.piece.owner !== aiPlayer || bp.piece.kind !== 'captain') continue;
         if (strategicDist(bp.coord, oppFlag, state) <= 3) {
-          score += 50 * flagMul;
+          score += P.flagThreat2ply * flagMul;
           break;
         }
       }

@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "selfplay": "tsx scripts/selfplay.ts",
     "selfplay:shards": "tsx scripts/selfplay-shards.ts",
+    "texel": "tsx scripts/texel-tune.ts",
     "ios:sync": "npm run build && npx cap sync ios",
     "ios:open": "npm run build && npx cap sync ios && npx cap open ios"
   },
