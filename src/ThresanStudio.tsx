@@ -29,18 +29,21 @@ const GAMES_URL = 'https://thresan.games';
 const UMBRELLA_URL = 'https://thresan.com';
 const LINKEDIN_URL = 'https://ca.linkedin.com/in/nelsonjatel';
 
-// ─── World content (all grounded in existing repo canon: ThresanGames
-// for clans/pieces, ThresanIO for the Lifts / Ashtapada / Nexus). Kept
-// deliberately spare — the full bios arrive with Issue One's pages. ────
+// ─── World content. Clans + the Captain are now grounded in the
+// PUBLISHED Issue One (back cover names "Captains Renn Dantec of the
+// Grey Ravens and Sera Dantec of the White Stags"). The other roster
+// roles (Durren, Thandiwe, Voss) are rulebook-v20 canon and are not
+// featured in Issue One, so they're stated as game roles, no story
+// promise. ────────────────────────────────────────────────────────
 
 const CLANS = [
   {
     name: 'The Grey Ravens',
-    line: 'One of the two clans of Kaleo contesting the Caelum Nexus. Full identity expands with Issue One.',
+    line: 'Captain Renn Dantec’s clan. In Issue One she works the Second Epoch archives and turns up the eight-footed mark — the Ashtapada-marked Aetheri leaf the First Clan left waiting before the Nexus shifted.',
   },
   {
     name: 'The White Stags',
-    line: 'The opposing clan. Same proof, opposite reach. Full identity expands with Issue One.',
+    line: 'Captain Sera Dantec’s clan. When the mark surfaces she sounds the mobilization, then descends with Renn into the hidden First Clan infrastructure beneath Kaleo.',
   },
 ];
 
@@ -50,7 +53,7 @@ const CLANS = [
 const PIECES = [
   {
     name: 'Captain Dantec',
-    line: 'The Captain. The proof rides on this piece — land your Captain on the Caelum Nexus and the game is won.',
+    line: 'The Captain — the piece the proof rides on; land it on the Caelum Nexus to win. Each clan fields a Dantec: Renn Dantec leads the Grey Ravens, Sera Dantec the White Stags.',
   },
   {
     name: 'Soldier Durren',
@@ -62,11 +65,11 @@ const PIECES = [
   },
   {
     name: 'Rover Thandiwe',
-    line: 'The Rover — a transport between layers, leap-captures up close. Full bio lands with Issue One.',
+    line: 'The Rover — one of the clan’s two transports between layers; leap-captures up close.',
   },
   {
     name: 'Pilot Voss',
-    line: 'The Pilot — a transport between layers, leap-captures up close. Full bio lands with Issue One.',
+    line: 'The Pilot — the clan’s other transport between layers; leap-captures up close.',
   },
 ];
 
@@ -78,6 +81,10 @@ const FRAGMENTS = [
   {
     name: 'Ashtapada',
     line: 'The eight-by-eight board predates chess by centuries. Ashtapada — Sanskrit for "eight-footed" — is the ancestor. Thresan keeps the disciplined grid and lifts it into three dimensions.',
+  },
+  {
+    name: 'The eight-footed mark',
+    line: 'The Ashtapada glyph as an in-world relic — an Aetheri leaf the First Clan left in the Kaleo archives. Issue One is its discovery, and its warning: it was never a game.',
   },
   {
     name: 'The Caelum Nexus',
