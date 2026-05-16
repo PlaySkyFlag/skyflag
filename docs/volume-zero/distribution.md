@@ -6,7 +6,11 @@ First-party (thresan.studio) is the hub; external platforms are for
 discovery and analytics. Stay **non-exclusive** everywhere — the
 strategy depends on the owned site + game ecosystem.
 
-## 1. GlobalComix — publish here FIRST
+## 1. GlobalComix — ✅ LIVE (2026-05-16)
+
+Published: https://globalcomix.com/read/650af4e6-1570-4196-87b3-fa8072e25dfb/1
+Linked from the Issue One landing ("Read on GlobalComix"). First
+external platform — discovery + analytics.
 
 Self-serve, non-exclusive, comics-native: creators upload and publish
 their own comics, retain rights, publish elsewhere too. Supports
@@ -24,8 +28,8 @@ Setup:
   playskyflag.com" and "Join the Kickstarter list"
 - First issue **free** — audience matters more than revenue now.
 
-> Manual step — requires Nelson's GlobalComix account. Claude cannot
-> upload on your behalf. Use the `01_Web_Reader` JPGs + `02_PDF_Digital`.
+> Done — uploaded under Nelson's GlobalComix account. Future issues:
+> same flow, reuse the `01_Web_Reader` JPGs + `02_PDF_Digital`.
 
 ## 2. Amazon / KDP — publish here SECOND
 
@@ -37,7 +41,7 @@ Prepare:
 
 - **Title:** Thresan: Skyflag — Issue One
 - **Subtitle:** The Eight-Footed Mark
-- **Author:** Dr. Nelson Jatel
+- **Author:** Nelson Jatel
 - **Publisher:** Limnology Research Corp. / Thresan.studio
 - **Categories:** Comics & Graphic Novels; Science Fiction & Fantasy;
   Games/Strategy if available

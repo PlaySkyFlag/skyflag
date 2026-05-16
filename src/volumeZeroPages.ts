@@ -54,7 +54,7 @@ export const VOLUME_ZERO_PAGES: VolumeZeroPage[] = [
   },
   {
     src: '/volume-zero/TH_VolumeZero_00b_Credits.jpg',
-    alt: 'Credits and indicia — created and written by Dr. Nelson Jatel, published by Limnology Research Corp., AI-assisted creation disclosure, and ISBN 978-1-7388485-4-6.',
+    alt: 'Credits and indicia — created and written by Nelson Jatel, published by Limnology Research Corp., AI-assisted creation disclosure, and ISBN 978-1-7388485-4-6.',
     kind: 'frontmatter',
   },
   {
@@ -122,7 +122,7 @@ export const VOLUME_ZERO = {
   /** As registered against the ISBN — now identical to `title`. */
   registeredTitle: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
   subtitle: 'A graphic prequel to the Thresan strategy game.',
-  author: 'Dr. Nelson Jatel',
+  author: 'Nelson Jatel',
   publisher: 'Limnology Research Corp.',
   imprint: 'Thresan.studio',
   format: 'Mixed media product',

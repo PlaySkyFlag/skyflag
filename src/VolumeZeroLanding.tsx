@@ -20,6 +20,9 @@ import {
 } from './volumeZeroPages';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-volume-zero';
+// Live on GlobalComix (first external platform — discovery + analytics).
+const GLOBALCOMIX_URL =
+  'https://globalcomix.com/read/650af4e6-1570-4196-87b3-fa8072e25dfb/1?utm_source=Link&utm_medium=Referral&utm_campaign=thresan&utm_term=GCRID_370744';
 
 // AI-use statement — transcribed verbatim from the creator's official
 // "AI-Assisted Creation Disclosure" on the issue's credits page (the
@@ -29,7 +32,7 @@ const AI_USE_STATEMENT =
   'This issue includes AI-generated and AI-assisted artwork and ' +
   'production assets. Story direction, worldbuilding, continuity, ' +
   'selection, editing, page sequencing, and publication assembly were ' +
-  'directed by Dr. Nelson Jatel, Limnology Research Corp., and Thresan ' +
+  'directed by Nelson Jatel, Limnology Research Corp., and Thresan ' +
   'Studio. AI image-generation and editing tools were used as ' +
   'production instruments for visual draft generation, illustration ' +
   'refinement, and cover development. This disclosure is included for ' +
@@ -42,9 +45,11 @@ export default function VolumeZeroLanding() {
       title: `${VOLUME_ZERO.shortTitle} · Thresan: Skyflag`,
       description: VOLUME_ZERO.subtitle + ' ' + VOLUME_ZERO.synopsis,
       canonicalUrl: 'https://thresan.studio/volume-zero',
-      ogImage: 'https://thresan.studio/thresan-og-clans.jpg',
+      // Shared comic links should preview the actual cover, not the
+      // generic boards card.
+      ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
       ogImageAlt:
-        'Three stacked boards with Grey Ravens and White Stags arrayed across all three planes.',
+        'Cover of Thresan: Skyflag, Issue One: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
     });
   }, []);
 
@@ -69,6 +74,14 @@ export default function VolumeZeroLanding() {
                 PDF — coming
               </span>
             )}
+            <a
+              href={GLOBALCOMIX_URL}
+              className="vzl-btn"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Read on GlobalComix
+            </a>
             <a href={GAME_URL} className="vzl-btn">
               Play Skyflag
             </a>

@@ -63,9 +63,9 @@ export default function VolumeZeroReader({
         'Read Issue One free — the prequel to Thresan: Skyflag. ' +
         'Grey Ravens, White Stags, the Lifts, the Caelum Nexus.',
       canonicalUrl: 'https://thresan.studio/volume-zero',
-      ogImage: 'https://thresan.studio/thresan-og-clans.jpg',
+      ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
       ogImageAlt:
-        'Three stacked boards with Grey Ravens and White Stags arrayed across all three planes.',
+        'Cover of Thresan: Skyflag, Issue One: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
     });
   }, [embedded]);
 

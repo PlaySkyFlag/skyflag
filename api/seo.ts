@@ -46,8 +46,8 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
     loadingTagline: 'Three worlds. One proof.',
   },
   'thresan.studio': {
-    title: 'Thresan Studio — designed by Dr. Nelson Jatel',
-    description: 'The studio behind Thresan, designed in British Columbia by Dr. Nelson Jatel. Free turn-based abstract strategy played across three stacked boards.',
+    title: 'Thresan Studio — designed by Nelson Jatel',
+    description: 'The studio behind Thresan, designed in British Columbia by Nelson Jatel. Free turn-based abstract strategy played across three stacked boards.',
     ogImage: 'https://playskyflag.com/thresan-og-studio.jpg',
     loadingHeadline: 'Thresan Studio',
     loadingTagline: 'Designed in British Columbia.',

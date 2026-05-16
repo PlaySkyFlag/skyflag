@@ -20,7 +20,7 @@ confirm before submitting anywhere public.
 
 - **ISBN-13:** 978-1-7388485-4-6 (assigned 2026-05-15; format: Mixed
   media product; check digit verified)
-- **Author:** Dr. Nelson Jatel
+- **Author:** Nelson Jatel
 - **Publisher:** Limnology Research Corp.
 - **Imprint:** Thresan.studio
 - **Copyright:** © 2026 Limnology Research Corp. Thresan™ and Skyflag™
@@ -36,7 +36,7 @@ confirm before submitting anywhere public.
   It is the prequel to the current edition of Thresan: Skyflag, the
   three-board strategy game. Read it free, then play the game it leads
   into. [Expand to 1–2 paragraphs once pages are locked.]
-- **Author bio:** Dr. Nelson Jatel is a limnologist and adjunct
+- **Author bio:** Nelson Jatel is a limnologist and adjunct
   professor at UBCO in Kelowna, BC, working on water governance. Thresan
   is the strategy game and universe he built on evenings and weekends;
   Skyflag is its current edition. [Confirm phrasing.]
@@ -55,7 +55,7 @@ confirm before submitting anywhere public.
 ## AI-use statement
 
 - **Public baseline (live now, verifiably true):** "Issue One is an
-  original story by Dr. Nelson Jatel, set in the original world of
+  original story by Nelson Jatel, set in the original world of
   Thresan™. A full AI-use disclosure is published together with the
   issue's pages."
 - **To finalize:** replace with the detailed statement (tools used, the

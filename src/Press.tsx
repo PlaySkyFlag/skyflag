@@ -140,7 +140,7 @@ function QuickFacts() {
       <table className="press-facts">
         <tbody>
           <tr><th>Title</th><td>Thresan™: Skyflag</td></tr>
-          <tr><th>Designer</th><td>Dr. Nelson Jatel</td></tr>
+          <tr><th>Designer</th><td>Nelson Jatel</td></tr>
           <tr><th>Publisher</th><td>Limnology Research Corp.</td></tr>
           <tr><th>Genre</th><td>Turn-based strategy · abstract · 3-board chess descendant</td></tr>
           <tr><th>Players</th><td>1–2 (solo vs AI, hot-seat, online multiplayer)</td></tr>
@@ -182,7 +182,7 @@ function Descriptions() {
         <h3 className="press-desc-label">Short (≈ 60 words)</h3>
         <p className="press-desc-body">
           Thresan™: Skyflag is a free turn-based strategy game from
-          designer Dr. Nelson Jatel and Limnology Research Corp. Two
+          designer Nelson Jatel and Limnology Research Corp. Two
           players command five pieces — Captain, Soldier, Promoted
           Soldier Captain, Rover, Pilot — across three stacked 6×6 boards. Capture the opposing clan's
           three claim-seals, then guide your Captain to the Caelum
@@ -421,7 +421,7 @@ function About() {
     <section className="press-section">
       <h2 className="press-section-title">About the designer</h2>
       <p className="press-desc-body">
-        Thresan™: Skyflag is designed by Dr. Nelson Jatel, working
+        Thresan™: Skyflag is designed by Nelson Jatel, working
         solo under Limnology Research Corp. The game has been in
         active design and play since 2025, evolving from a hand-built
         cardboard prototype on a kitchen counter through twenty-plus
@@ -455,7 +455,7 @@ function Contact() {
       <h3 className="press-desc-label">Boilerplate (copy-paste)</h3>
       <p className="press-desc-body press-boilerplate">
         Thresan™: Skyflag is a free, browser-based, turn-based strategy
-        game from designer Dr. Nelson Jatel and Limnology Research
+        game from designer Nelson Jatel and Limnology Research
         Corp. Players command five pieces across three stacked 6×6
         boards (Terran, Meridian, Empyrean), pursuing the opposing
         clan's three claim-seals and the Caelum Nexus. The game
