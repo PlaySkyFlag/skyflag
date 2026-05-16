@@ -26,6 +26,7 @@ function pageLabel(i: number, total: number): string {
   const p = VOLUME_ZERO_PAGES[i];
   if (!p) return '';
   if (p.kind === 'cover') return 'Cover';
+  if (p.kind === 'frontmatter') return 'Credits';
   if (p.kind === 'backcover') return 'Back cover';
   if (p.kind === 'backmatter') return 'Backmatter';
   // Story pages are numbered 1..N regardless of cover offset.

@@ -1,8 +1,8 @@
 // Issue One — page manifest. The reader (VolumeZeroReader.tsx) and the
 // landing (VolumeZeroLanding.tsx) read from this single source of truth.
-// The comic art does not exist yet; this ships as an empty manifest so
-// the reader/landing render an honest "in production" state today and
-// light up the moment pages are dropped in — no component changes.
+// Populated 2026-05-15 from the first publication-edition PDF (rendered
+// to 2000×3000 JPGs in public/volume-zero/). To revise: re-render and
+// update the entries below — no component changes needed.
 //
 // ── Naming (RESOLVED 2026-05-15) ───────────────────────────────────
 // Decision: the public/display title is aligned to the ISBN-registered
@@ -24,7 +24,12 @@
 // release. Art direction is cinematic, page-based, dark-fantasy /
 // industrial sci-fi — NOT vertical-scroll webtoon.
 
-export type VolumeZeroPageKind = 'cover' | 'page' | 'backmatter' | 'backcover';
+export type VolumeZeroPageKind =
+  | 'cover'
+  | 'frontmatter'
+  | 'page'
+  | 'backmatter'
+  | 'backcover';
 
 export type VolumeZeroPage = {
   /** Public path, e.g. "/volume-zero/TH_VolumeZero_01.jpg". */
@@ -36,23 +41,60 @@ export type VolumeZeroPage = {
 };
 
 /**
- * Pages in reading order — cover first, back cover last. Empty until
- * the first pages are cleared for release. Shape (uncomment when art
- * exists; the prequel is framed as 16 interior pages):
- *
- *   { src: '/volume-zero/TH_VolumeZero_00_Cover.jpg', alt: 'Cover — the Eight-Footed Mark.', kind: 'cover' },
- *   { src: '/volume-zero/TH_VolumeZero_01.jpg',       alt: 'Page 1 — the Lifts go quiet.',   kind: 'page' },
- *   …
- *   { src: '/volume-zero/TH_VolumeZero_16_Backmatter.jpg', alt: 'Backmatter — play Skyflag, join the Kickstarter list.', kind: 'backmatter' },
- *   { src: '/volume-zero/TH_VolumeZero_17_BackCover.jpg',  alt: 'Back cover.', kind: 'backcover' },
+ * Pages in reading order, rendered from the publication PDF
+ * (8 leaves: cover, credits/indicia, 5 story pages, back cover) at
+ * 2000×3000. Story pages are the only `kind: 'page'` entries so the
+ * reader numbers them 1–5; cover/credits/back render label-only.
  */
-export const VOLUME_ZERO_PAGES: VolumeZeroPage[] = [];
+export const VOLUME_ZERO_PAGES: VolumeZeroPage[] = [
+  {
+    src: '/volume-zero/TH_VolumeZero_00_Cover.jpg',
+    alt: 'Cover — Thresan: Skyflag, Issue One: The Eight-Footed Mark. Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags stand before the stone guardian, the Aetheri leaf glowing between them.',
+    kind: 'cover',
+  },
+  {
+    src: '/volume-zero/TH_VolumeZero_00b_Credits.jpg',
+    alt: 'Credits and indicia — created and written by Dr. Nelson Jatel, published by Limnology Research Corp., AI-assisted creation disclosure, and ISBN 978-1-7388485-4-6.',
+    kind: 'frontmatter',
+  },
+  {
+    src: '/volume-zero/TH_VolumeZero_01.jpg',
+    alt: 'Renn searches the Second Epoch archives; the eight-footed mark wakes, glowing, in her hand.',
+    kind: 'page',
+  },
+  {
+    src: '/volume-zero/TH_VolumeZero_02.jpg',
+    alt: 'Sera at the White Stags holo-table — the mark is confirmed. "Renn found it. Sound the mobilization."',
+    kind: 'page',
+  },
+  {
+    src: '/volume-zero/TH_VolumeZero_03.jpg',
+    alt: 'Blood on the floor-glyph wakes the stone guardian. "It recognizes the blood. For the Legacy."',
+    kind: 'page',
+  },
+  {
+    src: '/volume-zero/TH_VolumeZero_04.jpg',
+    alt: 'The gate opens; the guardian lets Renn and Sera pass. Something beneath the core was not sleeping.',
+    kind: 'page',
+  },
+  {
+    src: '/volume-zero/TH_VolumeZero_05.jpg',
+    alt: 'The Caelum Nexus burns. "The eight-footed mark was never a game. It was a warning." Next: Issue Two — The Violet Beneath.',
+    kind: 'page',
+  },
+  {
+    src: '/volume-zero/TH_VolumeZero_06_BackCover.jpg',
+    alt: 'Back cover — synopsis, ISBN barcode, and the Issue Two teaser, The Violet Beneath.',
+    kind: 'backcover',
+  },
+];
 
-/** Cover image for the landing hero, or null until it exists. */
-export const VOLUME_ZERO_COVER: string | null = null;
+/** Cover image for the landing hero. */
+export const VOLUME_ZERO_COVER: string | null =
+  '/volume-zero/TH_VolumeZero_00_Cover.jpg';
 
-/** Downloadable digital PDF (02_PDF_Digital), or null until it exists. */
-export const VOLUME_ZERO_PDF: string | null = null;
+/** Downloadable digital PDF (02_PDF_Digital). */
+export const VOLUME_ZERO_PDF: string | null = '/volume-zero/issue-one.pdf';
 
 /**
  * ISBN-13, registry-truthful. Assigned 2026-05-15 by the publisher
@@ -63,11 +105,12 @@ export const VOLUME_ZERO_PDF: string | null = null;
 export const VOLUME_ZERO_ISBN: string | null = '978-1-7388485-4-6';
 
 /**
- * Gates "publication-ready" framing. Stays false until the readable
- * pages exist — an assigned ISBN registers the work but does not make
- * it readable. Flip when pages land.
+ * Gates "publication-ready" framing. True as of 2026-05-15: the full
+ * publication PDF (cover, indicia, 5 story pages, back cover, ISBN,
+ * creator AI disclosure) is rendered into the reader — this is the
+ * first publication edition, not a placeholder.
  */
-export const VOLUME_ZERO_PUBLICATION_READY = false;
+export const VOLUME_ZERO_PUBLICATION_READY = true;
 
 /** Issue framing — single source for every surface. */
 export const VOLUME_ZERO = {
@@ -78,7 +121,7 @@ export const VOLUME_ZERO = {
   shortTitle: 'Issue One: The Eight-Footed Mark',
   /** As registered against the ISBN — now identical to `title`. */
   registeredTitle: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
-  subtitle: 'A 16-page graphic prequel to the Skyflag strategy game.',
+  subtitle: 'A graphic prequel to the Skyflag strategy game.',
   author: 'Dr. Nelson Jatel',
   publisher: 'Limnology Research Corp.',
   imprint: 'Thresan.studio',

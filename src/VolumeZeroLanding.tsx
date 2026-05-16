@@ -21,26 +21,19 @@ import {
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-volume-zero';
 
-// Transparent AI-use statement. Until the creator finalizes the
-// detailed wording, the page shows a verifiably-true baseline with NO
-// tool names or process specifics — nothing unverified ships to a live
-// page. Nelson: replace AI_USE_PUBLIC with your finalized statement
-// (use AI_USE_DRAFT as the starting point) and set AI_USE_FINAL = true.
-const AI_USE_FINAL = false;
-const AI_USE_PUBLIC =
-  'Issue One is an original story by Dr. Nelson Jatel, set in the ' +
-  'original world of Thresan™. A full AI-use disclosure is published ' +
-  'together with the issue’s pages.';
-// Draft kept in code only — contains a bracketed TODO, so it must not
-// render publicly until finalized.
-const AI_USE_DRAFT =
-  'Issue One is an original story written by Dr. Nelson Jatel. ' +
-  'Artwork was produced with AI image-generation tools under the ' +
-  'author’s art direction; the author made final selections, edits, ' +
-  'lettering, and layout, and reviewed every page. [Nelson: confirm ' +
-  'the exact tools and the steps each was used in before launch.] ' +
-  'All characters, world, and trademarks are original to Thresan™.';
-const AI_USE_STATEMENT = AI_USE_FINAL ? AI_USE_DRAFT : AI_USE_PUBLIC;
+// AI-use statement — transcribed verbatim from the creator's official
+// "AI-Assisted Creation Disclosure" on the issue's credits page (the
+// published, ISBN'd source of truth). Keep it identical to the page so
+// the site and the publication never diverge.
+const AI_USE_STATEMENT =
+  'This issue includes AI-generated and AI-assisted artwork and ' +
+  'production assets. Story direction, worldbuilding, continuity, ' +
+  'selection, editing, page sequencing, and publication assembly were ' +
+  'directed by Dr. Nelson Jatel, Limnology Research Corp., and Thresan ' +
+  'Studio. AI image-generation and editing tools were used as ' +
+  'production instruments for visual draft generation, illustration ' +
+  'refinement, and cover development. This disclosure is included for ' +
+  'transparency.';
 
 export default function VolumeZeroLanding() {
   useEffect(() => {

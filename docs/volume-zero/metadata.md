@@ -28,9 +28,9 @@ confirm before submitting anywhere public.
 
 ## Descriptions
 
-- **Short (≤ 200 chars):** A 16-page graphic prequel to the Skyflag
-  strategy game. Before the clans had names, the Aetheri lifted three
-  arcologies off the Earth and the Lifts went quiet.
+- **Short (≤ 200 chars):** A graphic prequel to the Skyflag strategy
+  game. Before the clans had names, the Aetheri lifted three arcologies
+  off the Earth and the Lifts went quiet.
 - **Long:** Issue One is the world of Kaleo at its hinge — the Grey
   Ravens, the White Stags, and the Caelum Nexus they both reach for.
   It is the prequel to the current edition of Thresan: Skyflag, the

@@ -52,5 +52,6 @@ references first. Common failure points to guard against:
 - **Resolution** — generate above final size; never upscale a weak
   source.
 
-Framing: 16 interior pages + cover + backmatter + back cover.
-"A 16-page graphic prequel to the Skyflag strategy game."
+Issue One as published: cover + credits/indicia + 5 story pages +
+back cover (8 leaves total), rendered to public/volume-zero/.
+"A graphic prequel to the Skyflag strategy game."
