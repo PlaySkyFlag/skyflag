@@ -1000,24 +1000,21 @@ button.tray-piece:hover {
   opacity: 0.45;
 }
 
-/* The tray piece is a faithful mini of the board piece: a neutral chip
-   with the glyph painted in the FACTION colour (not a contrast colour),
-   so a White Stag reads white and a Grey Raven reads dark in the tray
-   exactly as it does on the board. p1 = White Stags, p2 = Grey Ravens. */
-.tray-piece {
-  background: rgba(255, 255, 255, 0.05);
-  color: #cdd6e8;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+/* Tray piece mirrors the board piece's colour: White Stags (p1) read
+   white, Grey Ravens (p2) read dark — in the tray exactly as on the
+   board. The chip carries the faction colour (the dominant visual,
+   like a token); the glyph uses a contrasting colour only so Captain
+   vs Soldier stays legible. */
+.tray-p1 .tray-piece {
+  background: var(--ivory-fill);
+  color: var(--ivory-dark-text);
+  border: 1px solid var(--ivory-border);
 }
 
-.tray-p1 .tray-piece-letter {
-  color: var(--ivory-fill);
-  -webkit-text-stroke: 0.6px #1a1a1a;
-}
-
-.tray-p2 .tray-piece-letter {
-  color: var(--slate-fill);
-  -webkit-text-stroke: 0.6px #e8e8e8;
+.tray-p2 .tray-piece {
+  background: var(--slate-fill);
+  color: #e8e8e8;
+  border: 1px solid var(--slate-border);
 }
 
 .tray-piece-letter {
