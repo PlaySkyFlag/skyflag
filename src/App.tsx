@@ -1515,23 +1515,23 @@ export default function App() {
         }}
       />
       <PieceTray
-        player="p1"
-        pieces={state.inHand.p1}
-        capturedPieces={state.captured.p1}
+        player="p2"
+        pieces={state.inHand.p2}
+        capturedPieces={state.captured.p2}
         isInteractive={
           inProgress &&
-          state.currentPlayer === 'p1' &&
-          aiPlayer !== 'p1' &&
-          (room === null || (room.status === 'playing' && room.role === 'p1'))
+          state.currentPlayer === 'p2' &&
+          aiPlayer !== 'p2' &&
+          (room === null || (room.status === 'playing' && room.role === 'p2'))
         }
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
-        note={moveNote('p1')}
-        clockMs={state.clock?.p1Ms}
+        note={moveNote('p2')}
+        clockMs={state.clock?.p2Ms}
         clockActive={
           state.clock !== undefined &&
           inProgress &&
-          state.currentPlayer === 'p1'
+          state.currentPlayer === 'p2'
         }
         flagsState={state.flags}
       />
@@ -1605,23 +1605,23 @@ export default function App() {
         ))}
       </div>
       <PieceTray
-        player="p2"
-        pieces={state.inHand.p2}
-        capturedPieces={state.captured.p2}
+        player="p1"
+        pieces={state.inHand.p1}
+        capturedPieces={state.captured.p1}
         isInteractive={
           inProgress &&
-          state.currentPlayer === 'p2' &&
-          aiPlayer !== 'p2' &&
-          (room === null || (room.status === 'playing' && room.role === 'p2'))
+          state.currentPlayer === 'p1' &&
+          aiPlayer !== 'p1' &&
+          (room === null || (room.status === 'playing' && room.role === 'p1'))
         }
         selectedId={selectedHandId}
         onSelect={handleSelectHandPiece}
-        note={moveNote('p2')}
-        clockMs={state.clock?.p2Ms}
+        note={moveNote('p1')}
+        clockMs={state.clock?.p1Ms}
         clockActive={
           state.clock !== undefined &&
           inProgress &&
-          state.currentPlayer === 'p2'
+          state.currentPlayer === 'p1'
         }
         flagsState={state.flags}
       />

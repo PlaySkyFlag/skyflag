@@ -7,6 +7,12 @@ const ORIGIN_Y = PADDING + LABEL_GUTTER;
 const SVG_WIDTH = ORIGIN_X + BOARD_SIZE * CELL + PADDING;
 const SVG_HEIGHT = ORIGIN_Y + BOARD_SIZE * CELL + PADDING;
 
+// Vertical orientation: logical row 0 (p1 / White Stags home) renders at
+// the BOTTOM of the board, so the first player sits at the bottom as in
+// chess. Columns are unaffected. We remap each row's screen-Y rather than
+// mirroring the SVG group, so piece glyphs and labels stay upright.
+const yOf = (row: number) => ORIGIN_Y + (BOARD_SIZE - 1 - row) * CELL;
+
 
 import type { ReactElement } from 'react';
 import type { Layer, Player } from './game/types';
@@ -455,7 +461,7 @@ export default function Board({
           key={`${row}-${col}`}
           className={clickable ? 'board-cell' : undefined}
           x={ORIGIN_X + col * CELL}
-          y={ORIGIN_Y + row * CELL}
+          y={yOf(row)}
           width={CELL}
           height={CELL}
           fill={isDark ? theme.darkFill : theme.lightFill}
@@ -507,7 +513,7 @@ export default function Board({
       <text
         key={`r-${row}`}
         x={ORIGIN_X - LABEL_GUTTER / 2}
-        y={ORIGIN_Y + row * CELL + CELL / 2}
+        y={yOf(row) + CELL / 2}
         textAnchor="middle"
         dominantBaseline="central"
         fontSize={14}
@@ -532,7 +538,7 @@ export default function Board({
         <rect
           key="lm-from"
           x={ORIGIN_X + lastMoveFrom.col * CELL + 2}
-          y={ORIGIN_Y + lastMoveFrom.row * CELL + 2}
+          y={yOf(lastMoveFrom.row) + 2}
           width={CELL - 4}
           height={CELL - 4}
           rx={4}
@@ -549,7 +555,7 @@ export default function Board({
         <rect
           key="lm-to"
           x={ORIGIN_X + lastMoveTo.col * CELL + 2}
-          y={ORIGIN_Y + lastMoveTo.row * CELL + 2}
+          y={yOf(lastMoveTo.row) + 2}
           width={CELL - 4}
           height={CELL - 4}
           rx={4}
@@ -566,9 +572,9 @@ export default function Board({
       (lastMoveFrom.row !== lastMoveTo.row || lastMoveFrom.col !== lastMoveTo.col)
     ) {
       const fx = ORIGIN_X + lastMoveFrom.col * CELL + CELL / 2;
-      const fy = ORIGIN_Y + lastMoveFrom.row * CELL + CELL / 2;
+      const fy = yOf(lastMoveFrom.row) + CELL / 2;
       const tx = ORIGIN_X + lastMoveTo.col * CELL + CELL / 2;
-      const ty = ORIGIN_Y + lastMoveTo.row * CELL + CELL / 2;
+      const ty = yOf(lastMoveTo.row) + CELL / 2;
       // Shorten the line a touch on each end so the arrowhead doesn't
       // overlap pieces sitting in those cells.
       const dx = tx - fx;
@@ -623,7 +629,7 @@ export default function Board({
         <rect
           key="hint-from"
           x={ORIGIN_X + hintFrom.col * CELL + 2}
-          y={ORIGIN_Y + hintFrom.row * CELL + 2}
+          y={yOf(hintFrom.row) + 2}
           width={CELL - 4}
           height={CELL - 4}
           rx={4}
@@ -640,7 +646,7 @@ export default function Board({
         <rect
           key="hint-to"
           x={ORIGIN_X + hintTo.col * CELL + 2}
-          y={ORIGIN_Y + hintTo.row * CELL + 2}
+          y={yOf(hintTo.row) + 2}
           width={CELL - 4}
           height={CELL - 4}
           rx={4}
@@ -658,9 +664,9 @@ export default function Board({
       (hintFrom.row !== hintTo.row || hintFrom.col !== hintTo.col)
     ) {
       const fx = ORIGIN_X + hintFrom.col * CELL + CELL / 2;
-      const fy = ORIGIN_Y + hintFrom.row * CELL + CELL / 2;
+      const fy = yOf(hintFrom.row) + CELL / 2;
       const tx = ORIGIN_X + hintTo.col * CELL + CELL / 2;
-      const ty = ORIGIN_Y + hintTo.row * CELL + CELL / 2;
+      const ty = yOf(hintTo.row) + CELL / 2;
       const dx = tx - fx;
       const dy = ty - fy;
       const len = Math.hypot(dx, dy) || 1;
@@ -707,7 +713,7 @@ export default function Board({
   // is visible even when the piece itself fills most of the cell.
   const threatEls = threatenedCells.map((t) => {
     const x = ORIGIN_X + t.col * CELL;
-    const y = ORIGIN_Y + t.row * CELL;
+    const y = yOf(t.row);
     const cx = x + CELL / 2;
     const cy = y + CELL / 2;
     // Critical = Captain in danger; brighter ring + heavier fill +
@@ -778,7 +784,7 @@ export default function Board({
   const flagThreatEl = (() => {
     if (!flagAtRisk) return null;
     const x = ORIGIN_X + flagAtRisk.col * CELL;
-    const y = ORIGIN_Y + flagAtRisk.row * CELL;
+    const y = yOf(flagAtRisk.row);
     return (
       <g key="flag-at-risk" pointerEvents="none">
         <rect
@@ -806,7 +812,7 @@ export default function Board({
     <rect
       key="selection"
       x={ORIGIN_X + selectedCell.col * CELL + 2}
-      y={ORIGIN_Y + selectedCell.row * CELL + 2}
+      y={yOf(selectedCell.row) + 2}
       width={CELL - 4}
       height={CELL - 4}
       rx={4}
@@ -819,7 +825,7 @@ export default function Board({
 
   const targetEls = legalTargets.map((t) => {
     const cx = ORIGIN_X + t.col * CELL + CELL / 2;
-    const cy = ORIGIN_Y + t.row * CELL + CELL / 2;
+    const cy = yOf(t.row) + CELL / 2;
     if (t.kind === 'lift-up' || t.kind === 'lift-down') {
       const arrow = t.kind === 'lift-up' ? '↑' : '↓';
       return (
@@ -867,12 +873,12 @@ export default function Board({
     const isActive = activeDeployPlayer === d.player;
     const inset = 4;
     const cx = ORIGIN_X + d.col * CELL + CELL / 2;
-    const cy = ORIGIN_Y + d.row * CELL + CELL / 2;
+    const cy = yOf(d.row) + CELL / 2;
     return [
       <rect
         key={`d-${d.player}-${d.row}-${d.col}`}
         x={ORIGIN_X + d.col * CELL + inset}
-        y={ORIGIN_Y + d.row * CELL + inset}
+        y={yOf(d.row) + inset}
         width={CELL - inset * 2}
         height={CELL - inset * 2}
         rx={6}
@@ -931,10 +937,10 @@ export default function Board({
     .map((m) => {
       const inset = 8;
       const x = ORIGIN_X + m.col * CELL + inset;
-      const y = ORIGIN_Y + m.row * CELL + inset;
+      const y = yOf(m.row) + inset;
       const size = CELL - inset * 2;
       const cx = ORIGIN_X + m.col * CELL + CELL / 2;
-      const cy = ORIGIN_Y + m.row * CELL + CELL / 2;
+      const cy = yOf(m.row) + CELL / 2;
       return (
         <g key={`lift-${m.row}-${m.col}`} pointerEvents="none">
           <rect
@@ -991,7 +997,7 @@ export default function Board({
     .filter((m) => m.kind === 'nexus')
     .map((m) => {
       const cx = ORIGIN_X + m.col * CELL + CELL / 2;
-      const cy = ORIGIN_Y + m.row * CELL + CELL / 2;
+      const cy = yOf(m.row) + CELL / 2;
       const innerR = CELL * 0.16;
       const ringR = CELL * 0.28;
       const haloR = CELL * 0.42;
@@ -1075,7 +1081,7 @@ export default function Board({
           key={m.id ?? `m-${m.row}-${m.col}-${m.symbol}`}
           className={m.id ? 'piece-marker' : undefined}
           x={ORIGIN_X + m.col * CELL + CELL / 2}
-          y={ORIGIN_Y + m.row * CELL + CELL / 2}
+          y={yOf(m.row) + CELL / 2}
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={CELL * size}
@@ -1098,7 +1104,7 @@ export default function Board({
       <text
         key={`bdg-${m.row}-${m.col}-${m.badge}`}
         x={ORIGIN_X + m.col * CELL + CELL - 4}
-        y={ORIGIN_Y + m.row * CELL + 4}
+        y={yOf(m.row) + 4}
         textAnchor="end"
         dominantBaseline="hanging"
         fontSize={CELL * 0.28}
