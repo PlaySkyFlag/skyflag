@@ -1378,105 +1378,9 @@ export default function App() {
       {/* StatusBar moved into Sidebar (under the tab bar) so the
           "<Side> to move · N activations left · Turn …" status sits
           next to the panel switcher rather than floating above the
-          boards on its own. The `<header>` already establishes
-          identity; the status strip belongs with the controls. */}
-      <GameToolbar
-        gameOver={state.status.kind !== 'in-progress'}
-        clockOption={clockOption}
-        onSetClockOption={setClockOption}
-        hintEnabled={
-          state.status.kind === 'in-progress' &&
-          aiPlayer !== state.currentPlayer &&
-          (room === null ||
-            (room.status === 'playing' && room.role === state.currentPlayer))
-        }
-        onRequestHint={() => {
-          // Quick depth-2 search — deep enough to surface a sensible
-          // idea, shallow enough to feel instant.
-          const action = chooseAction(state, 2);
-          if (!action) {
-            flash('No legal moves available.');
-            return;
-          }
-          if (action.type === 'end-turn') {
-            flash('Suggestion: end your turn — no useful action found.');
-            return;
-          }
-          if (action.type === 'deploy') {
-            const pad = DEPLOY_COORDS[state.currentPlayer];
-            setHint({ from: pad, to: pad });
-            return;
-          }
-          if (action.type === 'move') {
-            const bp = state.onBoard.find((b) => b.piece.id === action.pieceId);
-            if (!bp) return;
-            setHint({ from: bp.coord, to: action.to });
-          }
-        }}
-        onOfferDraw={() => {
-          // Mode-aware: MP broadcasts; 1P asks the AI's evaluator;
-          // 2P hot-seat agrees instantly on confirm.
-          if (room && drawChannelRef.current) {
-            if (outgoingDraw) {
-              flash('Already waiting for opponent to respond.');
-              return;
-            }
-            setOutgoingDraw(true);
-            drawChannelRef.current
-              .send({
-                type: 'broadcast',
-                event: 'draw-offer',
-                payload: { from: room.role },
-              })
-              .catch(() => undefined);
-            flash('Draw offered — waiting for opponent.');
-            return;
-          }
-          if (aiPlayer) {
-            if (!confirm('Offer the AI a draw?')) return;
-            const score = evaluate(state, aiPlayer);
-            if (score > 100) {
-              flash('The AI declines — it sees the position as winning for itself.');
-            } else {
-              dispatch({ type: 'agree-draw' });
-            }
-            return;
-          }
-          if (!confirm('Agree to a draw? The game ends with no winner.')) return;
-          dispatch({ type: 'agree-draw' });
-        }}
-        onResign={() => {
-          // Resigner is the local human on the clock — room.role in MP,
-          // opposite-of-AI in 1P, current player in 2P hot-seat.
-          const resigner: Player =
-            room?.role ?? (aiPlayer ? (aiPlayer === 'p1' ? 'p2' : 'p1') : state.currentPlayer);
-          dispatch({ type: 'resign', player: resigner });
-        }}
-        onNewGame={() => {
-          if (room) {
-            // Three cases in MP:
-            //   (a) game already over → "play again in this room" — keep
-            //       the room, reset state. Push effect updates games.state
-            //       so the opponent's board flips to fresh too.
-            //   (b) game in-progress → confirm leave (this is effectively
-            //       a resign-and-leave from the user's POV).
-            //   (c) waiting room with no opponent → confirm leave.
-            const gameOver = state.status.kind !== 'in-progress';
-            if (gameOver) {
-              if (!confirm(`Start a new game in room ${room.code}?`)) return;
-              dispatch({ type: 'new-game', clockMs: clockMsForOption(clockOption) });
-              return;
-            }
-            const msg =
-              room.status === 'waiting'
-                ? `Leave room ${room.code} and start a new local game?`
-                : `Starting a new game will leave room ${room.code}. Continue?`;
-            if (!confirm(msg)) return;
-            setRoom(null);
-          }
-          dispatch({ type: 'new-game', clockMs: clockMsForOption(clockOption) });
-        }}
-      />
+          boards on its own. GameToolbar (hint / draw / resign / clock /
+          new game) is rendered AFTER the boards — see below the bottom
+          tray, between the play area and the footer. */}
       <Sidebar
         authUser={authUser}
         profile={profile}
@@ -1624,6 +1528,106 @@ export default function App() {
           state.currentPlayer === 'p1'
         }
         flagsState={state.flags}
+      />
+      {/* Controls row sits BELOW the boards (between the bottom tray
+          and the footer) so the play area stays at the top of the
+          viewport and the controls are within easy thumb reach. */}
+      <GameToolbar
+        gameOver={state.status.kind !== 'in-progress'}
+        clockOption={clockOption}
+        onSetClockOption={setClockOption}
+        hintEnabled={
+          state.status.kind === 'in-progress' &&
+          aiPlayer !== state.currentPlayer &&
+          (room === null ||
+            (room.status === 'playing' && room.role === state.currentPlayer))
+        }
+        onRequestHint={() => {
+          // Quick depth-2 search — deep enough to surface a sensible
+          // idea, shallow enough to feel instant.
+          const action = chooseAction(state, 2);
+          if (!action) {
+            flash('No legal moves available.');
+            return;
+          }
+          if (action.type === 'end-turn') {
+            flash('Suggestion: end your turn — no useful action found.');
+            return;
+          }
+          if (action.type === 'deploy') {
+            const pad = DEPLOY_COORDS[state.currentPlayer];
+            setHint({ from: pad, to: pad });
+            return;
+          }
+          if (action.type === 'move') {
+            const bp = state.onBoard.find((b) => b.piece.id === action.pieceId);
+            if (!bp) return;
+            setHint({ from: bp.coord, to: action.to });
+          }
+        }}
+        onOfferDraw={() => {
+          // Mode-aware: MP broadcasts; 1P asks the AI's evaluator;
+          // 2P hot-seat agrees instantly on confirm.
+          if (room && drawChannelRef.current) {
+            if (outgoingDraw) {
+              flash('Already waiting for opponent to respond.');
+              return;
+            }
+            setOutgoingDraw(true);
+            drawChannelRef.current
+              .send({
+                type: 'broadcast',
+                event: 'draw-offer',
+                payload: { from: room.role },
+              })
+              .catch(() => undefined);
+            flash('Draw offered — waiting for opponent.');
+            return;
+          }
+          if (aiPlayer) {
+            if (!confirm('Offer the AI a draw?')) return;
+            const score = evaluate(state, aiPlayer);
+            if (score > 100) {
+              flash('The AI declines — it sees the position as winning for itself.');
+            } else {
+              dispatch({ type: 'agree-draw' });
+            }
+            return;
+          }
+          if (!confirm('Agree to a draw? The game ends with no winner.')) return;
+          dispatch({ type: 'agree-draw' });
+        }}
+        onResign={() => {
+          // Resigner is the local human on the clock — room.role in MP,
+          // opposite-of-AI in 1P, current player in 2P hot-seat.
+          const resigner: Player =
+            room?.role ?? (aiPlayer ? (aiPlayer === 'p1' ? 'p2' : 'p1') : state.currentPlayer);
+          dispatch({ type: 'resign', player: resigner });
+        }}
+        onNewGame={() => {
+          if (room) {
+            // Three cases in MP:
+            //   (a) game already over → "play again in this room" — keep
+            //       the room, reset state. Push effect updates games.state
+            //       so the opponent's board flips to fresh too.
+            //   (b) game in-progress → confirm leave (this is effectively
+            //       a resign-and-leave from the user's POV).
+            //   (c) waiting room with no opponent → confirm leave.
+            const gameOver = state.status.kind !== 'in-progress';
+            if (gameOver) {
+              if (!confirm(`Start a new game in room ${room.code}?`)) return;
+              dispatch({ type: 'new-game', clockMs: clockMsForOption(clockOption) });
+              return;
+            }
+            const msg =
+              room.status === 'waiting'
+                ? `Leave room ${room.code} and start a new local game?`
+                : `Starting a new game will leave room ${room.code}. Continue?`;
+            if (!confirm(msg)) return;
+            setRoom(null);
+          }
+          dispatch({ type: 'new-game', clockMs: clockMsForOption(clockOption) });
+        }}
       />
       <EndGameOverlay
         state={state}
