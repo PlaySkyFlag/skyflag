@@ -274,7 +274,11 @@ export default function App() {
   );
   const [selection, setSelection] = useState<Selection>(null);
   const [aiPlayer, setAiPlayer] = useState<Player | null>(
-    INITIAL_SESSION?.aiPlayer ?? 'p2',
+    // Default solo: AI takes the Grey Ravens (p1, top of board) so the
+    // human plays the White Stags (p2) and sits at the bottom edge —
+    // the orientation players expect in a single-player game. A saved
+    // session still restores whatever side the player last chose.
+    INITIAL_SESSION?.aiPlayer ?? 'p1',
   );
   const [room, setRoom] = useState<RoomState | null>(
     INITIAL_SESSION?.room ?? null,
