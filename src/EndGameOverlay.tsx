@@ -81,15 +81,22 @@ export default function EndGameOverlay({ state, user, room, onPlayAgain }: Props
     }
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from('games')
-        .select('p1_id, p2_id')
-        .eq('room_code', room.code)
-        .maybeSingle();
-      if (cancelled || !data) return;
-      const { p1_id, p2_id } = data as { p1_id: string; p2_id: string | null };
-      const other = p1_id === user.id ? p2_id : p1_id;
-      setOpponentId(other ?? null);
+      try {
+        const { data } = await supabase
+          .from('games')
+          .select('p1_id, p2_id')
+          .eq('room_code', room.code)
+          .maybeSingle();
+        if (cancelled || !data) return;
+        const { p1_id, p2_id } = data as { p1_id: string; p2_id: string | null };
+        const other = p1_id === user.id ? p2_id : p1_id;
+        setOpponentId(other ?? null);
+      } catch {
+        // Network failure looking up the opponent is non-fatal — the
+        // end-game screen still renders without the opponent's name.
+        // Never let this reject and trip the global rejection handler.
+        if (!cancelled) setOpponentId(null);
+      }
     })();
     return () => {
       cancelled = true;

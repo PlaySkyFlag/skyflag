@@ -393,7 +393,7 @@ export default function App() {
   // authoritative view for this device.
   useEffect(() => {
     if (!authUser) return;
-    void syncStatsForUser(authUser.id);
+    void syncStatsForUser(authUser.id).catch(() => {});
   }, [authUser]);
 
   const [statsOpen, setStatsOpen] = useState(false);
@@ -492,7 +492,7 @@ export default function App() {
         // (network, RLS), the row stays in localStorage and the next
         // sign-in's syncStatsForUser picks it up via backfill.
         if (authUser) {
-          void syncGameToServer(written, authUser.id);
+          void syncGameToServer(written, authUser.id).catch(() => {});
         }
       }
     }

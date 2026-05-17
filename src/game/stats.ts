@@ -123,21 +123,30 @@ export function recordGame(rec: GameRecord): GameRecord {
 export async function syncGameToServer(rec: GameRecord, userId: string): Promise<boolean> {
   if (!supabase) return false;
   if (!rec.clientId) return false;
-  const { error } = await supabase.from('personal_games').insert({
-    user_id: userId,
-    client_id: rec.clientId,
-    mode: rec.mode,
-    result: rec.result,
-    reason: rec.reason,
-    turns: rec.turns,
-    played_at: rec.when,
-  });
-  // Conflict on (user_id, client_id) means we already synced this row —
-  // not a real failure. Postgres error code 23505 = unique_violation.
-  if (error && !/duplicate key|23505/i.test(error.message)) {
+  try {
+    const { error } = await supabase.from('personal_games').insert({
+      user_id: userId,
+      client_id: rec.clientId,
+      mode: rec.mode,
+      result: rec.result,
+      reason: rec.reason,
+      turns: rec.turns,
+      played_at: rec.when,
+    });
+    // Conflict on (user_id, client_id) means we already synced this row —
+    // not a real failure. Postgres error code 23505 = unique_violation.
+    if (error && !/duplicate key|23505/i.test(error.message)) {
+      return false;
+    }
+    return true;
+  } catch {
+    // Network failure ("Failed to fetch"), offline, blocked request, etc.
+    // The row is already in localStorage; the next sign-in's backfill
+    // re-sends it. Must never reject — fire-and-forget callers don't
+    // catch, and an unhandled rejection here trips the global handler
+    // and can blow away the end-game screen on a clock time-out.
     return false;
   }
-  return true;
 }
 
 // Pushes every local game that isn't already on the server. Idempotent
