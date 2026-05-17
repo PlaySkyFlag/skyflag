@@ -11,15 +11,15 @@ export default function Help({ inline = false }: Props) {
         <ol>
           <li>
             <strong>Pick a mode</strong> from the gear menu (⚙) in the
-            top-right corner — <em>1P · Stags</em> (the default: you play
-            the White Stags from the bottom of the board, AI plays the
-            Grey Ravens), <em>1P · Ravens</em> (the reverse), or{' '}
-            <em>2P</em> (two humans on one device).
+            top-right corner — <em>1P · White Stags</em> (the default:
+            you play the White Stags from the bottom of the board, AI
+            plays the Grey Ravens), <em>1P · Grey Ravens</em> (the
+            reverse), or <em>2P</em> (two humans on one device).
           </li>
           <li>
             <strong>Click "New game"</strong> in the toolbar above the
-            boards to begin. The Grey Ravens move first — in the default
-            1P · Stags mode that's the AI, so it opens and you reply.
+            boards to begin. The White Stags move first — as in chess,
+            white is at the bottom and opens the game.
           </li>
           <li>
             <strong>Each turn you have 2 activations.</strong> An

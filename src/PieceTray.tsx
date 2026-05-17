@@ -15,8 +15,8 @@ const KIND_GLYPH: Record<PieceKind, string> = {
 };
 
 const PLAYER_LABEL: Record<Player, string> = {
-  p1: 'Grey Ravens · Player 1',
-  p2: 'White Stags · Player 2',
+  p1: 'White Stags · Player 1',
+  p2: 'Grey Ravens · Player 2',
 };
 
 type Props = {

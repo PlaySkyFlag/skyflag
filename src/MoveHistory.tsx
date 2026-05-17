@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { Coord, HistoryEntry, Layer, PieceKind, Player } from './game/types';
 
-const PLAYER_NAME: Record<Player, string> = { p1: 'Ravens', p2: 'Stags' };
+const PLAYER_NAME: Record<Player, string> = { p1: 'Stags', p2: 'Ravens' };
 
 const PIECE_GLYPH: Record<PieceKind, string> = {
   captain: '♚',

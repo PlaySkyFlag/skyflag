@@ -1,8 +1,8 @@
 // Eval graph — inline SVG line chart of position evaluation over
 // the course of a reviewed game. Always renders from p1's
 // perspective so the line is consistent regardless of whose turn
-// it is at a given ply: positive = good for p1 (Grey Ravens),
-// negative = good for p2 (White Stags).
+// it is at a given ply: positive = good for p1 (White Stags),
+// negative = good for p2 (Grey Ravens).
 //
 // Click anywhere on the chart to jump the review scrubber to the
 // nearest analyzed move. A vertical guide line shows the current
@@ -137,8 +137,8 @@ export default function EvalGraph({ analyses, currentPly, onPlyClick }: Props) {
   return (
     <div className="eval-graph">
       <div className="eval-graph-axis-labels">
-        <span className="eval-graph-axis-top">↑ Grey Ravens</span>
-        <span className="eval-graph-axis-bot">↓ White Stags</span>
+        <span className="eval-graph-axis-top">↑ White Stags</span>
+        <span className="eval-graph-axis-bot">↓ Grey Ravens</span>
       </div>
       <svg
         className="eval-graph-svg"

@@ -26,8 +26,8 @@ import type {
 } from './game/types';
 
 const PLAYER_NAME: Record<Player, string> = {
-  p1: 'Grey Ravens',
-  p2: 'White Stags',
+  p1: 'White Stags',
+  p2: 'Grey Ravens',
 };
 
 const PIECE_SYMBOL: Record<PieceKind, string> = {

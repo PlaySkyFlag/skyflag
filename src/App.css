@@ -380,11 +380,11 @@
 }
 
 .hud-pip-p1 {
-  background: var(--slate-fill);
+  background: var(--ivory-fill);
 }
 
 .hud-pip-p2 {
-  background: var(--ivory-fill);
+  background: var(--slate-fill);
 }
 
 .hud-finished {
@@ -993,16 +993,24 @@ button.tray-piece:hover {
   opacity: 0.45;
 }
 
-.tray-p1 .tray-piece {
-  background: var(--slate-fill);
-  color: #e8e8e8;
-  border: 1px solid var(--slate-border);
+/* The tray piece is a faithful mini of the board piece: a neutral chip
+   with the glyph painted in the FACTION colour (not a contrast colour),
+   so a White Stag reads white and a Grey Raven reads dark in the tray
+   exactly as it does on the board. p1 = White Stags, p2 = Grey Ravens. */
+.tray-piece {
+  background: rgba(255, 255, 255, 0.05);
+  color: #cdd6e8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.tray-p2 .tray-piece {
-  background: var(--ivory-fill);
-  color: var(--ivory-dark-text);
-  border: 1px solid var(--ivory-border);
+.tray-p1 .tray-piece-letter {
+  color: var(--ivory-fill);
+  -webkit-text-stroke: 0.6px #1a1a1a;
+}
+
+.tray-p2 .tray-piece-letter {
+  color: var(--slate-fill);
+  -webkit-text-stroke: 0.6px #e8e8e8;
 }
 
 .tray-piece-letter {
@@ -2701,8 +2709,9 @@ button.tray-piece:hover {
   text-transform: uppercase;
   pointer-events: none;
 }
-.eval-graph-axis-top { color: var(--slate-fill, #a8b8d8); }
-.eval-graph-axis-bot { color: var(--ivory-fill, #C2A46B); }
+/* top = p1 = White Stags (ivory), bottom = p2 = Grey Ravens (slate) */
+.eval-graph-axis-top { color: var(--ivory-fill, #f0e0c0); }
+.eval-graph-axis-bot { color: var(--slate-accent, #a8b8d8); }
 .eval-graph-svg {
   display: block;
   width: 100%;
@@ -2812,8 +2821,8 @@ button.tray-piece:hover {
   border: 1px solid rgba(255, 255, 255, 0.25);
   flex-shrink: 0;
 }
-.review-move-pip-p1 { background: var(--slate-fill); }
-.review-move-pip-p2 { background: var(--ivory-fill); }
+.review-move-pip-p1 { background: var(--ivory-fill); }
+.review-move-pip-p2 { background: var(--slate-fill); }
 .review-move-num {
   font-variant-numeric: tabular-nums;
   opacity: 0.7;

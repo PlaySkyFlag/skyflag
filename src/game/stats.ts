@@ -219,11 +219,15 @@ export type StatsSummary = {
   recent: GameRecord[];
 };
 
+// Key strings are kept stable (they map 1:1 to an engine slot and are
+// persisted/synced); only the human-readable labels follow the faction
+// remap. '*-ravens' = the p1 slot = White Stags; '*-stags' = p2 = Grey
+// Ravens. Renaming keys would orphan existing stats history.
 const MODE_LABELS: Record<StatsMode, string> = {
-  '1p-ravens': '1P · Ravens',
-  '1p-stags': '1P · Stags',
-  'online-ravens': 'Online · Ravens',
-  'online-stags': 'Online · Stags',
+  '1p-ravens': '1P · White Stags',
+  '1p-stags': '1P · Grey Ravens',
+  'online-ravens': 'Online · White Stags',
+  'online-stags': 'Online · Grey Ravens',
 };
 
 export function modeLabel(m: StatsMode): string {

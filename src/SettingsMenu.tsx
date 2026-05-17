@@ -101,8 +101,8 @@ export default function SettingsMenu({
               disabled={inMpRoom}
               title={inMpRoom ? 'Online multiplayer — leave the room to change mode' : ''}
             >
-              <option value="p2">1P · Ravens (you)</option>
-              <option value="p1">1P · Stags (you)</option>
+              <option value="p2">1P · White Stags (you)</option>
+              <option value="p1">1P · Grey Ravens (you)</option>
               <option value="none">2P hot-seat</option>
               {inMpRoom && (
                 <option value="mp">Online — vs. opponent</option>

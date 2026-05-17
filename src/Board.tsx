@@ -43,17 +43,19 @@ export type DeployCell = {
   player: Player;
 };
 
-// Hex values mirror the player palette in App.css (:root section):
-//   p1.fill      = --slate-fill      (#0f1830)
-//   p2.fill      = --ivory-fill      (#fff4dc)
-//   p1 deploy    = --slate-accent    (#a8b8d8 / rgba(168,184,216,…))
-//   p2 deploy    = --ivory-fill      (#fff4dc / rgba(255,244,220,…))
+// Faction colours. p1 = White Stags (Player 1, white/ivory), p2 = Grey
+// Ravens (Player 2, dark/slate) — the chess convention (white = first
+// player). Hex values mirror the player palette in App.css (:root):
+//   p1.fill      = --ivory-fill      (#fff4dc)
+//   p2.fill      = --slate-fill      (#0f1830)
+//   p1 deploy    = --ivory-fill      (#fff4dc / rgba(255,244,220,…))
+//   p2 deploy    = --slate-accent    (#a8b8d8 / rgba(168,184,216,…))
 // Keep the two sources in sync if either side changes.
 const MARKER_STYLE: Record<MarkerKind, { fill: string; stroke: string; strokeWidth: number }> = {
   lift:  { fill: '#e8e8e8', stroke: '#1a1a1a', strokeWidth: 0.6 },
   nexus: { fill: '#f5c343', stroke: '#1a1a1a', strokeWidth: 0.8 },
-  p1:    { fill: '#0f1830', stroke: '#e8e8e8', strokeWidth: 0.8 },
-  p2:    { fill: '#fff4dc', stroke: '#1a1a1a', strokeWidth: 0.8 },
+  p1:    { fill: '#fff4dc', stroke: '#1a1a1a', strokeWidth: 0.8 },
+  p2:    { fill: '#0f1830', stroke: '#e8e8e8', strokeWidth: 0.8 },
 };
 
 // Fixed-position starfield for the Space board. Hand-placed so stars sit
@@ -94,8 +96,8 @@ const SPACE_STARS: Array<{ x: number; y: number; r: number; o: number }> = [
 ];
 
 const DEPLOY_STYLE: Record<Player, { stroke: string; fill: string; activeFill: string }> = {
-  p1: { stroke: '#a8b8d8', fill: 'rgba(168,184,216,0.30)', activeFill: 'rgba(168,184,216,0.55)' },
-  p2: { stroke: '#fff4dc', fill: 'rgba(255,244,220,0.30)', activeFill: 'rgba(255,244,220,0.55)' },
+  p1: { stroke: '#fff4dc', fill: 'rgba(255,244,220,0.30)', activeFill: 'rgba(255,244,220,0.55)' },
+  p2: { stroke: '#a8b8d8', fill: 'rgba(168,184,216,0.30)', activeFill: 'rgba(168,184,216,0.55)' },
 };
 
 type CellRef = {
