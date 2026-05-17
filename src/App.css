@@ -1000,27 +1000,46 @@ button.tray-piece:hover {
   opacity: 0.45;
 }
 
-/* Tray piece mirrors the board piece's colour: White Stags (p1) read
-   white, Grey Ravens (p2) read dark — in the tray exactly as on the
-   board. The chip carries the faction colour (the dominant visual,
-   like a token); the glyph uses a contrasting colour only so Captain
-   vs Soldier stays legible. */
-.tray-p1 .tray-piece {
-  background: var(--ivory-fill);
-  color: var(--ivory-dark-text);
-  border: 1px solid var(--ivory-border);
-}
-
+/* Tray piece mirrors the BOARD piece exactly. On the board a piece is
+   a shape whose FILL is the faction colour, with a thin contrasting
+   STROKE rim (Board.tsx FACTION_STYLE):
+     p1 White Stags  fill #fff4dc  stroke #1a1a1a   → reads white
+     p2 Grey Ravens  fill #0f1830  stroke #e8e8e8   → reads dark
+   So the faction colour must live on the GLYPH (its fill + rim), not
+   on the chip. The chip is one faction-neutral "square" for both sides
+   (like the board surface) — that way the tray piece reads the SAME
+   colour as on the board instead of the inverted colour. The previous
+   rule put the faction colour on the chip and the opposite colour on
+   the glyph, which flipped every piece. */
+.tray-p1 .tray-piece,
 .tray-p2 .tray-piece {
-  background: var(--slate-fill);
-  color: #e8e8e8;
-  border: 1px solid var(--slate-border);
+  background: #c9d1de;
+  color: #232834;
+  border: 1px solid rgba(0, 0, 0, 0.28);
 }
 
 .tray-piece-letter {
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.1;
+}
+
+/* The faction colour rides on the glyph itself — fill (color) + rim
+   (-webkit-text-stroke) — using the exact Board.tsx FACTION_STYLE
+   values so a hand piece is the same colour as the same piece on the
+   board. White Stags read white, Grey Ravens read dark, both crisp on
+   the neutral chip via their contrasting rim (just like on a board
+   square). */
+.tray-p1 .tray-piece-letter {
+  color: #fff4dc;
+  -webkit-text-stroke: 0.75px #1a1a1a;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.30);
+}
+
+.tray-p2 .tray-piece-letter {
+  color: #0f1830;
+  -webkit-text-stroke: 0.75px #e8e8e8;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.22);
 }
 
 .tray-piece-name {
