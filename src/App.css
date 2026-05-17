@@ -827,11 +827,11 @@
 
 .tray-label {
   margin: 0;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: 0.92;
   display: inline-flex;
   align-items: baseline;
   gap: 10px;
@@ -1048,14 +1048,16 @@ button.tray-piece:hover {
 }
 
 .tray-piece-name {
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  opacity: 0.85;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #232834;
+  opacity: 1;
 }
 
 .tray-empty {
   font-size: 0.85rem;
-  opacity: 0.5;
+  opacity: 0.65;
   font-style: italic;
 }
 
