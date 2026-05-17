@@ -37,9 +37,11 @@ import {
   chooseAction,
   setSearchOptions,
   setEvalParams,
+  setEvaluator,
   type SearchOptions,
   type EvalParams,
 } from '../src/game/ai';
+import { makeNetEvaluator, type NetWeights } from '../src/game/nnue/net';
 import { createInitialGameState } from '../src/game/constants';
 import { reduce, type Action } from '../src/game/reducer';
 import type { Player } from '../src/game/types';
@@ -76,7 +78,41 @@ type Args = {
   evalParamsB: Partial<EvalParams> | null;
   evalParamsAPath: string | null;
   evalParamsBPath: string | null;
+  // Learned-net evaluator per engine (nnue-train output). Mutually the
+  // same swap mechanism as eval-params: applied per move, null-reset so
+  // it can't leak across the move boundary.
+  netA: NetWeights | null;
+  netB: NetWeights | null;
+  netAPath: string | null;
+  netBPath: string | null;
+  // SPRT (Sequential Probability Ratio Test). When enabled, --games is
+  // a *cap*: the run stops the moment the log-likelihood ratio crosses a
+  // decision boundary, so a clear result costs far fewer games than a
+  // fixed-N run and a null result is bounded with controlled error.
+  // H0: A's Elo advantage ≤ elo0.  H1: A's Elo advantage ≥ elo1.
+  // alpha = P(accept H1 | H0 true), beta = P(accept H0 | H1 true).
+  sprt: boolean;
+  elo0: number;
+  elo1: number;
+  alpha: number;
+  beta: number;
 };
+
+function loadNet(path: string): NetWeights {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(path, 'utf8'));
+  } catch (e) {
+    console.error(`Cannot read net file ${path}: ${(e as Error).message}`);
+    process.exit(1);
+  }
+  const n = parsed as Partial<NetWeights>;
+  if (!n || !n.W1 || !n.W2 || !n.W3 || !n.arch || !n.norm) {
+    console.error(`Net file ${path} is missing weights/arch/norm.`);
+    process.exit(1);
+  }
+  return n as NetWeights;
+}
 
 // Accepts the texel-tune JSON ({tuned:EvalParams,…}) or a bare
 // EvalParams. Loaded at parse time so a bad path fails fast.
@@ -118,6 +154,15 @@ function parseArgs(argv: string[]): Args {
     evalParamsB: null,
     evalParamsAPath: null,
     evalParamsBPath: null,
+    netA: null,
+    netB: null,
+    netAPath: null,
+    netBPath: null,
+    sprt: false,
+    elo0: 0,
+    elo1: 10,
+    alpha: 0.05,
+    beta: 0.05,
   };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
@@ -143,6 +188,18 @@ function parseArgs(argv: string[]): Args {
       case '--eval-params':
         args.evalParamsAPath = args.evalParamsBPath = v;
         args.evalParamsA = args.evalParamsB = loadEvalParams(v); i++; break;
+      case '--net-a':
+        args.netAPath = v; args.netA = loadNet(v); i++; break;
+      case '--net-b':
+        args.netBPath = v; args.netB = loadNet(v); i++; break;
+      case '--net':
+        args.netAPath = args.netBPath = v;
+        args.netA = args.netB = loadNet(v); i++; break;
+      case '--sprt':  args.sprt  = true; break;
+      case '--elo0':  args.elo0  = parseFloat(v); i++; break;
+      case '--elo1':  args.elo1  = parseFloat(v); i++; break;
+      case '--alpha': args.alpha = parseFloat(v); i++; break;
+      case '--beta':  args.beta  = parseFloat(v); i++; break;
       // Per-engine feature toggles. --no-X-a forces X off for A;
       // --X-a forces X on for A; same for B; bare --X / --no-X applies
       // to both. Forcing ON is useful now that null-move is OFF by
@@ -185,7 +242,11 @@ function parseArgs(argv: string[]): Args {
           '         [--record-append]          append instead of truncating the file\n' +
           '         [--eval-params-a FILE]     load tuned EvalParams for engine A\n' +
           '         [--eval-params-b FILE]     load tuned EvalParams for engine B\n' +
-          '         [--eval-params FILE]       same file for both engines',
+          '         [--eval-params FILE]       same file for both engines\n' +
+          '         [--net-a|--net-b|--net FILE]  learned-net evaluator (nnue-train)\n' +
+          '         [--sprt]                   stop early on a decision; --games = cap\n' +
+          '         [--elo0 N] [--elo1 N]      SPRT hypotheses (default 0 / 10)\n' +
+          '         [--alpha N] [--beta N]     SPRT error rates (default 0.05 / 0.05)',
         );
         process.exit(0);
     }
@@ -203,6 +264,79 @@ function describeOpts(opts: Partial<SearchOptions>): string {
   if (opts.enableQThreats === true) off.push('+qthreats');
   if (opts.forceBalancedStance) off.push('bal');
   return off.length ? ` -${off.join(',')}` : '';
+}
+
+// ─── Statistics: Elo + SPRT ────────────────────────────────────────────────
+//
+// All from A's perspective. A "score" is wins + 0.5·draws over N games,
+// i.e. the expected points per game in [0,1]. Elo and the SPRT both work
+// off that scalar plus its empirical per-game variance — no draw-model
+// parameter (drawelo) needed, which keeps it robust for a game whose
+// draw rate swings with depth.
+
+/** Expected score for an Elo advantage `e` (logistic, base-10/400). */
+function expectedScore(e: number): number {
+  return 1 / (1 + Math.pow(10, -e / 400));
+}
+
+/** Elo advantage implied by a score in (0,1). Clamped away from ±∞. */
+function scoreToElo(score: number): number {
+  const s = Math.min(1 - 1e-6, Math.max(1e-6, score));
+  return -400 * Math.log10(1 / s - 1);
+}
+
+/** Φ(z): standard-normal CDF via the Abramowitz–Stegun erf (7.1.26). */
+function normalCdf(z: number): number {
+  const t = 1 / (1 + 0.3275911 * Math.abs(z) / Math.SQRT2);
+  const y =
+    1 -
+    (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t -
+      0.284496736) * t +
+      0.254829592) *
+      t *
+      Math.exp(-(z * z) / 2);
+  return z >= 0 ? 0.5 * (1 + y) : 0.5 * (1 - y);
+}
+
+type SprtState = {
+  /** Generalised-SPRT log-likelihood ratio (empirical-variance form). */
+  llr: number;
+  /** Decision boundaries: accept H0 at ≤ lo, accept H1 at ≥ hi. */
+  lo: number;
+  hi: number;
+  decision: 'H1' | 'H0' | 'continue';
+};
+
+/**
+ * Generalised SPRT (Vondele / Van den Bergh empirical-variance form, the
+ * pre-pentanomial fishtest formula). Trinomial W/D/L from A's view; no
+ * paired-game pentanomial reduction (swap-side pairing could tighten the
+ * variance further — a future refinement, not needed for correctness).
+ */
+function computeSprt(
+  w: number, d: number, l: number,
+  elo0: number, elo1: number, alpha: number, beta: number,
+): SprtState {
+  const lo = Math.log(beta / (1 - alpha));
+  const hi = Math.log((1 - beta) / alpha);
+  const n = w + d + l;
+  const s0 = expectedScore(elo0);
+  const s1 = expectedScore(elo1);
+  // Need at least one decisive game for a non-zero variance estimate.
+  if (n === 0 || (w === 0 && l === 0)) {
+    return { llr: 0, lo, hi, decision: 'continue' };
+  }
+  const mean = (w + 0.5 * d) / n;
+  const m2 = (w + 0.25 * d) / n; // E[x²], x ∈ {0,0.5,1}
+  const variance = m2 - mean * mean;
+  if (variance <= 0) return { llr: 0, lo, hi, decision: 'continue' };
+  // LLR = (N / 2σ²)·[(μ−s0)² − (μ−s1)²].
+  const llr =
+    (n / (2 * variance)) *
+    ((mean - s0) * (mean - s0) - (mean - s1) * (mean - s1));
+  const decision: SprtState['decision'] =
+    llr >= hi ? 'H1' : llr <= lo ? 'H0' : 'continue';
+  return { llr, lo, hi, decision };
 }
 
 // ─── Seeded PRNG (splitmix32) ──────────────────────────────────────────────
@@ -321,6 +455,7 @@ type EngineConfig = {
   timeBudgetMs: number | null;
   opts: Partial<SearchOptions>;
   evalParams: Partial<EvalParams> | null;
+  net: NetWeights | null;
 };
 
 type GameResult = {
@@ -361,6 +496,9 @@ function playGame(
     // Per-engine eval weights. null ⇒ reset to shipped defaults, so the
     // other engine's custom params never leak across the move boundary.
     setEvalParams(cfg.evalParams);
+    // Per-engine learned evaluator. null ⇒ hand eval. Set every move so
+    // engine A's net never leaks into engine B's turn.
+    setEvaluator(cfg.net ? makeNetEvaluator(cfg.net) : null);
     const picked = withSeededRandom(prng, () =>
       chooseAction(state, cfg.depth, cfg.timeBudgetMs ?? undefined),
     );
@@ -422,23 +560,30 @@ type Summary = {
   avgActions: number;
   byReason: Record<string, number>;
   byAside: { p1: { a: number; b: number; d: number }; p2: { a: number; b: number; d: number } };
+  // Final SPRT state (null when --sprt not given). sprtStopped = the run
+  // ended early because a boundary was crossed before the games cap.
+  sprt: SprtState | null;
+  sprtStopped: boolean;
 };
 
 function runSelfplay(args: Args): Summary {
   const epTag = (p: string | null) => (p ? `,ep=${basename(p)}` : '');
+  const netTag = (p: string | null) => (p ? `,net=${basename(p)}` : '');
   const engineA: EngineConfig = {
-    name: `A(d=${args.depthA}${args.timeAMs ? `,t=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}${epTag(args.evalParamsAPath)})`,
+    name: `A(d=${args.depthA}${args.timeAMs ? `,t=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}${epTag(args.evalParamsAPath)}${netTag(args.netAPath)})`,
     depth: args.depthA,
     timeBudgetMs: args.timeAMs,
     opts: args.optsA,
     evalParams: args.evalParamsA,
+    net: args.netA,
   };
   const engineB: EngineConfig = {
-    name: `B(d=${args.depthB}${args.timeBMs ? `,t=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}${epTag(args.evalParamsBPath)})`,
+    name: `B(d=${args.depthB}${args.timeBMs ? `,t=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}${epTag(args.evalParamsBPath)}${netTag(args.netBPath)})`,
     depth: args.depthB,
     timeBudgetMs: args.timeBMs,
     opts: args.optsB,
     evalParams: args.evalParamsB,
+    net: args.netB,
   };
 
   const summary: Summary = {
@@ -456,6 +601,8 @@ function runSelfplay(args: Args): Summary {
       p1: { a: 0, b: 0, d: 0 },
       p2: { a: 0, b: 0, d: 0 },
     },
+    sprt: null,
+    sprtStopped: false,
   };
 
   const recorder = args.recordPath
@@ -489,13 +636,36 @@ function runSelfplay(args: Args): Summary {
     totalActions += res.actions;
     summary.games++;
 
+    if (args.sprt) {
+      summary.sprt = computeSprt(
+        summary.aWins, summary.draws, summary.bWins,
+        args.elo0, args.elo1, args.alpha, args.beta,
+      );
+    }
+
     if (!args.quiet) {
       const winner = res.winner === 'draw' ? '— ' : res.winner;
+      const sprtTag = summary.sprt
+        ? ` LLR=${summary.sprt.llr.toFixed(2)} ` +
+          `[${summary.sprt.lo.toFixed(2)},${summary.sprt.hi.toFixed(2)}]`
+        : '';
       process.stdout.write(
         `[${String(i + 1).padStart(3)}/${args.games}] A=${aSide.toUpperCase()} ` +
         `winner=${winner} reason=${res.reason.padEnd(15)} turns=${String(res.turns).padStart(3)} ` +
-        `${(res.durationMs / 1000).toFixed(1)}s\n`,
+        `${(res.durationMs / 1000).toFixed(1)}s${sprtTag}\n`,
       );
+    }
+
+    if (args.sprt && summary.sprt && summary.sprt.decision !== 'continue') {
+      summary.sprtStopped = true;
+      process.stdout.write(
+        `\nSPRT decided after ${summary.games} games: ` +
+        `accept ${summary.sprt.decision} ` +
+        `(${summary.sprt.decision === 'H1'
+          ? `A is stronger by ≥ ${args.elo1} Elo`
+          : `A is NOT stronger than ${args.elo0} Elo`}).\n`,
+      );
+      break;
     }
   }
 
@@ -523,8 +693,9 @@ function pct(x: number): string {
 
 function printSummary(args: Args, s: Summary): void {
   const epDesc = (p: string | null) => (p ? `, eval-params=${p}` : '');
-  const engineA = `A: depth=${args.depthA}${args.timeAMs ? `, time=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}${epDesc(args.evalParamsAPath)}`;
-  const engineB = `B: depth=${args.depthB}${args.timeBMs ? `, time=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}${epDesc(args.evalParamsBPath)}`;
+  const netDesc = (p: string | null) => (p ? `, net=${p}` : '');
+  const engineA = `A: depth=${args.depthA}${args.timeAMs ? `, time=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}${epDesc(args.evalParamsAPath)}${netDesc(args.netAPath)}`;
+  const engineB = `B: depth=${args.depthB}${args.timeBMs ? `, time=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}${epDesc(args.evalParamsBPath)}${netDesc(args.netBPath)}`;
   console.log('');
   console.log('═══════════════════════════════════════════════════════════');
   console.log(' Skyflag self-play summary');
@@ -550,6 +721,47 @@ function printSummary(args: Args, s: Summary): void {
   console.log(' By A-side (sanity-check no side-bias):');
   console.log(`   A as P1: ${s.byAside.p1.a}-${s.byAside.p1.b}-${s.byAside.p1.d} (A-B-D)`);
   console.log(`   A as P2: ${s.byAside.p2.a}-${s.byAside.p2.b}-${s.byAside.p2.d} (A-B-D)`);
+  console.log('───────────────────────────────────────────────────────────');
+
+  // Elo anchor + likelihood-of-superiority. Lets any A/B be read on an
+  // absolute scale and states the confidence instead of eyeballing a %.
+  const n = s.games;
+  const mean = (s.aWins + 0.5 * s.draws) / n;
+  const m2 = (s.aWins + 0.25 * s.draws) / n;
+  const variance = Math.max(0, m2 - mean * mean);
+  const se = Math.sqrt(variance / n);
+  const elo = scoreToElo(mean);
+  const eloLo = scoreToElo(mean - 1.96 * se);
+  const eloHi = scoreToElo(mean + 1.96 * se);
+  const los = se > 0 ? normalCdf((mean - 0.5) / se) : 0.5;
+  console.log(' Strength (A relative to B):');
+  console.log(
+    `   Elo:  ${elo >= 0 ? '+' : ''}${elo.toFixed(1)}  ` +
+    `(95% CI ${eloLo >= 0 ? '+' : ''}${eloLo.toFixed(1)} … ` +
+    `${eloHi >= 0 ? '+' : ''}${eloHi.toFixed(1)})`,
+  );
+  console.log(`   LOS:  ${(los * 100).toFixed(1)}%  (P that A is the stronger engine)`);
+
+  if (s.sprt) {
+    const verdict =
+      s.sprt.decision === 'H1'
+        ? `ACCEPT H1 — A stronger by ≥ ${args.elo1} Elo`
+        : s.sprt.decision === 'H0'
+          ? `ACCEPT H0 — A not stronger than ${args.elo0} Elo`
+          : 'INCONCLUSIVE — boundary not reached within the games cap';
+    console.log('───────────────────────────────────────────────────────────');
+    console.log(' SPRT:');
+    console.log(
+      `   H0 ≤ ${args.elo0} Elo  vs  H1 ≥ ${args.elo1} Elo   ` +
+      `(α=${args.alpha}, β=${args.beta})`,
+    );
+    console.log(
+      `   LLR ${s.sprt.llr.toFixed(2)}  ` +
+      `bounds [${s.sprt.lo.toFixed(2)}, ${s.sprt.hi.toFixed(2)}]` +
+      `${s.sprtStopped ? '  (stopped early)' : ''}`,
+    );
+    console.log(`   ${verdict}`);
+  }
   console.log('═══════════════════════════════════════════════════════════');
 }
 
