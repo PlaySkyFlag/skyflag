@@ -1361,7 +1361,16 @@ export default function App() {
           </button>
           <SettingsMenu
             aiPlayer={aiPlayer}
-            onSetMode={setAiPlayer}
+            onSetMode={(mode) => {
+              // Turning the AI on (from 2P / off) defaults the
+              // opponent to Expert — the intended strength when
+              // someone opts into playing the AI. Switching which
+              // side you play (p1<->p2) leaves difficulty alone.
+              if (mode !== null && aiPlayer === null) {
+                setDifficulty('expert');
+              }
+              setAiPlayer(mode);
+            }}
             difficulty={difficulty}
             onSetDifficulty={setDifficulty}
             themeId={themeId}
