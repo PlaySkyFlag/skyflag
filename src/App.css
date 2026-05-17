@@ -1038,8 +1038,13 @@ button.tray-piece:hover {
 
 .tray-p2 .tray-piece-letter {
   color: #0f1830;
-  -webkit-text-stroke: 0.75px #e8e8e8;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.22);
+  /* Dark glyph on the light chip is already well separated by contrast,
+     so — unlike the board, where the light rim lifts the piece off a
+     darker board — a light rim here only bleeds the fill into the chip
+     and washes it out. Use a same-tone rim (adds weight to match p1's
+     stroked glyph) and a soft dark shadow for depth. */
+  -webkit-text-stroke: 0.6px #0f1830;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.22);
 }
 
 .tray-piece-name {
