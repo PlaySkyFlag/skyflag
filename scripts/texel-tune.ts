@@ -101,6 +101,11 @@ type Args = {
   lr: number;
   l2: number;
   limit: number;
+  // 'outcome' (default) = logistic fit to the self-play game result
+  // `r` (the label that proved near-noise). 'deep' = least-squares
+  // regression of the eval toward the deep-search teacher score `ds`
+  // written by label-deep — a far stronger target.
+  target: 'outcome' | 'deep';
 };
 
 function parseArgs(argv: string[]): Args {
@@ -113,6 +118,7 @@ function parseArgs(argv: string[]): Args {
     lr: 0.05,
     l2: 1e-4,
     limit: Infinity,
+    target: 'outcome',
   };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
@@ -126,8 +132,14 @@ function parseArgs(argv: string[]): Args {
       case '--lr':     a.lr = parseFloat(v); i++; break;
       case '--l2':     a.l2 = parseFloat(v); i++; break;
       case '--limit':  a.limit = parseInt(v, 10); i++; break;
+      case '--target':
+        if (v !== 'outcome' && v !== 'deep') {
+          console.error("--target must be 'outcome' or 'deep'");
+          process.exit(1);
+        }
+        a.target = v; i++; break;
       case '--help': case '-h':
-        console.log('texel --data FILE [--params a,b,...] [--out FILE] [--passes N] [--iters N] [--lr F] [--l2 F] [--limit N]');
+        console.log('texel --data FILE [--params a,b,...] [--out FILE] [--passes N] [--iters N] [--lr F] [--l2 F] [--limit N] [--target outcome|deep]');
         process.exit(0);
     }
   }
@@ -148,7 +160,13 @@ function parseArgs(argv: string[]): Args {
 
 type Rows = { y: Float64Array; base: Float64Array; F: Float64Array[]; n: number };
 
-async function extract(file: string, keys: string[], p0: EvalParams, limit: number): Promise<Rows> {
+async function extract(
+  file: string,
+  keys: string[],
+  p0: EvalParams,
+  limit: number,
+  target: 'outcome' | 'deep',
+): Promise<Rows> {
   // Per-key finite step. eval is affine in each param, so the slope is
   // exact for any step; pick one comfortably clear of zero.
   const step = keys.map((key) => {
@@ -180,11 +198,17 @@ async function extract(file: string, keys: string[], p0: EvalParams, limit: numb
     }
     if (ys.length >= limit) break;
 
-    let row: { r: number; state: GameState };
+    let row: { r: number; ds?: number; state: GameState };
     try { row = JSON.parse(line); } catch { continue; }
     const st = row.state;
     // Only quiet, undecided positions teach the eval anything.
     if (!st || st.status?.kind !== 'in-progress') continue;
+
+    // Pick the regression target. 'deep' needs a finite `ds` from
+    // label-deep; rows without one are skipped (e.g. an un-relabelled
+    // file fed with --target deep yields n=0, a clear error signal).
+    const yVal = target === 'deep' ? row.ds : row.r;
+    if (yVal === undefined || !Number.isFinite(yVal)) continue;
 
     setEvalParams(p0);
     const base = evaluate(st, 'p1');
@@ -201,7 +225,7 @@ async function extract(file: string, keys: string[], p0: EvalParams, limit: numb
     setEvalParams(p0);
     if (!ok) continue;
 
-    ys.push(row.r);
+    ys.push(yVal);
     bases.push(base);
     for (let j = 0; j < keys.length; j++) cols[j].push(f[j]);
   }
@@ -314,6 +338,102 @@ function fit(rows: Rows, keys: string[], p0: EvalParams, iters: number, lr: numb
   return { tuned, K, deltas, lossBefore, lossAfter };
 }
 
+// ─── Deep-target least-squares fit ──────────────────────────────────────────
+// The eval is affine in each param, so around p0 the linear model is
+//   eval ≈ base + Σ_j F_j · Δp_j .
+// We want eval to imitate the deep-search teacher score `ds`, i.e.
+// minimise Σ_i ( base_i + Σ_j F_ji·Δp_j − ds_i )². That is ordinary
+// linear least squares on the residual t_i = ds_i − base_i — no
+// logistic, no K, Δp already in engine units.
+
+function solveLinear(A: number[][], b: number[]): number[] {
+  const m = b.length;
+  // Augment and Gaussian-eliminate with partial pivoting.
+  const M = A.map((row, i) => [...row, b[i]]);
+  for (let c = 0; c < m; c++) {
+    let piv = c;
+    for (let r = c + 1; r < m; r++) {
+      if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
+    }
+    [M[c], M[piv]] = [M[piv], M[c]];
+    const d = M[c][c] || 1e-12;
+    for (let r = 0; r < m; r++) {
+      if (r === c) continue;
+      const f = M[r][c] / d;
+      for (let k = c; k <= m; k++) M[r][k] -= f * M[c][k];
+    }
+  }
+  return M.map((row, i) => row[m] / (M[i][i] || 1e-12));
+}
+
+function fitDeep(
+  rows: Rows,
+  keys: string[],
+  p0: EvalParams,
+): {
+  tuned: EvalParams;
+  deltas: Record<string, { from: number; to: number }>;
+  rmseBefore: number;
+  rmseAfter: number;
+  r2: number;
+} {
+  const { y, base, F, n } = rows;
+  const m = keys.length;
+
+  // Normal equations  (FᵀF + λI) Δp = Fᵀ t,  t = ds − base.
+  const A: number[][] = Array.from({ length: m }, () => new Array(m).fill(0));
+  const bvec = new Array(m).fill(0);
+  for (let i = 0; i < n; i++) {
+    const t = y[i] - base[i];
+    for (let j = 0; j < m; j++) {
+      const fj = F[j][i];
+      bvec[j] += fj * t;
+      for (let k = j; k < m; k++) A[j][k] += fj * F[k][i];
+    }
+  }
+  for (let j = 0; j < m; j++) for (let k = 0; k < j; k++) A[j][k] = A[k][j];
+  // Tikhonov ridge scaled to the problem so near-collinear params
+  // (the material×threatFrac coupling) don't blow up.
+  let diagMean = 0;
+  for (let j = 0; j < m; j++) diagMean += A[j][j];
+  diagMean = diagMean / m || 1;
+  for (let j = 0; j < m; j++) A[j][j] += 1e-3 * diagMean;
+
+  const dp = solveLinear(A, bvec);
+
+  let ssBefore = 0;
+  let ssAfter = 0;
+  let sumY = 0;
+  for (let i = 0; i < n; i++) sumY += y[i];
+  const meanY = sumY / n;
+  let ssTot = 0;
+  for (let i = 0; i < n; i++) {
+    const before = base[i];
+    let after = base[i];
+    for (let j = 0; j < m; j++) after += F[j][i] * dp[j];
+    ssBefore += (before - y[i]) ** 2;
+    ssAfter += (after - y[i]) ** 2;
+    ssTot += (y[i] - meanY) ** 2;
+  }
+
+  const tuned: EvalParams = { ...p0, material: { ...p0.material } };
+  const deltas: Record<string, { from: number; to: number }> = {};
+  for (let j = 0; j < m; j++) {
+    const from = getParam(p0, keys[j]);
+    const to = from + dp[j];
+    Object.assign(tuned, withParam(tuned, keys[j], to));
+    deltas[keys[j]] = { from, to };
+  }
+
+  return {
+    tuned,
+    deltas,
+    rmseBefore: Math.sqrt(ssBefore / n),
+    rmseAfter: Math.sqrt(ssAfter / n),
+    r2: ssTot > 0 ? 1 - ssAfter / ssTot : 0,
+  };
+}
+
 // ─── Main ──────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -321,29 +441,54 @@ async function main(): Promise<void> {
   const keys = args.params;
   console.log(`Tuning ${keys.length} params over ${args.passes} pass(es): ${keys.join(', ')}`);
 
+  console.log(`Target: ${args.target}`);
+
   let p0: EvalParams = { ...DEFAULT_EVAL_PARAMS, material: { ...DEFAULT_EVAL_PARAMS.material } };
   let lossStart = NaN;
   let lossEnd = NaN;
   let K = NaN;
+  let rmseStart = NaN;
+  let rmseEnd = NaN;
+  let r2 = NaN;
   let deltas: Record<string, { from: number; to: number }> = {};
 
   for (let pass = 0; pass < args.passes; pass++) {
     process.stdout.write(`\nPass ${pass + 1}/${args.passes}: extracting…\n`);
-    const rows = await extract(args.data, keys, p0, args.limit);
-    if (rows.n === 0) { console.error('No usable positions extracted.'); process.exit(1); }
+    const rows = await extract(args.data, keys, p0, args.limit, args.target);
+    if (rows.n === 0) {
+      console.error(
+        args.target === 'deep'
+          ? "No usable positions: --target deep needs a label-deep'd file (ds field)."
+          : 'No usable positions extracted.',
+      );
+      process.exit(1);
+    }
     process.stdout.write(`  ${rows.n.toLocaleString()} positions, fitting…\n`);
 
-    const r = fit(rows, keys, p0, args.iters, args.lr, args.l2);
-    // lossBefore = current eval recalibrated; lossAfter = reweighted.
-    if (pass === 0) lossStart = r.lossBefore;
-    lossEnd = r.lossAfter;
-    K = r.K;
-    deltas = r.deltas;
-    p0 = r.tuned;
-    process.stdout.write(
-      `  recalibrated ${r.lossBefore.toFixed(5)} → reweighted ${r.lossAfter.toFixed(5)}` +
-      `  (K=${r.K.toFixed(5)})\n`,
-    );
+    if (args.target === 'deep') {
+      const r = fitDeep(rows, keys, p0);
+      if (pass === 0) rmseStart = r.rmseBefore;
+      rmseEnd = r.rmseAfter;
+      r2 = r.r2;
+      deltas = r.deltas;
+      p0 = r.tuned;
+      process.stdout.write(
+        `  RMSE ${r.rmseBefore.toFixed(1)} → ${r.rmseAfter.toFixed(1)}` +
+        `  (R²=${r.r2.toFixed(4)})\n`,
+      );
+    } else {
+      const r = fit(rows, keys, p0, args.iters, args.lr, args.l2);
+      // lossBefore = current eval recalibrated; lossAfter = reweighted.
+      if (pass === 0) lossStart = r.lossBefore;
+      lossEnd = r.lossAfter;
+      K = r.K;
+      deltas = r.deltas;
+      p0 = r.tuned;
+      process.stdout.write(
+        `  recalibrated ${r.lossBefore.toFixed(5)} → reweighted ${r.lossAfter.toFixed(5)}` +
+        `  (K=${r.K.toFixed(5)})\n`,
+      );
+    }
   }
 
   console.log('\n── Tuned params (old → new) ──────────────────────────');
@@ -352,27 +497,44 @@ async function main(): Promise<void> {
     console.log(`  ${k.padEnd(20)} ${d.from.toFixed(3).padStart(10)} → ${d.to.toFixed(3)}`);
   }
   console.log('──────────────────────────────────────────────────────');
-  console.log(` logloss ${lossStart.toFixed(5)} → ${lossEnd.toFixed(5)}  (lower = better fit)`);
 
-  // K is the coefficient on the current eval (`base`); it must be
-  // clearly positive (better eval ⇒ higher P1-win probability). K ≤ 0
-  // or absurd Δs mean the fit is degenerate — almost always too few or
-  // too-correlated positions (e.g. a handful of shallow games). The
-  // tuned numbers are then meaningless; don't trust or ship them.
-  const degenerate = !(K > 1e-6);
-  if (degenerate) {
-    console.log('');
-    console.log(' ⚠️  DEGENERATE FIT (K ≤ 0). The dataset is too small or too');
-    console.log('     correlated — tuned params are NOT usable. Generate a');
-    console.log('     large, decorrelated set first, e.g.:');
-    console.log('     npm run selfplay:shards -- --games 40000 --bal \\');
-    console.log('       --depth-a 4 --depth-b 4 --record-min-turn 4 \\');
-    console.log('       --record-stride 6 --out data/selfplay.jsonl');
+  let degenerate: boolean;
+  if (args.target === 'deep') {
+    console.log(
+      ` RMSE ${rmseStart.toFixed(1)} → ${rmseEnd.toFixed(1)}` +
+      `   R²=${r2.toFixed(4)}  (eval vs deep-search target)`,
+    );
+    // A usable deep fit must actually reduce error and explain a
+    // non-trivial slice of the variance. If not, the eval's feature
+    // basis just can't represent the deep signal — don't ship it.
+    degenerate = !(Number.isFinite(r2) && r2 > 0.02 && rmseEnd < rmseStart);
+    if (degenerate) {
+      console.log('');
+      console.log(' ⚠️  WEAK FIT. The eval features barely track the deep');
+      console.log('     target (R²≈0) — tuned params are NOT usable. Either');
+      console.log('     the dataset is too small or the eval basis lacks the');
+      console.log('     terms the deep search is rewarding (→ PST redesign).');
+    }
+  } else {
+    console.log(` logloss ${lossStart.toFixed(5)} → ${lossEnd.toFixed(5)}  (lower = better fit)`);
+    // K is the coefficient on the current eval (`base`); it must be
+    // clearly positive. K ≤ 0 or absurd Δs ⇒ degenerate fit (too few /
+    // too-correlated positions). The tuned numbers are then meaningless.
+    degenerate = !(K > 1e-6);
+    if (degenerate) {
+      console.log('');
+      console.log(' ⚠️  DEGENERATE FIT (K ≤ 0). The dataset is too small or too');
+      console.log('     correlated — tuned params are NOT usable. Generate a');
+      console.log('     large, decorrelated set first, e.g.:');
+      console.log('     npm run selfplay:shards -- --games 40000 --bal \\');
+      console.log('       --depth-a 4 --depth-b 4 --record-min-turn 4 \\');
+      console.log('       --record-stride 6 --out data/selfplay.jsonl');
+    }
   }
   console.log('');
-  console.log(' NOTE: lower loss ≠ stronger play. Validate head-to-head:');
-  console.log('   (next step) wire setEvalParams into selfplay, then');
-  console.log('   npm run selfplay -- --games 400 --bal  (tuned A vs default B)');
+  console.log(' NOTE: better fit ≠ stronger play. Validate head-to-head AT d6:');
+  console.log('   npm run selfplay -- --games 150 --bal --depth-a 6 --depth-b 6 \\');
+  console.log(`     --eval-params-a ${args.out}`);
 
   mkdirSync(dirname(args.out), { recursive: true });
   writeFileSync(
@@ -383,10 +545,14 @@ async function main(): Promise<void> {
         dataset: args.data,
         params: keys,
         passes: args.passes,
+        target: args.target,
         K,
         degenerate,
         loglossBefore: lossStart,
         loglossAfter: lossEnd,
+        rmseBefore: rmseStart,
+        rmseAfter: rmseEnd,
+        r2,
         tuned: p0,
       },
       null,

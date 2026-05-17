@@ -153,6 +153,9 @@ function parseArgs(argv: string[]): Args {
       case '--null-a':    args.optsA.enableNullMove = true; break;
       case '--null-b':    args.optsB.enableNullMove = true; break;
       case '--null':      args.optsA.enableNullMove = args.optsB.enableNullMove = true; break;
+      case '--qthreats-a': args.optsA.enableQThreats = true; break;
+      case '--qthreats-b': args.optsB.enableQThreats = true; break;
+      case '--qthreats':   args.optsA.enableQThreats = args.optsB.enableQThreats = true; break;
       case '--no-lmr-a':  args.optsA.enableLMR = false; break;
       case '--no-lmr-b':  args.optsB.enableLMR = false; break;
       case '--no-lmr':    args.optsA.enableLMR = args.optsB.enableLMR = false; break;
@@ -174,6 +177,8 @@ function parseArgs(argv: string[]): Args {
           '         [--no-lmr |--no-lmr-a |--no-lmr-b ]   disable late-move reduction\n' +
           '         [--no-tt  |--no-tt-a  |--no-tt-b  ]   disable transposition table\n' +
           '         [--no-qs  |--no-qs-a  |--no-qs-b  ]   disable quiescence search\n' +
+          '         [--null|--null-a|--null-b]            enable (verified) null-move\n' +
+          '         [--qthreats|-a|-b]                    enable qsearch check-evasions\n' +
           '         [--record FILE]            write JSONL training set (Texel tuning)\n' +
           '         [--record-stride N]        keep every Nth eligible position (default 1)\n' +
           '         [--record-min-turn N]      skip plies before turn N (default 1)\n' +
@@ -194,6 +199,8 @@ function describeOpts(opts: Partial<SearchOptions>): string {
   if (opts.enableLMR === false) off.push('LMR');
   if (opts.enableTT === false) off.push('TT');
   if (opts.enableQuiescence === false) off.push('qs');
+  if (opts.enableNullMove === true) off.push('+null');
+  if (opts.enableQThreats === true) off.push('+qthreats');
   if (opts.forceBalancedStance) off.push('bal');
   return off.length ? ` -${off.join(',')}` : '';
 }

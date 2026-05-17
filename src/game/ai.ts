@@ -30,6 +30,13 @@ export type SearchOptions = {
   enableLMR: boolean;
   enableTT: boolean;
   enableQuiescence: boolean;
+  // Quiescence threat-extension: when the side to move's Captain is
+  // attacked ("in check"), search ALL evasions instead of standing pat
+  // on capture-only qsearch. This is the chess check-evasion rule and
+  // the documented fix for "non-capture threats are invisible to
+  // qsearch" — also the precondition that makes null-move safe. Default
+  // off until a d6 A/B proves it; flip in DEFAULT_SEARCH_OPTIONS then.
+  enableQThreats: boolean;
   // When true, skip the strategic-stance random picker and force
   // 'balanced'. Removes the stance multiplier as a confound during
   // benchmark A/B testing.
@@ -53,6 +60,9 @@ const DEFAULT_SEARCH_OPTIONS: SearchOptions = {
   enableLMR: true,
   enableTT: true,
   enableQuiescence: true,
+  // Off until the d6 A/B confirms it (then it can be enabled together
+  // with verified null-move). Shipped strength unchanged meanwhile.
+  enableQThreats: false,
   forceBalancedStance: false,
 };
 
@@ -812,27 +822,44 @@ function quiescence(
     return evaluate(state, aiPlayer);
   }
 
-  const standPat = evaluate(state, aiPlayer);
   const isMax = state.currentPlayer === aiPlayer;
+  // "In check": the side to move's Captain is attacked. Standing pat is
+  // unsound here — the Captain can be lost next ply — so we must search
+  // every evasion (the chess qsearch check-evasion rule), including
+  // non-capture defences that capture-only qsearch would never see.
+  // Gated so the shipped engine is byte-identical until the d6 A/B.
+  const inCheck =
+    activeSearchOptions.enableQThreats &&
+    captainThreatened(state, state.currentPlayer);
 
-  if (isMax) {
-    if (standPat >= beta) return beta;
-    if (standPat > alpha) alpha = standPat;
-  } else {
-    if (standPat <= alpha) return alpha;
-    if (standPat < beta) beta = standPat;
+  const standPat = evaluate(state, aiPlayer);
+
+  if (!inCheck) {
+    if (isMax) {
+      if (standPat >= beta) return beta;
+      if (standPat > alpha) alpha = standPat;
+    } else {
+      if (standPat <= alpha) return alpha;
+      if (standPat < beta) beta = standPat;
+    }
   }
 
-  const captures = legalActions(state).filter((a) => isCapture(state, a));
-  if (captures.length === 0) return standPat;
+  const all = legalActions(state);
+  const moves = inCheck ? all : all.filter((a) => isCapture(state, a));
+  if (moves.length === 0) {
+    // No evasion (in check, forced loss reflected by evaluate) / no
+    // capture to extend on (quiet position — stand-pat is the value).
+    return inCheck ? evaluate(state, aiPlayer) : standPat;
+  }
 
   // Quiescence orders by capture-victim value only — killer/history slots
-  // don't apply here (qsearch only follows captures, never quiet moves).
-  // Pass ply=0 as a no-op since killer/history won't match captures anyway.
-  const ordered = orderActions(state, captures, 0);
+  // don't apply here. Pass ply=0 as a no-op.
+  const ordered = orderActions(state, moves, 0);
 
+  // In check we cannot floor at standPat (passing isn't an option); start
+  // from the worst value and let the evasions establish the real score.
   if (isMax) {
-    let value = standPat;
+    let value = inCheck ? -Infinity : standPat;
     for (const action of ordered) {
       const next = reduce(state, action);
       value = Math.max(value, quiescence(next, alpha, beta, aiPlayer, depth - 1, budget));
@@ -842,7 +869,7 @@ function quiescence(
     return value;
   }
 
-  let value = standPat;
+  let value = inCheck ? Infinity : standPat;
   for (const action of ordered) {
     const next = reduce(state, action);
     value = Math.min(value, quiescence(next, alpha, beta, aiPlayer, depth - 1, budget));
@@ -948,10 +975,31 @@ function minimax(
       aiPlayer,
       false,
     );
-    if (isMax) {
-      if (nullScore >= beta) return beta; // fail-high: even passing beats beta
-    } else {
-      if (nullScore <= alpha) return alpha; // fail-low: even passing is below alpha
+    const nullFailHigh = isMax ? nullScore >= beta : nullScore <= alpha;
+    if (nullFailHigh) {
+      // Verified null-move. The R-reduced null search is cheap but
+      // error-prone — it can drop into shallow qsearch and miss a
+      // non-capture refutation, which is exactly why plain null-move
+      // regressed here. Before trusting the cut, confirm it with a
+      // genuine reduced-depth search of the ACTUAL position (allowNull
+      // = false → no recursive pass). Prune only if that also fails
+      // high; otherwise the null-move was a false alarm and we fall
+      // through to the normal move loop.
+      const verifyScore = minimax(
+        state,
+        depth - R_NULL,
+        ply,
+        alpha,
+        beta,
+        aiPlayer,
+        false,
+      );
+      const verifiedFailHigh = isMax
+        ? verifyScore >= beta
+        : verifyScore <= alpha;
+      if (verifiedFailHigh) {
+        return isMax ? beta : alpha;
+      }
     }
   }
 
@@ -1162,4 +1210,66 @@ export function chooseAction(
   const bestValue = Math.max(...scored.map((s) => s.value));
   const top = scored.filter((s) => s.value === bestValue);
   return top[Math.floor(Math.random() * top.length)].action;
+}
+
+// Deep-search score of `state` from PLAYER 1's perspective, in eval
+// units. This is the "teacher" signal for deep-target eval tuning: a
+// genuine deep search is far less noisy than a shallow self-play game
+// outcome (the label that made the Texel cycle fail). Mirrors
+// chooseAction's iterative-deepening root search but returns the
+// principal-variation value instead of the move, and normalises to a
+// fixed P1 perspective so labels are comparable across positions.
+// Callers should setSearchOptions({ forceBalancedStance: true }) so the
+// target is deterministic (no stance RNG).
+export function searchScore(
+  state: GameState,
+  depth: number,
+  timeBudgetMs?: number,
+): number {
+  if (state.status.kind !== 'in-progress') {
+    return evaluate(state, 'p1');
+  }
+  if (state.history.length > 0) {
+    state = { ...state, history: [] };
+  }
+  killers.length = 0;
+  historyTable.clear();
+  pickStanceIfNewGame(state);
+
+  const actions = legalActions(state);
+  const aiPlayer = state.currentPlayer;
+  if (actions.length === 0) {
+    const stm = evaluate(state, aiPlayer);
+    return aiPlayer === 'p1' ? stm : -stm;
+  }
+
+  let bestValue = -Infinity;
+  let lastBestAction: Action | undefined;
+  const startTime =
+    typeof performance !== 'undefined' ? performance.now() : Date.now();
+
+  for (let d = 1; d <= depth; d++) {
+    const iterStart =
+      typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const ordered = orderActionsWithPriority(state, actions, lastBestAction, 0);
+    let iterBest = -Infinity;
+    let alpha = -Infinity;
+    for (const action of ordered) {
+      const next = reduce(state, action);
+      const value = minimax(next, d - 1, 1, alpha, Infinity, aiPlayer);
+      if (value > iterBest) {
+        iterBest = value;
+        lastBestAction = action;
+      }
+      alpha = Math.max(alpha, value);
+    }
+    bestValue = iterBest;
+    if (timeBudgetMs !== undefined && d >= 2) {
+      const now =
+        typeof performance !== 'undefined' ? performance.now() : Date.now();
+      if (timeBudgetMs - (now - startTime) < (now - iterStart) * 5) break;
+    }
+  }
+  // bestValue is from the side-to-move's perspective — normalise to P1.
+  return aiPlayer === 'p1' ? bestValue : -bestValue;
 }
