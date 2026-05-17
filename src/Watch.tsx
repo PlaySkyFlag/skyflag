@@ -295,7 +295,8 @@ export default function Watch() {
 
       <footer className="app-footer">
         <p>
-          <a href="/play">← Back to the game</a> · <a href="/">Skyflag</a>
+          <a href="/play">← Back to the game</a> · <a href="/">Skyflag</a> ·{' '}
+          <a href="/ai-use">AI use</a>
         </p>
       </footer>
     </main>

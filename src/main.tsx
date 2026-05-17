@@ -56,6 +56,7 @@ const AshtapadaSplash = lazyWithRetry(() => import('./AshtapadaSplash.tsx'))
 const Landing = lazyWithRetry(() => import('./Landing.tsx'))
 const Origins = lazyWithRetry(() => import('./Origins.tsx'))
 const Press = lazyWithRetry(() => import('./Press.tsx'))
+const AiUse = lazyWithRetry(() => import('./AiUse.tsx'))
 const Privacy = lazyWithRetry(() => import('./Privacy.tsx'))
 const Review = lazyWithRetry(() => import('./Review.tsx'))
 const Story = lazyWithRetry(() => import('./Story.tsx'))
@@ -125,6 +126,7 @@ const isWatch = path.startsWith('/watch');
 const isReview = path.startsWith('/review');
 const isOrigins = path.startsWith('/origins');
 const isPress = path.startsWith('/press');
+const isAiUse = path.startsWith('/ai-use');
 const isPrivacy = path.startsWith('/privacy');
 const isTerms = path.startsWith('/terms');
 const isAshtapadaPath = path.startsWith('/ashtapada');
@@ -167,6 +169,7 @@ else if (isApp) rendered = <App />;
 else if (isStory) rendered = <Story />;
 else if (isOrigins) rendered = <Origins />;
 else if (isPress) rendered = <Press />;
+else if (isAiUse) rendered = <AiUse />;
 else if (isPrivacy) rendered = <Privacy />;
 else if (isTerms) rendered = <Terms />;
 else if (isAshtapadaPath) rendered = <AshtapadaSplash />;

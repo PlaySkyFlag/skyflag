@@ -1788,6 +1788,10 @@ export default function App() {
           </a>
           .
         </p>
+        <p className="app-footer-legal">
+          <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> ·{' '}
+          <a href="/ai-use">AI use</a>
+        </p>
       </footer>
     </main>
   );

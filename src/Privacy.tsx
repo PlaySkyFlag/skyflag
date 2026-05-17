@@ -182,7 +182,8 @@ export default function Privacy() {
           </p>
 
           <p className="legal-foot">
-            See also: <a href="/terms">Terms of use</a>.
+            See also: <a href="/terms">Terms of use</a> ·{' '}
+            <a href="/ai-use">AI use</a>.
           </p>
         </article>
       </main>

@@ -663,7 +663,8 @@ function Footer() {
           <a href={ORIGINS_URL}>Origins</a> ·{' '}
           <a href={GAME_URL}>Play digital</a> ·{' '}
           <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
-          <a href="https://playskyflag.com/terms">Terms</a>
+          <a href="https://playskyflag.com/terms">Terms</a> ·{' '}
+          <a href="https://playskyflag.com/ai-use">AI use</a>
         </p>
         <p className="store-footer-meta">
           © {new Date().getFullYear()} Limnology Research Corp.

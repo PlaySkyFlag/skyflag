@@ -3,8 +3,8 @@
 // Goal is NOT comic revenue: it is reader → player → email subscriber →
 // Kickstarter backer. Structure follows the creator's spec exactly:
 // title, subtitle, four buttons, synopsis, cover, page-by-page reader,
-// imprint note, copyright block, transparent AI-use statement, game
-// link, Kickstarter signup.
+// imprint note, copyright block, game link, Kickstarter signup. The
+// AI-use disclosure now lives on /ai-use (footer link), not inline.
 
 import { useEffect, useState, type FormEvent } from 'react';
 import './VolumeZeroLanding.css';
@@ -24,19 +24,10 @@ const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-volume-zero';
 const GLOBALCOMIX_URL =
   'https://globalcomix.com/read/650af4e6-1570-4196-87b3-fa8072e25dfb/1?utm_source=Link&utm_medium=Referral&utm_campaign=thresan&utm_term=GCRID_370744';
 
-// AI-use statement — transcribed verbatim from the creator's official
-// "AI-Assisted Creation Disclosure" on the issue's credits page (the
-// published, ISBN'd source of truth). Keep it identical to the page so
-// the site and the publication never diverge.
-const AI_USE_STATEMENT =
-  'This issue includes AI-generated and AI-assisted artwork and ' +
-  'production assets. Story direction, worldbuilding, continuity, ' +
-  'selection, editing, page sequencing, and publication assembly were ' +
-  'directed by Nelson Jatel, Limnology Research Corp., and Thresan ' +
-  'Studio. AI image-generation and editing tools were used as ' +
-  'production instruments for visual draft generation, illustration ' +
-  'refinement, and cover development. This disclosure is included for ' +
-  'transparency.';
+// The AI-use disclosure is no longer printed inline here — it now
+// lives on the single canonical /ai-use page (src/AiUse.tsx), linked
+// from the footer like Privacy/Terms. The verbatim statement (kept
+// identical to the published comic's credits page) lives there.
 
 export default function VolumeZeroLanding() {
   useEffect(() => {
@@ -134,9 +125,6 @@ export default function VolumeZeroLanding() {
         <KickstarterSignup />
 
         <footer className="vzl-foot">
-          <h2 className="vzl-h2">AI-use statement</h2>
-          <p className="vzl-aiuse">{AI_USE_STATEMENT}</p>
-
           <p className="vzl-colophon">
             {VOLUME_ZERO.author} · {VOLUME_ZERO.publisher} ·{' '}
             {VOLUME_ZERO.imprint}
@@ -151,7 +139,8 @@ export default function VolumeZeroLanding() {
           <p className="vzl-fineprint">
             <a href={GAME_URL}>Play Skyflag</a> ·{' '}
             <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
-            <a href="https://playskyflag.com/terms">Terms</a>
+            <a href="https://playskyflag.com/terms">Terms</a> ·{' '}
+            <a href="https://playskyflag.com/ai-use">AI use</a>
           </p>
         </footer>
       </main>

@@ -70,7 +70,8 @@ export default function ThresanUmbrella() {
         <p className="thresan-fineprint">
           Thresan™ is a project of Limnology Research Corp. ·{' '}
           <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
-          <a href="https://playskyflag.com/terms">Terms</a>
+          <a href="https://playskyflag.com/terms">Terms</a> ·{' '}
+          <a href="https://playskyflag.com/ai-use">AI use</a>
         </p>
       </main>
     </div>

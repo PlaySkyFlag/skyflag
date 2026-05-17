@@ -307,6 +307,13 @@
   flex-wrap: wrap;
 }
 
+.app-footer-legal {
+  margin-top: 12px !important;
+  font-size: 0.82rem;
+  text-align: center;
+  opacity: 0.6;
+}
+
 .app-build-time {
   font-size: 0.75rem;
   opacity: 0.65;

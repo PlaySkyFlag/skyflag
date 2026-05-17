@@ -143,7 +143,8 @@ export default function Terms() {
           </p>
 
           <p className="legal-foot">
-            See also: <a href="/privacy">Privacy policy</a>.
+            See also: <a href="/privacy">Privacy policy</a> ·{' '}
+            <a href="/ai-use">AI use</a>.
           </p>
         </article>
       </main>

@@ -225,11 +225,6 @@ export default function ThresanStudio() {
               built solo on evenings and weekends, with my brothers and
               friends as the first playtesters.
             </p>
-            <p className="studio-prose-note">
-              Chapter 1 carries a full AI-use disclosure on its credits
-              page; it&rsquo;s reproduced on the{' '}
-              <a href={READ_URL}>Chapter 1 page</a>.
-            </p>
           </div>
         </section>
 
@@ -263,7 +258,8 @@ export default function ThresanStudio() {
         <p className="studio-fineprint">
           Thresan™ is a project of Limnology Research Corp. ·{' '}
           <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
-          <a href="https://playskyflag.com/terms">Terms</a>
+          <a href="https://playskyflag.com/terms">Terms</a> ·{' '}
+          <a href="https://playskyflag.com/ai-use">AI use</a>
         </p>
       </main>
     </div>

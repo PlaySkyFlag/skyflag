@@ -226,7 +226,8 @@ function Footer() {
           <a href="https://thresan.store">Edition</a> ·{' '}
           <a href="https://thresan.studio">Studio</a> ·{' '}
           <a href="https://thresan.io">Lab</a> ·{' '}
-          <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
+          <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> ·{' '}
+          <a href="/ai-use">AI use</a>
         </p>
         <p className="origins-footer-meta">
           © {new Date().getFullYear()} Limnology Research Corp.

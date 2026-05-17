@@ -589,6 +589,7 @@ function Footer() {
           <a href="https://thresan.store">Physical edition</a>
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
+          <a href="/ai-use">AI use</a>
         </div>
         <div className="landing-footer-meta">
           © {new Date().getFullYear()} Limnology Research Corp.
