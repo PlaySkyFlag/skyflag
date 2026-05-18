@@ -15,6 +15,7 @@ import {
 } from './game/push';
 import { isMultiplayerAvailable, supabase } from './game/supabase';
 import type { RoomState } from './game/types';
+import { FACTION_NAME } from './game/factions';
 
 export type { RoomState };
 
@@ -678,7 +679,7 @@ export default function Multiplayer({ room, roomMeta = null, forceOpen = false, 
           <>
             <p>
               Room <strong className="mp-code">{room.code}</strong>
-              {' · '}You are <strong>{room.role === 'p1' ? 'Grey Ravens' : 'White Stags'}</strong>
+              {' · '}You are <strong>{FACTION_NAME[room.role]}</strong>
               {' · '}
               {room.status === 'waiting'
                 ? 'Waiting for opponent…'
