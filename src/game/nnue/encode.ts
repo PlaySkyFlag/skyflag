@@ -52,28 +52,65 @@ function boardIndex(
   );
 }
 
-/** Encode a position into a fixed-length P1-perspective feature vector. */
-export function encodeState(state: GameState): Float32Array {
-  const x = new Float32Array(INPUT_DIM);
+/**
+ * Sparse P1-perspective encoding: parallel `index`/`value` arrays of the
+ * non-zero features only (~40 of INPUT_DIM). This is the SINGLE SOURCE OF
+ * TRUTH for the feature layout — `encodeState` densifies this, and the
+ * incremental accumulator (nnue/accumulator.ts) diffs two of these. Keeping
+ * one producer means the dense path, the trainer, and the accumulator can
+ * never silently disagree on the layout.
+ *
+ * Zero-valued features are omitted (a dense vector is implicitly 0 there).
+ * A feature whose VALUE changes (in-hand counts accumulate at 0.25 each;
+ * the activations scalar is 0/0.5/1) appears once with its summed value, so
+ * a map-diff of two sparse encodings yields exact per-feature deltas.
+ */
+export function encodeSparse(state: GameState): { index: number[]; value: number[] } {
+  // Accumulate into a map so repeated in-hand pieces sum into one bucket,
+  // exactly as the dense `+= 0.25` did.
+  const acc = new Map<number, number>();
+  const bump = (i: number, v: number) => acc.set(i, (acc.get(i) ?? 0) + v);
 
   for (const bp of state.onBoard) {
-    x[boardIndex(bp.coord.layer, bp.coord.row, bp.coord.col, bp.piece.owner, bp.piece.kind)] = 1;
+    acc.set(
+      boardIndex(bp.coord.layer, bp.coord.row, bp.coord.col, bp.piece.owner, bp.piece.kind),
+      1,
+    );
   }
 
   for (const owner of ['p1', 'p2'] as Player[]) {
     for (const p of state.inHand[owner]) {
-      // Normalised count (≤ a few of each kind in hand).
-      x[HAND_OFF + ownerIdx(owner) * 4 + kindIdx(p.kind)] += 0.25;
+      bump(HAND_OFF + ownerIdx(owner) * 4 + kindIdx(p.kind), 0.25);
     }
   }
 
   for (const l of LAYERS) {
-    if (state.flags[l].p1) x[FLAG_OFF + layerIdx(l) * 2 + 0] = 1;
-    if (state.flags[l].p2) x[FLAG_OFF + layerIdx(l) * 2 + 1] = 1;
+    if (state.flags[l].p1) acc.set(FLAG_OFF + layerIdx(l) * 2 + 0, 1);
+    if (state.flags[l].p2) acc.set(FLAG_OFF + layerIdx(l) * 2 + 1, 1);
   }
 
-  x[SCALAR_OFF + 0] = state.currentPlayer === 'p1' ? 1 : 0;
-  x[SCALAR_OFF + 1] = (state.activationsRemaining ?? 0) / 2;
+  if (state.currentPlayer === 'p1') acc.set(SCALAR_OFF + 0, 1);
+  const actScalar = (state.activationsRemaining ?? 0) / 2;
+  if (actScalar !== 0) acc.set(SCALAR_OFF + 1, actScalar);
 
+  const index: number[] = [];
+  const value: number[] = [];
+  for (const [i, v] of acc) {
+    index.push(i);
+    value.push(v);
+  }
+  return { index, value };
+}
+
+/**
+ * Encode a position into a fixed-length P1-perspective feature vector.
+ * Byte-identical to the prior hand-written densification (verified by the
+ * parity harness) — it now just densifies `encodeSparse` so there is one
+ * authoritative layout.
+ */
+export function encodeState(state: GameState): Float32Array {
+  const x = new Float32Array(INPUT_DIM);
+  const { index, value } = encodeSparse(state);
+  for (let k = 0; k < index.length; k++) x[index[k]] = value[k];
   return x;
 }

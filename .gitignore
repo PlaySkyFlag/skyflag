@@ -46,3 +46,6 @@ dist-ssr
 *.key
 *.cer
 *.mobileprovision
+
+# Transient AI training scratch (self-play / deep-label / net JSON) — never commit
+data/
