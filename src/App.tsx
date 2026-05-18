@@ -35,6 +35,7 @@ import AiWorker from './game/aiWorker?worker';
 import type { AiWorkerRequest, AiWorkerResponse } from './game/aiWorker';
 import { supabase } from './game/supabase';
 import {
+  ACTIVATIONS_PER_TURN,
   DEPLOY_COORDS,
   FLAG_COORDS,
   LAYER_ORDER,
@@ -52,11 +53,14 @@ import type { Coord, GameState, HistoryEntry, Layer, PieceId, PieceKind, Player,
 import { opponentOf } from './game/types';
 import './App.css';
 
-// Artificial beat before the worker starts, so the UI can paint the
-// human's move and the "thinking…" state first. Applied PER ACTIVATION,
-// and a turn is ACTIVATIONS_PER_TURN (2), so this is paid twice before
-// control returns to the human — keep it short or the AI feels laggy.
+// Artificial beat before the worker starts so the UI can paint the
+// human's move and the "thinking…" state first. Only the FIRST
+// activation of the AI's turn needs the full beat; subsequent
+// activations within the same turn just need a hair to let the prior
+// AI move paint, so they use the shorter follow-up delay. Net: one
+// full beat per AI turn instead of ACTIVATIONS_PER_TURN of them.
 const AI_THINK_DELAY_MS = 250;
+const AI_FOLLOWUP_DELAY_MS = 60;
 
 // Build a BoardTheme record for the currently selected visual theme.
 // Layer kinds are tagged so Board.tsx can dispatch atmosphere by kind
@@ -902,6 +906,12 @@ export default function App() {
     };
     worker.addEventListener('message', handleMessage);
 
+    // Full beat only at the start of the AI's turn; follow-up
+    // activations within the same turn skip most of the delay.
+    const thinkDelay =
+      state.activationsRemaining === ACTIVATIONS_PER_TURN
+        ? AI_THINK_DELAY_MS
+        : AI_FOLLOWUP_DELAY_MS;
     const timer = setTimeout(() => {
       if (cancelled) return;
       const searchDepth =
@@ -932,7 +942,7 @@ export default function App() {
         timeBudgetMs,
       };
       worker.postMessage(req);
-    }, AI_THINK_DELAY_MS);
+    }, thinkDelay);
 
     return () => {
       cancelled = true;
