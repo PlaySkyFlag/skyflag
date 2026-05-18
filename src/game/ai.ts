@@ -72,6 +72,28 @@ export function setSearchOptions(opts: Partial<SearchOptions> = {}): void {
   activeSearchOptions = { ...DEFAULT_SEARCH_OPTIONS, ...opts };
 }
 
+// ─── Pluggable static evaluator ────────────────────────────────────────────
+// The search calls leafEval() for every static (non-recursed) position
+// score. By default that's the hand-crafted evaluate(); a learned net
+// can be hot-swapped in via setEvaluator() the same way setEvalParams /
+// setSearchOptions work (per-engine in the A/B harness, null-reset
+// between moves). When no evaluator is set the call is byte-identical
+// to calling evaluate() directly, so the shipped engine is unchanged
+// until/unless a net is explicitly installed.
+export type Evaluator = (state: GameState, aiPlayer: Player) => number;
+
+let activeEvaluator: Evaluator | null = null;
+
+export function setEvaluator(fn: Evaluator | null = null): void {
+  activeEvaluator = fn;
+}
+
+function leafEval(state: GameState, aiPlayer: Player): number {
+  return activeEvaluator
+    ? activeEvaluator(state, aiPlayer)
+    : evaluate(state, aiPlayer);
+}
+
 // ─── Tunable evaluation parameters ─────────────────────────────────────────
 // Every magic number evaluate() weighs is hoisted here so the offline
 // Texel tuner (scripts/texel-tune.ts) can fit them against self-play
@@ -816,10 +838,10 @@ function quiescence(
 ): number {
   budget.count++;
   if (budget.count > QSEARCH_NODE_CAP) {
-    return evaluate(state, aiPlayer);
+    return leafEval(state, aiPlayer);
   }
   if (depth === 0 || state.status.kind !== 'in-progress') {
-    return evaluate(state, aiPlayer);
+    return leafEval(state, aiPlayer);
   }
 
   const isMax = state.currentPlayer === aiPlayer;
@@ -832,7 +854,7 @@ function quiescence(
     activeSearchOptions.enableQThreats &&
     captainThreatened(state, state.currentPlayer);
 
-  const standPat = evaluate(state, aiPlayer);
+  const standPat = leafEval(state, aiPlayer);
 
   if (!inCheck) {
     if (isMax) {
@@ -849,7 +871,7 @@ function quiescence(
   if (moves.length === 0) {
     // No evasion (in check, forced loss reflected by evaluate) / no
     // capture to extend on (quiet position — stand-pat is the value).
-    return inCheck ? evaluate(state, aiPlayer) : standPat;
+    return inCheck ? leafEval(state, aiPlayer) : standPat;
   }
 
   // Quiescence orders by capture-victim value only — killer/history slots
@@ -919,12 +941,12 @@ function minimax(
   allowNull: boolean = true,
 ): number {
   if (state.status.kind !== 'in-progress') {
-    return evaluate(state, aiPlayer);
+    return leafEval(state, aiPlayer);
   }
   if (depth === 0) {
     return activeSearchOptions.enableQuiescence
       ? quiescence(state, alpha, beta, aiPlayer, QUIESCENCE_DEPTH, { count: 0 })
-      : evaluate(state, aiPlayer);
+      : leafEval(state, aiPlayer);
   }
 
   // Save originals — needed below to know whether the final score is an
