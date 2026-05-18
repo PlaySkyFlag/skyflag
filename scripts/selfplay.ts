@@ -42,6 +42,7 @@ import {
   type EvalParams,
 } from '../src/game/ai';
 import { makeNetEvaluator, type NetWeights } from '../src/game/nnue/net';
+import { setPstTables, type PstTables } from '../src/game/pst';
 import { createInitialGameState } from '../src/game/constants';
 import { reduce, type Action } from '../src/game/reducer';
 import type { Player } from '../src/game/types';
@@ -85,6 +86,13 @@ type Args = {
   netB: NetWeights | null;
   netAPath: string | null;
   netBPath: string | null;
+  // Per-engine PST tables (pst-fit output). Same swap mechanism as
+  // eval-params / net: applied per move, null-reset between moves so an
+  // engine's fitted tables can't leak across the move boundary.
+  pstA: PstTables | null;
+  pstB: PstTables | null;
+  pstAPath: string | null;
+  pstBPath: string | null;
   // SPRT (Sequential Probability Ratio Test). When enabled, --games is
   // a *cap*: the run stops the moment the log-likelihood ratio crosses a
   // decision boundary, so a clear result costs far fewer games than a
@@ -133,6 +141,26 @@ function loadEvalParams(path: string): Partial<EvalParams> {
   return params as Partial<EvalParams>;
 }
 
+// Accepts the pst-fit JSON ({tables:PstTables,…}) or a bare PstTables.
+// Loaded at parse time so a bad path fails fast.
+function loadPstTables(path: string): PstTables {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(path, 'utf8'));
+  } catch (e) {
+    console.error(`Cannot read pst file ${path}: ${(e as Error).message}`);
+    process.exit(1);
+  }
+  const obj = parsed as { tables?: unknown };
+  const tables = (obj && typeof obj === 'object' && obj.tables ? obj.tables : parsed);
+  const t = tables as Partial<PstTables>;
+  if (!t || !t.soldier || !t.captain || !t.rover || !t.pilot) {
+    console.error(`PST file ${path} is missing soldier/captain/rover/pilot tables.`);
+    process.exit(1);
+  }
+  return t as PstTables;
+}
+
 function parseArgs(argv: string[]): Args {
   const args: Args = {
     games: 20,
@@ -158,6 +186,10 @@ function parseArgs(argv: string[]): Args {
     netB: null,
     netAPath: null,
     netBPath: null,
+    pstA: null,
+    pstB: null,
+    pstAPath: null,
+    pstBPath: null,
     sprt: false,
     elo0: 0,
     elo1: 10,
@@ -195,6 +227,13 @@ function parseArgs(argv: string[]): Args {
       case '--net':
         args.netAPath = args.netBPath = v;
         args.netA = args.netB = loadNet(v); i++; break;
+      case '--pst-a':
+        args.pstAPath = v; args.pstA = loadPstTables(v); i++; break;
+      case '--pst-b':
+        args.pstBPath = v; args.pstB = loadPstTables(v); i++; break;
+      case '--pst':
+        args.pstAPath = args.pstBPath = v;
+        args.pstA = args.pstB = loadPstTables(v); i++; break;
       case '--sprt':  args.sprt  = true; break;
       case '--elo0':  args.elo0  = parseFloat(v); i++; break;
       case '--elo1':  args.elo1  = parseFloat(v); i++; break;
@@ -456,6 +495,7 @@ type EngineConfig = {
   opts: Partial<SearchOptions>;
   evalParams: Partial<EvalParams> | null;
   net: NetWeights | null;
+  pst: PstTables | null;
 };
 
 type GameResult = {
@@ -499,6 +539,9 @@ function playGame(
     // Per-engine learned evaluator. null ⇒ hand eval. Set every move so
     // engine A's net never leaks into engine B's turn.
     setEvaluator(cfg.net ? makeNetEvaluator(cfg.net) : null);
+    // Per-engine PST tables. null ⇒ reset to shipped defaults so the
+    // other engine's fitted tables never leak across the move boundary.
+    setPstTables(cfg.pst);
     const picked = withSeededRandom(prng, () =>
       chooseAction(state, cfg.depth, cfg.timeBudgetMs ?? undefined),
     );
@@ -569,21 +612,24 @@ type Summary = {
 function runSelfplay(args: Args): Summary {
   const epTag = (p: string | null) => (p ? `,ep=${basename(p)}` : '');
   const netTag = (p: string | null) => (p ? `,net=${basename(p)}` : '');
+  const pstTag = (p: string | null) => (p ? `,pst=${basename(p)}` : '');
   const engineA: EngineConfig = {
-    name: `A(d=${args.depthA}${args.timeAMs ? `,t=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}${epTag(args.evalParamsAPath)}${netTag(args.netAPath)})`,
+    name: `A(d=${args.depthA}${args.timeAMs ? `,t=${args.timeAMs}ms` : ''}${describeOpts(args.optsA)}${epTag(args.evalParamsAPath)}${netTag(args.netAPath)}${pstTag(args.pstAPath)})`,
     depth: args.depthA,
     timeBudgetMs: args.timeAMs,
     opts: args.optsA,
     evalParams: args.evalParamsA,
     net: args.netA,
+    pst: args.pstA,
   };
   const engineB: EngineConfig = {
-    name: `B(d=${args.depthB}${args.timeBMs ? `,t=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}${epTag(args.evalParamsBPath)}${netTag(args.netBPath)})`,
+    name: `B(d=${args.depthB}${args.timeBMs ? `,t=${args.timeBMs}ms` : ''}${describeOpts(args.optsB)}${epTag(args.evalParamsBPath)}${netTag(args.netBPath)}${pstTag(args.pstBPath)})`,
     depth: args.depthB,
     timeBudgetMs: args.timeBMs,
     opts: args.optsB,
     evalParams: args.evalParamsB,
     net: args.netB,
+    pst: args.pstB,
   };
 
   const summary: Summary = {
