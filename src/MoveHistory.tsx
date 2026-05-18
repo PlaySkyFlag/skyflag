@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
-import type { Coord, HistoryEntry, Layer, PieceKind, Player } from './game/types';
+import type { Coord, HistoryEntry, Layer, PieceKind } from './game/types';
+import { FACTION_SHORT } from './game/factions';
 
-const PLAYER_NAME: Record<Player, string> = { p1: 'Stags', p2: 'Ravens' };
+// Canonical compact display names — see src/game/factions.ts.
+const PLAYER_NAME = FACTION_SHORT;
 
 const PIECE_GLYPH: Record<PieceKind, string> = {
   captain: '♚',

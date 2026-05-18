@@ -2,7 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { sendRequest } from './game/friends';
 import { supabase } from './game/supabase';
-import type { GameState, GameStatus, Player, RoomState } from './game/types';
+import type { GameState, GameStatus, RoomState } from './game/types';
+import { FACTION_NAME } from './game/factions';
 import { stashReviewSession } from './game/reviewSession';
 
 // Persists the user's response to the post-game funnel (waitlist signup
@@ -29,7 +30,10 @@ function markWaitlistHandled(): void {
   }
 }
 
-const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
+// Display names live in one canonical place (src/game/factions.ts) —
+// this used to be a hand-rolled, INVERTED copy that told the winner the
+// other faction had won.
+const PLAYER_NAME = FACTION_NAME;
 
 // See StatusBar.tsx for why we derive these from GameStatus rather
 // than spelling the union out by hand.

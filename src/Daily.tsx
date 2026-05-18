@@ -24,11 +24,10 @@ import type {
   PieceKind,
   Player,
 } from './game/types';
+import { FACTION_NAME } from './game/factions';
 
-const PLAYER_NAME: Record<Player, string> = {
-  p1: 'White Stags',
-  p2: 'Grey Ravens',
-};
+// Canonical display names — see src/game/factions.ts.
+const PLAYER_NAME = FACTION_NAME;
 
 const PIECE_SYMBOL: Record<PieceKind, string> = {
   captain: '♚',

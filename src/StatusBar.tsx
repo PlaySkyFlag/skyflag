@@ -1,7 +1,10 @@
 import { TURN_LIMIT } from './game/constants';
 import type { GameState, GameStatus, Player } from './game/types';
+import { FACTION_NAME } from './game/factions';
 
-const PLAYER_NAME: Record<Player, string> = { p1: 'Grey Ravens', p2: 'White Stags' };
+// Canonical display names — see src/game/factions.ts. Was a local,
+// inverted copy (p1↔p2), so the HUD announced the wrong winner.
+const PLAYER_NAME = FACTION_NAME;
 
 // Derive reason keys directly from GameStatus so adding a new terminal
 // reason in types.ts trips a type error here instead of silently

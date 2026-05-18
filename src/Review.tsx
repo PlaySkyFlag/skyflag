@@ -47,6 +47,7 @@ import type {
 } from './game/reducer';
 import type { Coord, GameState, HistoryEntry, Layer, PieceKind, Player } from './game/types';
 import { loadReviewSession, type ReviewSession } from './game/reviewSession';
+import { FACTION_NAME } from './game/factions';
 import './App.css';
 
 // ── Board rendering helpers (mirrored from Watch.tsx) ──────────
@@ -307,8 +308,8 @@ export default function Review() {
       {/* Summary strip — totals per side */}
       {summary && (
         <div className="review-summary">
-          <SummaryCol label={`${p1Label} (Grey Ravens)`} counts={summary.p1} />
-          <SummaryCol label={`${p2Label} (White Stags)`} counts={summary.p2} />
+          <SummaryCol label={`${p1Label} (${FACTION_NAME.p1})`} counts={summary.p1} />
+          <SummaryCol label={`${p2Label} (${FACTION_NAME.p2})`} counts={summary.p2} />
         </div>
       )}
 

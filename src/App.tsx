@@ -52,7 +52,11 @@ import type { Coord, GameState, HistoryEntry, Layer, PieceId, PieceKind, Player,
 import { opponentOf } from './game/types';
 import './App.css';
 
-const AI_THINK_DELAY_MS = 600;
+// Artificial beat before the worker starts, so the UI can paint the
+// human's move and the "thinking…" state first. Applied PER ACTIVATION,
+// and a turn is ACTIVATIONS_PER_TURN (2), so this is paid twice before
+// control returns to the human — keep it short or the AI feels laggy.
+const AI_THINK_DELAY_MS = 250;
 
 // Build a BoardTheme record for the currently selected visual theme.
 // Layer kinds are tagged so Board.tsx can dispatch atmosphere by kind
@@ -1134,7 +1138,7 @@ export default function App() {
     );
     if (myDeployBlocked) {
       flash(
-        'Your deploy pad is occupied — move that piece off the pad before deploying a new one.',
+        'Your deploy pad is occupied — that piece must be moved off the pad before you can bring another piece onto the board.',
       );
     }
   };
@@ -1144,7 +1148,9 @@ export default function App() {
     if (player !== state.currentPlayer) return;
     if (selection?.kind !== 'hand') return;
     if (myDeployBlocked) {
-      flash('Deploy pad is occupied. Move the piece off the pad first.');
+      flash(
+        'Your deploy pad is occupied — that piece must be moved off the pad before you can bring another piece onto the board.',
+      );
       return;
     }
     dispatch({ type: 'deploy', pieceId: selection.pieceId });
