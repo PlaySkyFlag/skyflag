@@ -118,19 +118,52 @@ const TRANSPORT_PST: Record<Layer, number[][]> = {
   ],
 };
 
-const TABLES: Record<PieceKind, Record<Layer, number[][]>> = {
-  soldier: SOLDIER_PST,
-  captain: CAPTAIN_PST,
-  rover:   TRANSPORT_PST,
-  pilot:   TRANSPORT_PST,
-};
+export type PstTables = Record<PieceKind, Record<Layer, number[][]>>;
+
+// Deep clone so each kind owns independent tables. Notably rover and
+// pilot historically shared the TRANSPORT_PST object by reference; an
+// offline fitter must be able to diverge them. Values are the exact
+// shipped literals, so default behaviour is byte-identical.
+function clonePlanes(t: Record<Layer, number[][]>): Record<Layer, number[][]> {
+  return {
+    ground: t.ground.map((r) => r.slice()),
+    sky: t.sky.map((r) => r.slice()),
+    space: t.space.map((r) => r.slice()),
+  };
+}
+
+export function defaultPstTables(): PstTables {
+  return {
+    soldier: clonePlanes(SOLDIER_PST),
+    captain: clonePlanes(CAPTAIN_PST),
+    rover: clonePlanes(TRANSPORT_PST),
+    pilot: clonePlanes(TRANSPORT_PST),
+  };
+}
+
+let activeTables: PstTables = defaultPstTables();
+
+/**
+ * Swap in fitted PST tables (offline tuning / the selfplay A/B harness,
+ * mirroring setEvalParams). Pass null/undefined to reset to the shipped
+ * defaults. The app never calls this, so shipped behaviour is the
+ * defaults — verified byte-identical to the pre-swappable implementation
+ * across all 864 kind×layer×row×col×owner inputs.
+ */
+export function setPstTables(t?: PstTables | null): void {
+  activeTables = t ?? defaultPstTables();
+}
+
+export function getPstTables(): PstTables {
+  return activeTables;
+}
 
 // Returns the positional bonus for `piece` at `coord` from its owner's
 // perspective. Positive = good for the owner. Caller decides whether to
 // add or subtract this from the global score depending on whether the
 // piece belongs to the side being evaluated.
 export function pstScore(piece: Piece, coord: Coord): number {
-  const table = TABLES[piece.kind][coord.layer];
+  const table = activeTables[piece.kind][coord.layer];
   // Tables are written from P1's perspective. P2 mirrors row-wise since
   // the board flips along the row axis (P2 advances row 5 → row 0).
   const row = piece.owner === 'p1' ? coord.row : BOARD_SIZE - 1 - coord.row;
