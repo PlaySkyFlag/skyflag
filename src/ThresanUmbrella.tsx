@@ -8,6 +8,7 @@
 import { useEffect } from 'react';
 import './ThresanUmbrella.css';
 import { applySurfaceMeta } from './socialMeta';
+import WaitlistForm from './WaitlistForm';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-com';
 const STORE_URL = 'https://thresan.store';
@@ -95,6 +96,11 @@ export default function ThresanUmbrella() {
             Meet the studio →
           </a>
         </div>
+        <WaitlistForm
+          source="thresan-com"
+          heading="Get the launch email"
+          lead="The physical edition lands on Kickstarter in Fall 2026. One email when it goes live — the digital game stays free in the meantime."
+        />
         <p className="thresan-fineprint">
           Thresan™ is a project of Limnology Research Corp. ·{' '}
           <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}

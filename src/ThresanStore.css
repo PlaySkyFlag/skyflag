@@ -125,6 +125,30 @@
   margin-top: 14px;
 }
 
+/* Outline variant — for the "play free" sampling CTA, so it reads as a
+   secondary action that doesn't compete with the gold Reserve button. */
+.store-cta-ghost {
+  background: transparent;
+  color: #C2A46B !important;
+  border: 1px solid rgba(194, 164, 107, 0.55);
+}
+
+.store-cta-ghost:hover:not(:disabled) {
+  background: rgba(194, 164, 107, 0.12);
+  color: #ffe4a3 !important;
+}
+
+.store-video-cta {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.store-video-cta-note {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: rgba(245, 247, 251, 0.6);
+}
+
 /* ─── Hero ─────────────────────────────────────────────────────── */
 
 .store-hero {

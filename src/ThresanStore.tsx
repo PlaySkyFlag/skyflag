@@ -375,9 +375,17 @@ function GameplayVideo() {
           <strong>free to play, always</strong>, at{' '}
           <a href="https://thresan.com">thresan.com</a>. The premium
           physical board — the three-level deluxe edition above —
-          launches on <strong>Kickstarter in fall 2026</strong>.{' '}
+          launches on <strong>Kickstarter in Fall 2026</strong>.{' '}
           <a href="#waitlist">Sign up now</a> to get the launch email.
         </p>
+        <div className="store-video-cta">
+          <a href={GAME_URL} className="store-cta-button store-cta-ghost">
+            Play the full game free →
+          </a>
+          <p className="store-video-cta-note">
+            No signup, no paywall — try the whole game before you back.
+          </p>
+        </div>
       </div>
     </section>
   );

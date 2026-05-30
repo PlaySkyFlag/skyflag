@@ -10,6 +10,7 @@
 import { useEffect } from 'react';
 import './ThresanGames.css';
 import { applySurfaceMeta } from './socialMeta';
+import WaitlistForm from './WaitlistForm';
 
 const SKYFLAG_URL = 'https://www.playskyflag.com/?ref=thresan-games';
 const ORIGINS_URL = 'https://www.playskyflag.com/origins?ref=thresan-games';
@@ -106,6 +107,12 @@ export default function ThresanGames() {
             </div>
           </article>
         </section>
+
+        <WaitlistForm
+          source="thresan-games"
+          heading="Get the launch email"
+          lead="The Skyflag physical edition launches on Kickstarter in Fall 2026. One email when it goes live — that's all the list is for."
+        />
 
         <div className="games-outbound">
           <a href={UMBRELLA_URL} className="games-link">
