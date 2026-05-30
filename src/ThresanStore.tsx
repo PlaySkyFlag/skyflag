@@ -28,6 +28,14 @@ const FOUNDERS_RESERVATION_URL = 'https://buy.stripe.com/14A7sFdUCgpzg9R3PNbwk00
 // launches. Empty = pre-launch (current state).
 const KICKSTARTER_URL = '';
 
+// Kickstarter pre-launch page URL ("Notify me on launch"). Paste the
+// .../projects/<you>/<slug> pre-launch link here as soon as the KS page
+// exists. Followers gathered here convert to backers at roughly twice
+// the rate of people who discover the campaign after it's live, so this
+// is the highest-value pre-launch funnel after the email list. Empty =
+// not created yet (the follow CTA stays hidden).
+const KICKSTARTER_PRELAUNCH_URL = '';
+
 const FOUNDERS_PRICE_USD = 108;
 const FOUNDERS_TOTAL_SLOTS = 500;
 
@@ -593,6 +601,19 @@ function Waitlist() {
           One email when the Kickstarter goes live. That's the only
           thing the list is for.
         </p>
+        {KICKSTARTER_PRELAUNCH_URL && !KICKSTARTER_URL && (
+          <p className="store-waitlist-alt">
+            Prefer Kickstarter?{' '}
+            <a
+              href={KICKSTARTER_PRELAUNCH_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Follow the pre-launch page →
+            </a>{' '}
+            and Kickstarter notifies you the moment we go live.
+          </p>
+        )}
         {status === 'success' ? (
           <div
             className="store-waitlist-success"
@@ -646,7 +667,7 @@ function Faq() {
         <div className="store-faq">
           <FaqItem
             q="When does the Kickstarter launch?"
-            a="Date TBA. The waitlist gets the launch email first — typically a heads-up two to four weeks ahead of the campaign and a final note the morning the campaign goes live."
+            a="Targeting Fall 2026. The waitlist gets the exact date first — typically a heads-up two to four weeks ahead of the campaign and a final note the morning it goes live."
           />
           <FaqItem
             q="What does the Founders deposit cover?"
@@ -670,11 +691,13 @@ function Faq() {
             }
           />
           <FaqItem
-            q={`Why $${FOUNDERS_PRICE_USD}?`}
+            q={`Why a $${FOUNDERS_PRICE_USD} deposit?`}
             a={
               <>
-                Sixty-four squares become one hundred and eight. The
-                price is the math.{' '}
+                Sixty-four squares become one hundred and eight — the
+                deposit is the math, not the final price. The edition
+                price is set with the campaign; your deposit applies to
+                it in full.{' '}
                 <a href={ORIGINS_URL}>Read more in Origins →</a>
               </>
             }

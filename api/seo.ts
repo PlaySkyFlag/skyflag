@@ -70,10 +70,10 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
   },
   'thresan.store': {
     title: 'Thresan Store — premium physical edition',
-    description: 'Premium physical edition of Thresan: Skyflag. Matte black with gold accents, transparent acrylic boards, brass-cast pieces, weighted base. Kickstarter Q3 2026.',
+    description: 'Premium physical edition of Thresan: Skyflag. Matte black with gold accents, transparent acrylic boards, brass-cast pieces, weighted base. Kickstarter Fall 2026.',
     ogImage: 'https://playskyflag.com/thresan-deluxe-board.jpg',
     loadingHeadline: 'Thresan Store',
-    loadingTagline: 'Premium physical edition. Kickstarter Q3 2026.',
+    loadingTagline: 'Premium physical edition. Kickstarter Fall 2026.',
   },
   'ashtapada.com': {
     title: 'Ashtapada — the ancient root',

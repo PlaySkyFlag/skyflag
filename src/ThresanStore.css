@@ -590,6 +590,13 @@
   line-height: 1.55;
 }
 
+.store-waitlist-alt {
+  font-size: 0.95rem;
+  color: rgba(245, 247, 251, 0.7);
+  margin: -12px auto 24px;
+  line-height: 1.55;
+}
+
 .store-waitlist-form {
   display: flex;
   flex-direction: column;
