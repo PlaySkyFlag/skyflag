@@ -411,8 +411,8 @@ function PhysicalEditionSection() {
         </p>
         <figure className="landing-edition-figure">
           <img
-            src="/skyflag-render-tower.jpg"
-            alt="Thresan: Skyflag physical edition — three transparent boards stacked on an illuminated base."
+            src="/thresan-deluxe-board.jpg"
+            alt="Thresan: Skyflag deluxe physical edition — three illuminated acrylic boards fanned from a shared center-balanced powered hub on a weighted base."
             className="landing-edition-render"
             loading="lazy"
           />

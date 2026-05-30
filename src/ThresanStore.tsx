@@ -46,6 +46,11 @@ type RewardTier = {
   id: string;
   name: string;
   priceUSD: number;
+  // Overrides the displayed price (e.g. 'TBD') while priceUSD still
+  // drives the live deposit amount. Manufacturing quotes aren't locked,
+  // so the Founders final price shows TBD even though the $108 deposit
+  // is live.
+  priceDisplay?: string;
   pitch: string;
   includes: string[];
   live?: boolean;
@@ -92,6 +97,7 @@ const REWARD_TIERS: RewardTier[] = [
     id: 'founders',
     name: 'Founders Edition',
     priceUSD: FOUNDERS_PRICE_USD,
+    priceDisplay: 'TBD',
     pitch: 'The first 500. Numbered.',
     live: true,
     limited: true,
@@ -260,7 +266,7 @@ function primaryHeroCta(): {
   if (FOUNDERS_RESERVATION_URL) {
     return {
       href: FOUNDERS_RESERVATION_URL,
-      label: `Reserve a Founders Edition · $${FOUNDERS_PRICE_USD}`,
+      label: `Reserve a Founders Edition · $${FOUNDERS_PRICE_USD} deposit`,
       secondaryHref: '#waitlist',
       secondaryLabel: 'Just want updates? Join the free waitlist →',
     };
@@ -279,26 +285,16 @@ function Showcase() {
       <div className="store-section-inner">
         <h2 className="store-section-title">What's in the box</h2>
         <div className="store-showcase">
-          <figure className="store-figure">
+          <figure className="store-figure store-figure-solo">
             <img
-              src="/skyflag-render-tower.jpg"
-              alt="Transparent terrace tower layout — three boards stacked vertically with a central column on a metallic base."
+              src="/thresan-deluxe-board.jpg"
+              alt="Thresan deluxe edition — three illuminated 6×6 acrylic boards (green Ground, cyan Sky, blue Space) fanned from a shared center-balanced powered hub on a weighted base, with illuminated lift columns and a USB-C controller in the base."
               className="store-figure-img"
               loading="lazy"
             />
             <figcaption className="store-figure-caption">
-              Concept render — transparent terrace tower layout
-            </figcaption>
-          </figure>
-          <figure className="store-figure">
-            <img
-              src="/skyflag-render-fan.jpg"
-              alt="Fan-spread layout — three boards fanned out from a shared illuminated rear hub."
-              className="store-figure-img"
-              loading="lazy"
-            />
-            <figcaption className="store-figure-caption">
-              Concept render — fan-spread array layout
+              Deluxe edition — center-balanced fan-spread, illuminated lift
+              columns, shared powered hub
             </figcaption>
           </figure>
         </div>
@@ -323,7 +319,7 @@ function Showcase() {
           </li>
         </ul>
         <p className="store-section-fineprint">
-          Renders shown are concept art for the manufactured premium
+          The render shown is concept art for the manufactured premium
           edition — used to set context for what the physical edition
           aspires to. Actual photographs of the 3D-printed prototype
           coming soon. Final component spec confirmed at Kickstarter
@@ -399,8 +395,14 @@ function Tiers() {
               </div>
               <h3 className="store-tier-name">{tier.name}</h3>
               <p className="store-tier-price">
-                ${tier.priceUSD}
-                <span className="store-tier-price-unit"> USD</span>
+                {tier.priceDisplay ? (
+                  tier.priceDisplay
+                ) : (
+                  <>
+                    ${tier.priceUSD}
+                    <span className="store-tier-price-unit"> USD</span>
+                  </>
+                )}
               </p>
               <p className="store-tier-pitch">{tier.pitch}</p>
               <ul className="store-tier-includes">

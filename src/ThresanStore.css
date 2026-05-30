@@ -380,6 +380,14 @@
   margin: 0;
 }
 
+/* Single showcase render: center it across the grid and cap its width so
+   the tall portrait deluxe-board image doesn't dominate the section. */
+.store-figure-solo {
+  grid-column: 1 / -1;
+  max-width: 480px;
+  margin-inline: auto;
+}
+
 .store-figure-img {
   display: block;
   width: 100%;
