@@ -111,8 +111,8 @@ export default function World() {
       title: 'The World of Kaleo — Thresan™: Skyflag',
       description:
         'A world suspended above a world that failed. Kaleo: the three-layer arcology, the Grey Ravens and White Stags, the four Aetheri templates, and the silent Nexus at the summit. The universe behind Thresan: Skyflag.',
-      canonicalUrl: 'https://www.playskyflag.com/world',
-      ogImage: 'https://www.playskyflag.com/kaleo-arcology.jpg',
+      canonicalUrl: 'https://thresan.com/world',
+      ogImage: 'https://thresan.com/kaleo-arcology.jpg',
       ogImageAlt:
         'The three stacked layers of the Kaleo arcology rising into light — Terran, Meridian, Empyrean.',
     });

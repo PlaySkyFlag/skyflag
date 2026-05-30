@@ -162,6 +162,22 @@ const COMIC_PATHS = new Set([
   '/read',
 ]);
 
+// The World of Kaleo codex. Like the comic, /world is served on ANY host
+// (thresan.com/world, thresan.studio/world, playskyflag.com/world, …) so a
+// shared link always previews the lore hub — never the per-hostname
+// umbrella card. Canonical is pinned to thresan.com (see the handler) as
+// the ecosystem consolidates onto that domain.
+const WORLD_SURFACE: Surface = {
+  title: 'The World of Kaleo — Thresan: Skyflag',
+  description:
+    'A world suspended above a world that failed. Kaleo: the three-layer arcology, the Grey Ravens and White Stags, the four Aetheri templates, and the silent Nexus at the summit. The universe behind Thresan: Skyflag.',
+  ogImage: 'https://thresan.com/kaleo-arcology.jpg',
+  ogImageAlt:
+    'The three stacked layers of the Kaleo arcology rising into light — Terran, Meridian, Empyrean.',
+  loadingHeadline: 'The World of Kaleo',
+  loadingTagline: 'A world above a world that failed.',
+};
+
 // ─── Resolver ───────────────────────────────────────────────────────
 
 function resolveSurface(host: string, path: string): Surface {
@@ -171,6 +187,7 @@ function resolveSurface(host: string, path: string): Surface {
   // the studio homepage card.
   const normalized = path === '/' ? '/' : path.replace(/\/+$/, '').toLowerCase();
   if (COMIC_PATHS.has(normalized)) return CHAPTER_ONE_SURFACE;
+  if (normalized === '/world') return WORLD_SURFACE;
 
   // Strip leading "www." for hostname matching; the redirects in
   // vercel.json already canonicalize, but bare requests may still hit
@@ -245,7 +262,14 @@ export default async function handler(req: Request): Promise<Response> {
   // Canonical URL uses the hostname-without-www, and preserves the
   // requested path (so deep links keep their context in og:url).
   const canonicalHost = host.replace(/^www\./, '');
-  const canonicalUrl = `https://${canonicalHost}${path === '/' ? '/' : path}`;
+  // /world is reachable on every host but consolidates to one canonical on
+  // thresan.com (the domain the ecosystem is migrating onto), so the lore
+  // hub's link equity doesn't split across playskyflag.com and the
+  // thresan.* surfaces.
+  const canonicalUrl =
+    path.replace(/\/+$/, '').toLowerCase() === '/world'
+      ? 'https://thresan.com/world'
+      : `https://${canonicalHost}${path === '/' ? '/' : path}`;
 
   // Fetch the static index.html. The vercel.json SPA rewrite excludes
   // /index.html (regex skips paths with dots), so the response is the

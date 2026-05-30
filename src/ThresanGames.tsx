@@ -115,10 +115,7 @@ export default function ThresanGames() {
         />
 
         <div className="games-outbound">
-          <a
-            href="https://www.playskyflag.com/world"
-            className="games-link"
-          >
+          <a href="https://thresan.com/world" className="games-link">
             The world of Kaleo →
           </a>
           <a href={UMBRELLA_URL} className="games-link">

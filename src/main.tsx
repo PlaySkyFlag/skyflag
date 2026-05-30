@@ -156,7 +156,13 @@ const isThresanPath = path === '/thresan' || path.startsWith('/thresan/');
 const isWorldPath = path === '/world' || path.startsWith('/world/');
 
 let rendered;
-if (isAshtapadaHost) rendered = <AshtapadaSplash />;
+// /world is a universal path: it resolves to the World of Kaleo codex on
+// EVERY host (thresan.com, thresan.studio, thresan.games, playskyflag.com,
+// …), the same precedence the comic paths get in api/seo.ts. This lets the
+// lore hub be reached from any brand domain as the ecosystem consolidates
+// onto thresan.com, without a per-host branch.
+if (isWorldPath) rendered = <World />;
+else if (isAshtapadaHost) rendered = <AshtapadaSplash />;
 else if (isThresanStoreHost) rendered = <ThresanStore />;
 else if (isThresanStudioHost) rendered = isReadPath
   ? <VolumeZeroReader />
@@ -184,7 +190,6 @@ else if (isThresanGamesPath) rendered = <ThresanGames />;
 else if (isVolumeZeroPath) rendered = <VolumeZeroLanding />;
 else if (isReadPath) rendered = <VolumeZeroReader />;
 else if (isThresanPath) rendered = <ThresanUmbrella />;
-else if (isWorldPath) rendered = <World />;
 else rendered = <Landing />;
 
 // Mark the root so index.html's pre-mount error catcher knows

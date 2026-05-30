@@ -384,7 +384,7 @@ function GameplayVideo() {
           </a>
           <p className="store-video-cta-note">
             No signup, no paywall — try the whole game before you back.{' '}
-            <a href="https://www.playskyflag.com/world" className="store-cta-link">
+            <a href="https://thresan.com/world" className="store-cta-link">
               Explore the world of Kaleo →
             </a>
           </p>
