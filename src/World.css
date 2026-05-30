@@ -1,0 +1,386 @@
+/* The World of Kaleo codex (/world). Same gold-on-dark palette as the
+   thresan.* surfaces, declared with literal values so the page renders
+   correctly even if no other stylesheet loads. */
+
+.world {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 12%, rgba(194, 164, 107, 0.12), transparent 70%),
+    radial-gradient(ellipse 60% 80% at 50% 100%, rgba(120, 80, 200, 0.06), transparent 70%),
+    #070a0f;
+  color: #f5f7fb;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.world-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 56px 22px 80px;
+}
+
+/* ─── Hero ──────────────────────────────────────────────────────── */
+.world-hero {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.world-sigil {
+  width: 60px;
+  height: auto;
+  opacity: 0.9;
+  margin: 0 auto 20px;
+  display: block;
+}
+
+.world-eyebrow {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.34em;
+  color: rgba(245, 247, 251, 0.55);
+  margin: 0 0 6px;
+}
+
+.world-title {
+  font-size: clamp(3rem, 12vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin: 0;
+  background: linear-gradient(180deg, #f3e3bd, #c2a46b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.world-tagline {
+  font-size: 1.25rem;
+  color: rgba(194, 164, 107, 0.92);
+  margin: 14px 0 34px;
+}
+
+.world-hero-art {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 10px;
+  border: 1px solid rgba(194, 164, 107, 0.28);
+  box-shadow: 0 22px 64px rgba(0, 0, 0, 0.6);
+}
+
+.world-hero-credit {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: rgba(245, 247, 251, 0.5);
+  margin: 12px 0 0;
+}
+
+/* ─── Sections ──────────────────────────────────────────────────── */
+.world-section {
+  padding: 40px 0;
+  border-top: 1px solid rgba(194, 164, 107, 0.14);
+}
+
+.world-section-alt {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(194, 164, 107, 0.05), transparent 70%);
+}
+
+.world-section-title {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: rgba(194, 164, 107, 0.85);
+  text-align: center;
+  margin: 0 0 26px;
+}
+
+.world-section-lead {
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: rgba(245, 247, 251, 0.82);
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 30px;
+}
+
+.world-prose {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.world-prose p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(245, 247, 251, 0.82);
+  margin: 0 0 18px;
+}
+
+/* ─── Figures ───────────────────────────────────────────────────── */
+.world-figure {
+  margin: 30px auto;
+  max-width: 460px;
+  text-align: center;
+}
+
+.world-figure-wide {
+  max-width: 640px;
+}
+
+.world-figure-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(194, 164, 107, 0.24);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.world-figure figcaption {
+  font-size: 0.84rem;
+  font-style: italic;
+  color: rgba(245, 247, 251, 0.55);
+  margin-top: 10px;
+}
+
+.world-figure-pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 30px auto;
+  max-width: 640px;
+}
+
+@media (min-width: 680px) {
+  .world-figure-pair {
+    grid-template-columns: 1fr 1fr;
+  }
+  .world-figure-pair .world-figure {
+    margin: 0;
+  }
+}
+
+/* ─── Pull quotes ───────────────────────────────────────────────── */
+.world-pullquote {
+  max-width: 600px;
+  margin: 34px auto 8px;
+  padding: 0 24px;
+  border-left: 2px solid rgba(194, 164, 107, 0.6);
+  font-size: 1.18rem;
+  line-height: 1.6;
+  font-style: italic;
+  color: rgba(245, 247, 251, 0.9);
+}
+
+.world-pullquote cite {
+  display: block;
+  margin-top: 12px;
+  font-size: 0.88rem;
+  font-style: normal;
+  color: rgba(194, 164, 107, 0.8);
+}
+
+/* ─── Clans ─────────────────────────────────────────────────────── */
+.world-clans {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+@media (min-width: 720px) {
+  .world-clans {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.world-clan {
+  padding: 26px 24px;
+  border: 1px solid rgba(194, 164, 107, 0.22);
+  border-radius: 10px;
+  background: rgba(8, 11, 16, 0.5);
+}
+
+.world-clan-name {
+  font-size: 1.3rem;
+  margin: 0 0 4px;
+  color: #f3e3bd;
+}
+
+.world-clan-sub {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: rgba(194, 164, 107, 0.8);
+  margin: 0 0 16px;
+}
+
+.world-clan-body {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(245, 247, 251, 0.8);
+  margin: 0 0 16px;
+}
+
+.world-clan-line {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(245, 247, 251, 0.72);
+  margin: 0 0 12px;
+}
+
+.world-clan-label,
+.world-template-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(194, 164, 107, 0.7);
+  margin-bottom: 3px;
+}
+
+.world-clan-conviction {
+  margin: 16px 0 0;
+  padding-left: 16px;
+  border-left: 2px solid rgba(194, 164, 107, 0.5);
+  font-size: 1rem;
+  font-style: italic;
+  color: rgba(245, 247, 251, 0.9);
+}
+
+.world-clan-conviction cite {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  font-style: normal;
+  color: rgba(194, 164, 107, 0.75);
+}
+
+/* ─── Templates ─────────────────────────────────────────────────── */
+.world-templates {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.world-template {
+  border: 1px solid rgba(194, 164, 107, 0.22);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(8, 11, 16, 0.5);
+}
+
+.world-template-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 8;
+  object-fit: cover;
+  border-bottom: 1px solid rgba(194, 164, 107, 0.18);
+}
+
+.world-template-body {
+  padding: 22px 24px 26px;
+}
+
+.world-template-role {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: rgba(194, 164, 107, 0.78);
+  margin: 0 0 2px;
+}
+
+.world-template-name {
+  font-size: 1.5rem;
+  margin: 0 0 12px;
+  color: #f3e3bd;
+}
+
+.world-template-psych {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(245, 247, 251, 0.8);
+  margin: 0 0 16px;
+}
+
+.world-template-line {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(245, 247, 251, 0.74);
+  margin: 0 0 12px;
+}
+
+.world-note {
+  max-width: 620px;
+  margin: 28px auto 0;
+  padding: 18px 22px;
+  border: 1px dashed rgba(194, 164, 107, 0.32);
+  border-radius: 10px;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(245, 247, 251, 0.82);
+  text-align: center;
+}
+
+/* ─── Actions / links ───────────────────────────────────────────── */
+.world-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.world-cta {
+  display: inline-flex;
+  align-items: center;
+  background: #c2a46b;
+  color: #111826;
+  padding: 13px 26px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.98rem;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.world-cta:hover {
+  background: #ffe4a3;
+  transform: translateY(-1px);
+}
+
+.world-link {
+  display: inline-block;
+  color: #c2a46b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.world-link:hover {
+  color: #ffe4a3;
+}
+
+.world-outbound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 48px 0 32px;
+  padding-top: 36px;
+  border-top: 1px solid rgba(194, 164, 107, 0.14);
+}
+
+.world-fineprint {
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(245, 247, 251, 0.45);
+  margin: 0;
+}
+
+.world-fineprint a {
+  color: rgba(194, 164, 107, 0.7);
+}

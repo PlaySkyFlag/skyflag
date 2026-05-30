@@ -383,7 +383,10 @@ function GameplayVideo() {
             Play the full game free →
           </a>
           <p className="store-video-cta-note">
-            No signup, no paywall — try the whole game before you back.
+            No signup, no paywall — try the whole game before you back.{' '}
+            <a href="https://www.playskyflag.com/world" className="store-cta-link">
+              Explore the world of Kaleo →
+            </a>
           </p>
         </div>
       </div>

@@ -83,6 +83,12 @@ export default function ThresanUmbrella() {
           Play Skyflag free →
         </a>
         <div className="thresan-secondary">
+          <a
+            href="https://www.playskyflag.com/world"
+            className="thresan-link"
+          >
+            The world of Kaleo →
+          </a>
           <a href={GAMES_URL} className="thresan-link">
             The editions of Thresan →
           </a>

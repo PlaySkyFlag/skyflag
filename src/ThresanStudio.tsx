@@ -271,6 +271,12 @@ export default function ThresanStudio() {
         <KickstarterList />
 
         <div className="studio-secondary">
+          <a
+            href="https://www.playskyflag.com/world"
+            className="studio-link"
+          >
+            The world of Kaleo →
+          </a>
           <a href={GAMES_URL} className="studio-link">
             The editions (thresan.games) →
           </a>

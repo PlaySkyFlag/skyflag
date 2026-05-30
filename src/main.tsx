@@ -67,6 +67,7 @@ const ThresanStore = lazyWithRetry(() => import('./ThresanStore.tsx'))
 const ThresanStudio = lazyWithRetry(() => import('./ThresanStudio.tsx'))
 const ThresanUmbrella = lazyWithRetry(() => import('./ThresanUmbrella.tsx'))
 const VolumeZeroLanding = lazyWithRetry(() => import('./VolumeZeroLanding.tsx'))
+const World = lazyWithRetry(() => import('./World.tsx'))
 // VolumeZeroReader takes an optional `embedded` prop; the route renders
 // it prop-less (embedded defaults false), so assert the prop-less shape
 // the lazy wrapper expects. The embedded use is a direct import in
@@ -150,6 +151,9 @@ const isReadPath = path === '/read' || path.startsWith('/read/');
 // Matched on exact path or trailing slash so it doesn't swallow
 // /thresan-store, /thresan-studio, /thresan-io, or /thresan-games.
 const isThresanPath = path === '/thresan' || path.startsWith('/thresan/');
+// /world — the World of Kaleo codex (lore hub). Exact-or-subpath so it
+// can later be aliased to a thresan.world host without touching this.
+const isWorldPath = path === '/world' || path.startsWith('/world/');
 
 let rendered;
 if (isAshtapadaHost) rendered = <AshtapadaSplash />;
@@ -180,6 +184,7 @@ else if (isThresanGamesPath) rendered = <ThresanGames />;
 else if (isVolumeZeroPath) rendered = <VolumeZeroLanding />;
 else if (isReadPath) rendered = <VolumeZeroReader />;
 else if (isThresanPath) rendered = <ThresanUmbrella />;
+else if (isWorldPath) rendered = <World />;
 else rendered = <Landing />;
 
 // Mark the root so index.html's pre-mount error catcher knows
