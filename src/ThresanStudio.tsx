@@ -271,6 +271,9 @@ export default function ThresanStudio() {
         <KickstarterList />
 
         <div className="studio-secondary">
+          <a href="https://thresan.com/kickstarter" className="studio-link">
+            Notify me — Kickstarter Fall 2026 →
+          </a>
           <a href="https://thresan.com/world" className="studio-link">
             The world of Kaleo →
           </a>

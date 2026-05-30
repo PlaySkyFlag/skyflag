@@ -11,7 +11,6 @@
 import { useEffect } from 'react';
 import './World.css';
 import { applySurfaceMeta } from './socialMeta';
-import WaitlistForm from './WaitlistForm';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-world';
 const STORE_URL = 'https://thresan.store';
@@ -368,11 +367,15 @@ export default function World() {
               Download the rulebook (PDF) →
             </a>
           </div>
-          <WaitlistForm
-            source="thresan-world"
-            heading="Follow the world of Kaleo"
-            lead="The physical edition launches on Kickstarter in Fall 2026. One email when it goes live — and the digital game is free to play right now."
-          />
+          <p className="world-section-lead">
+            The physical edition launches on Kickstarter in Fall 2026 — be
+            first in line for early-backer pricing.
+          </p>
+          <div className="world-actions">
+            <a href="https://thresan.com/kickstarter" className="world-cta">
+              Notify me at launch →
+            </a>
+          </div>
         </section>
 
         {/* ── Outbound ─────────────────────────────────────────── */}

@@ -8,7 +8,6 @@
 import { useEffect } from 'react';
 import './ThresanIO.css';
 import { applySurfaceMeta } from './socialMeta';
-import WaitlistForm from './WaitlistForm';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-io';
 const UMBRELLA_URL = 'https://thresan.com';
@@ -520,11 +519,13 @@ export default function ThresanIO() {
           </p>
         </section>
 
-        <WaitlistForm
-          source="thresan-io"
-          heading="Get the Kickstarter launch email"
-          lead="Separate from the lab notes above: the Skyflag physical edition — three boards in brass and acrylic — launches on Kickstarter in Fall 2026. One email when it goes live."
-        />
+        <p className="lab-roadmap-foot" style={{ textAlign: 'center', marginTop: 28 }}>
+          Separate from the lab notes: the Skyflag physical edition launches
+          on Kickstarter in Fall 2026.{' '}
+          <a href="https://thresan.com/kickstarter" className="lab-mail">
+            Notify me at launch →
+          </a>
+        </p>
 
         <div className="lab-outbound">
           <a href={GAME_URL} className="lab-link">
