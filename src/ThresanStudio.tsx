@@ -228,6 +228,41 @@ export default function ThresanStudio() {
           </div>
         </section>
 
+        {/* ── Gameplay ─────────────────────────────────────────── */}
+        <section className="studio-section" aria-labelledby="play-title">
+          <h2 id="play-title" className="studio-section-title">
+            See it in play
+          </h2>
+          <div className="studio-video">
+            <video
+              className="studio-video-el"
+              src="/thresan-gameplay.mp4"
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            >
+              Your browser doesn&rsquo;t support inline video.{' '}
+              <a href="/thresan-gameplay.mp4" download>
+                Download the clip
+              </a>{' '}
+              instead.
+            </video>
+          </div>
+          <p className="studio-section-note">
+            This is Thresan in play — three stacked boards (Ground, Sky,
+            and Space), five pieces a side moving across all three planes
+            at once, lifting between worlds to set up captures no flat
+            board could hold. The digital game is{' '}
+            <strong>free to play, always</strong>, at{' '}
+            <a href={UMBRELLA_URL}>thresan.com</a>. The premium physical
+            board launches on <strong>Kickstarter in fall 2026</strong>.{' '}
+            <a href={STORE_URL}>Sign up now</a> to get the launch email.
+          </p>
+        </section>
+
         {/* ── Convert ──────────────────────────────────────────── */}
         <a href={GAME_URL} className="studio-cta studio-cta-wide">
           Play Skyflag now →

@@ -256,6 +256,24 @@
   margin: 0 0 16px;
 }
 
+/* ─── Gameplay video ──────────────────────────────────────────── */
+.studio-video {
+  max-width: 640px;
+  margin: 0 auto 18px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(194, 164, 107, 0.28);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
+  background: #06090f;
+}
+
+.studio-video-el {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+}
+
 .studio-profiles {
   list-style: none;
   margin: 0 0 8px;

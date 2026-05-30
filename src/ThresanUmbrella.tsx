@@ -50,8 +50,36 @@ export default function ThresanUmbrella() {
           className="thresan-render"
           loading="lazy"
         />
+        <div className="thresan-video">
+          <video
+            className="thresan-video-el"
+            src="/thresan-gameplay.mp4"
+            controls
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          >
+            Your browser doesn&rsquo;t support inline video.{' '}
+            <a href="/thresan-gameplay.mp4" download>
+              Download the clip
+            </a>{' '}
+            instead.
+          </video>
+        </div>
+        <p className="thresan-lead thresan-video-caption">
+          This is Thresan in play — three stacked boards (Ground, Sky,
+          and Space), five pieces a side moving across all three planes
+          at once, lifting between worlds to set up captures no flat
+          board could hold. The game is{' '}
+          <strong>free to play, always</strong> — jump in below. The
+          premium physical board launches on{' '}
+          <strong>Kickstarter in fall 2026</strong>.{' '}
+          <a href={STORE_URL}>Sign up now</a> to get the launch email.
+        </p>
         <a href={GAME_URL} className="thresan-cta">
-          Play Skyflag →
+          Play Skyflag free →
         </a>
         <div className="thresan-secondary">
           <a href={GAMES_URL} className="thresan-link">

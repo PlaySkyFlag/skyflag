@@ -170,6 +170,7 @@ export default function ThresanStore() {
       <main>
         <Hero />
         <Showcase />
+        <GameplayVideo />
         <Prototype />
         <Tiers />
         <Founders />
@@ -325,6 +326,49 @@ function Showcase() {
           coming soon. Final component spec confirmed at Kickstarter
           launch; reservations carry the same price into and through
           the campaign.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ─── Gameplay video ────────────────────────────────────────────────
+// Short silent gameplay loop. Sits right after the board showcase so a
+// visitor sees the product, then sees it in motion, before the ask.
+
+function GameplayVideo() {
+  return (
+    <section className="store-section store-video-section">
+      <div className="store-section-inner">
+        <h2 className="store-section-title">See it in play</h2>
+        <div className="store-video">
+          <video
+            className="store-video-el"
+            src="/thresan-gameplay.mp4"
+            controls
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          >
+            Your browser doesn't support inline video.{' '}
+            <a href="/thresan-gameplay.mp4" download>
+              Download the clip
+            </a>{' '}
+            instead.
+          </video>
+        </div>
+        <p className="store-video-caption">
+          This is Thresan in play — three stacked boards (Ground, Sky,
+          and Space), five pieces a side moving across all three planes
+          at once, lifting between worlds to set up captures no flat
+          board could hold. The digital game is{' '}
+          <strong>free to play, always</strong>, at{' '}
+          <a href="https://thresan.com">thresan.com</a>. The premium
+          physical board — the three-level deluxe edition above —
+          launches on <strong>Kickstarter in fall 2026</strong>.{' '}
+          <a href="#waitlist">Sign up now</a> to get the launch email.
         </p>
       </div>
     </section>
