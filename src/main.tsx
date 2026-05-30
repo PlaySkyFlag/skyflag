@@ -68,6 +68,7 @@ const ThresanStudio = lazyWithRetry(() => import('./ThresanStudio.tsx'))
 const ThresanUmbrella = lazyWithRetry(() => import('./ThresanUmbrella.tsx'))
 const VolumeZeroLanding = lazyWithRetry(() => import('./VolumeZeroLanding.tsx'))
 const World = lazyWithRetry(() => import('./World.tsx'))
+const Kickstarter = lazyWithRetry(() => import('./Kickstarter.tsx'))
 // VolumeZeroReader takes an optional `embedded` prop; the route renders
 // it prop-less (embedded defaults false), so assert the prop-less shape
 // the lazy wrapper expects. The embedded use is a direct import in
@@ -154,6 +155,10 @@ const isThresanPath = path === '/thresan' || path.startsWith('/thresan/');
 // /world — the World of Kaleo codex (lore hub). Exact-or-subpath so it
 // can later be aliased to a thresan.world host without touching this.
 const isWorldPath = path === '/world' || path.startsWith('/world/');
+// /kickstarter — the focused launch-capture page. Universal path (every
+// host) and the single canonical destination all surfaces funnel toward.
+const isKickstarterPath =
+  path === '/kickstarter' || path.startsWith('/kickstarter/');
 
 let rendered;
 // /world is a universal path: it resolves to the World of Kaleo codex on
@@ -162,6 +167,7 @@ let rendered;
 // lore hub be reached from any brand domain as the ecosystem consolidates
 // onto thresan.com, without a per-host branch.
 if (isWorldPath) rendered = <World />;
+else if (isKickstarterPath) rendered = <Kickstarter />;
 else if (isAshtapadaHost) rendered = <AshtapadaSplash />;
 else if (isThresanStoreHost) rendered = <ThresanStore />;
 else if (isThresanStudioHost) rendered = isReadPath

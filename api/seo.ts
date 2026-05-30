@@ -178,6 +178,19 @@ const WORLD_SURFACE: Surface = {
   loadingTagline: 'A world above a world that failed.',
 };
 
+// The launch-capture page. Like /world, served on every host and pinned to
+// a single canonical on thresan.com — the one door all surfaces point at.
+const KICKSTARTER_SURFACE: Surface = {
+  title: 'Thresan: Skyflag — coming to Kickstarter',
+  description:
+    'A premium illuminated strategy game: three glass decks, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter in Fall 2026, and claim early-backer pricing.',
+  ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
+  ogImageAlt:
+    'The Thresan: Skyflag deluxe edition — three illuminated acrylic boards fanned from a shared powered hub.',
+  loadingHeadline: 'Thresan: Skyflag',
+  loadingTagline: 'Coming to Kickstarter — Fall 2026.',
+};
+
 // ─── Resolver ───────────────────────────────────────────────────────
 
 function resolveSurface(host: string, path: string): Surface {
@@ -188,6 +201,7 @@ function resolveSurface(host: string, path: string): Surface {
   const normalized = path === '/' ? '/' : path.replace(/\/+$/, '').toLowerCase();
   if (COMIC_PATHS.has(normalized)) return CHAPTER_ONE_SURFACE;
   if (normalized === '/world') return WORLD_SURFACE;
+  if (normalized === '/kickstarter') return KICKSTARTER_SURFACE;
 
   // Strip leading "www." for hostname matching; the redirects in
   // vercel.json already canonicalize, but bare requests may still hit
@@ -266,10 +280,13 @@ export default async function handler(req: Request): Promise<Response> {
   // thresan.com (the domain the ecosystem is migrating onto), so the lore
   // hub's link equity doesn't split across playskyflag.com and the
   // thresan.* surfaces.
+  const normPath = path.replace(/\/+$/, '').toLowerCase();
   const canonicalUrl =
-    path.replace(/\/+$/, '').toLowerCase() === '/world'
+    normPath === '/world'
       ? 'https://thresan.com/world'
-      : `https://${canonicalHost}${path === '/' ? '/' : path}`;
+      : normPath === '/kickstarter'
+        ? 'https://thresan.com/kickstarter'
+        : `https://${canonicalHost}${path === '/' ? '/' : path}`;
 
   // Fetch the static index.html. The vercel.json SPA rewrite excludes
   // /index.html (regex skips paths with dots), so the response is the
