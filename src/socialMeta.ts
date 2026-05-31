@@ -46,7 +46,7 @@ function setLinkHref(sel: string, value: string | undefined): void {
 
 /**
  * Override the global meta tags from index.html for a specific surface.
- * Returns a teardown that restores the previous values — call it from
+ * Returns a teardown that restores the previous values, call it from
  * the useEffect cleanup so SPA navigation away from the surface
  * (currently rare since main.tsx uses hard nav, but cheap insurance)
  * doesn't leak this surface's values into the next render.

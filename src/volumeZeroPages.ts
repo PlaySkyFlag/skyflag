@@ -1,16 +1,16 @@
-// Issue One — page manifest. The reader (VolumeZeroReader.tsx) and the
+// Issue One, page manifest. The reader (VolumeZeroReader.tsx) and the
 // landing (VolumeZeroLanding.tsx) read from this single source of truth.
 // Populated 2026-05-15 from the first publication-edition PDF (rendered
 // to 2000×3000 JPGs in public/volume-zero/). To revise: re-render and
-// update the entries below — no component changes needed.
+// update the entries below, no component changes needed.
 //
 // ── Naming (RESOLVED 2026-05-15) ───────────────────────────────────
 // Decision: the public/display title is aligned to the ISBN-registered
-// title — "Thresan: Skyflag, Issue One: The Eight-Footed Mark". The
+// title, "Thresan: Skyflag, Issue One: The Eight-Footed Mark". The
 // site and the ISBN record now read identically; no Library and
 // Archives Canada amendment is needed. `title` therefore equals
 // `registeredTitle` verbatim. The "volume-zero" string survives ONLY as
-// internal infra — the route slug (/volume-zero, alias
+// internal infra, the route slug (/volume-zero, alias
 // /the-eight-footed-mark), the module/identifier names (VOLUME_ZERO),
 // the public asset dir (public/volume-zero/), the export filename
 // convention (TH_VolumeZero_*), and docs/volume-zero/. None of those
@@ -22,7 +22,7 @@
 // TH_VolumeZero_17_BackCover (see docs/volume-zero/deliverables.md).
 // Add an entry per page below in reading order once cleared for
 // release. Art direction is cinematic, page-based, dark-fantasy /
-// industrial sci-fi — NOT vertical-scroll webtoon.
+// industrial sci-fi, NOT vertical-scroll webtoon.
 
 export type VolumeZeroPageKind =
   | 'cover'
@@ -49,12 +49,12 @@ export type VolumeZeroPage = {
 export const VOLUME_ZERO_PAGES: VolumeZeroPage[] = [
   {
     src: '/volume-zero/TH_VolumeZero_00_Cover.jpg',
-    alt: 'Cover — Thresan: Skyflag, Issue One: The Eight-Footed Mark. Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags stand before the stone guardian, the Aetheri leaf glowing between them.',
+    alt: 'Cover, Thresan: Skyflag, Issue One: The Eight-Footed Mark. Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags stand before the stone guardian, the Aetheri leaf glowing between them.',
     kind: 'cover',
   },
   {
     src: '/volume-zero/TH_VolumeZero_00b_Credits.jpg',
-    alt: 'Credits and indicia — created and written by Nelson Jatel, published by Limnology Research Corp., AI-assisted creation disclosure, and ISBN 978-1-7388485-4-6.',
+    alt: 'Credits and indicia, created and written by Nelson Jatel, published by Limnology Research Corp., AI-assisted creation disclosure, and ISBN 978-1-7388485-4-6.',
     kind: 'frontmatter',
   },
   {
@@ -64,7 +64,7 @@ export const VOLUME_ZERO_PAGES: VolumeZeroPage[] = [
   },
   {
     src: '/volume-zero/TH_VolumeZero_02.jpg',
-    alt: 'Sera at the White Stags holo-table — the mark is confirmed. "Renn found it. Sound the mobilization."',
+    alt: 'Sera at the White Stags holo-table, the mark is confirmed. "Renn found it. Sound the mobilization."',
     kind: 'page',
   },
   {
@@ -79,12 +79,12 @@ export const VOLUME_ZERO_PAGES: VolumeZeroPage[] = [
   },
   {
     src: '/volume-zero/TH_VolumeZero_05.jpg',
-    alt: 'The Caelum Nexus burns. "The eight-footed mark was never a game. It was a warning." Next: Issue Two — The Violet Beneath.',
+    alt: 'The Caelum Nexus burns. "The eight-footed mark was never a game. It was a warning." Next: Issue Two, The Violet Beneath.',
     kind: 'page',
   },
   {
     src: '/volume-zero/TH_VolumeZero_06_BackCover.jpg',
-    alt: 'Back cover — synopsis, ISBN barcode, and the Issue Two teaser, The Violet Beneath.',
+    alt: 'Back cover, synopsis, ISBN barcode, and the Issue Two teaser, The Violet Beneath.',
     kind: 'backcover',
   },
 ];
@@ -107,28 +107,27 @@ export const VOLUME_ZERO_ISBN: string | null = '978-1-7388485-4-6';
 /**
  * Gates "publication-ready" framing. True as of 2026-05-15: the full
  * publication PDF (cover, indicia, 5 story pages, back cover, ISBN,
- * creator AI disclosure) is rendered into the reader — this is the
+ * creator AI disclosure) is rendered into the reader, this is the
  * first publication edition, not a placeholder.
  */
 export const VOLUME_ZERO_PUBLICATION_READY = true;
 
-/** Issue framing — single source for every surface. */
+/** Issue framing, single source for every surface. */
 export const VOLUME_ZERO = {
   seriesTitle: 'Thresan: Skyflag',
-  /** Public display title — aligned verbatim to the ISBN registration. */
+  /** Public display title, aligned verbatim to the ISBN registration. */
   title: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
   /** Short form for cards/headers. */
   shortTitle: 'Issue One: The Eight-Footed Mark',
   /**
-   * Marketed publicly as "Chapter 1" (creator decision 2026-05-16) —
-   * used on every funnel surface (homepage gate, landing, reader,
+   * Marketed publicly as "Chapter 1" (creator decision 2026-05-16),    * used on every funnel surface (homepage gate, landing, reader,
    * studio card). The ISBN is registered as "Issue One" and cannot be
    * changed, so the colophon still shows `registeredTitle` truthfully;
    * marketing name and registry name intentionally differ.
    */
   marketingTitle: 'Chapter 1: The Eight-Footed Mark',
   marketingShort: 'Chapter 1',
-  /** As registered against the ISBN — shown verbatim in the colophon. */
+  /** As registered against the ISBN, shown verbatim in the colophon. */
   registeredTitle: 'Thresan: Skyflag, Issue One: The Eight-Footed Mark',
   subtitle: 'A graphic prequel to the Thresan strategy game.',
   author: 'Nelson Jatel',
@@ -140,7 +139,7 @@ export const VOLUME_ZERO = {
   synopsis:
     'Before the clans had names, the Aetheri lifted three arcologies ' +
     'off the Earth and the Lifts went quiet. Issue One is the world ' +
-    'of Kaleo at that hinge — the Grey Ravens, the White Stags, and ' +
+    'of Kaleo at that hinge, the Grey Ravens, the White Stags, and ' +
     'the Caelum Nexus they both reach for. It is the prequel to the ' +
     'current edition of Thresan: Skyflag.',
 } as const;

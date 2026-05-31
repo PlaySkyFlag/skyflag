@@ -6,7 +6,7 @@
     <link rel="apple-touch-icon" href="/3phor-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
 
-    <!-- Caveat — handwriting font used for the "Three worlds. One proof."
+    <!-- Caveat, handwriting font used for the "Three worlds. One proof."
          tagline across the landing hero, end-game overlay, and
          in-app footer. Single weight (700) keeps the payload small;
          display=swap so layout doesn't wait on the font network
@@ -20,12 +20,12 @@
 
     <!-- Search-engine crawl directives. max-image-preview:large lets
          Google use a full-size og-image card instead of a tiny thumbnail
-         in search results — meaningful CTR uplift for branded queries. -->
+         in search results, meaningful CTR uplift for branded queries. -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
     <!-- Primary SEO. Description trimmed to <160 chars so it shows
          in full in Google SERP without truncation. -->
-    <title>Thresan™: Skyflag — Three worlds. One proof.</title>
+    <title>Thresan™: Skyflag, Three worlds. One proof.</title>
     <meta name="description" content="Thresan: a free turn-based strategy game. Three layers. Four Lifts. One Nexus. Currently in its Skyflag edition. Play now." />
     <meta name="keywords" content="Thresan, Skyflag, Kaleo, strategy game, turn-based, board game, online, multiplayer, daily puzzle, chess-like, AI opponent, three-layer game, Grey Ravens, White Stags, Caelum Nexus" />
     <meta name="author" content="Limnology Research Corp." />
@@ -34,22 +34,22 @@
     <!-- Open Graph (Facebook, LinkedIn, Discord, iMessage previews) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Thresan™: Skyflag" />
-    <meta property="og:title" content="Thresan™: Skyflag — Three worlds. One proof." />
+    <meta property="og:title" content="Thresan™: Skyflag, Three worlds. One proof." />
     <meta property="og:description" content="Thresan: a turn-based strategy game. Three layers. Four Lifts. One Nexus. Neutralize the opposing clan's three claim-seals, or guide your Captain to the Caelum Nexus. Free to play. Currently in its Skyflag edition." />
     <meta property="og:url" content="https://playskyflag.com/" />
     <meta property="og:image" content="https://playskyflag.com/thresan-og-card.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Thresan: Skyflag — three stacked boards, gold-on-dark wordmark, tagline 'Three worlds. One proof.'" />
+    <meta property="og:image:alt" content="Thresan: Skyflag, three stacked boards, gold-on-dark wordmark, tagline 'Three worlds. One proof.'" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Thresan™: Skyflag — Three worlds. One proof." />
+    <meta name="twitter:title" content="Thresan™: Skyflag, Three worlds. One proof." />
     <meta name="twitter:description" content="Thresan: a turn-based strategy game. Three layers. Four Lifts. One Nexus. Free to play. Currently in its Skyflag edition." />
     <meta name="twitter:image" content="https://playskyflag.com/thresan-og-card.jpg" />
 
-    <!-- Schema.org structured data — helps Google render a rich card.
+    <!-- Schema.org structured data, helps Google render a rich card.
          Two separate JSON-LD blocks: a VideoGame entity for the game
          itself, and an Organization entity for the publisher (so
          "Limnology Research Corp." can show up as a knowledge panel
@@ -100,7 +100,7 @@
     </script>
   </head>
   <body>
-    <!-- Static loading shell — visible immediately on first paint,
+    <!-- Static loading shell, visible immediately on first paint,
          even before the JS bundle parses. React replaces this with
          the real route once it mounts. If JS never runs (parse
          error, blocked network, etc.) the user sees this instead
@@ -127,7 +127,7 @@
         // HTML (which references the current chunks), and only fall
         // through to the visible error card if reloading itself
         // didn't fix it (genuine bug, not stale deploy).
-        // Storage key kept as '3phor.*' for backward compatibility — renaming
+        // Storage key kept as '3phor.*' for backward compatibility, renaming
         // would lose the stale-deploy guard for existing users on first load
         // after the rebrand, causing a needless reload-loop window.
         var RELOAD_KEY = '3phor.stale-deploy-reloaded';
@@ -159,7 +159,7 @@
           if (!root.querySelector('[data-react-mounted]')) {
             root.innerHTML =
               '<div style="padding:22px 26px;margin:40px auto;max-width:560px;background:rgba(20,30,52,0.95);border:1px solid rgba(255,138,138,0.45);border-radius:14px;color:#f5f7fb;font-family:system-ui,-apple-system,sans-serif;line-height:1.5;">' +
-              '<h2 style="margin:0 0 8px;font-size:1.2rem;color:#ff9a9a;">Skyflag — initial load failed</h2>' +
+              '<h2 style="margin:0 0 8px;font-size:1.2rem;color:#ff9a9a;">Skyflag, initial load failed</h2>' +
               '<p style="margin:0 0 12px;opacity:0.9;">The app hit a problem before React could start. Try a hard reload first (Cmd+Shift+R / Ctrl+Shift+R). If it keeps happening, the error below is the cause:</p>' +
               '<pre style="margin:0 0 14px;padding:10px 12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.10);border-radius:8px;font:0.78rem ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word;max-height:30vh;overflow:auto;">' +
               String(message || 'unknown error') +
@@ -177,7 +177,7 @@
           showError((r && r.message) || String(r), r && r.fileName, r && r.lineNumber);
         });
         // Clear the reload flag once we're confident this load is
-        // healthy — by the time the React app has been visible for a
+        // healthy, by the time the React app has been visible for a
         // second or two, the cycle is over. Done in window.load so
         // it runs after the entry chunk has at least started.
         window.addEventListener('load', function () {

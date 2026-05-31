@@ -1,10 +1,10 @@
-// /story — The Three Seals of Kaleo, Volume One.
+// /story, The Three Seals of Kaleo, Volume One.
 // A cinematic scroll-driven storybook drawn from the original
 // Storybook v3 manuscript. Designed to be read, not skimmed.
 //
 // Visual approach: atmospheric typography on dark gold-on-black, with
 // inline SVG accents for clan totems, layer geometry, and the Nexus.
-// No external image assets required — everything renders from code.
+// No external image assets required, everything renders from code.
 
 import { useEffect } from 'react';
 import './Story.css';
@@ -14,7 +14,7 @@ export default function Story() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'The Story — Thresan™: Skyflag',
+      title: 'The Story, Thresan™: Skyflag',
       description:
         'Volume One of the Skyflag edition: the Three Seals of Kaleo. A narrative account of the campaign across Terran, Meridian, and Empyrean.',
       canonicalUrl: 'https://playskyflag.com/story',
@@ -67,7 +67,7 @@ function StoryFooter() {
   return (
     <footer className="story-footer">
       <div className="story-footer-inner">
-        <p className="story-footer-mark">Thresan™: Skyflag — The Three Seals of Kaleo</p>
+        <p className="story-footer-mark">Thresan™: Skyflag, The Three Seals of Kaleo</p>
         <p className="story-footer-meta">
           Storybook v3 · © {new Date().getFullYear()} Limnology Research Corp.
         </p>
@@ -125,11 +125,11 @@ function Foreword() {
           farms, workshops, and crowded human districts. Above it, the{' '}
           <Term>Meridian</Term> carries charged air, transit architecture,
           and the old routing systems. At the summit rests the{' '}
-          <Term>Empyrean</Term> — the quiet upper shell where the Aetheri
+          <Term>Empyrean</Term>, the quiet upper shell where the Aetheri
           left their highest instruments.
         </p>
         <p>
-          At the center of the Empyrean — and only there — waits the{' '}
+          At the center of the Empyrean, and only there, waits the{' '}
           <Term>Caelum Nexus</Term>. The lower layers have no such central
           shrine. What they have, instead, are corners.
         </p>
@@ -164,7 +164,7 @@ function TwoClans() {
         <p>
           For seven generations after founding, Kaleo was one people. The
           schism came in the eighth generation, during the event the
-          archives record as the <Term>First Hollow</Term> — a partial
+          archives record as the <Term>First Hollow</Term>, a partial
           outbreak of the wasting disease that would return six generations
           later as the Grey Hollow.
         </p>
@@ -189,12 +189,12 @@ function TwoClans() {
           </p>
           <p className="story-clan-body">
             Slate-grey field uniforms with black accents. Long memory,
-            high vantage. Ravens speak of <em>raven's patience</em> — the
+            high vantage. Ravens speak of <em>raven's patience</em>, the
             willingness to observe a situation for as long as observation
             alone can produce information, and to act only when action is
             the only remaining option.
           </p>
-          <PullQuote attribution="— Grey Raven field maxim" muted>
+          <PullQuote attribution="Grey Raven field maxim" muted>
             We have been here longer than the crisis. We will be here
             longer than its answer.
           </PullQuote>
@@ -210,11 +210,11 @@ function TwoClans() {
           </p>
           <p className="story-clan-body">
             Bone-ivory field uniforms with warm gold accents. Endurance
-            across distance. Stags speak of the <em>stag-path</em> — the
+            across distance. Stags speak of the <em>stag-path</em>, the
             commitment to complete a traverse once begun, because a
             half-completed ascent is worse than an unattempted one.
           </p>
-          <PullQuote attribution="— White Stag field maxim" muted>
+          <PullQuote attribution="White Stag field maxim" muted>
             We were given a path. If we do not walk it, it becomes a
             monument to our refusal.
           </PullQuote>
@@ -242,7 +242,7 @@ function FourTemplates() {
           The Aetheri did not leave Kaleo with armies. They left it with
           four training-and-augmentation protocols. A recruit who passes
           into one of the four templates inherits the name along with the
-          training. The templates are shared across clans — the Ravens and
+          training. The templates are shared across clans, the Ravens and
           the Stags both train their recruits into the same four
           protocols. What differs is only the cultural frame each clan
           wraps around the training.
@@ -272,7 +272,7 @@ function FourTemplates() {
         />
       </div>
 
-      <PullQuote attribution="— Archivist of the Third Generation">
+      <PullQuote attribution="Archivist of the Third Generation">
         They did not make soldiers. They made the shapes we could pour
         ourselves into.
       </PullQuote>
@@ -319,13 +319,13 @@ function Cast() {
           <Character
             name="Renn Dantec"
             role="Captain · Grey Raven"
-            bio="Fifties. Meridian-born, daughter of a Lift warden, raised in the shadow of the Raven Archive. The only character in the cast who has stood before the Nexus before — at twenty-nine, under a partial rediscovery, she declined to ask a question. The decision has defined her ever since."
+            bio="Fifties. Meridian-born, daughter of a Lift warden, raised in the shadow of the Raven Archive. The only character in the cast who has stood before the Nexus before, at twenty-nine, under a partial rediscovery, she declined to ask a question. The decision has defined her ever since."
             quote="The hardest answer is the one you can still defend tomorrow."
           />
           <Character
             name="Toren Durren"
             role="Soldier · Grey Raven"
-            bio="Late twenties. Terran-born, raised in a Stag-adjacent reservoir sector — a fact that made his entry into the Raven clan a matter of quiet controversy. Discipline in service of urgency. Unusual in the Raven corps."
+            bio="Late twenties. Terran-born, raised in a Stag-adjacent reservoir sector, a fact that made his entry into the Raven clan a matter of quiet controversy. Discipline in service of urgency. Unusual in the Raven corps."
             quote="Hold the line. But hold it forward."
           />
           <Character
@@ -337,7 +337,7 @@ function Cast() {
           <Character
             name="Zara Voss"
             role="Pilot · Grey Raven"
-            bio="Early thirties. Archive chemist turned field tactician. Treats capture-geometries the way an archivist treats cross-references — catalogued and collated rather than acted on immediately. Slower than most Vosses; her interventions, when they come, decisive."
+            bio="Early thirties. Archive chemist turned field tactician. Treats capture-geometries the way an archivist treats cross-references, catalogued and collated rather than acted on immediately. Slower than most Vosses; her interventions, when they come, decisive."
             quote="Access changes the future long before possession does."
           />
         </div>
@@ -369,7 +369,7 @@ function Cast() {
           <Character
             name="Arin Voss"
             role="Pilot · White Stag"
-            bio="Early thirties. Former Stag archive runner. Knows more of Kaleo's physical geography — service shafts, maintenance bypasses, closed corridors — than any operative in either clan. He can reach places the Voss template alone cannot."
+            bio="Early thirties. Former Stag archive runner. Knows more of Kaleo's physical geography, service shafts, maintenance bypasses, closed corridors, than any operative in either clan. He can reach places the Voss template alone cannot."
             quote="Knowledge that cannot circulate begins to rot."
           />
         </div>
@@ -462,7 +462,7 @@ function Chapter1() {
         The White Stags learned of the discovery on day four. A Stag
         Medic, treating an unrelated respiratory condition in a Raven
         Archive Keeper, noticed an unusual distraction in her patient's
-        bedside conversation — the archivist had been unable to stop
+        bedside conversation, the archivist had been unable to stop
         returning to a phrase she recognized as Aetheri citation format.
         The information reached the Ascendant Council by evening.
       </p>
@@ -566,8 +566,7 @@ function Chapter3() {
       </p>
       <p>
         Sera arrived at Lift (1,4) on the Terran. The control plate read
-        MERIDIAN: OCCUPIED. She recognized the doctrine immediately —
-        Raven, Mox, probably. She had read his field reports for nine
+        MERIDIAN: OCCUPIED. She recognized the doctrine immediately,         Raven, Mox, probably. She had read his field reports for nine
         years. She did not try to clear him. A Stag sent to clear a Raven
         Thandiwe on a Lift platform was a Stag the Stags could not afford
         to lose. Sera rerouted through Lift (4,1). Two activations lost.
@@ -701,7 +700,7 @@ function Chapter5() {
         activation. The Stag clan considered a fifty-seven percent
         success rate acceptable. The Ravens did not.
       </p>
-      <PullQuote attribution="— Renn Dantec">
+      <PullQuote attribution="Renn Dantec">
         Because we will still be here when their waked Durren collapses
         at the wrong moment. We will not be here if ours does.
       </PullQuote>
@@ -759,7 +758,7 @@ function Chapter6() {
       <p>
         A warmth at the base of his skull that was not painful, only
         warmer than the rest of him. A sudden doubling of his visual field
-        as the Dantec overlay activated — capture-geometries, movement
+        as the Dantec overlay activated, capture-geometries, movement
         options, seal-acknowledgements he had been trained to recognize
         in others for ten years, now his own. A hairline of gold light
         traced the Stag sigil on his sleeve from within; the leaping stag
@@ -770,7 +769,7 @@ function Chapter6() {
         Kael was, for four seconds, both things at once. A Durren who had
         completed a traverse. A Dantec who had just been raised to the
         mantle. Then the wake settled. His route map, unfolded in his
-        hand, had acquired new options — a Dantec's king-move range, all
+        hand, had acquired new options, a Dantec's king-move range, all
         eight directions, all three layers available to him now.
       </p>
       <p>
@@ -789,7 +788,7 @@ function Chapter6() {
         for the first time, the thirty-year silence his Captain had been
         carrying. She had just declined, in a single syllable, to give
         her own Durren the same chance the Stags had given theirs. She
-        had been willing to let Kael succeed — she had known he might.
+        had been willing to let Kael succeed, she had known he might.
         She was not willing to take the same risk with Toren.
       </p>
       <p>
@@ -813,7 +812,7 @@ function Chapter7() {
         Sera reached the upper layer first. Mox had redeployed from
         Sky(1,4) to block Kael's projected Meridian Lift at (4,4),
         freeing Sera's original Lift. She ascended through (1,4) into the
-        Empyrean — bone-white floor plates, weightless architecture, the
+        Empyrean, bone-white floor plates, weightless architecture, the
         Nexus a held-breath glow at the dead center of the grid. She had
         never walked the Empyrean. No living Stag Dantec had.
       </p>
@@ -944,7 +943,7 @@ function Chapter8() {
         people in either clan's command structure who had seen both
         lists.
       </p>
-      <PullQuote attribution="— Renn Dantec">
+      <PullQuote attribution="Renn Dantec">
         I could ask for it myself. I didn't, twenty-two years ago, because
         I didn't know how to ask correctly. You are a Durren three hours
         into a Dantec mantle. You are the only person here who can still
@@ -958,7 +957,7 @@ function Chapter8() {
       <p>
         He asked anyway.
       </p>
-      <PullQuote large attribution="— Kael Dantec, at the Caelum Nexus">
+      <PullQuote large attribution="Kael Dantec, at the Caelum Nexus">
         Open the Aetheri archives of Kaleo to both clans and to the
         civilian population. Release the medical protocols sealed in
         them. Let the cure circulate.
@@ -984,7 +983,7 @@ function Epilogue() {
         previous rate. The condenser systems were stabilized. Three of
         the failing reservoirs were rebuilt with Aetheri protocols that
         had not been available to any engineer in Kaleo's living memory.
-        The medical protocols sealed in the archives were opened — not to
+        The medical protocols sealed in the archives were opened, not to
         one clan, but to both, and to civilian distribution.
       </p>
       <p>

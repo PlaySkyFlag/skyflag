@@ -1,4 +1,4 @@
-// ThresanStudio — served at thresan.studio. Per the launch plan this is
+// ThresanStudio, served at thresan.studio. Per the launch plan this is
 // the reader's home: the canonical place to find Issue One, meet the
 // world, hear from the creator, and convert into either playing Skyflag
 // now or joining the Kickstarter list. It is intentionally the deepest
@@ -41,7 +41,7 @@ const LINKEDIN_URL = 'https://ca.linkedin.com/in/nelsonjatel';
 const CLANS = [
   {
     name: 'The Grey Ravens',
-    line: 'Captain Renn Dantec’s clan. In Issue One she works the Second Epoch archives and turns up the eight-footed mark — the Ashtapada-marked Aetheri leaf the First Clan left waiting before the Nexus shifted.',
+    line: 'Captain Renn Dantec’s clan. In Issue One she works the Second Epoch archives and turns up the eight-footed mark, the Ashtapada-marked Aetheri leaf the First Clan left waiting before the Nexus shifted.',
   },
   {
     name: 'The White Stags',
@@ -50,12 +50,12 @@ const CLANS = [
 ];
 
 // Five pieces a side (Captain, Soldier, Promoted Soldier Captain,
-// Rover, Pilot) — canonical per rulebook v20. The Soldier promotes, so
+// Rover, Pilot), canonical per rulebook v20. The Soldier promotes, so
 // Durren is two of the five: Soldier Durren, then Captain Durren.
 const PIECES = [
   {
     name: 'Captain Dantec',
-    line: 'The Captain — the piece the proof rides on; land it on the Caelum Nexus to win. Each clan fields a Dantec: Renn Dantec leads the Grey Ravens, Sera Dantec the White Stags.',
+    line: 'The Captain, the piece the proof rides on; land it on the Caelum Nexus to win. Each clan fields a Dantec: Renn Dantec leads the Grey Ravens, Sera Dantec the White Stags.',
   },
   {
     name: 'Soldier Durren',
@@ -63,34 +63,34 @@ const PIECES = [
   },
   {
     name: 'Captain Durren',
-    line: 'The Promoted Soldier Captain — the swap-in Durren becomes on promotion. The fifth piece, and why a side counts five.',
+    line: 'The Promoted Soldier Captain, the swap-in Durren becomes on promotion. The fifth piece, and why a side counts five.',
   },
   {
     name: 'Rover Thandiwe',
-    line: 'The Rover — one of the clan’s two transports between layers; leap-captures up close.',
+    line: 'The Rover, one of the clan’s two transports between layers; leap-captures up close.',
   },
   {
     name: 'Pilot Voss',
-    line: 'The Pilot — the clan’s other transport between layers; leap-captures up close.',
+    line: 'The Pilot, the clan’s other transport between layers; leap-captures up close.',
   },
 ];
 
 const FRAGMENTS = [
   {
     name: 'The Lifts',
-    line: 'Fixed positions at (1,1), (1,4), (4,1), (4,4) — the only way a piece changes planes. No free transit; the third dimension is a strategic asset, not noise.',
+    line: 'Fixed positions at (1,1), (1,4), (4,1), (4,4), the only way a piece changes planes. No free transit; the third dimension is a strategic asset, not noise.',
   },
   {
     name: 'Ashtapada',
-    line: 'The eight-by-eight board predates chess by centuries. Ashtapada — Sanskrit for "eight-footed" — is the ancestor. Thresan keeps the disciplined grid and lifts it into three dimensions.',
+    line: 'The eight-by-eight board predates chess by centuries. Ashtapada, Sanskrit for "eight-footed", is the ancestor. Thresan keeps the disciplined grid and lifts it into three dimensions.',
   },
   {
     name: 'The eight-footed mark',
-    line: 'The Ashtapada glyph as an in-world relic — an Aetheri leaf the First Clan left in the Kaleo archives. Issue One is its discovery, and its warning: it was never a game.',
+    line: 'The Ashtapada glyph as an in-world relic, an Aetheri leaf the First Clan left in the Kaleo archives. Issue One is its discovery, and its warning: it was never a game.',
   },
   {
     name: 'The Caelum Nexus',
-    line: 'A single column at the centre of the stack. Land your Captain there and the proof is complete. One column, one win path — by design.',
+    line: 'A single column at the centre of the stack. Land your Captain there and the proof is complete. One column, one win path, by design.',
   },
 ];
 
@@ -98,15 +98,15 @@ export default function ThresanStudio() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'Read Chapter 1 free — Thresan: Skyflag',
+      title: 'Read Chapter 1 free, Thresan: Skyflag',
       description:
         'Get Chapter 1 of the Thresan: Skyflag graphic prequel, free. ' +
         'Enter your email and read it online, on GlobalComix, or as a ' +
-        'PDF — then play the game.',
+        'PDF, then play the game.',
       canonicalUrl: 'https://thresan.studio/',
       ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
       ogImageAlt:
-        'Cover of Thresan: Skyflag — Chapter 1: The Eight-Footed Mark. Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
+        'Cover of Thresan: Skyflag, Chapter 1: The Eight-Footed Mark. Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
     });
   }, []);
 
@@ -174,7 +174,7 @@ export default function ThresanStudio() {
 
           <h2 className="studio-section-title">The pieces</h2>
           <p className="studio-section-note">
-            Five pieces a side — the Soldier promotes, so Durren is two
+            Five pieces a side, the Soldier promotes, so Durren is two
             of them: Soldier Durren, then Captain Durren.
           </p>
           <ul className="studio-profiles">
@@ -213,7 +213,7 @@ export default function ThresanStudio() {
             <p>
               Thresan is built by <strong>Nelson Jatel</strong> in
               Kelowna, BC. By day I support watershed management and am
-              an adjunct professor at UBCO — limnologist and doctor of
+              an adjunct professor at UBCO, limnologist and doctor of
               social sciences.
             </p>
             <p>
@@ -252,7 +252,7 @@ export default function ThresanStudio() {
             </video>
           </div>
           <p className="studio-section-note">
-            This is Thresan in play — three stacked boards (Ground, Sky,
+            This is Thresan in play, three stacked boards (Ground, Sky,
             and Space), five pieces a side moving across all three planes
             at once, lifting between worlds to set up captures no flat
             board could hold. The digital game is{' '}
@@ -272,7 +272,7 @@ export default function ThresanStudio() {
 
         <div className="studio-secondary">
           <a href="https://thresan.com/kickstarter" className="studio-link">
-            Notify me — Kickstarter Fall 2026 →
+            Notify me, Kickstarter Fall 2026 →
           </a>
           <a href="https://thresan.com/world" className="studio-link">
             The world of Kaleo →
@@ -400,11 +400,10 @@ function KickstarterList() {
 
 // ─── Chapter 1 gate ────────────────────────────────────────────────
 // The single above-the-fold job on thresan.studio: trade an email for
-// the free comic. Nothing sells yet — the list is the asset. Same
+// the free comic. Nothing sells yet, the list is the asset. Same
 // proven thresan_waitlist pattern, tagged source 'thresan-studio-
 // chapter1'. On success the read options are revealed (online,
-// GlobalComix, PDF) so the subscriber gets the comic immediately —
-// the email is the ask, not a wall.
+// GlobalComix, PDF) so the subscriber gets the comic immediately, // the email is the ask, not a wall.
 
 function ChapterOneGate() {
   const [email, setEmail] = useState('');
@@ -449,7 +448,7 @@ function ChapterOneGate() {
         Read Chapter 1 free
       </h2>
       <p className="studio-gate-lead">
-        <em>{VOLUME_ZERO.marketingTitle}</em> — the graphic prequel to
+        <em>{VOLUME_ZERO.marketingTitle}</em>, the graphic prequel to
         Thresan: Skyflag. Enter your email and read it now. One email
         when Chapter 2 and the Kickstarter land. Nothing else.
       </p>

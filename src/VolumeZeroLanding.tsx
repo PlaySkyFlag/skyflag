@@ -1,4 +1,4 @@
-// VolumeZeroLanding — served at thresan.studio/volume-zero (and the
+// VolumeZeroLanding, served at thresan.studio/volume-zero (and the
 // /the-eight-footed-mark alias). The conversion surface for the prequel.
 // Goal is NOT comic revenue: it is reader → player → email subscriber →
 // Kickstarter backer. Structure follows the creator's spec exactly:
@@ -20,11 +20,11 @@ import {
 } from './volumeZeroPages';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-volume-zero';
-// Live on GlobalComix (first external platform — discovery + analytics).
+// Live on GlobalComix (first external platform, discovery + analytics).
 const GLOBALCOMIX_URL =
   'https://globalcomix.com/read/650af4e6-1570-4196-87b3-fa8072e25dfb/1?utm_source=Link&utm_medium=Referral&utm_campaign=thresan&utm_term=GCRID_370744';
 
-// The AI-use disclosure is no longer printed inline here — it now
+// The AI-use disclosure is no longer printed inline here, it now
 // lives on the single canonical /ai-use page (src/AiUse.tsx), linked
 // from the footer like Privacy/Terms. The verbatim statement (kept
 // identical to the published comic's credits page) lives there.
@@ -40,7 +40,7 @@ export default function VolumeZeroLanding() {
       // generic boards card.
       ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
       ogImageAlt:
-        'Cover of Thresan: Skyflag, Issue One: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
+        'Cover of Thresan: Skyflag, Issue One: The Eight-Footed Mark, Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
     });
   }, []);
 
@@ -62,7 +62,7 @@ export default function VolumeZeroLanding() {
               </a>
             ) : (
               <span className="vzl-btn vzl-btn--disabled" aria-disabled="true">
-                PDF — coming
+                PDF, coming
               </span>
             )}
             <a
@@ -87,7 +87,7 @@ export default function VolumeZeroLanding() {
             {VOLUME_ZERO_COVER ? (
               <img
                 src={VOLUME_ZERO_COVER}
-                alt={`Cover — ${VOLUME_ZERO.shortTitle}`}
+                alt={`Cover, ${VOLUME_ZERO.shortTitle}`}
                 className="vzl-cover-img"
               />
             ) : (
@@ -107,7 +107,7 @@ export default function VolumeZeroLanding() {
           </div>
         </section>
 
-        {/* Page-by-page reader (embedded, page-based — not webtoon). */}
+        {/* Page-by-page reader (embedded, page-based, not webtoon). */}
         <section id="reader" className="vzl-reader" aria-label="Read Chapter 1">
           <h2 className="vzl-h2">Read it</h2>
           <VolumeZeroReader embedded />

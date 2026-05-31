@@ -1,4 +1,4 @@
-// Kickstarter — the focused launch-capture page served at /kickstarter on
+// Kickstarter, the focused launch-capture page served at /kickstarter on
 // every host, canonical on thresan.com. The single destination all surfaces
 // funnel toward: one ask (the email), segmentation checkboxes so the list is
 // useful later, and a required CASL/GDPR consent box. Signups write to the
@@ -7,7 +7,7 @@
 //
 // Deliberately one screen + a short pitch: no nav, no competing links, the
 // deluxe-board render doing the heavy lifting. Lead magnet is the real free
-// prequel (Volume Zero — The Eight-Footed Mark), not a vaporware title.
+// prequel (Volume Zero, The Eight-Footed Mark), not a vaporware title.
 
 import { useEffect, useState, type FormEvent } from 'react';
 import './Kickstarter.css';
@@ -35,13 +35,13 @@ export default function Kickstarter() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'Thresan: Skyflag — coming to Kickstarter',
+      title: 'Thresan: Skyflag, coming to Kickstarter',
       description:
         'A premium illuminated strategy game: three glass decks, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter in Fall 2026, and claim early-backer pricing.',
       canonicalUrl: 'https://thresan.com/kickstarter',
       ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
       ogImageAlt:
-        'The Thresan: Skyflag deluxe edition — three illuminated acrylic boards fanned from a shared powered hub.',
+        'The Thresan: Skyflag deluxe edition, three illuminated acrylic boards fanned from a shared powered hub.',
     });
   }, []);
 
@@ -103,13 +103,13 @@ export default function Kickstarter() {
             </span>
           </h1>
           <p className="ks-subhead">
-            Thresan is a premium illuminated strategy game — three glass
+            Thresan is a premium illuminated strategy game, three glass
             decks, four Lifts, one shared hub. Be first to know when it
             launches, and claim early-backer pricing.
           </p>
           <img
             src="/thresan-deluxe-board.jpg"
-            alt="The Thresan: Skyflag deluxe edition — three illuminated acrylic boards fanned from a shared center-balanced powered hub on a weighted base."
+            alt="The Thresan: Skyflag deluxe edition, three illuminated acrylic boards fanned from a shared center-balanced powered hub on a weighted base."
             className="ks-hero-art"
           />
           <a href="#notify" className="ks-hero-cta">
@@ -138,7 +138,7 @@ export default function Kickstarter() {
             <div className="ks-success" role="status" aria-live="polite">
               <h2 className="ks-success-title">You're first in line.</h2>
               <p>
-                We'll email you the moment the Kickstarter goes live — plus
+                We'll email you the moment the Kickstarter goes live, plus
                 the early-backer offer. While you wait, read the free
                 prequel:
               </p>
@@ -217,7 +217,7 @@ export default function Kickstarter() {
         <section className="ks-magnet">
           <h2 className="ks-magnet-title">Start reading free</h2>
           <p>
-            Sign up and dive into <strong>Volume Zero — The Eight-Footed
+            Sign up and dive into <strong>Volume Zero, The Eight-Footed
             Mark</strong>, the graphic prequel to Thresan: Skyflag. Free to
             read right now, with the world of Kaleo waiting behind it.
           </p>
@@ -229,7 +229,7 @@ export default function Kickstarter() {
         {/* ── Footer strip ─────────────────────────────────────── */}
         <p className="ks-footer">
           Three layers. Four Lifts. One Nexus. Ages 14+. Thresan™: Skyflag,
-          from the studio of Dr. Nelson Jatel — a project of Limnology
+          from the studio of Dr. Nelson Jatel, a project of Limnology
           Research Corp.{' '}
           <a href={STORE_URL}>The physical edition →</a>
         </p>

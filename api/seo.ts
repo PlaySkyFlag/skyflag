@@ -1,4 +1,4 @@
-// Vercel Edge Function — injects per-hostname OG/Twitter meta and
+// Vercel Edge Function, injects per-hostname OG/Twitter meta and
 // above-the-fold loading copy into index.html at the edge.
 //
 // Why this exists: every Thresan brand domain (thresan.com, .studio,
@@ -7,7 +7,7 @@
 // JS runs. Social previewers (Twitter/X, LinkedIn, Discord, iMessage,
 // Slack), search-engine snippet generators, and any cache-warmer
 // that doesn't run JS see "Loading Skyflag…" as the entire body and
-// the playskyflag-fixed meta tags from index.html — same preview for
+// the playskyflag-fixed meta tags from index.html, same preview for
 // every domain. This silently kneecaps every shared link.
 //
 // The fix runs at the edge: read the host header, decide which
@@ -15,7 +15,7 @@
 // string-replace the meta tags and the loading-shell text, return
 // the rewritten HTML. After hydration, the SPA's socialMeta.ts takes
 // over and continues to update tags client-side as the user navigates
-// — so this only matters for the FIRST byte that a non-JS client sees.
+//, so this only matters for the FIRST byte that a non-JS client sees.
 //
 // Build wiring: vercel.json rewrites the SPA paths through
 // /api/seo so this runs before the static asset is served. The
@@ -36,47 +36,46 @@ type Surface = {
   loadingTagline?: string;  // optional smaller subtitle below the headline
 };
 
-// Per-hostname surfaces. Keys do NOT include the "www." prefix —
-// the resolver strips it before lookup.
+// Per-hostname surfaces. Keys do NOT include the "www." prefix, // the resolver strips it before lookup.
 const HOSTNAME_SURFACES: Record<string, Surface> = {
   'thresan.com': {
-    title: 'Thresan — the rules behind the editions',
+    title: 'Thresan, the rules behind the editions',
     description: 'Thresan is a chess-style abstract strategy game played across three stacked 6x6 boards. Skyflag is the current edition. Discover the universe.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Thresan',
     loadingTagline: 'Three worlds. One proof.',
   },
   'thresan.studio': {
-    title: 'Read Chapter 1 free — Thresan: Skyflag',
-    description: 'Get Chapter 1 of the Thresan: Skyflag graphic prequel free. Enter your email and read it online, on GlobalComix, or as a PDF — then play the game.',
+    title: 'Read Chapter 1 free, Thresan: Skyflag',
+    description: 'Get Chapter 1 of the Thresan: Skyflag graphic prequel free. Enter your email and read it online, on GlobalComix, or as a PDF, then play the game.',
     ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
-    ogImageAlt: 'Cover of Thresan: Skyflag, Chapter 1: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian.',
+    ogImageAlt: 'Cover of Thresan: Skyflag, Chapter 1: The Eight-Footed Mark, Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian.',
     loadingHeadline: 'Read Chapter 1 free',
-    loadingTagline: 'The Thresan: Skyflag prequel — your email, the comic.',
+    loadingTagline: 'The Thresan: Skyflag prequel, your email, the comic.',
   },
   'thresan.io': {
-    title: 'Thresan Lab — engine notes, opening theory, build journal',
+    title: 'Thresan Lab, engine notes, opening theory, build journal',
     description: 'Engineering and theory notes for Thresan. Engine design, opening analysis, and build journal entries from the studio.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Thresan Lab',
     loadingTagline: 'Engine notes. Opening theory. Build journal.',
   },
   'thresan.games': {
-    title: 'Thresan Games — catalog of editions',
+    title: 'Thresan Games, catalog of editions',
     description: 'Thresan editions catalog. Skyflag is the current edition; future editions share the same rules under the same umbrella brand.',
     ogImage: 'https://playskyflag.com/thresan-og-clans.jpg',
     loadingHeadline: 'Thresan Games',
     loadingTagline: 'One rule set. Many editions.',
   },
   'thresan.store': {
-    title: 'Thresan Store — premium physical edition',
+    title: 'Thresan Store, premium physical edition',
     description: 'Premium physical edition of Thresan: Skyflag. Matte black with gold accents, transparent acrylic boards, brass-cast pieces, weighted base. Kickstarter Fall 2026.',
     ogImage: 'https://playskyflag.com/thresan-deluxe-board.jpg',
     loadingHeadline: 'Thresan Store',
     loadingTagline: 'Premium physical edition. Kickstarter Fall 2026.',
   },
   'ashtapada.com': {
-    title: 'Ashtapada — the ancient root',
+    title: 'Ashtapada, the ancient root',
     description: 'Ashtapada is one of the oldest known board games, played in ancient India for thousands of years and the same 8x8 grid that carried Chaturanga west to become chess. Thresan returns to that root and takes a different fork.',
     ogImage: 'https://playskyflag.com/ashtapada-carpet-15c.jpg',
     loadingHeadline: 'Ashtapada',
@@ -90,49 +89,49 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
 // to DEFAULT_SURFACE here so canonical URLs stay on the subdomain.
 const PATH_SURFACES: Record<string, Surface> = {
   '/': {
-    title: 'Thresan: Skyflag — Three worlds. One proof.',
+    title: 'Thresan: Skyflag, Three worlds. One proof.',
     description: 'Thresan: a free turn-based strategy game. Three layers. Four Lifts. One Nexus. Currently in its Skyflag edition. Play now.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Thresan: Skyflag',
     loadingTagline: 'Three worlds. One proof.',
   },
   '/play': {
-    title: 'Play Thresan: Skyflag online — free turn-based strategy',
+    title: 'Play Thresan: Skyflag online, free turn-based strategy',
     description: 'Play Thresan: Skyflag in the browser. Single-player vs AI, two-player hot-seat, online multiplayer with friends, daily puzzle.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Thresan: Skyflag',
     loadingTagline: 'Loading game…',
   },
   '/story': {
-    title: 'The Three Seals of Kaleo — Thresan: Skyflag story',
+    title: 'The Three Seals of Kaleo, Thresan: Skyflag story',
     description: 'The narrative storybook for Thresan: Skyflag. The world of Kaleo, the Grey Ravens, the White Stags, and the Caelum Nexus.',
     ogImage: 'https://playskyflag.com/thresan-og-stack.jpg',
     loadingHeadline: 'The Three Seals of Kaleo',
     loadingTagline: 'Volume one.',
   },
   '/origins': {
-    title: 'Origins — from Ashtapada to Thresan',
+    title: 'Origins, from Ashtapada to Thresan',
     description: 'Thresan descends from Ashtapada, one of the oldest known board games and the root of chess. A historical bridge from 8th-century India to a three-layer 21st-century abstract.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Origins',
     loadingTagline: 'From Ashtapada to Thresan.',
   },
   '/press': {
-    title: 'Thresan: Skyflag — press kit',
+    title: 'Thresan: Skyflag, press kit',
     description: 'Media kit for Thresan: Skyflag. Descriptions, screenshots, founder bio, contact. Free turn-based strategy on web and iOS.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Press Kit',
     loadingTagline: 'Thresan: Skyflag',
   },
   '/privacy': {
-    title: 'Privacy — Thresan: Skyflag',
+    title: 'Privacy, Thresan: Skyflag',
     description: 'Privacy policy for Thresan: Skyflag and the broader Thresan ecosystem.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Privacy',
     loadingTagline: 'Thresan: Skyflag',
   },
   '/terms': {
-    title: 'Terms — Thresan: Skyflag',
+    title: 'Terms, Thresan: Skyflag',
     description: 'Terms of use for Thresan: Skyflag and the broader Thresan ecosystem.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Terms',
@@ -146,14 +145,14 @@ const DEFAULT_SURFACE: Surface = PATH_SURFACES['/'];
 // (thresan.studio/the-eight-footed-mark, /volume-zero, /read, and the
 // playskyflag.com path mirrors) so shared comic links preview the
 // actual cover + title instead of the per-hostname default. og:image
-// is the cover itself — a comic link should show the comic.
+// is the cover itself, a comic link should show the comic.
 const CHAPTER_ONE_SURFACE: Surface = {
-  title: 'Read Chapter 1 free — Thresan: Skyflag',
-  description: 'Chapter 1: The Eight-Footed Mark — the graphic prequel to Thresan: Skyflag. Read it free online, on GlobalComix, or as a PDF, then play the game.',
+  title: 'Read Chapter 1 free, Thresan: Skyflag',
+  description: 'Chapter 1: The Eight-Footed Mark, the graphic prequel to Thresan: Skyflag. Read it free online, on GlobalComix, or as a PDF, then play the game.',
   ogImage: 'https://thresan.studio/volume-zero/TH_VolumeZero_00_Cover.jpg',
-  ogImageAlt: 'Cover of Thresan: Skyflag, Chapter 1: The Eight-Footed Mark — Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
+  ogImageAlt: 'Cover of Thresan: Skyflag, Chapter 1: The Eight-Footed Mark, Renn Dantec of the Grey Ravens and Sera Dantec of the White Stags before the stone guardian, the Aetheri leaf glowing between them.',
   loadingHeadline: 'Chapter 1: The Eight-Footed Mark',
-  loadingTagline: 'A graphic prequel — read it free.',
+  loadingTagline: 'A graphic prequel, read it free.',
 };
 
 const COMIC_PATHS = new Set([
@@ -164,37 +163,37 @@ const COMIC_PATHS = new Set([
 
 // The World of Kaleo codex. Like the comic, /world is served on ANY host
 // (thresan.com/world, thresan.studio/world, playskyflag.com/world, …) so a
-// shared link always previews the lore hub — never the per-hostname
+// shared link always previews the lore hub, never the per-hostname
 // umbrella card. Canonical is pinned to thresan.com (see the handler) as
 // the ecosystem consolidates onto that domain.
 const WORLD_SURFACE: Surface = {
-  title: 'The World of Kaleo — Thresan: Skyflag',
+  title: 'The World of Kaleo, Thresan: Skyflag',
   description:
     'A world suspended above a world that failed. Kaleo: the three-layer arcology, the Grey Ravens and White Stags, the four Aetheri templates, and the silent Nexus at the summit. The universe behind Thresan: Skyflag.',
   ogImage: 'https://thresan.com/kaleo-arcology.jpg',
   ogImageAlt:
-    'The three stacked layers of the Kaleo arcology rising into light — Terran, Meridian, Empyrean.',
+    'The three stacked layers of the Kaleo arcology rising into light, Terran, Meridian, Empyrean.',
   loadingHeadline: 'The World of Kaleo',
   loadingTagline: 'A world above a world that failed.',
 };
 
 // The launch-capture page. Like /world, served on every host and pinned to
-// a single canonical on thresan.com — the one door all surfaces point at.
+// a single canonical on thresan.com, the one door all surfaces point at.
 const KICKSTARTER_SURFACE: Surface = {
-  title: 'Thresan: Skyflag — coming to Kickstarter',
+  title: 'Thresan: Skyflag, coming to Kickstarter',
   description:
     'A premium illuminated strategy game: three glass decks, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter in Fall 2026, and claim early-backer pricing.',
   ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
   ogImageAlt:
-    'The Thresan: Skyflag deluxe edition — three illuminated acrylic boards fanned from a shared powered hub.',
+    'The Thresan: Skyflag deluxe edition, three illuminated acrylic boards fanned from a shared powered hub.',
   loadingHeadline: 'Thresan: Skyflag',
-  loadingTagline: 'Coming to Kickstarter — Fall 2026.',
+  loadingTagline: 'Coming to Kickstarter, Fall 2026.',
 };
 
 // ─── Resolver ───────────────────────────────────────────────────────
 
 function resolveSurface(host: string, path: string): Surface {
-  // Normalize trailing slash and case first — path precedence (the
+  // Normalize trailing slash and case first, path precedence (the
   // comic) must win over the per-hostname default so a shared
   // thresan.studio/the-eight-footed-mark link previews the comic, not
   // the studio homepage card.
@@ -290,7 +289,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   // Fetch the static index.html. The vercel.json SPA rewrite excludes
   // /index.html (regex skips paths with dots), so the response is the
-  // raw static file — no rewrite loop.
+  // raw static file, no rewrite loop.
   const indexUrl = `${url.origin}/index.html`;
   let indexResp: Response;
   try {
@@ -316,7 +315,7 @@ export default async function handler(req: Request): Promise<Response> {
       'Content-Type': 'text/html; charset=utf-8',
       // Short browser cache; longer shared-CDN cache; stale-while-
       // revalidate keeps perceived latency low while a refresh runs in
-      // the background. 300s at the shared edge is plenty — content
+      // the background. 300s at the shared edge is plenty, content
       // only changes on deploy.
       'Cache-Control': 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400',
       // Vary on Host so the edge cache doesn't serve the

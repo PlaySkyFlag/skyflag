@@ -1,5 +1,4 @@
-// Landing page. Marketing surface for new visitors —
-// what Skyflag is, why to play, where to start. The game itself lives
+// Landing page. Marketing surface for new visitors, // what Skyflag is, why to play, where to start. The game itself lives
 // at /play; this page links there.
 //
 // Design notes:
@@ -27,7 +26,7 @@ import './Landing.css';
 // Mid-game snapshot rendered in the demo section. Hand-curated for
 // visual balance: both sides have committed soldiers + captains on
 // Ground, transports have lifted to Sky, the position has tension.
-// Static — no clicks, no animation.
+// Static, no clicks, no animation.
 type DemoPiece = {
   owner: Player;
   kind: PieceKind;
@@ -38,15 +37,15 @@ type DemoPiece = {
 };
 
 const DEMO_PIECES: ReadonlyArray<DemoPiece> = [
-  // Ground — both sides advancing toward the opponent's flag corner
+  // Ground, both sides advancing toward the opponent's flag corner
   { owner: 'p1', kind: 'soldier', layer: 'ground', row: 2, col: 3, id: 'demo-p1-soldier' },
   { owner: 'p1', kind: 'captain', layer: 'ground', row: 3, col: 4, id: 'demo-p1-captain' },
   { owner: 'p2', kind: 'captain', layer: 'ground', row: 3, col: 1, id: 'demo-p2-captain' },
   { owner: 'p2', kind: 'soldier', layer: 'ground', row: 4, col: 2, id: 'demo-p2-soldier' },
-  // Sky — Pilots / Rovers lifted up to support layer transitions
+  // Sky, Pilots / Rovers lifted up to support layer transitions
   { owner: 'p1', kind: 'pilot',   layer: 'sky', row: 1, col: 4, id: 'demo-p1-pilot'  },
   { owner: 'p2', kind: 'rover',   layer: 'sky', row: 4, col: 1, id: 'demo-p2-rover'  },
-  // Space — empty in this snapshot; pieces haven't reached the upper layer yet
+  // Space, empty in this snapshot; pieces haven't reached the upper layer yet
 ];
 
 const PIECE_SYMBOL: Record<PieceKind, string> = {
@@ -118,7 +117,7 @@ function Header() {
   return (
     <header className="landing-header">
       <div className="landing-header-inner">
-        <a href="/" className="landing-logo" aria-label="Thresan: Skyflag — home">
+        <a href="/" className="landing-logo" aria-label="Thresan: Skyflag, home">
           <img
             src="/3phor-logo.png"
             alt=""
@@ -153,7 +152,7 @@ function Hero() {
         <p className="landing-hero-subtitle">
           Where strategists gather. Three boards. Four Lifts.
         </p>
-        {/* Numeric hero strip — leans on the three-board hook the
+        {/* Numeric hero strip, leans on the three-board hook the
             rest of the design is built around. Pure typography, no
             extra art needed. */}
         <ul className="landing-hero-stats" aria-label="At a glance">
@@ -204,7 +203,7 @@ function FeaturesSection() {
           <Feature
             icon="◇◆◇"
             title="Three layers of Kaleo"
-            body="Every game plays out simultaneously across the Terran, Meridian, and Empyrean. Lifts move pieces between layers but cost two activations — vertical momentum has to be earned."
+            body="Every game plays out simultaneously across the Terran, Meridian, and Empyrean. Lifts move pieces between layers but cost two activations, vertical momentum has to be earned."
           />
           <Feature
             icon="♚♟♛♜♝"
@@ -224,7 +223,7 @@ function FeaturesSection() {
           <Feature
             icon="◷"
             title="Time controls + daily puzzle"
-            body="Play untimed, blitz, or rapid. A new puzzle every 24 hours — same position for everyone, one attempt to find the best move."
+            body="Play untimed, blitz, or rapid. A new puzzle every 24 hours, same position for everyone, one attempt to find the best move."
           />
           <Feature
             icon="♛"
@@ -247,7 +246,7 @@ function Feature({ icon, title, body }: { icon: string; title: string; body: str
   );
 }
 
-// Social-proof section. Reads from public.quotes — RLS only returns rows
+// Social-proof section. Reads from public.quotes, RLS only returns rows
 // that are approved + featured + consent_to_share, so anything that hits
 // the client is publish-ready. If the fetch fails or there are zero
 // featured quotes yet, the whole section silently returns null. The pre-
@@ -323,7 +322,7 @@ function HowItWorksSection() {
           </li>
           <li>
             <strong>Trade and pressure.</strong> Two activations per turn
-            means tempo matters. Threats compound across layers — a piece
+            means tempo matters. Threats compound across layers, a piece
             that's safe on the Terran may be one lift away from a Meridian
             capture.
           </li>
@@ -396,7 +395,7 @@ function PricingSection() {
 }
 
 function PhysicalEditionSection() {
-  // Coda to the Landing — after the digital game is fully pitched
+  // Coda to the Landing, after the digital game is fully pitched
   // (features, mechanics, pricing), point engaged readers at the
   // physical edition waitlist. Visitors who scrolled this far are
   // the highest-quality Kickstarter lead pool.
@@ -405,14 +404,14 @@ function PhysicalEditionSection() {
       <div className="landing-section-inner landing-edition-inner">
         <h2 className="landing-section-title">And in your hands</h2>
         <p className="landing-edition-lead">
-          A physical edition is coming to Kickstarter — three boards,
+          A physical edition is coming to Kickstarter, three boards,
           lifted, in brass and acrylic. Join the waitlist for the
           launch email.
         </p>
         <figure className="landing-edition-figure">
           <img
             src="/thresan-deluxe-board.jpg"
-            alt="Thresan: Skyflag deluxe physical edition — three illuminated acrylic boards fanned from a shared center-balanced powered hub on a weighted base."
+            alt="Thresan: Skyflag deluxe physical edition, three illuminated acrylic boards fanned from a shared center-balanced powered hub on a weighted base."
             className="landing-edition-render"
             loading="lazy"
           />
@@ -429,7 +428,7 @@ function PhysicalEditionSection() {
 }
 
 function UniverseSection() {
-  // Coda after the physical edition pitch — for visitors who want to
+  // Coda after the physical edition pitch, for visitors who want to
   // go deeper than the digital game. Four sister-surfaces, each
   // anchoring a different register: brand universe, edition catalog,
   // creator, engine/lab. The physical edition is omitted (already
@@ -495,14 +494,13 @@ function DemoSection() {
       <div className="landing-section-inner">
         <h2 className="landing-section-title">Three boards. One game.</h2>
         <p className="landing-demo-lead">
-          Every match plays out simultaneously across three 6×6 boards —
-          Ground, Sky, Space. Pieces lift between layers, threats compound
+          Every match plays out simultaneously across three 6×6 boards,           Ground, Sky, Space. Pieces lift between layers, threats compound
           vertically, and a position that's safe on one board can be one
           activation away from collapse on the next.{' '}
           <strong>Three worlds. One proof.</strong>
         </p>
 
-        {/* Optional asset slot — gameplay GIF or short MP4. Drop a file
+        {/* Optional asset slot, gameplay GIF or short MP4. Drop a file
             into /public/demo.gif (or .mp4) and it'll appear here.
             Falls back to the live SVG demo below when absent. */}
         <DemoAsset />
@@ -532,7 +530,7 @@ function DemoSection() {
 
 // Optional gameplay GIF / MP4 placed at /public/demo.gif or
 // /public/demo.mp4. The wrapper is hidden until something actually
-// loads — avoids the empty-styled-box that <video> renders when its
+// loads, avoids the empty-styled-box that <video> renders when its
 // src 404s (onError doesn't fire reliably for missing video sources).
 function DemoAsset() {
   const [videoOk, setVideoOk] = useState(false);

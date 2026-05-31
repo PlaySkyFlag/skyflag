@@ -1,10 +1,10 @@
-// ThresanGames — catalog surface served at thresan.games. The editions
+// ThresanGames, catalog surface served at thresan.games. The editions
 // catalog: which editions of Thresan exist, and where to find each.
 // Currently lists Skyflag (active) with a forward-compatible ghost
 // slot for future editions to signal the catalog framing (the page
 // has to read as "the editions of Thresan" even when there's only
 // one). Same gold-on-dark palette as the other thresan.* surfaces;
-// Terran Sand accent on the .games suffix — the brand color reserved
+// Terran Sand accent on the .games suffix, the brand color reserved
 // for "the lower world, stone, archives", a fit for a catalog.
 
 import { useEffect } from 'react';
@@ -21,7 +21,7 @@ export default function ThresanGames() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'The editions — Thresan.games',
+      title: 'The editions, Thresan.games',
       description:
         'The catalog of Thresan editions. The rules are Thresan; each edition brings a new storyboard, new pieces, new boards. Skyflag is the current edition.',
       canonicalUrl: 'https://thresan.games/',
@@ -42,7 +42,7 @@ export default function ThresanGames() {
           The editions of Thresan.
         </p>
         <p className="games-lead">
-          Thresan is the game — three boards, five piece types, an
+          Thresan is the game, three boards, five piece types, an
           ancient proof of reach. Each edition brings new pieces, new
           board art, and a new storyboard. The rules stay the same.
           This is the catalog.
@@ -61,8 +61,8 @@ export default function ThresanGames() {
               <h2 className="games-edition-title">Skyflag</h2>
               <p className="games-edition-storyboard">
                 Storyboard: <em>Kaleo</em>. Three stacked arcologies
-                lifted from the Earth by the Aetheri. Two clans — the
-                Grey Ravens and the White Stags — contest the Caelum
+                lifted from the Earth by the Aetheri. Two clans, the
+                Grey Ravens and the White Stags, contest the Caelum
                 Nexus.
               </p>
               <p className="games-edition-features">
@@ -108,7 +108,7 @@ export default function ThresanGames() {
         </section>
 
         <a href="https://thresan.com/kickstarter" className="games-cta games-cta-ks">
-          Notify me — Kickstarter Fall 2026 →
+          Notify me, Kickstarter Fall 2026 →
         </a>
 
         <div className="games-outbound">

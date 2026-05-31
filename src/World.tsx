@@ -1,6 +1,6 @@
-// World — "The World of Kaleo" codex, served at /world (aliasable to a
+// World, "The World of Kaleo" codex, served at /world (aliasable to a
 // thresan.world host later). The lore hub of the ecosystem: it explains
-// the universe the game is set in, and — crucially — shows that the four
+// the universe the game is set in, and, crucially, shows that the four
 // game pieces ARE the four Aetheri templates. studio (read the comic) →
 // world (why this universe matters) → games (catalog) → store (back it).
 //
@@ -35,23 +35,23 @@ const CLANS: Clan[] = [
     name: 'The Grey Ravens',
     sub: 'Memory, custody, and the discipline of waiting',
     totem:
-      'The raven — long memory, high vantage, and the patience to watch a situation for as long as observation alone can teach, acting only when action is the last option left.',
-    mark: 'Slate field-coats, black collar accents; a black flight-feather at the collar in formal rank — always from a bird that died of age.',
+      'The raven, long memory, high vantage, and the patience to watch a situation for as long as observation alone can teach, acting only when action is the last option left.',
+    mark: 'Slate field-coats, black collar accents; a black flight-feather at the collar in formal rank, always from a bird that died of age.',
     conviction:
       '“We have been here longer than the crisis. We will be here longer than its answer.”',
     attribution: 'Grey Raven field maxim',
-    body: 'Heir to the containment tradition. The Ravens believe Kaleo survived its worst collapse through patience and archival memory, and that Aetheri inheritance is to be preserved, not spent. A Raven would rather let a generation die than waste a protocol whose function is not yet understood — not from cruelty, but from a hard-won belief that survival depends on keeping more than Kaleo can currently understand.',
+    body: 'Heir to the containment tradition. The Ravens believe Kaleo survived its worst collapse through patience and archival memory, and that Aetheri inheritance is to be preserved, not spent. A Raven would rather let a generation die than waste a protocol whose function is not yet understood, not from cruelty, but from a hard-won belief that survival depends on keeping more than Kaleo can currently understand.',
   },
   {
     name: 'The White Stags',
     sub: 'Traverse, urgency, and the legitimacy of reaching',
     totem:
-      'The stag — endurance across distance and the will to complete a traverse once begun, because a half-finished ascent is worse than one never attempted.',
-    mark: 'Bone-ivory field-coats, warm gold accents; an antler fragment at the shoulder in formal rank — always from a stag that completed a full-depth traverse.',
+      'The stag, endurance across distance and the will to complete a traverse once begun, because a half-finished ascent is worse than one never attempted.',
+    mark: 'Bone-ivory field-coats, warm gold accents; an antler fragment at the shoulder in formal rank, always from a stag that completed a full-depth traverse.',
     conviction:
       '“We were given a path. If we do not walk it, it becomes a monument to our refusal.”',
     attribution: 'White Stag field maxim',
-    body: 'Heir to the escalation tradition. The Stags believe the Aetheri were engineers who built tools and vanished — and that tools exist to be used. A Stag would rather consume an irreplaceable protocol to save a generation than preserve it intact for a future that may never arrive. Not recklessness, but a belief that legitimacy is measured by what a people does, not by what it keeps.',
+    body: 'Heir to the escalation tradition. The Stags believe the Aetheri were engineers who built tools and vanished, and that tools exist to be used. A Stag would rather consume an irreplaceable protocol to save a generation than preserve it intact for a future that may never arrive. Not recklessness, but a belief that legitimacy is measured by what a people does, not by what it keeps.',
   },
 ];
 
@@ -80,7 +80,7 @@ const TEMPLATES: Template[] = [
     img: '/kaleo-soldier.jpg',
     psych:
       'Action and pressure tolerance. Keeps forward motion under conditions that would freeze a planner.',
-    aug: 'Lower-spine augmentation steadies performance under fatigue — and carries a latent Dantec implant, dormant since training.',
+    aug: 'Lower-spine augmentation steadies performance under fatigue, and carries a latent Dantec implant, dormant since training.',
     game: 'The forward edge. Cross the full Terran depth under live opposition and the implant wakes: the Soldier becomes a Captain. The promotion is a medical event, not a metaphor.',
   },
   {
@@ -90,7 +90,7 @@ const TEMPLATES: Template[] = [
     psych:
       'Order and systems thinking. Reads the arcology as a machine where every corridor has a function.',
     aug: 'Holds the Lift-occupancy state of all four columns, across all three layers, in working memory.',
-    game: 'Controls the vertical. Stand in the right square on the right layer and an entire Lift column locks — no weapon required, only presence.',
+    game: 'Controls the vertical. Stand in the right square on the right layer and an entire Lift column locks, no weapon required, only presence.',
   },
   {
     name: 'Voss',
@@ -107,13 +107,13 @@ export default function World() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'The World of Kaleo — Thresan™: Skyflag',
+      title: 'The World of Kaleo, Thresan™: Skyflag',
       description:
         'A world suspended above a world that failed. Kaleo: the three-layer arcology, the Grey Ravens and White Stags, the four Aetheri templates, and the silent Nexus at the summit. The universe behind Thresan: Skyflag.',
       canonicalUrl: 'https://thresan.com/world',
       ogImage: 'https://thresan.com/kaleo-arcology.jpg',
       ogImageAlt:
-        'The three stacked layers of the Kaleo arcology rising into light — Terran, Meridian, Empyrean.',
+        'The three stacked layers of the Kaleo arcology rising into light, Terran, Meridian, Empyrean.',
     });
   }, []);
 
@@ -130,7 +130,7 @@ export default function World() {
           </p>
           <img
             src="/kaleo-arcology.jpg"
-            alt="The three stacked layers of the Kaleo arcology rising into light — Terran at the base, Meridian in the middle, Empyrean at the summit."
+            alt="The three stacked layers of the Kaleo arcology rising into light, Terran at the base, Meridian in the middle, Empyrean at the summit."
             className="world-hero-art"
           />
           <p className="world-hero-credit">
@@ -150,12 +150,12 @@ export default function World() {
               farms, and crowded districts. Above it, the{' '}
               <strong>Meridian</strong> carried charged air and the old
               routing systems that governed movement between sectors. At
-              the summit stood the <strong>Empyrean</strong> — the quiet
+              the summit stood the <strong>Empyrean</strong>, the quiet
               upper shell, and at its dead center, the Caelum Nexus.
             </p>
             <p>
               The Aetheri did not trust survival to strength alone. They
-              built Kaleo as a system of proofs — a law of geometry and
+              built Kaleo as a system of proofs, a law of geometry and
               consequence binding the arcology to the Nexus. They left no
               armies. They left protocols, seals, and a single question
               waiting at the top of the world.
@@ -169,7 +169,7 @@ export default function World() {
               loading="lazy"
             />
             <figcaption>
-              The Aetheri — engineers who built the proof, then vanished.
+              The Aetheri, engineers who built the proof, then vanished.
             </figcaption>
           </figure>
         </section>
@@ -191,24 +191,23 @@ export default function World() {
           </figure>
           <div className="world-prose">
             <p>
-              Six centuries after founding, the first real crisis came —
-              the <strong>First Hollow</strong>, a wasting sickness that
+              Six centuries after founding, the first real crisis came,               the <strong>First Hollow</strong>, a wasting sickness that
               spread through the oldest, thirstiest districts. The Aetheri
               records were opened for the first time in living memory, and
               with them a dangerous possibility: the Nexus could still
               answer. It might even release the protocols to arrest the
-              sickness — but only under the Law of Three, and no one alive
+              sickness, but only under the Law of Three, and no one alive
               had stood before it under the full proof.
             </p>
             <p>
               One faction argued to <strong>open everything</strong> and
               petition the Nexus under whatever partial proof could be
               assembled. The other argued for <strong>containment</strong>{' '}
-              — preserve the inheritance, refuse panic, let the Nexus stay
+, preserve the inheritance, refuse panic, let the Nexus stay
               silent rather than risk an ungoverned answer.
             </p>
             <p>
-              Containment won by one vote. It stabilized Kaleo — and two
+              Containment won by one vote. It stabilized Kaleo, and two
               hundred thousand Terran residents died who might have been
               saved. The escalation faction never forgot. Over four
               generations the two sides hardened into clans.
@@ -240,7 +239,7 @@ export default function World() {
                 </p>
                 <blockquote className="world-clan-conviction">
                   {c.conviction}
-                  <cite>— {c.attribution}</cite>
+                  <cite>{c.attribution}</cite>
                 </blockquote>
               </article>
             ))}
@@ -251,8 +250,7 @@ export default function World() {
         <section className="world-section world-section-alt">
           <h2 className="world-section-title">The four Aetheri templates</h2>
           <p className="world-section-lead">
-            The Aetheri left four training-and-augmentation protocols —
-            shared by both clans, named for the Aetheri who authored them.
+            The Aetheri left four training-and-augmentation protocols,             shared by both clans, named for the Aetheri who authored them.
             They are the game’s five pieces. The way each one moves on the
             board is the way its augmentation worked in the world.
           </p>
@@ -261,7 +259,7 @@ export default function World() {
               <article key={t.name} className="world-template">
                 <img
                   src={t.img}
-                  alt={`${t.name} — ${t.role}.`}
+                  alt={`${t.name}, ${t.role}.`}
                   className="world-template-img"
                   loading="lazy"
                 />
@@ -355,7 +353,7 @@ export default function World() {
         <section className="world-section world-section-alt">
           <h2 className="world-section-title">The story</h2>
           <p className="world-section-lead">
-            <strong>Volume One — The Three Seals of Kaleo</strong> follows
+            <strong>Volume One, The Three Seals of Kaleo</strong> follows
             eight claimants through the First Reclamation: the campaign
             that became the game. The prequel, <em>Volume Zero</em>, reads
             free at the studio.
@@ -369,7 +367,7 @@ export default function World() {
             </a>
           </div>
           <p className="world-section-lead">
-            The physical edition launches on Kickstarter in Fall 2026 — be
+            The physical edition launches on Kickstarter in Fall 2026, be
             first in line for early-backer pricing.
           </p>
           <div className="world-actions">

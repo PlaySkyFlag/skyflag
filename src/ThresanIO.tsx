@@ -1,4 +1,4 @@
-// ThresanIO — engineering / lab surface served at thresan.io. The
+// ThresanIO, engineering / lab surface served at thresan.io. The
 // behind-the-boards content: engine internals, opening theory, build
 // journal. Same gold-on-dark palette as the other thresan.* surfaces
 // so the umbrella reads coherently; an Aether Copper accent on .io
@@ -18,7 +18,7 @@ export default function ThresanIO() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'The Lab — Thresan.io',
+      title: 'The Lab, Thresan.io',
       description:
         'Engine notes, opening theory, and the build journal behind Thresan™: Skyflag. The math behind the boards.',
       canonicalUrl: 'https://thresan.io/',
@@ -62,7 +62,7 @@ export default function ThresanIO() {
               boards?</em>
             </p>
             <p>
-              The temptation was four. Four feels deliberate — four
+              The temptation was four. Four feels deliberate, four
               directions, four corners. But every
               time I sketched a four-plane version, the middle two
               planes became transit space. Pieces moved <em>through</em>{' '}
@@ -74,7 +74,7 @@ export default function ThresanIO() {
             <p>
               Two planes was the other extreme. Two planes gives you
               exactly one decision: up or down. The vertical dimension
-              exists but doesn't produce strategy — it produces a
+              exists but doesn't produce strategy, it produces a
               binary toggle. You're playing chess with a slightly
               bigger board.
             </p>
@@ -84,8 +84,7 @@ export default function ThresanIO() {
               <em>positional</em>. Where on the column you sit changes
               what you can threaten and what can threaten you. The
               middle is not transit. The middle is a third theater of
-              contest. A piece on Meridian isn't on its way somewhere —
-              it's in a position no piece on Terran or Empyrean can
+              contest. A piece on Meridian isn't on its way somewhere,               it's in a position no piece on Terran or Empyrean can
               occupy. The plane itself carries strategic information.
             </p>
             <p>
@@ -154,10 +153,10 @@ export default function ThresanIO() {
               change.
             </p>
             <p>
-              Add a third dimension with the right constraints — three
+              Add a third dimension with the right constraints, three
               planes, fixed-position Lifts, a single Nexus axis, and
               clan pieces that move differently relative to their
-              plane — and you get a new strategic surface. Not chess
+              plane, and you get a new strategic surface. Not chess
               on stilts. Something else.
             </p>
             <p>
@@ -166,7 +165,7 @@ export default function ThresanIO() {
               strategic primitives. Three was the answer.
             </p>
 
-            <p className="lab-post-signoff">— Nelson</p>
+            <p className="lab-post-signoff">Nelson</p>
           </div>
         </article>
 
@@ -182,7 +181,7 @@ export default function ThresanIO() {
 
           <div className="lab-post-body">
             <p>
-              The Caelum Nexus sits at <em>space(3,3)</em> — a single
+              The Caelum Nexus sits at <em>space(3,3)</em>, a single
               square, at the top of a single column running through
               all three boards. It's one of the two ways to win
               Thresan: get your Captain there.
@@ -220,7 +219,7 @@ export default function ThresanIO() {
 
             <h3>3. It clarifies the proof</h3>
             <p>
-              <em>Three worlds. One proof.</em> — the win condition
+              <em>Three worlds. One proof.</em>, the win condition
               is a single demonstration of vertical reach. With four
               Nexus columns, the proof would be "any one of four
               reaches." That's a different kind of statement. Cleaner
@@ -233,11 +232,10 @@ export default function ThresanIO() {
               columns, flag-capture would feel like a side quest.
               With one column, flag-capture is the <em>defensive</em>{' '}
               win path: you can't get to the top, so you sweep the
-              bottom. Two paths, balanced against each other —
-              because there's exactly one of each.
+              bottom. Two paths, balanced against each other,               because there's exactly one of each.
             </p>
 
-            <p className="lab-post-signoff">— Nelson</p>
+            <p className="lab-post-signoff">Nelson</p>
           </div>
         </article>
 
@@ -254,8 +252,8 @@ export default function ThresanIO() {
           <div className="lab-post-body">
             <p>
               The eight-by-eight board predates chess by several
-              hundred years. <em>Ashtapada</em> — Sanskrit for
-              "eight-footed," the eight squares on each side — was a
+              hundred years. <em>Ashtapada</em>, Sanskrit for
+              "eight-footed," the eight squares on each side, was a
               race game played in India well before Chaturanga
               (chess's direct ancestor) appeared in the sixth century.
               The board itself was older than the rules anyone now
@@ -274,7 +272,7 @@ export default function ThresanIO() {
               but lift it into three dimensions?
             </p>
             <p>
-              The naive answer is "you get 3D chess" — and the
+              The naive answer is "you get 3D chess", and the
               history of that suggests it doesn't work. Most 3D-chess
               variants end up unplayable: too many pieces, too many
               planes, the rules ramify until the game stops being
@@ -287,8 +285,7 @@ export default function ThresanIO() {
             <ul className="lab-post-list">
               <li>
                 <strong>Smaller grid.</strong> 6×6 instead of 8×8.
-                Three 36-square boards give 108 squares total —
-                meaningfully larger than chess's 64, but each plane
+                Three 36-square boards give 108 squares total,                 meaningfully larger than chess's 64, but each plane
                 stays small enough that a human can read it at a
                 glance.
               </li>
@@ -300,7 +297,7 @@ export default function ThresanIO() {
               <li>
                 <strong>Constrained vertical movement.</strong> Lifts
                 at fixed positions (1,1), (1,4), (4,1), (4,4).
-                Pieces can only change planes via these — no free
+                Pieces can only change planes via these, no free
                 transit. The third dimension is a strategic asset,
                 not noise.
               </li>
@@ -309,7 +306,7 @@ export default function ThresanIO() {
             <h3>The math, loosely</h3>
             <p>
               <strong>Chess:</strong> 64 squares × 16 pieces × ~30
-              average legal moves per turn — a search space measured
+              average legal moves per turn, a search space measured
               in roughly 10^120 possible games.
             </p>
             <p>
@@ -317,13 +314,12 @@ export default function ThresanIO() {
               average legal moves per turn. The branching factor is
               lower (fewer pieces), the board is larger (more
               squares), and the layer dimension adds a{' '}
-              <em>qualitative</em> primitive — <em>do I go up?</em> —
-              that chess doesn't have.
+              <em>qualitative</em> primitive, <em>do I go up?</em>              that chess doesn't have.
             </p>
             <p>
               The end position-count for Thresan is hard to estimate
               without running it, but the game-tree complexity is
-              probably in the same neighbourhood as chess — possibly
+              probably in the same neighbourhood as chess, possibly
               slightly higher because of the layer transitions,
               possibly lower because of the smaller piece count.
               Either way, it's deep enough to be a real strategy
@@ -342,7 +338,7 @@ export default function ThresanIO() {
               Three boards. Five piece types. One Nexus. One question.
             </p>
 
-            <p className="lab-post-signoff">— Nelson</p>
+            <p className="lab-post-signoff">Nelson</p>
           </div>
         </article>
 
@@ -359,7 +355,7 @@ export default function ThresanIO() {
           <div className="lab-post-body">
             <p>
               The 3D-chess tradition is older than most people
-              realise. The first attempt — Kubicschach — was published
+              realise. The first attempt, Kubicschach, was published
               in 1851, when Lionel Kieseritzky stacked eight 8×8
               boards on top of each other and tried to play. The
               result was unplayable, but the <em>idea</em> persisted.
@@ -438,7 +434,7 @@ export default function ThresanIO() {
             <p>
               Thresan's design has gone through twelve numbered
               iterations across roughly three years. The central
-              event was the <em>v17 → v19</em> arc — the Cross-Board
+              event was the <em>v17 → v19</em> arc, the Cross-Board
               Rule transforming the game from parallel three-board
               race to integrated three-dimensional position game.
             </p>
@@ -465,7 +461,7 @@ export default function ThresanIO() {
               </li>
               <li>
                 <strong>v19</strong> (April 2026). Cross-Board Rule
-                v2 — RoverLock eliminated. Revealed a 31.5% P1
+                v2, RoverLock eliminated. Revealed a 31.5% P1
                 advantage gap.
               </li>
               <li>
@@ -474,8 +470,7 @@ export default function ThresanIO() {
                 mechanical change.
               </li>
               <li>
-                <strong>v21</strong> (current). Brand pivot —
-                Exedra / 3phor → Thresan: Skyflag. No rule change.
+                <strong>v21</strong> (current). Brand pivot,                 Exedra / 3phor → Thresan: Skyflag. No rule change.
               </li>
             </ul>
 
@@ -483,8 +478,8 @@ export default function ThresanIO() {
             <p>
               A claim that Thresan is better than chess. Chess is one
               of the great inventions of human strategic culture.
-              Thresan is asking a different question — <em>what does
-              strategy look like when the floor lifts?</em> — and
+              Thresan is asking a different question, <em>what does
+              strategy look like when the floor lifts?</em>, and
               trying to answer it in the smallest, cleanest geometry
               that holds together.
             </p>
@@ -492,7 +487,7 @@ export default function ThresanIO() {
               Three boards. Five piece types. One Nexus. One proof.
             </p>
 
-            <p className="lab-post-signoff">— Nelson</p>
+            <p className="lab-post-signoff">Nelson</p>
           </div>
         </article>
 
@@ -501,17 +496,17 @@ export default function ThresanIO() {
           <ul className="lab-roadmap-list">
             <li>
               <strong>Curriculum of openings.</strong> How the engine
-              learns positional fundamentals — and the first dozen
+              learns positional fundamentals, and the first dozen
               openings worth knowing.
             </li>
             <li>
-              <strong>Build journal — weeks 1 to 12.</strong> Honest
+              <strong>Build journal, weeks 1 to 12.</strong> Honest
               notes on what worked and what didn't in the first three
               months of construction.
             </li>
           </ul>
           <p className="lab-roadmap-foot">
-            No newsletter yet. The lab is in slow build — when the
+            No newsletter yet. The lab is in slow build, when the
             next post ships it'll surface on this page. If you want
             to know when, reply by email:{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="lab-mail">

@@ -1,4 +1,4 @@
-// Origins — heritage page. Connects Ashtapada (the ~ancient Indian
+// Origins, heritage page. Connects Ashtapada (the ~ancient Indian
 // 8×8 board game, board-ancestor of chess via Chaturanga) to Skyflag
 // (three 6×6 boards) and bridges into the Thresan mythology. Linked
 // from the Landing nav and excerpted on the Ashtapada splash so the
@@ -12,12 +12,12 @@ export default function Origins() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'Origins — Thresan™: Skyflag',
+      title: 'Origins, Thresan™: Skyflag',
       description:
-        'How Ashtapada — one of the oldest known board games — became Thresan: the eight-by-eight grid lifted into three boards. Currently in its Skyflag edition.',
+        'How Ashtapada, one of the oldest known board games, became Thresan: the eight-by-eight grid lifted into three boards. Currently in its Skyflag edition.',
       canonicalUrl: 'https://playskyflag.com/origins',
       ogImage: 'https://playskyflag.com/thresan-og-stack.jpg',
-      ogImageAlt: 'Three stacked boards forming a column — the eighth-century board lifted.',
+      ogImageAlt: 'Three stacked boards forming a column, the eighth-century board lifted.',
     });
   }, []);
 
@@ -88,7 +88,7 @@ function AshtapadaSection() {
       <p className="origins-prose">
         Ashtapada is one of the oldest known board games. Played in
         ancient India for thousands of years, on a square board of eight
-        by eight — <em>aṣṭāpada</em>, "eight-stepped." Pieces moved along
+        by eight, <em>aṣṭāpada</em>, "eight-stepped." Pieces moved along
         the grid; the strategy was geometric and contemplative; the game
         predates chess by millennia.
       </p>
@@ -101,8 +101,7 @@ function LineageSection() {
     <section className="origins-section">
       <h2 className="origins-section-title">The line that became chess</h2>
       <p className="origins-prose">
-        Around the sixth century, Ashtapada's board carried a new game —
-        Chaturanga, four armies in concert. Chaturanga travelled west and
+        Around the sixth century, Ashtapada's board carried a new game,         Chaturanga, four armies in concert. Chaturanga travelled west and
         became Shatranj in Persia, then chess in Europe. The board
         persisted; the pieces and rules evolved away from their root.
         Skyflag returns to that root, and takes a different fork.
@@ -118,19 +117,19 @@ function LiftSection() {
       <figure className="origins-figure">
         <img
           src="/skyflag-render-tower.jpg"
-          alt="Skyflag board concept render: three transparent 6×6 boards stacked vertically — Ground at the base, Sky in the middle, Space at the top — supported by a central column on a metallic base."
+          alt="Skyflag board concept render: three transparent 6×6 boards stacked vertically, Ground at the base, Sky in the middle, Space at the top, supported by a central column on a metallic base."
           className="origins-figure-img"
           loading="lazy"
         />
         <figcaption className="origins-figure-caption">
-          Skyflag — concept render of the three-board stack: Terran
+          Skyflag, concept render of the three-board stack: Terran
           (Ground), Meridian (Sky), Empyrean (Space).
         </figcaption>
       </figure>
       <p className="origins-prose">
         Where chess preserved the eight-by-eight plane, Skyflag lifts it.
-        The single grid becomes three stacked grids — Terran, Meridian,
-        Empyrean — six by six each. Sixty-four squares become one hundred
+        The single grid becomes three stacked grids, Terran, Meridian,
+        Empyrean, six by six each. Sixty-four squares become one hundred
         and eight. The mechanical change is a numerical one too: in the
         tradition that gave us Ashtapada, 108 is the count that runs
         through cosmology, prayer, and breath. Three worlds. One proof.
@@ -146,18 +145,18 @@ function ThresanSection() {
       <figure className="origins-figure">
         <img
           src="/skyflag-render-fan.jpg"
-          alt="Skyflag board concept render: three glowing 6×6 boards fanned out from a central illuminated hub — green Ground, cyan Sky, blue Space — each set with metallic chess-like pieces."
+          alt="Skyflag board concept render: three glowing 6×6 boards fanned out from a central illuminated hub, green Ground, cyan Sky, blue Space, each set with metallic chess-like pieces."
           className="origins-figure-img"
           loading="lazy"
         />
         <figcaption className="origins-figure-caption">
-          Skyflag — concept render, fan-spread arrangement.
+          Skyflag, concept render, fan-spread arrangement.
         </figcaption>
       </figure>
       <p className="origins-prose">
         Within the Thresan universe, the lift is literal. After the long
         collapse, the Aetheri raised what remained of civilization up
-        into three living layers — and the game, like the city, ascended
+        into three living layers, and the game, like the city, ascended
         with it. Ashtapada was the floor. The Aetheri built the sky.
       </p>
       <p className="origins-rally tagline-script">
@@ -190,7 +189,7 @@ function Sources() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Ashtapada — Wikipedia
+            Ashtapada, Wikipedia
           </a>
         </li>
         <li>
@@ -199,7 +198,7 @@ function Sources() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Chaturanga — Wikipedia
+            Chaturanga, Wikipedia
           </a>
         </li>
         <li>

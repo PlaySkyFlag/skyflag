@@ -1,4 +1,4 @@
-// Press — media kit page for journalists, content creators, and anyone
+// Press, media kit page for journalists, content creators, and anyone
 // covering Thresan™: Skyflag. Modeled after dopresskit.com conventions:
 // quick-facts table, multiple description lengths (so any word-count
 // budget fits), feature bullets, history, downloadable assets, founder
@@ -16,9 +16,9 @@ export default function Press() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'Press kit — Thresan™: Skyflag',
+      title: 'Press kit, Thresan™: Skyflag',
       description:
-        'Press kit for Thresan™: Skyflag — fact sheet, descriptions, logos, renders, trailer, and contact for journalists and content creators.',
+        'Press kit for Thresan™: Skyflag, fact sheet, descriptions, logos, renders, trailer, and contact for journalists and content creators.',
       canonicalUrl: 'https://playskyflag.com/press',
       ogImage: 'https://playskyflag.com/thresan-og-clans.jpg',
       ogImageAlt: 'Three stacked boards with Grey Ravens and White Stags arrayed across all three planes.',
@@ -75,7 +75,7 @@ function Hero() {
       </p>
       <img
         src="/thresan-hero-clans.jpg"
-        alt="Thresan: Skyflag — three stacked boards with Grey Ravens and White Stags arrayed across all three planes."
+        alt="Thresan: Skyflag, three stacked boards with Grey Ravens and White Stags arrayed across all three planes."
         className="press-hero-render"
       />
       <p className="press-hero-fineprint">
@@ -109,14 +109,14 @@ function Trailer() {
       </div>
       <p className="press-section-note">
         <strong>What you'll see.</strong> The trailer opens on a single
-        round of stone — the eighth-century <em>Ashtapada</em> board,
+        round of stone, the eighth-century <em>Ashtapada</em> board,
         weathered, rotating under amber light. The Ashtapada lifts; a
         second board fades in beneath it, then a third. Three planes
-        stacked like the floors of an arcology — Terran, Meridian,
+        stacked like the floors of an arcology, Terran, Meridian,
         Empyrean. The clans assemble across all three: Grey Ravens and
         White Stags, five pieces per side. A short sequence of moves
-        follows — a Captain crossing a Lift, a Pilot threading the
-        Empyrean, a Nexus capture decided in three dimensions — set
+        follows, a Captain crossing a Lift, a Pilot threading the
+        Empyrean, a Nexus capture decided in three dimensions, set
         against tactile foley and a single low cello. Pieces freeze in
         their final position; the three boards become a single column
         of light. Cards: <strong>Three worlds. One proof.</strong>{' '}
@@ -149,9 +149,9 @@ function QuickFacts() {
           <tr><th>Languages</th><td>English</td></tr>
           <tr><th>Platforms</th><td>Web (browser), iOS (TestFlight, in development)</td></tr>
           <tr><th>Price (digital)</th><td>Free · optional Plus tier $4.99/month</td></tr>
-          <tr><th>Physical edition</th><td>Coming to Kickstarter — reservations at thresan.store</td></tr>
+          <tr><th>Physical edition</th><td>Coming to Kickstarter, reservations at thresan.store</td></tr>
           <tr><th>Release</th><td>Live now at <a href="https://playskyflag.com">playskyflag.com</a></td></tr>
-          <tr><th>Rulebook</th><td>v20, Cross-Board Rule — <a href="/3phor-rulebook.pdf">PDF</a></td></tr>
+          <tr><th>Rulebook</th><td>v20, Cross-Board Rule, <a href="/3phor-rulebook.pdf">PDF</a></td></tr>
           <tr><th>Press contact</th><td><a href={`mailto:${PRESS_EMAIL}?subject=${encodeURIComponent(PRESS_SUBJECT)}`}>{PRESS_EMAIL}</a></td></tr>
         </tbody>
       </table>
@@ -167,7 +167,7 @@ function Descriptions() {
       <h2 className="press-section-title">Descriptions</h2>
       <p className="press-section-note">
         Three lengths to fit any word-count budget. Select the text and
-        copy — all blocks are plain text.
+        copy, all blocks are plain text.
       </p>
 
       <div className="press-desc">
@@ -183,8 +183,8 @@ function Descriptions() {
         <p className="press-desc-body">
           Thresan™: Skyflag is a free turn-based strategy game from
           designer Nelson Jatel and Limnology Research Corp. Two
-          players command five pieces — Captain, Soldier, Promoted
-          Soldier Captain, Rover, Pilot — across three stacked 6×6 boards. Capture the opposing clan's
+          players command five pieces, Captain, Soldier, Promoted
+          Soldier Captain, Rover, Pilot, across three stacked 6×6 boards. Capture the opposing clan's
           three claim-seals, then guide your Captain to the Caelum
           Nexus to win. No dice. No cards. Pure geometry.
         </p>
@@ -205,7 +205,7 @@ function Descriptions() {
         <p className="press-desc-body">
           Pieces move and capture by geometry alone. There are no
           special abilities, no cards, no dice. The game descends from
-          Ashtapada — one of the oldest known board games, played in
+          Ashtapada, one of the oldest known board games, played in
           ancient India for thousands of years and the same 8×8 grid
           that, centuries later, carried Chaturanga west to become
           chess. Skyflag returns to that root and takes a different
@@ -270,7 +270,7 @@ function History() {
     <section className="press-section">
       <h2 className="press-section-title">History</h2>
       <p className="press-desc-body">
-        Ashtapada is one of the oldest known board games — the 8×8
+        Ashtapada is one of the oldest known board games, the 8×8
         grid that ancient India played for thousands of years. Around
         the sixth century, that board carried a new game called
         Chaturanga, which travelled west to become Shatranj in Persia
@@ -280,8 +280,8 @@ function History() {
       <p className="press-desc-body">
         Thresan™: Skyflag returns to that root and takes a different
         fork. Where chess preserved the eight-by-eight plane, Skyflag
-        lifts it. The single grid becomes three stacked grids — Terran,
-        Meridian, Empyrean — six by six each. Sixty-four squares
+        lifts it. The single grid becomes three stacked grids, Terran,
+        Meridian, Empyrean, six by six each. Sixty-four squares
         become one hundred and eight. The full historical lineage and
         the in-universe Thresan mythology are documented at{' '}
         <a href="/origins">playskyflag.com/origins</a>.
@@ -304,30 +304,30 @@ function Assets() {
       <div className="press-asset-grid">
         <figure className="press-asset">
           <a href="/3phor-logo.png" download>
-            <img src="/3phor-logo.png" alt="Thresan sigil on dark — gold concentric arcs pierced by a vertical line" />
+            <img src="/3phor-logo.png" alt="Thresan sigil on dark, gold concentric arcs pierced by a vertical line" />
           </a>
           <figcaption>
-            <strong>Logo — gold on dark</strong>
+            <strong>Logo, gold on dark</strong>
             <span>768×768 PNG · primary brand mark</span>
           </figcaption>
         </figure>
 
         <figure className="press-asset">
           <a href="/3phor-mark.png" download>
-            <img src="/3phor-mark.png" alt="Thresan sigil on white — black concentric arcs pierced by a vertical line" />
+            <img src="/3phor-mark.png" alt="Thresan sigil on white, black concentric arcs pierced by a vertical line" />
           </a>
           <figcaption>
-            <strong>Logo — black on white</strong>
+            <strong>Logo, black on white</strong>
             <span>256×256 PNG · for light backgrounds</span>
           </figcaption>
         </figure>
 
         <figure className="press-asset">
           <a href="/skyflag-screenshot-home.png" download>
-            <img src="/skyflag-screenshot-home.png" alt="Thresan: Skyflag app home view — branded splash above the game controls" />
+            <img src="/skyflag-screenshot-home.png" alt="Thresan: Skyflag app home view, branded splash above the game controls" />
           </a>
           <figcaption>
-            <strong>App — home view</strong>
+            <strong>App, home view</strong>
             <span>1400px PNG · in-app lobby with brand splash</span>
           </figcaption>
         </figure>
@@ -337,7 +337,7 @@ function Assets() {
             <img src="/thresan-hero-clans.jpg" alt="Three stacked boards with Grey Ravens and White Stags arrayed across all three planes" />
           </a>
           <figcaption>
-            <strong>Render — clans on three planes</strong>
+            <strong>Render, clans on three planes</strong>
             <span>1920px JPG · both clans in starting positions</span>
           </figcaption>
         </figure>
@@ -347,7 +347,7 @@ function Assets() {
             <img src="/thresan-hero-lift.jpg" alt="Figurine being lifted between planes on a column of gold light" />
           </a>
           <figcaption>
-            <strong>Render — the Lift, mid-arc</strong>
+            <strong>Render, the Lift, mid-arc</strong>
             <span>1920px JPG · piece transiting between planes</span>
           </figcaption>
         </figure>
@@ -357,7 +357,7 @@ function Assets() {
             <img src="/thresan-hero-nexus.jpg" alt="Glowing Aether figure suspended above the topmost board in the Nexus column" />
           </a>
           <figcaption>
-            <strong>Render — the Caelum Nexus</strong>
+            <strong>Render, the Caelum Nexus</strong>
             <span>1920px JPG · Aether figure in the Nexus column</span>
           </figcaption>
         </figure>
@@ -367,14 +367,14 @@ function Assets() {
             <img src="/thresan-hero-stack.jpg" alt="Three stacked boards rising as a column, no figures" />
           </a>
           <figcaption>
-            <strong>Render — stack, no figures</strong>
+            <strong>Render, stack, no figures</strong>
             <span>1920px JPG · architectural / brand-card variant</span>
           </figcaption>
         </figure>
 
         <figure className="press-asset">
           <a href="/thresan-card.jpg" download>
-            <img src="/thresan-card.jpg" alt="Brand card — sigil, Thresan wordmark, Skyflag subhead, 'Three worlds. One proof.', thresan.com" />
+            <img src="/thresan-card.jpg" alt="Brand card, sigil, Thresan wordmark, Skyflag subhead, 'Three worlds. One proof.', thresan.com" />
           </a>
           <figcaption>
             <strong>Brand card</strong>
@@ -387,7 +387,7 @@ function Assets() {
             <img src="/thresan-prototype-kitchen.jpg" alt="Three-tier cardboard prototype on a kitchen counter, with painted figurines as pieces" />
           </a>
           <figcaption>
-            <strong>First prototype — kitchen</strong>
+            <strong>First prototype, kitchen</strong>
             <span>The hand-built version that came before the renders</span>
           </figcaption>
         </figure>
@@ -426,7 +426,7 @@ function About() {
         active design and play since 2025, evolving from a hand-built
         cardboard prototype on a kitchen counter through twenty-plus
         rulebook revisions to the version published today. The Thresan
-        universe extends beyond the game itself — additional titles
+        universe extends beyond the game itself, additional titles
         and stories are in development.
       </p>
       <p className="press-section-note">
@@ -459,7 +459,7 @@ function Contact() {
         Corp. Players command five pieces across three stacked 6×6
         boards (Terran, Meridian, Empyrean), pursuing the opposing
         clan's three claim-seals and the Caelum Nexus. The game
-        descends from Ashtapada — the ancient Indian board that, via
+        descends from Ashtapada, the ancient Indian board that, via
         Chaturanga, eventually became chess. A premium physical
         edition is coming to Kickstarter. Play at playskyflag.com.
       </p>

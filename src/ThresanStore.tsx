@@ -1,4 +1,4 @@
-// ThresanStore — the physical-edition waitlist landing, served at
+// ThresanStore, the physical-edition waitlist landing, served at
 // thresan.store. The Kickstarter handles every hard part of selling
 // (payments, fulfillment, trust), so this surface only needs to do
 // three things: build a pre-launch email list, capture high-intent
@@ -16,12 +16,12 @@ import './ThresanStore.css';
 
 // ─── Configuration ─────────────────────────────────────────────────
 // Fill these in as the campaign reaches each milestone. Empty strings
-// are handled gracefully — the page degrades to email-only signup.
+// are handled gracefully, the page degrades to email-only signup.
 
 // Stripe Payment Link for the $108 refundable Founders Edition
 // Reservation. Capped at 500 payments (Stripe enforces server-side).
 // Empty string disables the Reserve button and degrades the page to
-// email-only signup — useful if reservations need to be paused.
+// email-only signup, useful if reservations need to be paused.
 const FOUNDERS_RESERVATION_URL = 'https://buy.stripe.com/14A7sFdUCgpzg9R3PNbwk00';
 
 // Paste the live Kickstarter campaign URL here once the campaign
@@ -44,7 +44,7 @@ const GAME_URL = 'https://playskyflag.com/play?ref=thresan-store';
 
 // ─── Reward tier preview ───────────────────────────────────────────
 // Preliminary Kickstarter reward ladder. Prices, slot counts, and
-// inclusions are placeholders — they'll be re-tuned once manufacturer
+// inclusions are placeholders, they'll be re-tuned once manufacturer
 // quotes come back and the funding goal is locked. The Founders
 // Edition tier is the only one currently with a live pre-launch
 // reservation (FOUNDERS_RESERVATION_URL above). Each tier inherits
@@ -97,7 +97,7 @@ const REWARD_TIERS: RewardTier[] = [
     pitch: 'The standard physical game.',
     includes: [
       'Everything in Digital Founder',
-      'One copy of Thresan: Skyflag — three boards, ten pieces, rulebook',
+      'One copy of Thresan: Skyflag, three boards, ten pieces, rulebook',
       'Standard packaging, full-colour print',
     ],
   },
@@ -115,7 +115,7 @@ const REWARD_TIERS: RewardTier[] = [
       'Numbered box (#001–#500), weighted brass pieces',
       'Gold-foiled rulebook cover, linen-finish components',
       'Name in the rulebook acknowledgments',
-      'Founders Discord — early playtests, build updates, decision input',
+      'Founders Discord, early playtests, build updates, decision input',
     ],
   },
   {
@@ -138,7 +138,7 @@ const REWARD_TIERS: RewardTier[] = [
     limited: true,
     includes: [
       'Deluxe Edition × 2 (yours + one to gift or playtest)',
-      '1-hour video call with Nelson — design conversation, watch you play, whatever fits',
+      '1-hour video call with Nelson, design conversation, watch you play, whatever fits',
       'Your name on the Patrons page at thresan.studio',
     ],
   },
@@ -163,12 +163,12 @@ export default function ThresanStore() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'Thresan™: Skyflag — The Physical Edition',
+      title: 'Thresan™: Skyflag, The Physical Edition',
       description:
-        'The physical edition of Thresan: Skyflag — three boards, lifted. Coming to Kickstarter. Reserve your Founders Edition or join the waitlist.',
+        'The physical edition of Thresan: Skyflag, three boards, lifted. Coming to Kickstarter. Reserve your Founders Edition or join the waitlist.',
       canonicalUrl: 'https://thresan.store/',
       ogImage: 'https://thresan.store/thresan-og-nexus.jpg',
-      ogImageAlt: 'The Caelum Nexus column glowing through three stacked boards — Thresan: Skyflag physical edition.',
+      ogImageAlt: 'The Caelum Nexus column glowing through three stacked boards, Thresan: Skyflag physical edition.',
     });
   }, []);
 
@@ -225,7 +225,7 @@ function Hero() {
         </h1>
         <p className="store-hero-lead">
           Sixty-four squares opened to one hundred and eight. Three
-          stacked boards — transparent, illuminated, brass-piece-and-
+          stacked boards, transparent, illuminated, brass-piece-and-
           acrylic construction.{' '}
           {KICKSTARTER_URL ? (
             <strong>Live on Kickstarter.</strong>
@@ -248,7 +248,7 @@ function Hero() {
         </div>
         <img
           src="/thresan-hero-nexus.jpg"
-          alt="Thresan: Skyflag — three stacked boards with figurines arrayed across all three planes, gold Nexus column rising through the center."
+          alt="Thresan: Skyflag, three stacked boards with figurines arrayed across all three planes, gold Nexus column rising through the center."
           className="store-hero-render"
         />
       </div>
@@ -297,30 +297,30 @@ function Showcase() {
           <figure className="store-figure store-figure-solo">
             <img
               src="/thresan-deluxe-board.jpg"
-              alt="Thresan deluxe edition — three illuminated 6×6 acrylic boards (green Ground, cyan Sky, blue Space) fanned from a shared center-balanced powered hub on a weighted base, with illuminated lift columns and a USB-C controller in the base."
+              alt="Thresan deluxe edition, three illuminated 6×6 acrylic boards (green Ground, cyan Sky, blue Space) fanned from a shared center-balanced powered hub on a weighted base, with illuminated lift columns and a USB-C controller in the base."
               className="store-figure-img"
               loading="lazy"
             />
             <figcaption className="store-figure-caption">
-              Deluxe edition — center-balanced fan-spread, illuminated lift
+              Deluxe edition, center-balanced fan-spread, illuminated lift
               columns, shared powered hub
             </figcaption>
           </figure>
         </div>
         <ul className="store-includes">
           <li>
-            <strong>Three 6×6 boards</strong> — Terran, Meridian, Empyrean
+            <strong>Three 6×6 boards</strong>, Terran, Meridian, Empyrean
           </li>
           <li>
-            <strong>Five pieces per side</strong> — Captain, Soldier,
-            Promoted Soldier Captain, Rover, Pilot — slate and ivory
+            <strong>Five pieces per side</strong>, Captain, Soldier,
+            Promoted Soldier Captain, Rover, Pilot, slate and ivory
             finishes (ten pieces total in the box)
           </li>
           <li>
             <strong>Illuminated base</strong> with the Thresan sigil
           </li>
           <li>
-            <strong>Bound rulebook</strong> — the Three Seals of Kaleo,
+            <strong>Bound rulebook</strong>, the Three Seals of Kaleo,
             illustrated
           </li>
           <li>
@@ -329,7 +329,7 @@ function Showcase() {
         </ul>
         <p className="store-section-fineprint">
           The render shown is concept art for the manufactured premium
-          edition — used to set context for what the physical edition
+          edition, used to set context for what the physical edition
           aspires to. Actual photographs of the 3D-printed prototype
           coming soon. Final component spec confirmed at Kickstarter
           launch; reservations carry the same price into and through
@@ -368,14 +368,13 @@ function GameplayVideo() {
           </video>
         </div>
         <p className="store-video-caption">
-          This is Thresan in play — three stacked boards (Ground, Sky,
+          This is Thresan in play, three stacked boards (Ground, Sky,
           and Space), five pieces a side moving across all three planes
           at once, lifting between worlds to set up captures no flat
           board could hold. The digital game is{' '}
           <strong>free to play, always</strong>, at{' '}
           <a href="https://thresan.com">thresan.com</a>. The premium
-          physical board — the three-level deluxe edition above —
-          launches on <strong>Kickstarter in Fall 2026</strong>.{' '}
+          physical board, the three-level deluxe edition above,           launches on <strong>Kickstarter in Fall 2026</strong>.{' '}
           <a href="#waitlist">Sign up now</a> to get the launch email.
         </p>
         <div className="store-video-cta">
@@ -383,7 +382,7 @@ function GameplayVideo() {
             Play the full game free →
           </a>
           <p className="store-video-cta-note">
-            No signup, no paywall — try the whole game before you back.{' '}
+            No signup, no paywall, try the whole game before you back.{' '}
             <a href="https://thresan.com/world" className="store-cta-link">
               Explore the world of Kaleo →
             </a>
@@ -394,7 +393,7 @@ function GameplayVideo() {
   );
 }
 
-// ─── Prototype — the kitchen-counter beat ──────────────────────────
+// ─── Prototype, the kitchen-counter beat ──────────────────────────
 // Placed between the polished renders (Showcase) and the Founders ask.
 // The job: prove the maker is real, the design is hand-tested, the
 // product isn't vaporware. Photographic evidence right before the
@@ -414,12 +413,12 @@ function Prototype() {
         <figure className="store-prototype-figure">
           <img
             src="/thresan-prototype-kitchen.jpg"
-            alt="Hand-built three-layer prototype of Thresan: Skyflag on a kitchen counter — cardboard boards, wooden dowels at the corners, painted figurines as game pieces."
+            alt="Hand-built three-layer prototype of Thresan: Skyflag on a kitchen counter, cardboard boards, wooden dowels at the corners, painted figurines as game pieces."
             className="store-prototype-img"
             loading="lazy"
           />
           <figcaption className="store-prototype-caption">
-            The first prototype — kitchen, cardboard, dowels.
+            The first prototype, kitchen, cardboard, dowels.
           </figcaption>
         </figure>
       </div>
@@ -437,7 +436,7 @@ function Tiers() {
         <h2 className="store-section-title">Reward tiers</h2>
         <p className="store-founders-lead">
           A preview of the Kickstarter reward ladder. Prices, slot
-          counts, and inclusions are <em>preliminary</em> — they'll
+          counts, and inclusions are <em>preliminary</em>, they'll
           be locked once manufacturing quotes return and the funding
           goal is set. The Founders Edition is the only tier with a
           live pre-launch reservation today; the rest preview here so
@@ -487,7 +486,7 @@ function Tiers() {
 
         <p className="store-section-fineprint">
           <strong>Subject to change.</strong> Manufacturing quotes are
-          still in progress — final prices, slot counts, and
+          still in progress, final prices, slot counts, and
           inclusions will be re-tuned before the campaign launches.{' '}
           <strong>Shipping</strong> is not included in physical tiers
           and is expected at <em>$20–40 USD</em> depending on region
@@ -515,7 +514,7 @@ function Founders() {
           <li>
             <strong>Numbered First Edition</strong>{' '}
             <span className="store-founders-perk-detail">
-              #001 — #{String(FOUNDERS_TOTAL_SLOTS).padStart(3, '0')}
+              #001, #{String(FOUNDERS_TOTAL_SLOTS).padStart(3, '0')}
             </span>
           </li>
           <li>
@@ -547,7 +546,7 @@ function Founders() {
             </a>
           ) : (
             <div className="store-founders-soon">
-              Founders reservations opening soon —{' '}
+              Founders reservations opening soon, {' '}
               <a href="#waitlist">join the waitlist to be notified first.</a>
             </div>
           )}
@@ -555,7 +554,7 @@ function Founders() {
         <p className="store-founders-refund">
           Fully refundable any time before shipping. Your deposit
           applies in full to your Kickstarter pledge when the campaign
-          launches — you're not paying extra.
+          launches, you're not paying extra.
         </p>
       </div>
     </section>
@@ -594,7 +593,7 @@ function Waitlist() {
         user_agent: navigator.userAgent,
       });
     // 23505 = unique-violation. Treat duplicate signups as success
-    // rather than surfacing "you're already on the list" — that would
+    // rather than surfacing "you're already on the list", that would
     // leak signup status of any email an attacker tries.
     if (insertError && insertError.code !== '23505') {
       setStatus('error');
@@ -678,11 +677,11 @@ function Faq() {
         <div className="store-faq">
           <FaqItem
             q="When does the Kickstarter launch?"
-            a="Targeting Fall 2026. The waitlist gets the exact date first — typically a heads-up two to four weeks ahead of the campaign and a final note the morning it goes live."
+            a="Targeting Fall 2026. The waitlist gets the exact date first, typically a heads-up two to four weeks ahead of the campaign and a final note the morning it goes live."
           />
           <FaqItem
             q="What does the Founders deposit cover?"
-            a={`A $${FOUNDERS_PRICE_USD} refundable deposit reserves one of the first ${FOUNDERS_TOTAL_SLOTS} numbered copies and earns the Founders perks above. When the Kickstarter launches, your deposit applies in full as a credit toward your pledge — you're not paying extra to reserve, and the deposit remains refundable any time before shipping.`}
+            a={`A $${FOUNDERS_PRICE_USD} refundable deposit reserves one of the first ${FOUNDERS_TOTAL_SLOTS} numbered copies and earns the Founders perks above. When the Kickstarter launches, your deposit applies in full as a credit toward your pledge, you're not paying extra to reserve, and the deposit remains refundable any time before shipping.`}
           />
           <FaqItem
             q="Refunds?"
@@ -695,7 +694,7 @@ function Faq() {
                 The digital game is free at{' '}
                 <a href="https://playskyflag.com">playskyflag.com</a> and
                 stays free. The physical edition is a tabletop instrument
-                — three layers, brass and acrylic — playable by candlelight,
+, three layers, brass and acrylic, playable by candlelight,
                 kept on a shelf, gifted forward. Same game, different
                 medium.
               </>
@@ -705,7 +704,7 @@ function Faq() {
             q={`Why a $${FOUNDERS_PRICE_USD} deposit?`}
             a={
               <>
-                Sixty-four squares become one hundred and eight — the
+                Sixty-four squares become one hundred and eight, the
                 deposit is the math, not the final price. The edition
                 price is set with the campaign; your deposit applies to
                 it in full.{' '}

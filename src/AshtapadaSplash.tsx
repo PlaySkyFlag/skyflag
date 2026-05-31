@@ -1,4 +1,4 @@
-// AshtapadaSplash — splash page served at /ashtapada (and later, when
+// AshtapadaSplash, splash page served at /ashtapada (and later, when
 // the domain is wired up, at the root of ashtapada.com). One screen,
 // one CTA: the gold sigil, an eyebrow that bridges the URL to the
 // game, the rally line, and a single Play button that hands the
@@ -24,12 +24,12 @@ export default function AshtapadaSplash() {
   // Ashtapada-branded rather than the Skyflag defaults. Restored on
   // unmount so SPA navigation away from this route is clean.
   useEffect(() => applySurfaceMeta({
-    title: 'Ashtapada, lifted. — Thresan™: Skyflag',
+    title: 'Ashtapada, lifted., Thresan™: Skyflag',
     description:
       'Ashtapada, lifted. Three worlds. One proof. Thresan: a strategy game, currently in its Skyflag edition.',
     canonicalUrl: 'https://ashtapada.com/',
     ogImage: 'https://ashtapada.com/thresan-og-stack.jpg',
-    ogImageAlt: 'Three stacked boards rising as a column — Ashtapada lifted into Thresan.',
+    ogImageAlt: 'Three stacked boards rising as a column, Ashtapada lifted into Thresan.',
   }), []);
 
   return (
@@ -47,12 +47,12 @@ export default function AshtapadaSplash() {
               Play
             </a>
             <p className="ashtapada-fineprint">
-              <em>Thresan</em> — a strategy game. Currently in its{' '}
+              <em>Thresan</em>, a strategy game. Currently in its{' '}
               <em>Skyflag</em> edition.
             </p>
             <img
               src="/thresan-hero-stack.jpg"
-              alt="Three stacked boards rising as a column — the Ashtapada lifted."
+              alt="Three stacked boards rising as a column, the Ashtapada lifted."
               className="ashtapada-render"
               loading="lazy"
             />
@@ -63,7 +63,7 @@ export default function AshtapadaSplash() {
           <div className="ashtapada-more-inner">
             <p className="ashtapada-more-eyebrow">Origins</p>
             <p className="ashtapada-more-prose">
-              Ashtapada is one of the oldest known board games — the
+              Ashtapada is one of the oldest known board games, the
               eight-by-eight grid that ancient India played for thousands
               of years, and the same grid that, centuries later, carried
               Chaturanga west into Persia and eventually became chess.
@@ -71,7 +71,7 @@ export default function AshtapadaSplash() {
               Where chess kept the single plane, Skyflag lifts it: three
               stacked six-by-six boards, sixty-four squares opened to one
               hundred and eight. In the world of <em>Thresan</em>, the
-              lift is literal — the Aetheri raised what remained of
+              lift is literal, the Aetheri raised what remained of
               civilization into three living layers, and the game
               ascended with the city. Ashtapada was the floor. The
               Aetheri built the sky.

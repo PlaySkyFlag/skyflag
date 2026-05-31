@@ -1,8 +1,8 @@
-// ThresanUmbrella — the page served at thresan.com (the universe-level
+// ThresanUmbrella, the page served at thresan.com (the universe-level
 // brand surface). Frames Thresan as the world; points the visitor to
 // the current product (Skyflag, on www.playskyflag.com) and surfaces
 // the physical edition (thresan.store) and the heritage page
-// (Origins). Intentionally short — one screen, one primary CTA, two
+// (Origins). Intentionally short, one screen, one primary CTA, two
 // secondary links. The job is direction, not depth.
 
 import { useEffect } from 'react';
@@ -19,12 +19,12 @@ export default function ThresanUmbrella() {
   useEffect(() => {
     window.scrollTo(0, 0);
     return applySurfaceMeta({
-      title: 'Thresan — a strategy game and the universe around it',
+      title: 'Thresan, a strategy game and the universe around it',
       description:
         'Thresan is a strategy game with a layered fictional universe. Three boards, five piece types, ancient roots. The current edition is Skyflag.',
       canonicalUrl: 'https://thresan.com/',
       ogImage: 'https://thresan.com/thresan-og-stack.jpg',
-      ogImageAlt: 'Three stacked boards forming a column — Terran, Meridian, Empyrean.',
+      ogImageAlt: 'Three stacked boards forming a column, Terran, Meridian, Empyrean.',
     });
   }, []);
 
@@ -41,12 +41,11 @@ export default function ThresanUmbrella() {
         <p className="thresan-lead">
           Thresan is a strategy game with a layered universe around
           it. Three stacked boards, five piece types, an ancient
-          proof of reach. The current edition is <em>Skyflag</em> —
-          the clans, the boards, the world of Kaleo.
+          proof of reach. The current edition is <em>Skyflag</em>          the clans, the boards, the world of Kaleo.
         </p>
         <img
           src="/thresan-hero-stack.jpg"
-          alt="Three stacked boards forming a column — Terran, Meridian, Empyrean."
+          alt="Three stacked boards forming a column, Terran, Meridian, Empyrean."
           className="thresan-render"
           loading="lazy"
         />
@@ -69,11 +68,11 @@ export default function ThresanUmbrella() {
           </video>
         </div>
         <p className="thresan-lead thresan-video-caption">
-          This is Thresan in play — three stacked boards (Ground, Sky,
+          This is Thresan in play, three stacked boards (Ground, Sky,
           and Space), five pieces a side moving across all three planes
           at once, lifting between worlds to set up captures no flat
           board could hold. The game is{' '}
-          <strong>free to play, always</strong> — jump in below. The
+          <strong>free to play, always</strong>, jump in below. The
           premium physical board launches on{' '}
           <strong>Kickstarter in fall 2026</strong>.{' '}
           <a href={STORE_URL}>Sign up now</a> to get the launch email.
@@ -99,7 +98,7 @@ export default function ThresanUmbrella() {
           </a>
         </div>
         <a href="https://thresan.com/kickstarter" className="thresan-cta">
-          Notify me — Kickstarter, Fall 2026 →
+          Notify me, Kickstarter, Fall 2026 →
         </a>
         <p className="thresan-fineprint">
           Thresan™ is a project of Limnology Research Corp. ·{' '}
