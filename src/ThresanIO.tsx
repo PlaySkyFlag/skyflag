@@ -114,32 +114,34 @@ export default function ThresanIO() {
             </p>
             <ol className="lab-post-list">
               <li>
-                <strong>Capture all three of the opposing clan's
-                claim-seals.</strong> One seal lives on each plane. To
-                win this way you've demonstrated control across all
-                three theaters — you've proved you can reach into
-                every depth of the world.
+                <strong>Capture the opposing Captain and Soldier.</strong>{' '}
+                With no piece left that could ever escort a claim to the
+                Nexus, the contest is over. This is Thresan's equivalent of
+                checkmate.
               </li>
               <li>
-                <strong>Land your Captain on the Caelum Nexus</strong>{' '}
-                at the top of the stack. To win this way you've
-                demonstrated that a single piece, escorted up through
-                your own play, can traverse the full column.
+                <strong>Capture all three of the opposing clan's
+                claim-seals, then land your Captain on the Nexus.</strong>{' '}
+                One seal lives on each plane. Take all three, in any order,
+                then climb to the summit. Seals first, Nexus last, and only
+                a Captain can do either part.
               </li>
             </ol>
             <p>
-              Both win conditions are <em>constructive</em> proofs.
-              You don't win by trapping the opponent. You win by
-              building a positional structure that demonstrates reach
-              across the three planes. The game ends when one side has
-              assembled the proof.
+              The seal-and-Nexus path is a <em>constructive</em> proof:
+              you win not by luck but by building a positional structure
+              that demonstrates reach across all three planes, seal by
+              seal, until a Captain stands on the Nexus. The checkmate path
+              is its mirror, an eliminative proof: strip the opponent of
+              every piece that could ever make that climb. Two proofs, one
+              of reach and one of denial.
             </p>
             <p>
               That's why three planes matters. Two planes can't host a
-              proof of reach — the column is too short for "reach" to
-              be the right word. Four planes host one but at the cost
-              of legibility. Three is the smallest number where the
-              proof feels like a proof rather than a coincidence.
+              proof of reach (the column is too short for "reach" to be the
+              right word). Four planes host one but at the cost of
+              legibility. Three is the smallest number where the proof
+              feels like a proof rather than a coincidence.
             </p>
 
             <h3>The smallest interesting strategic surface</h3>
@@ -408,10 +410,10 @@ export default function ThresanIO() {
                 single-session learnability.
               </li>
               <li>
-                <strong>No checkmate.</strong> Thresan replaces the
-                contradiction-style win condition with two
-                constructive paths: capture all three claim-seals, or
-                land the Captain on the Caelum Nexus.
+                <strong>Two win paths.</strong> One eliminative (capture
+                the opposing Captain and Soldier, Thresan's checkmate), one
+                constructive (capture all three claim-seals, then land a
+                Captain on the Nexus).
               </li>
               <li>
                 <strong>Cross-Board Rule.</strong> Captures route

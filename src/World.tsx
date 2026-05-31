@@ -72,7 +72,7 @@ const TEMPLATES: Template[] = [
     psych:
       'Perspective and judgment. Trained to read a situation as a pattern of choices and consequences.',
     aug: 'A skullbase implant recognizes Aetheri seal authorization and grants king-move geometry.',
-    game: 'Moves a single step in any direction — and is the only template that can wake a clan’s seals and stand before the Nexus.',
+    game: 'Moves a single step in any direction: the only piece that can capture the enemy clan’s seals and finish on the Nexus.',
   },
   {
     name: 'Durren',
@@ -285,8 +285,8 @@ export default function World() {
             Five pieces a side, not four: the Soldier promotes. A{' '}
             <strong>Durren</strong> who crosses the full Terran depth under
             live opposition wakes the latent Dantec implant and becomes a{' '}
-            <strong>Captain</strong> — a lawful claimant, able to wake
-            seals and answer the Nexus.
+            <strong>Captain</strong>: a lawful claimant, able to capture
+            the enemy's seals and answer the Nexus.
           </p>
         </section>
 
@@ -295,19 +295,20 @@ export default function World() {
           <h2 className="world-section-title">The proof</h2>
           <div className="world-prose">
             <p>
-              Each clan is bound to the arcology through{' '}
-              <strong>three claim-seals</strong>, one on each layer. The
-              Sky and Space seals share a coordinate — the{' '}
-              <em>Aetheri Echo Point</em> — because the Aetheri demanded a
-              claimant prove not just reach, but continuity across layers.
-              A seal answers only its lawful clan; it cannot be stolen,
-              only blocked.
+              Each clan holds <strong>three claim-seals</strong>, one in a
+              corner of each layer. A clan's Ground and Space seals sit on
+              the same corner; its Sky seal sits at the diagonally opposite
+              corner. The scholars call that alignment the{' '}
+              <em>Aetheri Echo Point</em>: proof of continuity across the
+              layers, not just reach. To win the long way, a Captain must
+              capture all three of the enemy's seals, then stand on the
+              Nexus.
             </p>
             <p>
               Between the layers run <strong>four Lifts</strong>, the
               hidden skeleton of the contest. Transit is never instant: a
-              climber must reach a Lift, hold it, and rise on a later move
-              — and a body standing in the column above can deny passage
+              climber must reach a Lift, hold it, and rise on a later move,
+              and a body standing in the column above can deny passage
               entirely, through presence alone. Every ascent is a claim
               about time, control, and vulnerability.
             </p>
@@ -335,18 +336,18 @@ export default function World() {
           <div className="world-prose">
             <p>
               At the summit waits the <strong>Caelum Nexus</strong>,
-              silent and exacting — the one point on any layer claimed by
+              silent and exacting: the one point on any layer claimed by
               neither clan. It does not reward haste, or bloodline, or mere
               survival. It answers the clan that proves continuity across
-              all three layers of Kaleo. Only when all three of a clan’s
-              seals are awake may one of its Captains approach.
+              all three layers of Kaleo. Only after a Captain has captured
+              all three of the enemy's seals may that Captain approach.
             </p>
           </div>
           <blockquote className="world-pullquote">
             It does not feel like a judge. It feels like a listener whose
             attention is costly. The longer it listens, the more carefully
             one must speak.
-            <cite>— Renn Dantec, Grey Ravens, who chose not to ask</cite>
+            <cite>Renn Dantec, Grey Ravens, who chose not to ask</cite>
           </blockquote>
         </section>
 

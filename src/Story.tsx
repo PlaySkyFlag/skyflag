@@ -134,18 +134,16 @@ function Foreword() {
           shrine. What they have, instead, are corners.
         </p>
         <p>
-          Each clan is bound to Kaleo through three dormant claim-seals,
-          placed in the corners of its own territory on each layer. The
-          Terran Seal anchors the clan to the lowest world. The Meridian
-          Echo repeats that claim across the charged transit layer. The
-          Empyrean Echo answers it again at the summit. The second and
-          third seals share the same coordinates — the scholars call this
-          the <Term>Aetheri Echo Point</Term> — because continuity across
-          layers was the proof the Aetheri required.
+          Each clan keeps three claim-seals, set in the corners of its own
+          territory, one on each layer. A clan's Terran seal and its
+          Empyrean seal sit on the same corner; its Meridian seal sits at
+          the diagonally opposite corner. The scholars call that alignment
+          the <Term>Aetheri Echo Point</Term>: continuity across the
+          layers, not reach alone, was the proof the Aetheri required.
         </p>
         <p>
-          Only when a clan has reactivated all three of its own seals may
-          one of its Dantecs approach the Nexus and ask it to answer.
+          Only after a clan's Captain has captured all three of the enemy's
+          seals may that Captain approach the Nexus and ask it to answer.
         </p>
         <p>
           The Aetheri did not trust survival to strength alone. They built
@@ -255,7 +253,7 @@ function FourTemplates() {
         <Template
           name="DANTEC"
           role="Captain"
-          description="The claimant authorized to wake seals and answer the Nexus. Skullbase implant recognizes Aetheri seal authorization directly. A Dantec who lays a hand on a seal receives confirmation through the implant itself."
+          description="The only piece that can capture the enemy's seals and answer the Nexus. Skullbase implant recognizes Aetheri seal authorization directly. A Dantec who captures a seal receives confirmation through the implant itself."
         />
         <Template
           name="DURREN"

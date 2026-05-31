@@ -194,13 +194,13 @@ function Descriptions() {
         <h3 className="press-desc-label">Long (≈ 180 words)</h3>
         <p className="press-desc-body">
           Thresan™: Skyflag is a free, browser-based turn-based strategy
-          game played simultaneously across three stacked 6×6 boards —
-          the Terran, Meridian, and Empyrean layers of an arcology
-          called Kaleo. Each of the two players commands five pieces —
-          Captain, Soldier, Promoted Soldier Captain, Rover, Pilot — and
-          pursues the opposing clan's three claim-flags, one on each layer. Once all three
-          opposing flags are claimed, the Captain must land on the
-          Caelum Nexus at Space(3,3) to win.
+          game played simultaneously across three stacked 6×6 boards: the
+          Terran, Meridian, and Empyrean layers of an arcology called
+          Kaleo. Each of the two players commands five pieces (Captain,
+          Soldier, Promoted Soldier Captain, Rover, Pilot) and wins one of
+          two ways: capture the opposing Captain and Soldier, or capture
+          the opposing clan's three flags, one on each layer, and then land
+          a Captain on the Caelum Nexus at Space(3,3).
         </p>
         <p className="press-desc-body">
           Pieces move and capture by geometry alone. There are no

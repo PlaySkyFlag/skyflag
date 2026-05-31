@@ -120,13 +120,15 @@ export default function Kickstarter() {
         {/* ── Pitch ────────────────────────────────────────────── */}
         <section className="ks-pitch">
           <p>
-            Thresan is a two-player contest of reach across a three-level
-            arcology. Reclaim your clan's three claim-seals across every
-            layer, or drive a Captain to the Caelum Nexus at the summit.{' '}
-            <strong>No dice, no cards — pure geometry.</strong> Built as a
-            single kinetic object in smoked acrylic, brushed brass, and
-            machined metal, with under-board lighting that brings the board
-            to life. The <em>Skyflag</em> edition.
+            Thresan is a two-player contest of pure geometry across three
+            stacked boards. Two ways to win: capture your opponent's
+            Captain and Soldier, the way chess ends a game, or send your
+            own Captain to seize all three of their flags and land on the
+            Nexus at the summit.{' '}
+            <strong>No dice, no cards, no luck.</strong> Built as a single
+            kinetic object in smoked acrylic, brushed brass, and machined
+            metal, with under-board lighting that brings the board to life.
+            The <em>Skyflag</em> edition.
           </p>
         </section>
 
