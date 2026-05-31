@@ -495,46 +495,46 @@ function Chapter2() {
         temptation is deliberate.
       </p>
       <p>
-        Sera moved first. Her deployment position at Ground(0,3) placed
-        her three activations from the Stag Terran Seal at Ground(0,0).
-        She walked the processional corridor that led to the alcove with
-        the measured pace of a Captain who has been through seal-wake
+        Sera moved first. Her deployment at Ground(5,2) placed her a full
+        traverse of the Terran from the Raven Terran Seal at Ground(0,0),
+        the top-left corner, where a Raven alcove had waited dust-sealed
+        for three generations. She walked the long corridor toward the
+        enemy alcove with the measured pace of a Captain who has run seal
         drills for a decade. Her Dantec implant, dormant since her
         template's completion at twenty-four, sat at the base of her
         skull, waiting for its cue.
       </p>
       <p>
-        When her palm met the leaping-stag crystal in the alcove, the cue
-        arrived. The seal's warm gold light traced its own outline from
-        within. At Sera's skullbase, a matching glow. The seal did not
-        grant her power. It acknowledged her clan's claim, and registered
-        the acknowledgment in the old Aetheri record.
+        When her palm met the raven-marked crystal, the cue arrived. The
+        seal's cold light traced its own outline from within. At Sera's
+        skullbase, a matching glow. The capture took nothing the Ravens
+        could still use, and gave Sera no new power. It registered, in the
+        old Aetheri record, that a Stag Captain had reached into the
+        enemy's lowest claim and taken it.
       </p>
       <p className="story-prose-emphasis">
-        One Stag seal awake. Two to go.
+        One Raven seal taken. Two of the enemy's to go.
       </p>
       <Pause />
       <p>
-        Renn moved second. Her deployment at Ground(5,2) and her Raven
+        Renn moved second. Her deployment at Ground(0,3) and the Stag
         Terran Seal at Ground(5,5) were separated by collapsed
-        architecture. She reached her seal two rounds later than Sera
-        reached hers.
-      </p>
-      <p>
-        The wake sequence was identical. Raven silver-grey light in the
-        alcove. Renn's skullbase implant — older than Sera's, carrying
-        more seal-wakes across more years — answering. Renn knelt beside
-        the seal a moment longer than she needed to. Behind her, through
-        a gap in the collapsed wall, a Terran ration yard was glimpsed at
-        a distance. Civilians still in line. Still coughing.
+        architecture: the Stag quarter of the Terran had been damaged more
+        heavily in the last infrastructure crisis than the Raven quarter,
+        and Renn's approach involved clearing debris Sera's route had not.
+        Renn reached the Stag seal two rounds later than Sera reached the
+        Raven one.
       </p>
       <p>
         Raven doctrine did not reward velocity for its own sake, and a
-        Captain who arrived at her first seal already fatigued was a
-        Captain who would not reach her third.
+        Captain who arrived at her first capture already fatigued was a
+        Captain who would not reach her third. Behind her, through a gap in
+        the collapsed wall, a Terran ration yard stood at a distance.
+        Civilians still in line. Still coughing.
       </p>
       <p className="story-prose-emphasis">
-        Two seals awake across the Terran. Both clans, one-third proven.
+        Two seals taken across the Terran. Each clan one-third of the way
+        to the enemy's three.
       </p>
     </Chapter>
   );
