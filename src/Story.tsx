@@ -551,9 +551,9 @@ function Chapter3() {
       </p>
       <p>
         Mox Thandiwe deployed to the Meridian on the fourth round. He did
-        not move toward the Raven Meridian Echo. He moved toward a Stag
-        Lift coordinate — Sky(1,4), the arrival point Sera would use when
-        she ascended from the Terran. He did not run. He walked along the
+        not move toward the Raven Meridian Echo. He moved toward the Lift
+        coordinate Sky(1,4), the arrival point Sera would use when she
+        ascended from the Terran. He did not run. He walked along the
         catwalk, past numbered Lift shafts, and stopped at the square
         platform marked with the corner symbol. He stepped onto it. He
         stood there. He did nothing else.
@@ -610,9 +610,9 @@ function Chapter4() {
       <p>
         The Meridian had not seen a Stag Captain in seven years. Her
         footsteps echoed in the wide corridors. The charged air moved
-        against her face. The Stag Meridian Echo waited four king-moves
-        away, at the top-right corner of the upper layer. Four king-moves
-        of exposed transit. The Aetheri had designed the Meridian
+        against her face. The Raven Meridian seal waited four king-moves
+        away, at the top-right corner of the upper layer, Sky(0,5). Four
+        king-moves of exposed transit. The Aetheri had designed the Meridian
         crossing to be the hardest proof of the Law of Three.
       </p>
       <p>
@@ -634,12 +634,12 @@ function Chapter4() {
         You rerouted around Mox. You did not plan for me.
       </PullQuote>
       <p>
-        Sera had options. She could engage Zara directly — a Dantec's
+        Sera had options. She could engage Zara directly: a Dantec's
         king-move had capture-geometry sufficient to threaten a Voss in
-        adjacent space. She could try to cross diagonally and outflank —
-        a move Zara's augmentation was specifically designed to prevent.
-        Or she could step sideways, one square, and evade Zara's
-        sight-line rather than fight through it.
+        adjacent space. She could try to cross diagonally and outflank, a
+        move Zara's augmentation was specifically designed to prevent. Or
+        she could step sideways, one square, and evade Zara's sight-line
+        rather than fight through it.
       </p>
       <p>
         She stepped sideways. A lateral king-move. Not forward, not
@@ -648,15 +648,16 @@ function Chapter4() {
       </p>
       <p>
         The Meridian stripped rhetoric away. By the time Sera reached the
-        Stag Meridian Echo — seven activations after her Lift arrival
-        rather than the planned four — she had been grazed twice by
-        Zara's positioning, had lost a support operative she had not
-        expected to lose, and had arrived at the seal tired in a way she
-        had not been on the Terran.
+        Raven Meridian seal, seven activations after her Lift arrival
+        rather than the planned four, she had been grazed twice by Zara's
+        positioning, had lost a support operative she had not expected to
+        lose, and had arrived at the seal tired in a way she had not been
+        on the Terran.
       </p>
       <p className="story-prose-emphasis">
-        She placed her hand on the leaping-stag crystal. Two Stag seals
-        awake. The chain was two-thirds complete.
+        She placed her hand on the Raven crystal and its light went out.
+        Two of the rival's seals down. The Stag chain was two-thirds
+        complete.
       </p>
     </Chapter>
   );
@@ -738,8 +739,9 @@ function Chapter6() {
   return (
     <Chapter num="Six" title="The Template-Wake">
       <p className="story-prose-lead">
-        Kael Durren reached row five of the Terran on the same round Sera
-        Dantec reached the Meridian Echo.
+        Kael Durren reached row zero of the Terran, the far row where a
+        Stag Durren promotes, on the same round Sera Dantec reached the
+        Raven Meridian seal.
       </p>
       <p>
         He had spent four activations crossing the Terran under live
@@ -820,10 +822,10 @@ function Chapter7() {
       </p>
       <p>
         Zara had ascended to the Empyrean on the previous cycle. She had
-        positioned herself not at the Stag Empyrean Echo, but one square
-        from it — a Voss positioned to threaten Sera's next move. Sera
-        could take the seal. Sera would then be unable to move. Zara
-        could capture her on the following activation.
+        positioned herself not on the Raven seal cell, but one square
+        from it, a Voss set to threaten Sera's next move. Sera could take
+        the seal. Sera would then be exposed. Zara could capture her on
+        the following activation.
       </p>
       <p>
         Sera recognized the trade. She made the calculation. She was
@@ -833,36 +835,38 @@ function Chapter7() {
         She took the seal.
       </p>
       <p>
-        Her palm against the leaping-stag crystal at Space(0,5). Gold
-        light from within. The third Stag seal awake. The chain complete.
-        Sera still standing.
+        Her palm against the Raven crystal at Space(0,0). Silver-grey
+        light guttering out under her hand. The third of the rival's
+        seals neutralized. The Stag chain complete. Sera still standing.
       </p>
       <p>
         Zara took her diagonal Voss move. Two squares, ending adjacent to
         Sera. The capture was clean, professional, almost respectful.
         Zara did not smile. Sera said only: <em>Don't be sorry</em>. She
-        fell. The seal continued to burn independent of her.
+        fell. The Stag chain stood complete without her, its three
+        captures already logged.
       </p>
       <p>
         The Law of Three does not require a living claimant at the moment
-        of answer. It requires only that the chain have been completed,
-        and that a lawful Dantec remain. Kael was now the only Stag
-        Dantec on the board.
+        of answer. It requires only that the rival's three seals be down,
+        that progress be shared across a clan's claimants, and that a
+        lawful Dantec remain to reach the Nexus. Kael was now the only
+        Stag Dantec on the board.
       </p>
       <Pause />
       <p>
-        Renn reached her own Empyrean Echo three activations later. The
-        Raven approach was slower by necessity — her Lift path from the
+        Renn reached the last Stag seal three activations later. The
+        Raven approach was slower by necessity: her Lift path from the
         Meridian had been contested by a Stag Reservoir Corps operative,
         and she had taken a circuitous route to avoid exposure.
       </p>
       <p>
-        Her palm met the Raven crystal at Space(5,0). Silver-grey light
-        from within. The third Raven seal awake. The Raven chain
+        Her palm met the Stag crystal at Space(5,5). Its gold light went
+        dark. The third of the Stag seals neutralized. The Raven chain
         complete.
       </p>
       <p className="story-prose-emphasis">
-        Both clans had now proven continuity.
+        Both clans had now completed the rival's chain.
       </p>
     </Chapter>
   );
