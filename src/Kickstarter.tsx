@@ -70,11 +70,20 @@ export default function Kickstarter() {
     }
     setStatus('submitting');
     setError('');
+    // Capture the social platform from the UTM link so signups attribute by
+    // source in the CRM. Keep `source` = 'thresan-kickstarter' (the Kit
+    // tag-sync keys off it); the platform rides in its own column.
+    const utm = new URLSearchParams(window.location.search)
+      .get('utm_source');
+    const utmSource = utm
+      ? utm.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 40)
+      : null;
     const { error: insertError } = await supabase
       .from('thresan_waitlist')
       .insert({
         email: trimmed,
         source: 'thresan-kickstarter',
+        utm_source: utmSource,
         interests,
         consent: true,
         referrer: document.referrer || null,
