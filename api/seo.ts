@@ -69,7 +69,7 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
   },
   'thresan.store': {
     title: 'Thresan Store, premium physical edition',
-    description: 'Premium physical edition of Thresan: Skyflag. Matte black with gold accents, transparent acrylic boards, brass-cast pieces, weighted base. Kickstarter Fall 2026.',
+    description: 'Premium physical edition of Thresan: Skyflag. A three-tier strategy game: stacked boards, molded pieces, a numbered collector edition. Kickstarter Fall 2026.',
     ogImage: 'https://playskyflag.com/thresan-deluxe-board.jpg',
     loadingHeadline: 'Thresan Store',
     loadingTagline: 'Premium physical edition. Kickstarter Fall 2026.',
@@ -182,10 +182,10 @@ const WORLD_SURFACE: Surface = {
 const KICKSTARTER_SURFACE: Surface = {
   title: 'Thresan: Skyflag, coming to Kickstarter',
   description:
-    'A premium illuminated strategy game: three glass decks, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter in Fall 2026, and claim early-backer pricing.',
+    'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter in Fall 2026, and claim early-backer pricing.',
   ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
   ogImageAlt:
-    'The Thresan: Skyflag deluxe edition, three illuminated acrylic boards fanned from a shared powered hub.',
+    'Concept render of Thresan: Skyflag, three stacked boards fanned from a shared central hub.',
   loadingHeadline: 'Thresan: Skyflag',
   loadingTagline: 'Coming to Kickstarter, Fall 2026.',
 };

@@ -404,14 +404,14 @@ function PhysicalEditionSection() {
       <div className="landing-section-inner landing-edition-inner">
         <h2 className="landing-section-title">And in your hands</h2>
         <p className="landing-edition-lead">
-          A physical edition is coming to Kickstarter, three boards,
-          lifted, in brass and acrylic. Join the waitlist for the
+          A physical edition is coming to Kickstarter: three boards,
+          lifted, a premium three-tier object. Join the waitlist for the
           launch email.
         </p>
         <figure className="landing-edition-figure">
           <img
             src="/thresan-deluxe-board.jpg"
-            alt="Thresan: Skyflag deluxe physical edition, three illuminated acrylic boards fanned from a shared center-balanced powered hub on a weighted base."
+            alt="Concept render of Thresan: Skyflag, three stacked boards fanned from a shared central hub."
             className="landing-edition-render"
             loading="lazy"
           />

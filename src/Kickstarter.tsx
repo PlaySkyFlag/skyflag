@@ -37,11 +37,11 @@ export default function Kickstarter() {
     return applySurfaceMeta({
       title: 'Thresan: Skyflag, coming to Kickstarter',
       description:
-        'A premium illuminated strategy game: three glass decks, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter in Fall 2026, and claim early-backer pricing.',
+        'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter in Fall 2026, and claim early-backer pricing.',
       canonicalUrl: 'https://thresan.com/kickstarter',
       ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
       ogImageAlt:
-        'The Thresan: Skyflag deluxe edition, three illuminated acrylic boards fanned from a shared powered hub.',
+        'Concept render of Thresan: Skyflag, three stacked boards fanned from a shared central hub.',
     });
   }, []);
 
@@ -99,17 +99,17 @@ export default function Kickstarter() {
             Three layers. One Nexus.
             <br />
             <span className="ks-headline-accent">
-              A game that lights up the table.
+              Strategy in three dimensions.
             </span>
           </h1>
           <p className="ks-subhead">
-            Thresan is a premium illuminated strategy game, three glass
-            decks, four Lifts, one shared hub. Be first to know when it
+            Thresan is a premium three-layer strategy game: three stacked
+            boards, four Lifts, one shared hub. Be first to know when it
             launches, and claim early-backer pricing.
           </p>
           <img
             src="/thresan-deluxe-board.jpg"
-            alt="The Thresan: Skyflag deluxe edition, three illuminated acrylic boards fanned from a shared center-balanced powered hub on a weighted base."
+            alt="Concept render of Thresan: Skyflag, three stacked 6×6 boards fanned from a shared central hub."
             className="ks-hero-art"
           />
           <a href="#notify" className="ks-hero-cta">
@@ -125,10 +125,10 @@ export default function Kickstarter() {
             Captain and Soldier, the way chess ends a game, or send your
             own Captain to seize all three of their flags and land on the
             Nexus at the summit.{' '}
-            <strong>No dice, no cards, no luck.</strong> Built as a single
-            kinetic object in smoked acrylic, brushed brass, and machined
-            metal, with under-board lighting that brings the board to life.
-            The <em>Skyflag</em> edition.
+            <strong>No dice, no cards, no luck.</strong> The Skyflag
+            edition is a premium, three-tier object built to live on the
+            table: stackable boards, integrated Lifts, and a numbered
+            collector edition.
           </p>
         </section>
 

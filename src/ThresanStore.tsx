@@ -112,8 +112,8 @@ const REWARD_TIERS: RewardTier[] = [
     reserveHref: FOUNDERS_RESERVATION_URL || undefined,
     includes: [
       'Everything in Skyflag Edition',
-      'Numbered box (#001–#500), weighted brass pieces',
-      'Gold-foiled rulebook cover, linen-finish components',
+      'Numbered box (#001–#500), premium molded pieces',
+      'Foil rulebook cover, premium components',
       'Name in the rulebook acknowledgments',
       'Founders Discord, early playtests, build updates, decision input',
     ],
@@ -224,9 +224,9 @@ function Hero() {
           One table.
         </h1>
         <p className="store-hero-lead">
-          Sixty-four squares opened to one hundred and eight. Three
-          stacked boards, transparent, illuminated, brass-piece-and-
-          acrylic construction.{' '}
+          Sixty-four squares opened to one hundred and eight. A premium
+          three-tier object: stacked boards, integrated Lifts, molded
+          pieces.{' '}
           {KICKSTARTER_URL ? (
             <strong>Live on Kickstarter.</strong>
           ) : (
@@ -297,13 +297,13 @@ function Showcase() {
           <figure className="store-figure store-figure-solo">
             <img
               src="/thresan-deluxe-board.jpg"
-              alt="Thresan deluxe edition, three illuminated 6×6 acrylic boards (green Ground, cyan Sky, blue Space) fanned from a shared center-balanced powered hub on a weighted base, with illuminated lift columns and a USB-C controller in the base."
+              alt="Concept render of Thresan: Skyflag, three stacked 6×6 boards (green Ground, cyan Sky, blue Space) fanned from a shared central hub."
               className="store-figure-img"
               loading="lazy"
             />
             <figcaption className="store-figure-caption">
-              Deluxe edition, center-balanced fan-spread, illuminated lift
-              columns, shared powered hub
+              Concept render, center-balanced fan-spread, shared central
+              hub
             </figcaption>
           </figure>
         </div>
@@ -317,7 +317,7 @@ function Showcase() {
             finishes (ten pieces total in the box)
           </li>
           <li>
-            <strong>Illuminated base</strong> with the Thresan sigil
+            <strong>Display base</strong> with the Thresan sigil
           </li>
           <li>
             <strong>Bound rulebook</strong>, the Three Seals of Kaleo,
@@ -693,10 +693,9 @@ function Faq() {
               <>
                 The digital game is free at{' '}
                 <a href="https://playskyflag.com">playskyflag.com</a> and
-                stays free. The physical edition is a tabletop instrument
-, three layers, brass and acrylic, playable by candlelight,
-                kept on a shelf, gifted forward. Same game, different
-                medium.
+                stays free. The physical edition is a tabletop instrument,
+                three layers you can hold, set up on the table, kept on a
+                shelf, gifted forward. Same game, different medium.
               </>
             }
           />
