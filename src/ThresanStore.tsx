@@ -68,6 +68,17 @@ type RewardTier = {
 
 const REWARD_TIERS: RewardTier[] = [
   {
+    id: 'back-the-build',
+    name: 'Back the build',
+    priceUSD: 1,
+    pitch: 'No reward, just support. Every backer counts.',
+    includes: [
+      'Our genuine thanks',
+      'Name in the digital credits on playskyflag.com',
+      'Backer-only build updates',
+    ],
+  },
+  {
     id: 'supporter',
     name: 'Three Worlds Supporter',
     priceUSD: 5,
@@ -76,6 +87,16 @@ const REWARD_TIERS: RewardTier[] = [
       'Name in the digital credits on playskyflag.com',
       'Build updates from inside the studio',
       'Printable PDF of the world of Kaleo (lore brief)',
+    ],
+  },
+  {
+    id: 'sticker',
+    name: 'Sticker pack',
+    priceUSD: 12,
+    pitch: 'A little piece of Kaleo.',
+    includes: [
+      'Everything in Three Worlds Supporter',
+      'Die-cut vinyl sticker pack: the two clan sigils and the Caelum Nexus',
     ],
   },
   {
@@ -91,14 +112,14 @@ const REWARD_TIERS: RewardTier[] = [
     ],
   },
   {
-    id: 'skyflag',
-    name: 'Skyflag Edition',
+    id: 'standard',
+    name: 'Standard Edition',
     priceUSD: 75,
     pitch: 'The standard physical game.',
     includes: [
       'Everything in Digital Founder',
       'One copy of Thresan: Skyflag, three boards, ten pieces, rulebook',
-      'Standard packaging, full-colour print',
+      'Standard construction, full-colour print',
     ],
   },
   {
@@ -111,7 +132,7 @@ const REWARD_TIERS: RewardTier[] = [
     limited: true,
     reserveHref: FOUNDERS_RESERVATION_URL || undefined,
     includes: [
-      'Everything in Skyflag Edition',
+      'Everything in Standard Edition',
       'Numbered box (#001–#500), premium molded pieces',
       'Foil rulebook cover, premium components',
       'Name in the rulebook acknowledgments',
