@@ -11,6 +11,7 @@
 import { useEffect } from 'react';
 import './AshtapadaSplash.css';
 import { applySurfaceMeta } from './socialMeta';
+import KickstarterCTA from './KickstarterCTA';
 
 const PLAY_URL = 'https://playskyflag.com/play?ref=ashtapada';
 // Absolute URL so the link works from both ashtapada.com (where the
@@ -81,6 +82,7 @@ export default function AshtapadaSplash() {
             </a>
           </div>
         </section>
+        <KickstarterCTA />
       </main>
     </div>
   );

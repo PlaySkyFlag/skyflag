@@ -69,7 +69,7 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
   },
   'thresan.store': {
     title: 'Thresan Store, premium physical edition',
-    description: 'Premium physical edition of Thresan: Skyflag. A three-tier strategy game: stacked boards, molded pieces, a numbered collector edition. Kickstarter Fall 2026.',
+    description: 'Premium physical edition of Thresan: Skyflag. A three-tier strategy game: stacked boards, premium pieces, a numbered collector edition. Kickstarter Fall 2026.',
     ogImage: 'https://playskyflag.com/thresan-deluxe-board.jpg',
     loadingHeadline: 'Thresan Store',
     loadingTagline: 'Premium physical edition. Kickstarter Fall 2026.',

@@ -120,17 +120,17 @@ export default function ThresanIO() {
               </li>
               <li>
                 <strong>Capture all three of the opposing clan's
-                claim-seals, then land your Captain on the Nexus.</strong>{' '}
-                One seal lives on each plane. Take all three, in any order,
-                then climb to the summit. Seals first, Nexus last, and only
+                flags, then land your Captain on the Nexus.</strong>{' '}
+                One flag lives on each plane. Take all three, in any order,
+                then climb to the summit. Flags first, Nexus last, and only
                 a Captain can do either part.
               </li>
             </ol>
             <p>
-              The seal-and-Nexus path is a <em>constructive</em> proof:
+              The flag-and-Nexus path is a <em>constructive</em> proof:
               you win not by luck but by building a positional structure
-              that demonstrates reach across all three planes, seal by
-              seal, until a Captain stands on the Nexus. The checkmate path
+              that demonstrates reach across all three planes, flag by
+              flag, until a Captain stands on the Nexus. The checkmate path
               is its mirror, an eliminative proof: strip the opponent of
               every piece that could ever make that climb. Two proofs, one
               of reach and one of denial.
@@ -388,7 +388,7 @@ export default function ThresanIO() {
                 <tr><td>1985</td><td>Dragonchess</td><td>3 × (8×12)</td><td>Gary Gygax</td></tr>
                 <tr><td>1996</td><td>Hyperchess</td><td>helical</td><td>Max Chappell</td></tr>
                 <tr><td>2001</td><td>Millennium 3D Chess</td><td>3 × (8×8)</td><td>William d'Agostino</td></tr>
-                <tr><td>2026</td><td><strong>Thresan: Skyflag</strong></td><td>3 × (6×6)</td><td>Nelson Regan Jatel</td></tr>
+                <tr><td>2026</td><td><strong>Thresan: Skyflag</strong></td><td>3 × (6×6)</td><td>Nelson Jatel</td></tr>
               </tbody>
             </table>
             <p>
@@ -408,7 +408,7 @@ export default function ThresanIO() {
               <li>
                 <strong>Two win paths.</strong> One eliminative (capture
                 the opposing Captain and Soldier, Thresan's checkmate), one
-                constructive (capture all three claim-seals, then land a
+                constructive (capture all three flags, then land a
                 Captain on the Nexus).
               </li>
               <li>

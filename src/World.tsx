@@ -71,8 +71,8 @@ const TEMPLATES: Template[] = [
     img: '/kaleo-captain.jpg',
     psych:
       'Perspective and judgment. Trained to read a situation as a pattern of choices and consequences.',
-    aug: 'A skullbase implant recognizes Aetheri seal authorization and grants king-move geometry.',
-    game: 'Moves a single step in any direction: the only piece that can capture the enemy clan’s seals and finish on the Nexus.',
+    aug: 'A skullbase implant recognizes Aetheri flag authorization and grants king-move geometry.',
+    game: 'Moves a single step in any direction: the only piece that can capture the enemy clan’s flags and finish on the Nexus.',
   },
   {
     name: 'Durren',
@@ -157,7 +157,7 @@ export default function World() {
               The Aetheri did not trust survival to strength alone. They
               built Kaleo as a system of proofs, a law of geometry and
               consequence binding the arcology to the Nexus. They left no
-              armies. They left protocols, seals, and a single question
+              armies. They left protocols, flags, and a single question
               waiting at the top of the world.
             </p>
           </div>
@@ -284,22 +284,22 @@ export default function World() {
             <strong>Durren</strong> who crosses the full Terran depth under
             live opposition wakes the latent Dantec implant and becomes a{' '}
             <strong>Captain</strong>: a lawful claimant, able to capture
-            the enemy's seals and answer the Nexus.
+            the enemy's flags and answer the Nexus.
           </p>
         </section>
 
-        {/* ── Seals, Lifts, the Nexus ──────────────────────────── */}
+        {/* ── Flags, Lifts, the Nexus ──────────────────────────── */}
         <section className="world-section">
           <h2 className="world-section-title">The proof</h2>
           <div className="world-prose">
             <p>
-              Each clan holds <strong>three claim-seals</strong>, one in a
-              corner of each layer. A clan's Ground and Space seals sit on
-              the same corner; its Sky seal sits at the diagonally opposite
+              Each clan holds <strong>three flags</strong>, one in a
+              corner of each layer. A clan's Ground and Space flags sit on
+              the same corner; its Sky flag sits at the diagonally opposite
               corner. The scholars call that alignment the{' '}
               <em>Aetheri Echo Point</em>: proof of continuity across the
               layers, not just reach. To win the long way, a Captain must
-              capture all three of the enemy's seals, then stand on the
+              capture all three of the enemy's flags, then stand on the
               Nexus.
             </p>
             <p>
@@ -338,7 +338,7 @@ export default function World() {
               neither clan. It does not reward haste, or bloodline, or mere
               survival. It answers the clan that proves continuity across
               all three layers of Kaleo. Only after a Captain has captured
-              all three of the enemy's seals may that Captain approach.
+              all three of the enemy's flags may that Captain approach.
             </p>
           </div>
           <blockquote className="world-pullquote">

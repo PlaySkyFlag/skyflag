@@ -22,6 +22,7 @@ import { supabase } from './game/supabase';
 import { THEMES, type ThemeId } from './game/themes';
 import type { Layer, PieceKind, Player } from './game/types';
 import './Landing.css';
+import KickstarterCTA from './KickstarterCTA';
 
 // Mid-game snapshot rendered in the demo section. Hand-curated for
 // visual balance: both sides have committed soldiers + captains on
@@ -164,7 +165,7 @@ function Hero() {
           A turn-based strategy game from the <em>Thresan</em> universe.
           Set in Kaleo, the three-layer arcology where the Aetheri lifted
           what remained of civilization. Lead the Grey Ravens or the
-          White Stags. Neutralize the opposing clan's three claim-seals,
+          White Stags. Neutralize the opposing clan's three flags,
           or guide your Captain to the Caelum Nexus.
         </p>
         <div className="landing-hero-actions">
@@ -208,12 +209,12 @@ function FeaturesSection() {
           <Feature
             icon="♚♟♛♜♝"
             title="Five pieces, distinct roles"
-            body="Captains neutralize claim-seals. Soldiers advance and promote into Promoted Soldier Captains. Rovers and Pilots transport between layers and leap-capture in close quarters. No piece is interchangeable."
+            body="Captains neutralize flags. Soldiers advance and promote into Promoted Soldier Captains. Rovers and Pilots transport between layers and leap-capture in close quarters. No piece is interchangeable."
           />
           <Feature
             icon="∞"
             title="Two ways to win"
-            body="Neutralize the opposing clan's three claim-seals, or guide your Captain to the Caelum Nexus once the seals are gone. Both paths reward different play styles."
+            body="Neutralize the opposing clan's three flags, or guide your Captain to the Caelum Nexus once the flags are gone. Both paths reward different play styles."
           />
           <Feature
             icon="✦"
@@ -317,7 +318,7 @@ function HowItWorksSection() {
           </li>
           <li>
             <strong>Advance.</strong> Push your Soldier and Captain toward
-            the opposing clan's claim-seal corners. Use Rovers and Pilots
+            the opposing clan's flag corners. Use Rovers and Pilots
             to lift pieces between layers when the path opens up.
           </li>
           <li>
@@ -328,8 +329,8 @@ function HowItWorksSection() {
           </li>
           <li>
             <strong>Win.</strong> Neutralize all three of the opposing
-            clan's claim-seals (Captain lands on the seal square), or
-            guide your Captain to the Caelum Nexus once the seals are
+            clan's flags (Captain lands on the flag square), or
+            guide your Captain to the Caelum Nexus once the flags are
             off the board.
           </li>
         </ol>
@@ -569,6 +570,7 @@ function DemoAsset() {
 function Footer() {
   return (
     <footer className="landing-footer">
+      <KickstarterCTA />
       <div className="landing-footer-inner">
         <div className="landing-footer-brand">
           <strong>Thresan™: Skyflag</strong>

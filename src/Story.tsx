@@ -9,6 +9,7 @@
 import { useEffect } from 'react';
 import './Story.css';
 import { applySurfaceMeta } from './socialMeta';
+import KickstarterCTA from './KickstarterCTA';
 
 export default function Story() {
   useEffect(() => {
@@ -66,6 +67,7 @@ function StoryHeader() {
 function StoryFooter() {
   return (
     <footer className="story-footer">
+      <KickstarterCTA />
       <div className="story-footer-inner">
         <p className="story-footer-mark">Thresan™: Skyflag, The Three Seals of Kaleo</p>
         <p className="story-footer-meta">

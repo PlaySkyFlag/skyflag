@@ -114,7 +114,7 @@ const REWARD_TIERS: RewardTier[] = [
     pitch: 'The collector’s object.',
     includes: [
       'One copy of Thresan: Skyflag in premium, collector form',
-      'Premium molded pieces and upgraded board construction',
+      'Premium components and upgraded board construction',
       'Foil rulebook cover and collector packaging',
       'Your name in the rulebook acknowledgments',
     ],
@@ -189,7 +189,7 @@ function Hero() {
         </h1>
         <p className="store-hero-lead">
           Sixty-four squares opened to one hundred and eight. A premium
-          three-tier object: stacked boards, integrated Lifts, molded
+          three-tier object: stacked boards, integrated Lifts, premium
           pieces.{' '}
           {KICKSTARTER_URL ? (
             <strong>Live on Kickstarter.</strong>
@@ -338,7 +338,7 @@ function GameplayVideo() {
           board could hold. The digital game is{' '}
           <strong>free to play, always</strong>, at{' '}
           <a href="https://thresan.com">thresan.com</a>. The premium
-          physical board, the three-level deluxe edition above,           launches on <strong>Kickstarter in Fall 2026</strong>.{' '}
+          physical edition launches on <strong>Kickstarter in Fall 2026</strong>.{' '}
           <a href="#waitlist">Sign up now</a> to get the launch email.
         </p>
         <div className="store-video-cta">

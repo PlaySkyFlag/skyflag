@@ -8,6 +8,7 @@
 import { useEffect } from 'react';
 import './Press.css';
 import { applySurfaceMeta } from './socialMeta';
+import KickstarterCTA from './KickstarterCTA';
 
 const PRESS_EMAIL = 'njatel@limnology.ca';
 const PRESS_SUBJECT = '[Press] Thresan: Skyflag';
@@ -185,7 +186,7 @@ function Descriptions() {
           designer Nelson Jatel and Limnology Research Corp. Two
           players command five pieces, Captain, Soldier, Promoted
           Soldier Captain, Rover, Pilot, across three stacked 6×6 boards. Capture the opposing clan's
-          three claim-seals, then guide your Captain to the Caelum
+          three flags, then guide your Captain to the Caelum
           Nexus to win. No dice. No cards. Pure geometry.
         </p>
       </div>
@@ -233,14 +234,14 @@ function Features() {
         </li>
         <li>
           <strong>Five pieces, distinct roles.</strong> Captains
-          neutralize claim-seals. Soldiers advance and promote into
+          neutralize flags. Soldiers advance and promote into
           Promoted Soldier Captains. Rovers and Pilots transport between
           layers.
         </li>
         <li>
           <strong>Two ways to win.</strong> Neutralize the opposing
-          clan's three claim-seals, or guide your Captain to the
-          Caelum Nexus once the seals are off the board.
+          clan's three flags, or guide your Captain to the
+          Caelum Nexus once the flags are off the board.
         </li>
         <li>
           <strong>A real AI.</strong> Iterative-deepening minimax with
@@ -458,7 +459,7 @@ function Contact() {
         game from designer Nelson Jatel and Limnology Research
         Corp. Players command five pieces across three stacked 6×6
         boards (Terran, Meridian, Empyrean), pursuing the opposing
-        clan's three claim-seals and the Caelum Nexus. The game
+        clan's three flags and the Caelum Nexus. The game
         descends from Ashtapada, the ancient Indian board that, via
         Chaturanga, eventually became chess. A premium physical
         edition is coming to Kickstarter. Play at playskyflag.com.
@@ -472,6 +473,7 @@ function Contact() {
 function Footer() {
   return (
     <footer className="press-footer">
+      <KickstarterCTA />
       <div className="press-footer-inner">
         <p className="press-footer-mark">Thresan™: Skyflag</p>
         <p className="press-footer-links">

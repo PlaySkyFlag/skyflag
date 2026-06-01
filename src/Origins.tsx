@@ -7,6 +7,7 @@
 import { useEffect } from 'react';
 import './Origins.css';
 import { applySurfaceMeta } from './socialMeta';
+import KickstarterCTA from './KickstarterCTA';
 
 export default function Origins() {
   useEffect(() => {
@@ -212,6 +213,7 @@ function Sources() {
 function Footer() {
   return (
     <footer className="origins-footer">
+      <KickstarterCTA />
       <div className="origins-footer-inner">
         <p className="origins-footer-mark">Thresan™: Skyflag</p>
         <p className="origins-footer-tagline tagline-script">
