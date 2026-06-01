@@ -170,11 +170,49 @@
   flex-shrink: 0;
 }
 
+/* Consent is the one MANDATORY box (the optional interests sit above it),
+   so it's set apart deliberately: an amber wash + border and a "Required"
+   tag, the convention used by Substack / ConvertKit / Mailchimp signup
+   forms to mark the consent gate without burying it. */
 .ks-consent {
-  font-size: 0.85rem;
-  color: rgba(245, 247, 251, 0.7);
-  padding-top: 6px;
-  border-top: 1px solid rgba(194, 164, 107, 0.16);
+  font-size: 0.88rem;
+  color: #f0d9a0;
+  margin-top: 4px;
+  padding: 12px 14px;
+  background: rgba(232, 162, 60, 0.09);
+  border: 1px solid rgba(232, 162, 60, 0.55);
+  border-radius: 10px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.ks-consent input {
+  accent-color: #e8a23c;
+}
+
+/* Small uppercase amber pill, the "this one is not optional" signal. */
+.ks-consent-flag {
+  display: inline-block;
+  background: #e8a23c;
+  color: #1a1205;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1px 7px;
+  border-radius: 5px;
+  margin-right: 6px;
+  vertical-align: 1.5px;
+}
+
+/* When the user submits without ticking it, the box turns red so the
+   error message ("Please tick the consent box") has an obvious anchor. */
+.ks-consent-error {
+  border-color: #e88a8a;
+  background: rgba(232, 138, 138, 0.12);
+}
+
+.ks-consent-error .ks-consent-flag {
+  background: #e88a8a;
 }
 
 .ks-btn {

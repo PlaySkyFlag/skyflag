@@ -189,7 +189,11 @@ export default function Kickstarter() {
                   ))}
                 </fieldset>
 
-                <label className="ks-check ks-consent">
+                <label
+                  className={`ks-check ks-consent${
+                    status === 'error' && !consent ? ' ks-consent-error' : ''
+                  }`}
+                >
                   <input
                     type="checkbox"
                     checked={consent}
@@ -197,9 +201,10 @@ export default function Kickstarter() {
                     required
                   />
                   <span>
+                    <strong className="ks-consent-flag">Required</strong>
                     Yes, email me about Thresan, the Kickstarter launch, and
-                    related updates from Limnology Research Corp. I can
-                    unsubscribe anytime.
+                    related updates from Limnology Research Corp. Tick this box
+                    to subscribe. I can unsubscribe anytime.
                   </span>
                 </label>
 
