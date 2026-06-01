@@ -107,21 +107,26 @@ async function checkCapture() {
   const svc = process.env.SMOKE_SERVICE_KEY;
   if (!url || !anon) return { skipped: true };
   const email = `smoke-canary-${Date.now()}@playskyflag.com`;
+  // IMPORTANT: use Prefer: return=minimal — exactly what the form's
+  // supabase-js .insert() sends. return=representation forces a RETURNING
+  // read, which fails on this table because it has no SELECT policy by
+  // design (service-role reads only) — that would FALSE-FAIL even though
+  // capture is healthy. (This exact gotcha caused a false alarm once.)
   const res = await fetch(`${url}/rest/v1/thresan_waitlist`, {
     method: 'POST',
-    headers: { apikey: anon, Authorization: `Bearer ${anon}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    headers: { apikey: anon, Authorization: `Bearer ${anon}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
     body: JSON.stringify({ email, source: 'healthcheck', consent: true }),
   });
-  const ok = res.status === 201;
+  const ok = res.status === 201 || res.status === 204;
   let cleaned = 'left (no service key)';
   if (ok && svc) {
-    const row = (await res.json())[0];
-    await fetch(`${url}/rest/v1/thresan_waitlist?id=eq.${row.id}`, {
+    // return=minimal gives no id back, so delete the canary by email.
+    await fetch(`${url}/rest/v1/thresan_waitlist?email=eq.${encodeURIComponent(email)}`, {
       method: 'DELETE', headers: { apikey: svc, Authorization: `Bearer ${svc}` },
     });
     cleaned = 'canary deleted';
   }
-  return { skipped: false, ok, status: res.status, detail: ok ? `anon insert 201 (${cleaned})` : `anon insert ${res.status} — CAPTURE DOWN (form cannot save emails)` };
+  return { skipped: false, ok, status: res.status, detail: ok ? `anon insert ${res.status} (${cleaned})` : `anon insert ${res.status} — CAPTURE DOWN (form cannot save emails)` };
 }
 
 const cap = await checkCapture();
