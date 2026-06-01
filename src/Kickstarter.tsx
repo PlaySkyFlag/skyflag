@@ -14,7 +14,7 @@ import { track } from '@vercel/analytics';
 import './Kickstarter.css';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
-import { KICKSTARTER_URL } from './kickstarterLink';
+import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 
 const READER_URL = 'https://thresan.studio/volume-zero';
 const WORLD_URL = 'https://thresan.com/world';
@@ -129,7 +129,7 @@ export default function Kickstarter() {
               Get the launch email ↓
             </a>
             <a
-              href={KICKSTARTER_URL}
+              href={KICKSTARTER_PRELAUNCH_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="ks-hero-cta ks-hero-cta-ks"
@@ -168,7 +168,7 @@ export default function Kickstarter() {
               </p>
               <div className="ks-success-actions">
                 <a
-                  href={KICKSTARTER_URL}
+                  href={KICKSTARTER_PRELAUNCH_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ks-btn"

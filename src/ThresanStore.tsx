@@ -14,6 +14,7 @@ import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
 import './ThresanStore.css';
 import ConsentCheckbox from './ConsentCheckbox';
+import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 
 // ─── Configuration ─────────────────────────────────────────────────
 // Fill these in as the campaign reaches each milestone. Empty strings
@@ -29,13 +30,11 @@ const FOUNDERS_RESERVATION_URL = 'https://buy.stripe.com/14A7sFdUCgpzg9R3PNbwk00
 // launches. Empty = pre-launch (current state).
 const KICKSTARTER_URL = '';
 
-// Kickstarter pre-launch page URL ("Notify me on launch"). Paste the
-// .../projects/<you>/<slug> pre-launch link here as soon as the KS page
-// exists. Followers gathered here convert to backers at roughly twice
-// the rate of people who discover the campaign after it's live, so this
-// is the highest-value pre-launch funnel after the email list. Empty =
-// not created yet (the follow CTA stays hidden).
-const KICKSTARTER_PRELAUNCH_URL = '';
+// Kickstarter pre-launch page URL ("Notify me on launch") — now the live
+// link, sourced from the shared kickstarterLink module so every surface
+// stays in sync. Followers gathered here convert to backers at roughly
+// twice the rate of people who discover the campaign after it's live, so
+// this is the highest-value pre-launch funnel after the email list.
 
 const FOUNDERS_PRICE_USD = 108;
 const FOUNDERS_TOTAL_SLOTS = 500;

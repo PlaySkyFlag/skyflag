@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import './ThresanIO.css';
 import { applySurfaceMeta } from './socialMeta';
 import KickstarterCTA from './KickstarterCTA';
+import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-io';
 const UMBRELLA_URL = 'https://thresan.com';
@@ -45,6 +46,65 @@ export default function ThresanIO() {
           behind the <em>Skyflag</em> edition. Read what's behind the
           boards.
         </p>
+
+        <article className="lab-post">
+          <header className="lab-post-header">
+            <p className="lab-post-meta">Build journal · 2026-06-01 · Nelson</p>
+            <h2 className="lab-post-title">It's going to Kickstarter</h2>
+            <p className="lab-post-subtitle">
+              Thresan: Skyflag was approved this week. A few honest notes
+              on the road here, and why I'm not pressing launch yet.
+            </p>
+          </header>
+
+          <div className="lab-post-body">
+            <p>
+              Today I got the email I'd been waiting on: <em>"Your project
+              looks great and has been approved."</em> Thresan: Skyflag,
+              the physical, three-board edition of the game you can already
+              play free at{' '}
+              <a href={GAME_URL} className="lab-mail">playskyflag.com</a>,
+              is cleared to come to Kickstarter this fall.
+            </p>
+            <p>
+              The road to that one sentence was longer than I expected.
+              Getting approved isn't just clicking submit, it's a real
+              campaign page: a funding goal that has to honestly cover
+              manufacturing, shipping, and fees with a buffer; reward tiers
+              you can't change once someone pledges; a fulfillment plan; a
+              video; and a Trust &amp; Safety review of the whole thing.
+              Building it forced me to answer the unglamorous questions,
+              what a unit actually costs to make and mail, that are easy to
+              hand-wave when the game lives only on a screen.
+            </p>
+            <p>
+              Here's the counterintuitive part, and the reason there's no
+              live campaign to back yet: <strong>the smartest thing a new
+              project can do is not launch right away.</strong> Kickstarter
+              rewards momentum, the projects that fund are overwhelmingly
+              the ones that get a real surge in the first 48 hours, and that
+              surge comes from people who already knew it was coming. So
+              instead of launching into silence, I've put up a pre-launch
+              page and I'm spending the next few weeks doing the slow,
+              honest work of telling people it exists.
+            </p>
+            <p>
+              If you want to be part of that opening push, two things help
+              more than anything:{' '}
+              <a
+                href={KICKSTARTER_PRELAUNCH_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lab-mail"
+              >
+                follow the campaign on Kickstarter
+              </a>{' '}
+              (you'll be notified the instant it goes live), and join the
+              launch list below. I'll write more here as the campaign comes
+              together, the parts that work and the parts that don't.
+            </p>
+          </div>
+        </article>
 
         <article className="lab-post">
           <header className="lab-post-header">
