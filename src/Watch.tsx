@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react';
 import Board, { type BoardTheme, type Marker } from './Board';
 import PlusBadge from './PlusBadge';
+import KickstarterCTA from './KickstarterCTA';
 import { supabase } from './game/supabase';
 import {
   DEPLOY_COORDS,
@@ -292,6 +293,8 @@ export default function Watch() {
           </div>
         ))}
       </div>
+
+      <KickstarterCTA />
 
       <footer className="app-footer">
         <p>

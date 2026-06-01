@@ -522,7 +522,7 @@ export default function ThresanIO() {
             lost its inline capture in the single-capture-door move and was
             left with only a buried mailto; this restores a real, visible
             email path consistent with the other surfaces. */}
-        <KickstarterCTA />
+        <KickstarterCTA source="thresan-io" />
 
         <div className="lab-outbound">
           <a href={GAME_URL} className="lab-link">

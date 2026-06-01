@@ -95,11 +95,48 @@ for (const c of checks) {
   console.log(`  ${mark} ${c.path.padEnd(14)} ${c.summary}`);
 }
 
+// ── Capture health (optional) ────────────────────────────────────────
+// The form's DB write broke mid-campaign once (anon INSERT rejected by
+// RLS) with no alert. If SMOKE_SUPABASE_URL + SMOKE_ANON_KEY are set, do
+// a real anon insert through the public path; if SMOKE_SERVICE_KEY is set
+// too, delete the canary afterward. Skipped (not failed) when unset, so
+// the route monitor still runs anywhere.
+async function checkCapture() {
+  const url = process.env.SMOKE_SUPABASE_URL;
+  const anon = process.env.SMOKE_ANON_KEY;
+  const svc = process.env.SMOKE_SERVICE_KEY;
+  if (!url || !anon) return { skipped: true };
+  const email = `smoke-canary-${Date.now()}@playskyflag.com`;
+  const res = await fetch(`${url}/rest/v1/thresan_waitlist`, {
+    method: 'POST',
+    headers: { apikey: anon, Authorization: `Bearer ${anon}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    body: JSON.stringify({ email, source: 'healthcheck', consent: true }),
+  });
+  const ok = res.status === 201;
+  let cleaned = 'left (no service key)';
+  if (ok && svc) {
+    const row = (await res.json())[0];
+    await fetch(`${url}/rest/v1/thresan_waitlist?id=eq.${row.id}`, {
+      method: 'DELETE', headers: { apikey: svc, Authorization: `Bearer ${svc}` },
+    });
+    cleaned = 'canary deleted';
+  }
+  return { skipped: false, ok, status: res.status, detail: ok ? `anon insert 201 (${cleaned})` : `anon insert ${res.status} — CAPTURE DOWN (form cannot save emails)` };
+}
+
+const cap = await checkCapture();
+if (!cap.skipped) {
+  console.log(`  ${cap.ok ? '✓' : '✗'} capture       ${cap.detail}`);
+  if (!cap.ok) failed++;
+} else {
+  console.log('  · capture       (skipped — set SMOKE_SUPABASE_URL/SMOKE_ANON_KEY to enable)');
+}
+
 console.log('');
 if (failed) {
   console.error(
-    `FAIL: ${failed}/${checks.length} route(s) regressed. Deep links are ` +
-      `redirecting away from their own URL — the funnel is broken.`,
+    `FAIL: ${failed} check(s) regressed — deep links redirecting away from ` +
+      `their own URL and/or the signup form cannot save. The funnel is broken.`,
   );
   process.exit(1);
 } else {

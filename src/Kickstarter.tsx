@@ -10,6 +10,7 @@
 // prequel (Volume Zero, The Eight-Footed Mark), not a vaporware title.
 
 import { useEffect, useState, type FormEvent } from 'react';
+import { track } from '@vercel/analytics';
 import './Kickstarter.css';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
@@ -95,6 +96,7 @@ export default function Kickstarter() {
       setError("Couldn't save your email. Please try again.");
       return;
     }
+    track('waitlist_signup', { source: 'thresan-kickstarter', placement: 'page' });
     setStatus('success');
   };
 
@@ -157,6 +159,32 @@ export default function Kickstarter() {
                 </a>
                 <a href={WORLD_URL} className="ks-link">
                   Explore the world of Kaleo →
+                </a>
+              </div>
+              {/* Referral loop: an engaged, just-converted visitor is the
+                  best person to ask for a share. Each share seeds more
+                  signups at zero cost. */}
+              <p className="ks-share-prompt">Know someone who'd love this? Spread the word:</p>
+              <div className="ks-success-actions">
+                <a
+                  className="ks-link"
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                    'Thresan: Skyflag — a three-layer strategy game coming to Kickstarter. Play free now:',
+                  )}&url=${encodeURIComponent('https://playskyflag.com')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => track('waitlist_share', { channel: 'x' })}
+                >
+                  Share on X →
+                </a>
+                <a
+                  className="ks-link"
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://playskyflag.com')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => track('waitlist_share', { channel: 'facebook' })}
+                >
+                  Share on Facebook →
                 </a>
               </div>
             </div>

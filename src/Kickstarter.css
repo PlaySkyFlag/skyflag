@@ -259,6 +259,12 @@
   text-align: center;
 }
 
+.ks-share-prompt {
+  margin: 22px 0 8px;
+  font-size: 0.9rem;
+  color: rgba(245, 247, 251, 0.75);
+}
+
 /* ── Success ───────────────────────────────────────────────────── */
 .ks-success {
   text-align: center;

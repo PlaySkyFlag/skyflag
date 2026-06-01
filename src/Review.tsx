@@ -47,6 +47,7 @@ import type {
 } from './game/reducer';
 import type { Coord, GameState, HistoryEntry, Layer, PieceKind, Player } from './game/types';
 import { loadReviewSession, type ReviewSession } from './game/reviewSession';
+import KickstarterCTA from './KickstarterCTA';
 import { FACTION_NAME } from './game/factions';
 import './App.css';
 
@@ -448,6 +449,8 @@ export default function Review() {
           </ol>
         </div>
       )}
+
+      <KickstarterCTA />
 
       <footer className="app-footer">
         <p>
