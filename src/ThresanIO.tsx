@@ -433,7 +433,7 @@ export default function ThresanIO() {
             <h3>The arc that got us here</h3>
             <p>
               Thresan's design has gone through twelve numbered
-              iterations across roughly three years. The central
+              iterations across several years. The central
               event was the <em>v17 → v19</em> arc, the Cross-Board
               Rule transforming the game from parallel three-board
               race to integrated three-dimensional position game.
