@@ -3141,6 +3141,7 @@ button.tray-piece:hover {
 @media (min-width: 480px) {
   .end-game-waitlist-form {
     flex-direction: row;
+    flex-wrap: wrap;
   }
 }
 

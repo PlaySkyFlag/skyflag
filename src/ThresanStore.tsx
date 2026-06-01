@@ -13,6 +13,7 @@ import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
 import './ThresanStore.css';
+import ConsentCheckbox from './ConsentCheckbox';
 
 // ─── Configuration ─────────────────────────────────────────────────
 // Fill these in as the campaign reaches each milestone. Empty strings
@@ -530,6 +531,7 @@ function Waitlist() {
   const [status, setStatus] =
     useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [error, setError] = useState<string>('');
+  const [consent, setConsent] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -537,6 +539,11 @@ function Waitlist() {
     if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
       setStatus('error');
       setError('Please enter a valid email.');
+      return;
+    }
+    if (!consent) {
+      setStatus('error');
+      setError('Please tick the consent box so we can email you.');
       return;
     }
     if (!supabase) {
@@ -551,6 +558,7 @@ function Waitlist() {
       .insert({
         email: trimmed,
         source: 'thresan-store',
+        consent: true,
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,
       });
@@ -611,6 +619,11 @@ function Waitlist() {
               disabled={status === 'submitting'}
               required
               aria-label="Email address"
+            />
+            <ConsentCheckbox
+              checked={consent}
+              onChange={setConsent}
+              disabled={status === 'submitting'}
             />
             <button
               type="submit"

@@ -7,6 +7,7 @@
 // AI-use disclosure now lives on /ai-use (footer link), not inline.
 
 import { useEffect, useState, type FormEvent } from 'react';
+import ConsentCheckbox from './ConsentCheckbox';
 import './VolumeZeroLanding.css';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
@@ -157,6 +158,7 @@ function KickstarterSignup() {
   const [status, setStatus] =
     useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
+  const [consent, setConsent] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -164,6 +166,11 @@ function KickstarterSignup() {
     if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
       setStatus('error');
       setError('Please enter a valid email.');
+      return;
+    }
+    if (!consent) {
+      setStatus('error');
+      setError('Please tick the consent box so we can email you.');
       return;
     }
     if (!supabase) {
@@ -178,6 +185,7 @@ function KickstarterSignup() {
       .insert({
         email: trimmed,
         source: 'thresan-volume-zero-kickstarter',
+        consent: true,
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,
       });
@@ -214,6 +222,11 @@ function KickstarterSignup() {
             disabled={status === 'submitting'}
             required
             aria-label="Email address"
+          />
+          <ConsentCheckbox
+            checked={consent}
+            onChange={setConsent}
+            disabled={status === 'submitting'}
           />
           <button
             type="submit"

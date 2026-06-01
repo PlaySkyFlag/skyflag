@@ -632,6 +632,7 @@
 @media (min-width: 540px) {
   .store-waitlist-form {
     flex-direction: row;
+    flex-wrap: wrap;
   }
 }
 

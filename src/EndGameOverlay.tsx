@@ -5,6 +5,7 @@ import { supabase } from './game/supabase';
 import type { GameState, GameStatus, RoomState } from './game/types';
 import { FACTION_NAME } from './game/factions';
 import { stashReviewSession } from './game/reviewSession';
+import ConsentCheckbox from './ConsentCheckbox';
 
 // Persists the user's response to the post-game funnel (waitlist signup
 // AND optional testimonial quote). Either is dismissable; once the user
@@ -234,6 +235,7 @@ function PostGameWaitlist({
   const userEmail =
     typeof user?.email === 'string' && user.email.includes('@') ? user.email : '';
   const [email, setEmail] = useState(userEmail);
+  const [emailConsent, setEmailConsent] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   // Quote-stage state — first name + city are optional, consent gates
@@ -253,6 +255,11 @@ function PostGameWaitlist({
       setErrorMsg('Please enter a valid email.');
       return;
     }
+    if (!emailConsent) {
+      setPhase('waitlist-error');
+      setErrorMsg('Please tick the consent box so we can email you.');
+      return;
+    }
     if (!supabase) {
       setPhase('waitlist-error');
       setErrorMsg("Couldn't reach the list right now. Try again later.");
@@ -265,6 +272,7 @@ function PostGameWaitlist({
       .insert({
         email: trimmed,
         source: 'skyflag-postgame',
+        consent: true,
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,
       });
@@ -443,6 +451,11 @@ function PostGameWaitlist({
           disabled={phase === 'waitlist-submitting'}
           required
           aria-label="Email address"
+        />
+        <ConsentCheckbox
+          checked={emailConsent}
+          onChange={setEmailConsent}
+          disabled={phase === 'waitlist-submitting'}
         />
         <button
           type="submit"
