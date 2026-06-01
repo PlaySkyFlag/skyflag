@@ -66,114 +66,56 @@ type RewardTier = {
   reserveHref?: string;
 };
 
+// The four Kickstarter reward tiers, mirrored from the live campaign.
+// Prices show TBD until manufacturing quotes return and the funding
+// goal is locked. The $108 pre-launch deposit lives in the Founders()
+// section + hero CTA below (kept live for now), not in this ladder.
 const REWARD_TIERS: RewardTier[] = [
   {
-    id: 'back-the-build',
-    name: 'Back the build',
+    id: 'day-one',
+    name: 'Day-One Supporter',
     priceUSD: 1,
-    pitch: 'No reward, just support. Every backer counts.',
+    priceDisplay: 'TBD',
+    pitch: 'Be first in line.',
     includes: [
-      'Our genuine thanks',
-      'Name in the digital credits on playskyflag.com',
-      'Backer-only build updates',
+      'Day-One Club membership: a launch-day notification the moment the campaign goes live',
+      'Early-bird access to the best launch pricing',
+      'Backer-only build updates from inside the studio',
     ],
   },
   {
-    id: 'supporter',
-    name: 'Three Worlds Supporter',
-    priceUSD: 5,
-    pitch: 'Help build Thresan.',
+    id: 'maker-files',
+    name: 'Maker Files (Print-It-Yourself)',
+    priceUSD: 20,
+    priceDisplay: 'TBD',
+    pitch: 'Make it yourself.',
     includes: [
-      'Name in the digital credits on playskyflag.com',
-      'Build updates from inside the studio',
-      'Printable PDF of the world of Kaleo (lore brief)',
-    ],
-  },
-  {
-    id: 'sticker',
-    name: 'Sticker pack',
-    priceUSD: 12,
-    pitch: 'A little piece of Kaleo.',
-    includes: [
-      'Everything in Three Worlds Supporter',
-      'Die-cut vinyl sticker pack: the two clan sigils and the Caelum Nexus',
-    ],
-  },
-  {
-    id: 'digital-founder',
-    name: 'Digital Founder',
-    priceUSD: 25,
-    pitch: 'For the screen, with respect.',
-    includes: [
-      'Everything in Three Worlds Supporter',
-      'Exclusive "Founder" badge on your playskyflag.com profile',
-      'Custom Aether Copper board theme',
-      'Lifetime Plus on the digital game (premium themes, rating history)',
+      'The complete digital build files to print and assemble your own Thresan: Skyflag set',
+      'The full Thresan: Skyflag rulebook (PDF)',
     ],
   },
   {
     id: 'standard',
     name: 'Standard Edition',
     priceUSD: 75,
-    pitch: 'The standard physical game.',
+    priceDisplay: 'TBD',
+    pitch: 'The full physical game.',
     includes: [
-      'Everything in Digital Founder',
-      'One copy of Thresan: Skyflag, three boards, ten pieces, rulebook',
-      'Standard construction, full-colour print',
+      'One copy of Thresan: Skyflag, the complete physical game',
+      'Three stacked boards, four Lifts, the full piece set, and the rulebook',
     ],
   },
   {
-    id: 'founders',
-    name: 'Founders Edition',
+    id: 'collector',
+    name: 'Premium / Collector Edition',
     priceUSD: FOUNDERS_PRICE_USD,
     priceDisplay: 'TBD',
-    pitch: 'The first 500. Numbered.',
-    live: true,
-    limited: true,
-    reserveHref: FOUNDERS_RESERVATION_URL || undefined,
+    pitch: 'The collector’s object.',
     includes: [
-      'Everything in Standard Edition',
-      'Numbered box (#001–#500), premium molded pieces',
-      'Foil rulebook cover, premium components',
-      'Name in the rulebook acknowledgments',
-      'Founders Discord, early playtests, build updates, decision input',
-    ],
-  },
-  {
-    id: 'deluxe',
-    name: 'Deluxe Edition',
-    priceUSD: 175,
-    pitch: 'The Aetheri set.',
-    includes: [
-      'Everything in Founders Edition',
-      'Second piece set in Empyrean Indigo (alternate colourway)',
-      'Signed Storybook v3 (the in-world narrative, softcover)',
-      'A3 heraldic art print of your chosen clan',
-    ],
-  },
-  {
-    id: 'patron',
-    name: 'Studio Patron',
-    priceUSD: 400,
-    pitch: 'For people who want to be in the room.',
-    limited: true,
-    includes: [
-      'Deluxe Edition × 2 (yours + one to gift or playtest)',
-      '1-hour video call with Nelson, design conversation, watch you play, whatever fits',
-      'Your name on the Patrons page at thresan.studio',
-    ],
-  },
-  {
-    id: 'creators-circle',
-    name: "Creator's Circle",
-    priceUSD: 1500,
-    pitch: 'For the believers.',
-    limited: true,
-    includes: [
-      'Everything in Studio Patron',
-      'A piece in the next edition of Thresan named after you, with your input on its lore role',
-      'Limited bronze-cast Caelum Nexus sigil (80mm display piece)',
-      'Acknowledgment in the rulebook front matter',
+      'One copy of Thresan: Skyflag in premium, collector form',
+      'Premium molded pieces and upgraded board construction',
+      'Foil rulebook cover and collector packaging',
+      'Your name in the rulebook acknowledgments',
     ],
   },
 ];
@@ -456,12 +398,11 @@ function Tiers() {
         <p className="store-section-eyebrow">Preview</p>
         <h2 className="store-section-title">Reward tiers</h2>
         <p className="store-founders-lead">
-          A preview of the Kickstarter reward ladder. Prices, slot
-          counts, and inclusions are <em>preliminary</em>, they'll
-          be locked once manufacturing quotes return and the funding
-          goal is set. The Founders Edition is the only tier with a
-          live pre-launch reservation today; the rest preview here so
-          backers know what's coming.
+          A preview of the four Kickstarter reward tiers. Prices show{' '}
+          <em>TBD</em> until manufacturing quotes return and the
+          funding goal is set; the tiers preview here so backers know
+          what's coming. A refundable pre-launch deposit (below) lets
+          you reserve early.
         </p>
 
         <div className="store-tier-grid">
