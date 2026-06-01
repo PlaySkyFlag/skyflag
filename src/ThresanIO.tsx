@@ -8,6 +8,7 @@
 import { useEffect } from 'react';
 import './ThresanIO.css';
 import { applySurfaceMeta } from './socialMeta';
+import KickstarterCTA from './KickstarterCTA';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-io';
 const UMBRELLA_URL = 'https://thresan.com';
@@ -516,13 +517,12 @@ export default function ThresanIO() {
           </p>
         </section>
 
-        <p className="lab-roadmap-foot" style={{ textAlign: 'center', marginTop: 28 }}>
-          Separate from the lab notes: the Skyflag physical edition launches
-          on Kickstarter in Fall 2026.{' '}
-          <a href="https://thresan.com/kickstarter" className="lab-mail">
-            Notify me at launch →
-          </a>
-        </p>
+        {/* Shared conversion band, the same prominent path to the launch
+            list that Landing / Origins / Press / Story carry. thresan.io
+            lost its inline capture in the single-capture-door move and was
+            left with only a buried mailto; this restores a real, visible
+            email path consistent with the other surfaces. */}
+        <KickstarterCTA />
 
         <div className="lab-outbound">
           <a href={GAME_URL} className="lab-link">
