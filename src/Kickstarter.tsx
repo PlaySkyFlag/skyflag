@@ -14,6 +14,7 @@ import { track } from '@vercel/analytics';
 import './Kickstarter.css';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
+import { KICKSTARTER_URL } from './kickstarterLink';
 
 const READER_URL = 'https://thresan.studio/volume-zero';
 const WORLD_URL = 'https://thresan.com/world';
@@ -123,9 +124,20 @@ export default function Kickstarter() {
             alt="Concept render of Thresan: Skyflag, three stacked 6×6 boards fanned from a shared central hub."
             className="ks-hero-art"
           />
-          <a href="#notify" className="ks-hero-cta">
-            Notify me at launch ↓
-          </a>
+          <div className="ks-hero-ctas">
+            <a href="#notify" className="ks-hero-cta">
+              Get the launch email ↓
+            </a>
+            <a
+              href={KICKSTARTER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ks-hero-cta ks-hero-cta-ks"
+              onClick={() => track('kickstarter_follow', { placement: 'hero' })}
+            >
+              Follow on Kickstarter →
+            </a>
+          </div>
         </header>
 
         {/* ── Pitch ────────────────────────────────────────────── */}
@@ -149,12 +161,25 @@ export default function Kickstarter() {
             <div className="ks-success" role="status" aria-live="polite">
               <h2 className="ks-success-title">You're first in line.</h2>
               <p>
-                We'll email you the moment the Kickstarter goes live, plus
-                the early-backer offer. While you wait, read the free
-                prequel:
+                We'll email you the moment the Kickstarter goes live. One
+                thing that genuinely helps us launch strong, follow the
+                campaign now and Kickstarter will notify you the instant
+                it's live:
               </p>
               <div className="ks-success-actions">
-                <a href={READER_URL} className="ks-btn">
+                <a
+                  href={KICKSTARTER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ks-btn"
+                  onClick={() => track('kickstarter_follow', { placement: 'page-success' })}
+                >
+                  Follow on Kickstarter →
+                </a>
+              </div>
+              <p style={{ marginTop: 18 }}>While you wait, read the free prequel:</p>
+              <div className="ks-success-actions">
+                <a href={READER_URL} className="ks-link">
                   Read Volume Zero free →
                 </a>
                 <a href={WORLD_URL} className="ks-link">

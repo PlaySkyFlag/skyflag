@@ -78,6 +78,28 @@
   color: #ffe4a3;
 }
 
+.ks-hero-ctas {
+  display: flex;
+  gap: 14px 28px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* The Kickstarter-follow CTA reads as a solid button (primary pre-launch
+   action) next to the text-link email CTA. */
+.ks-hero-cta-ks {
+  background: #c2a46b;
+  color: #0b0e13;
+  padding: 11px 22px;
+  border-radius: 999px;
+}
+
+.ks-hero-cta-ks:hover {
+  background: #ffe4a3;
+  color: #0b0e13;
+}
+
 /* ── Pitch ─────────────────────────────────────────────────────── */
 .ks-pitch {
   margin: 44px auto;

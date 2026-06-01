@@ -14,6 +14,7 @@
 import { useState, type FormEvent } from 'react';
 import { track } from '@vercel/analytics';
 import { supabase } from './game/supabase';
+import { KICKSTARTER_URL } from './kickstarterLink';
 
 const GOLD = '#c2a46b';
 const AMBER = '#e8a23c';
@@ -71,16 +72,34 @@ export default function InlineCapture({
 
   if (status === 'success') {
     return (
-      <p
-        role="status"
-        aria-live="polite"
-        style={{ margin: '8px 0 0', fontWeight: 600, fontSize: '1rem' }}
-      >
-        You're on the list — watch your inbox.{' '}
-        <a href="https://thresan.studio/volume-zero" style={{ color: GOLD }}>
-          Read the free prequel →
+      <div role="status" aria-live="polite" style={{ margin: '8px 0 0', textAlign: 'center' }}>
+        <p style={{ margin: '0 0 10px', fontWeight: 600, fontSize: '1rem' }}>
+          You're on the list. One quick thing that genuinely helps:
+        </p>
+        <a
+          href={KICKSTARTER_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => track('kickstarter_follow', { placement: 'inline-success' })}
+          style={{
+            display: 'inline-block',
+            padding: '11px 22px',
+            borderRadius: 8,
+            background: GOLD,
+            color: '#0b0e13',
+            fontWeight: 700,
+            textDecoration: 'none',
+          }}
+        >
+          Follow us on Kickstarter →
         </a>
-      </p>
+        <p style={{ margin: '10px 0 0', fontSize: '0.82rem', opacity: 0.75 }}>
+          You'll be notified the instant we launch.{' '}
+          <a href="https://thresan.studio/volume-zero" style={{ color: GOLD }}>
+            Or read the free prequel →
+          </a>
+        </p>
+      </div>
     );
   }
 
