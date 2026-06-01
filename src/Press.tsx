@@ -144,7 +144,7 @@ function QuickFacts() {
           <tr><th>Publisher</th><td>Limnology Research Corp.</td></tr>
           <tr><th>Genre</th><td>Turn-based strategy · abstract · 3-board chess descendant</td></tr>
           <tr><th>Players</th><td>1–2 (solo vs AI, hot-seat, online multiplayer)</td></tr>
-          <tr><th>Age</th><td>8+</td></tr>
+          <tr><th>Age</th><td>14+</td></tr>
           <tr><th>Length</th><td>45–75 minutes</td></tr>
           <tr><th>Languages</th><td>English</td></tr>
           <tr><th>Platforms</th><td>Web (browser), iOS (TestFlight, in development)</td></tr>

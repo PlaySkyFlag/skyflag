@@ -159,7 +159,7 @@ export default function Privacy() {
 
           <h2>Children</h2>
           <p>
-            Thresan is suitable for ages 12+. If you're under 13,
+            Thresan is suitable for ages 14+. If you're under 13,
             don't submit an email address.
           </p>
 
