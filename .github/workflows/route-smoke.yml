@@ -1,0 +1,37 @@
+# Route-integrity monitor — the automated half of the QAQC cycle added
+# after the 2026-06-01 funnel outage (deep links 302'd to the landing
+# page top because the SEO edge function's self-fetch was flaky).
+#
+# Runs scripts/smoke-routes.mjs against PRODUCTION, because that failure
+# only exists on Vercel — a local build can't reproduce it. Three triggers:
+#   • push to main  → wait for Vercel to deploy, then verify the live site
+#   • schedule      → synthetic monitor; catches intermittent regressions
+#                     (and platform-side breakage) within ~15 min
+#   • manual        → run on demand from the Actions tab
+#
+# A failure here means real visitors clicking "Get the launch email" (and
+# every other deep link) are being bounced off their target route.
+name: route-smoke
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # On push, give Vercel's git-integration deploy time to go live
+      # before we probe production. Skipped for schedule/manual runs.
+      - name: Wait for deploy (push only)
+        if: github.event_name == 'push'
+        run: sleep 120
+      - name: Smoke-test production routes
+        run: TRIES=8 node scripts/smoke-routes.mjs https://playskyflag.com

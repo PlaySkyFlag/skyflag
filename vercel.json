@@ -46,7 +46,18 @@
   "rewrites": [
     {
       "source": "/((?!api|assets|.*\\..*).*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|facebot|twitterbot|linkedinbot|slackbot|slack-imgproxy|discordbot|whatsapp|telegrambot|googlebot|google-inspectiontool|bingbot|applebot|yandexbot|baiduspider|duckduckbot|pinterest|redditbot|embedly|quora|outbrain|vkshare|w3c_validator|ia_archiver|bitlybot|skypeuripreview|nuzzel|mastodon|bsky|developers\\.google\\.com).*"
+        }
+      ],
       "destination": "/api/seo"
+    },
+    {
+      "source": "/((?!api|assets|.*\\..*).*)",
+      "destination": "/index.html"
     }
   ]
 }

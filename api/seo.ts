@@ -264,6 +264,40 @@ function injectMeta(html: string, surface: Surface, canonicalUrl: string): strin
     .replace(/Loading Skyflag…/, loadingReplacement);
 }
 
+// Crawler-only fallback document. vercel.json routes humans straight to
+// the static SPA, so this function only serves social/search crawlers,
+// which read meta tags, not the SPA. When the static-shell self-fetch is
+// unavailable, emit a self-contained document carrying the full
+// per-surface meta. Critically this is a 200 AT THE REQUESTED URL, never
+// a 3xx to /index.html: a path-stripping redirect was a previous
+// production outage (every deep link bounced to the landing-page top).
+// Do not reintroduce a redirect here.
+function metaOnlyDocument(surface: Surface, canonicalUrl: string): string {
+  const titleAttr = escapeAttr(surface.title);
+  const descAttr = escapeAttr(surface.description);
+  const ogImageAttr = escapeAttr(surface.ogImage);
+  const ogImageAltAttr = escapeAttr(surface.ogImageAlt ?? surface.title);
+  const canonicalAttr = escapeAttr(canonicalUrl);
+  return (
+    `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
+    `<title>${escapeText(surface.title)}</title>` +
+    `<meta name="description" content="${descAttr}">` +
+    `<link rel="canonical" href="${canonicalAttr}">` +
+    `<meta property="og:type" content="website">` +
+    `<meta property="og:title" content="${titleAttr}">` +
+    `<meta property="og:description" content="${descAttr}">` +
+    `<meta property="og:url" content="${canonicalAttr}">` +
+    `<meta property="og:image" content="${ogImageAttr}">` +
+    `<meta property="og:image:alt" content="${ogImageAltAttr}">` +
+    `<meta name="twitter:card" content="summary_large_image">` +
+    `<meta name="twitter:title" content="${titleAttr}">` +
+    `<meta name="twitter:description" content="${descAttr}">` +
+    `<meta name="twitter:image" content="${ogImageAttr}">` +
+    `</head><body><p>${escapeText(surface.title)} — ` +
+    `<a href="${canonicalAttr}">${escapeText(canonicalUrl)}</a></p></body></html>`
+  );
+}
+
 // ─── Handler ────────────────────────────────────────────────────────
 
 export default async function handler(req: Request): Promise<Response> {
@@ -295,15 +329,21 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     indexResp = await fetch(indexUrl);
   } catch {
-    // Edge fetch failure (network blip, deploy in flight, etc.).
-    // Fall back to redirecting the client to the static asset so they
-    // still land on a working page, just without the per-surface meta.
-    return Response.redirect(indexUrl, 302);
+    // Self-fetch unavailable (the same edge fetch that was flaky in
+    // production). Serve per-surface meta directly as a 200 at this URL.
+    // NEVER 302 to /index.html — that stripped the path and bounced
+    // every deep link to the landing-page top. See metaOnlyDocument.
+    return new Response(metaOnlyDocument(surface, canonicalUrl), {
+      status: 200,
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Vary': 'Host' },
+    });
   }
 
   if (!indexResp.ok) {
-    // Same fallback: better to serve the unmodified SPA than to 500.
-    return Response.redirect(indexUrl, 302);
+    return new Response(metaOnlyDocument(surface, canonicalUrl), {
+      status: 200,
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Vary': 'Host' },
+    });
   }
 
   const html = await indexResp.text();
