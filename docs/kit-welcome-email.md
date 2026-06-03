@@ -1,28 +1,29 @@
-# Welcome email — Thresan launch list
+# Welcome email — Thresan launch list (MailerLite)
 
-**Status (2026-06-01):** Not yet live. The signup pipeline creates and tags
-the Kit subscriber, but nothing sends a welcome. New signups currently
-receive **no email**. This document is the copy + the setup to fix that.
+**Status (2026-06-02):** Sync is LIVE — every consented signup lands in the
+MailerLite **"Thresan Launch List"** group with `signup_source` + `interests`
+fields (verified end-to-end). The only remaining step is building the
+**welcome automation** in MailerLite so new subscribers get this email. Until
+that automation exists, signups are captured but receive no welcome.
 
 ---
 
-## How to make it send (pick one)
+## How to make it send — MailerLite Automation (no code)
 
-**Option A — Kit Visual Automation (recommended, no code).**
-In Kit: *Automations → New Visual Automation → Trigger: "Subscriber added
-to a tag" → `src:website` (and/or the per-surface src tags) → Action: Send
-the email below.* Set it to send immediately. Because every consented
-signup is already tagged by source, this fires automatically. Kit handles
-unsubscribe, the required physical-address footer, and deliverability.
+In MailerLite: **Automations → Create automation → Start from scratch.**
+1. **Trigger:** *"When subscriber joins a group"* → select **Thresan Launch
+   List**. (The sync adds every consented signup to this group, so it fires
+   automatically.)
+2. **Add step → Email.** Set:
+   - **From:** `Nelson` — a real name, not no-reply.
+   - **Reply-to:** `njatel@limnology.ca` (the email invites replies).
+   - **Subject / content:** the copy below.
+3. **Turn the automation ON.**
 
-**Option B — Sequence enrollment from the DB trigger (code).**
-Create a one-email *Sequence* in Kit with the copy below, note its numeric
-ID, and I'll extend `sync_waitlist_to_kit()` to also
-`POST /v4/sequences/{id}/subscribers` for consented rows. Kit then sends
-the sequence automatically. (The trigger already reads the Kit key from
-Vault, so no secret handling changes.)
-
-Either way the copy lives in Kit, not in the app.
+MailerLite auto-appends the unsubscribe link + your physical mailing address
+(the CASL/CAN-SPAM footer set in Organization Information), so compliance is
+handled. Send immediately (no delay step) — welcome emails get the highest
+opens, don't wait.
 
 ## Best-practice settings
 
@@ -36,7 +37,7 @@ Either way the copy lives in Kit, not in the app.
 - **Personalization:** we only collect email, no name — so greet with
   "Hi there," (don't fake a first-name token that would render blank).
 - **Cadence promise:** set expectations so they don't unsubscribe later.
-- **Compliance:** Kit auto-appends unsubscribe + mailing address (CASL/
+- **Compliance:** MailerLite auto-appends unsubscribe + mailing address (CASL/
   CAN-SPAM). Don't remove them.
 
 ---
@@ -93,4 +94,4 @@ Either way the copy lives in Kit, not in the app.
 ---
 
 *Plain-text version: keep the same words, links as bare URLs, same
-sign-off. Kit generates this automatically but proof it once.*
+sign-off. MailerLite generates this automatically but proof it once.*
