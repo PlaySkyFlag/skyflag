@@ -64,7 +64,7 @@ export default function ThresanIO() {
               the physical, three-board edition of the game you can already
               play free at{' '}
               <a href={GAME_URL} className="lab-mail">playskyflag.com</a>,
-              is cleared to come to Kickstarter this fall.
+              is cleared to come to Kickstarter on October 20, 2026.
             </p>
             <p>
               The road to that one sentence was longer than I expected.

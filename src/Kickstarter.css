@@ -78,6 +78,28 @@
   color: #ffe4a3;
 }
 
+.ks-countdown {
+  margin: 0 0 18px;
+  font-size: 1rem;
+  color: rgba(245, 247, 251, 0.8);
+  letter-spacing: 0.02em;
+}
+
+.ks-countdown strong {
+  font-size: 1.5rem;
+  color: #ffe4a3;
+  font-weight: 800;
+}
+
+.ks-countdown-date {
+  opacity: 0.7;
+}
+
+.ks-countdown-live {
+  color: #ffe4a3;
+  font-weight: 700;
+}
+
 .ks-hero-ctas {
   display: flex;
   gap: 14px 28px;

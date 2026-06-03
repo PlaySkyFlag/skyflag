@@ -259,7 +259,7 @@ export default function ThresanStudio() {
             board could hold. The digital game is{' '}
             <strong>free to play, always</strong>, at{' '}
             <a href={UMBRELLA_URL}>thresan.com</a>. The premium physical
-            board launches on <strong>Kickstarter in fall 2026</strong>.{' '}
+            board launches on <strong>Kickstarter on October 20, 2026</strong>.{' '}
             <a href={STORE_URL}>Sign up now</a> to get the launch email.
           </p>
         </section>
@@ -273,7 +273,7 @@ export default function ThresanStudio() {
 
         <div className="studio-secondary">
           <a href="https://thresan.com/kickstarter" className="studio-link">
-            Notify me, Kickstarter Fall 2026 →
+            Notify me, Kickstarter October 20, 2026 →
           </a>
           <a href="https://thresan.com/world" className="studio-link">
             The world of Kaleo →

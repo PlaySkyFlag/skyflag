@@ -337,7 +337,7 @@ function GameplayVideo() {
           board could hold. The digital game is{' '}
           <strong>free to play, always</strong>, at{' '}
           <a href="https://thresan.com">thresan.com</a>. The premium
-          physical edition launches on <strong>Kickstarter in Fall 2026</strong>.{' '}
+          physical edition launches on <strong>Kickstarter on October 20, 2026</strong>.{' '}
           <a href="#waitlist">Sign up now</a> to get the launch email.
         </p>
         <div className="store-video-cta">
@@ -651,7 +651,7 @@ function Faq() {
         <div className="store-faq">
           <FaqItem
             q="When does the Kickstarter launch?"
-            a="Targeting Fall 2026. The waitlist gets the exact date first, typically a heads-up two to four weeks ahead of the campaign and a final note the morning it goes live."
+            a="The campaign launches October 20, 2026. The waitlist gets a heads-up two to four weeks ahead and a final reminder the morning it goes live."
           />
           <FaqItem
             q="What does the Founders deposit cover?"

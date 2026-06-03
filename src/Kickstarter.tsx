@@ -26,6 +26,31 @@ const INTERESTS = [
   { id: 'novel', label: 'The Thresan graphic novel' },
 ];
 
+// Live launch countdown. Scarcity/urgency lifts pre-launch signups as the
+// date nears. Targets ~9am PDT on launch day; flips to a live-now message
+// once the campaign opens.
+const LAUNCH_TS = new Date('2026-10-20T16:00:00Z').getTime();
+
+function Countdown() {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const ms = LAUNCH_TS - now;
+  if (ms <= 0) {
+    return <p className="ks-countdown ks-countdown-live">🚀 We're live on Kickstarter — back it now</p>;
+  }
+  const days = Math.floor(ms / 86_400_000);
+  const hours = Math.floor((ms % 86_400_000) / 3_600_000);
+  return (
+    <p className="ks-countdown">
+      <strong>{days}</strong> {days === 1 ? 'day' : 'days'} · {hours}h until launch
+      <span className="ks-countdown-date"> — October 20, 2026</span>
+    </p>
+  );
+}
+
 export default function Kickstarter() {
   const [email, setEmail] = useState('');
   const [interests, setInterests] = useState<string[]>(['backing']);
@@ -39,7 +64,7 @@ export default function Kickstarter() {
     return applySurfaceMeta({
       title: 'Thresan: Skyflag, coming to Kickstarter',
       description:
-        'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter in Fall 2026, and claim early-backer pricing.',
+        'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter on October 20, 2026, and claim early-backer pricing.',
       canonicalUrl: 'https://thresan.com/kickstarter',
       ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
       ogImageAlt:
@@ -106,7 +131,8 @@ export default function Kickstarter() {
       <main className="ks-inner">
         {/* ── Hero ─────────────────────────────────────────────── */}
         <header className="ks-hero">
-          <p className="ks-eyebrow">Coming to Kickstarter · Fall 2026</p>
+          <p className="ks-eyebrow">Coming to Kickstarter · October 20, 2026</p>
+          <Countdown />
           <h1 className="ks-headline">
             Three layers. One Nexus.
             <br />
