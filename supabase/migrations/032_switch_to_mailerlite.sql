@@ -56,8 +56,8 @@ begin
     body := jsonb_build_object(
       'email', new.email,
       'fields', jsonb_build_object(
-        'source',    coalesce(new.source, 'website'),
-        'interests', interests_csv
+        'signup_source', coalesce(new.source, 'website'),  -- 'source' is reserved in MailerLite
+        'interests',     interests_csv
       )
     ) || case when ml_group is not null
               then jsonb_build_object('groups', jsonb_build_array(ml_group))
