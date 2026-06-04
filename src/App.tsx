@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import EndGameOverlay from './EndGameOverlay';
 import GameToolbar from './GameToolbar';
@@ -1798,21 +1799,26 @@ export default function App() {
             })}
           </span>
         </p>
-        <p className="app-footer-elsewhere tagline-script">
-          The heritage at{' '}
-          <a href="https://ashtapada.com" target="_blank" rel="noopener noreferrer">
-            ashtapada.com
-          </a>
-          . The studio at{' '}
-          <a href="https://thresan.studio" target="_blank" rel="noopener noreferrer">
-            thresan.studio
-          </a>
-          . The edition at{' '}
-          <a href="https://thresan.store" target="_blank" rel="noopener noreferrer">
-            thresan.store
-          </a>
-          .
-        </p>
+        {/* External brand/commerce links — web only. thresan.store sells the
+            physical edition (external purchase), so these are hidden in the
+            native build to stay clear of Guidelines 3.1.1 / 4.2.3. */}
+        {!Capacitor.isNativePlatform() && (
+          <p className="app-footer-elsewhere tagline-script">
+            The heritage at{' '}
+            <a href="https://ashtapada.com" target="_blank" rel="noopener noreferrer">
+              ashtapada.com
+            </a>
+            . The studio at{' '}
+            <a href="https://thresan.studio" target="_blank" rel="noopener noreferrer">
+              thresan.studio
+            </a>
+            . The edition at{' '}
+            <a href="https://thresan.store" target="_blank" rel="noopener noreferrer">
+              thresan.store
+            </a>
+            .
+          </p>
+        )}
         <p className="app-footer-legal">
           <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> ·{' '}
           <a href="/ai-use">AI use</a>

@@ -2,6 +2,7 @@ import { StrictMode, Suspense, lazy, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
+import { Capacitor } from '@capacitor/core'
 import './index.css'
 import ErrorBoundary from './ErrorBoundary.tsx'
 import { migrateLocalStorage } from './game/migrate.ts'
@@ -91,6 +92,8 @@ migrateLocalStorage();
 // landing pages need client-side transitions.
 const path = window.location.pathname;
 const hostname = window.location.hostname.toLowerCase();
+// True inside the Capacitor iOS/Android shell (the App Store build).
+const isNativeApp = Capacitor.isNativePlatform();
 // ashtapada.com is a bridging domain — every URL on it should land
 // on the splash, not the main game. Match explicit hostnames rather
 // than endsWith so a future subdomain (staging.ashtapada.com, etc.)
@@ -161,12 +164,27 @@ const isKickstarterPath =
   path === '/kickstarter' || path.startsWith('/kickstarter/');
 
 let rendered;
+// Native (App Store) build: ship ONLY the game, its in-game flows
+// (spectate, post-game review), and the legal pages. Every marketing,
+// commerce, or funnel surface (Landing, Kickstarter, store, lore/universe,
+// the Plus pricing) is unreachable here — Apple rejects in-app subscription
+// pricing, crowdfunding, and external-purchase CTAs (Guidelines 3.1.1 /
+// 3.1.3 / 4.2.3). The web build is unaffected: its full routing is the
+// else-chain below.
+if (isNativeApp) {
+  if (isPrivacy) rendered = <Privacy />;
+  else if (isTerms) rendered = <Terms />;
+  else if (isAiUse) rendered = <AiUse />;
+  else if (isWatch) rendered = <Watch />;
+  else if (isReview) rendered = <Review />;
+  else rendered = <App />;
+}
 // /world is a universal path: it resolves to the World of Kaleo codex on
 // EVERY host (thresan.com, thresan.studio, thresan.games, playskyflag.com,
 // …), the same precedence the comic paths get in api/seo.ts. This lets the
 // lore hub be reached from any brand domain as the ecosystem consolidates
 // onto thresan.com, without a per-host branch.
-if (isWorldPath) rendered = <World />;
+else if (isWorldPath) rendered = <World />;
 else if (isKickstarterPath) rendered = <Kickstarter />;
 else if (isAshtapadaHost) rendered = <AshtapadaSplash />;
 else if (isThresanStoreHost) rendered = <ThresanStore />;

@@ -6,6 +6,7 @@
 // Min/max axes pad slightly so the line never touches the edge.
 
 import { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from './game/supabase';
 
@@ -62,6 +63,9 @@ export default function RatingHistory({ user, hasPlus }: Props) {
   // subscribers, but surfacing it as a teaser with a CTA is a known
   // conversion pattern — users see what they're missing.
   if (!hasPlus) {
+    // Native (App Store): don't surface the subscription pitch at all —
+    // Apple forbids promoting digital subscriptions sold outside IAP (3.1.1).
+    if (Capacitor.isNativePlatform()) return null;
     return (
       <div className="rating-history rating-history-locked">
         <div className="rating-history-header">

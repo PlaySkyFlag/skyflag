@@ -8,9 +8,14 @@
 // and Kit; defaults to the kickstarter tag so every existing usage keeps
 // a valid attribution without changes.
 
+import { Capacitor } from '@capacitor/core';
 import InlineCapture from './InlineCapture';
 
 export default function KickstarterCTA({ source }: { source?: string }) {
+  // Never render in the native (App Store) build: this band captures email
+  // for the Kickstarter launch and links out to the crowdfunding page —
+  // both disallowed in-app (Guidelines 3.1.1 / 4.2.3). Web surfaces only.
+  if (Capacitor.isNativePlatform()) return null;
   return (
     <div
       className="ks-funnel-cta"
