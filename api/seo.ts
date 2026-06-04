@@ -69,10 +69,10 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
   },
   'thresan.store': {
     title: 'Thresan Store, premium physical edition',
-    description: 'Premium physical edition of Thresan: Skyflag. A three-tier strategy game: stacked boards, premium pieces, a numbered collector edition. Kickstarter October 20, 2026.',
+    description: 'Premium physical edition of Thresan: Skyflag. A three-tier strategy game: stacked boards, premium pieces, a numbered collector edition. Kickstarter October 27, 2026.',
     ogImage: 'https://playskyflag.com/thresan-deluxe-board.jpg',
     loadingHeadline: 'Thresan Store',
-    loadingTagline: 'Premium physical edition. Kickstarter October 20, 2026.',
+    loadingTagline: 'Premium physical edition. Kickstarter October 27, 2026.',
   },
   'ashtapada.com': {
     title: 'Ashtapada, the ancient root',
@@ -182,12 +182,12 @@ const WORLD_SURFACE: Surface = {
 const KICKSTARTER_SURFACE: Surface = {
   title: 'Thresan: Skyflag, coming to Kickstarter',
   description:
-    'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter on October 20, 2026, and claim early-backer pricing.',
+    'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter on October 27, 2026, and claim early-backer pricing.',
   ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
   ogImageAlt:
     'Concept render of Thresan: Skyflag, three stacked boards fanned from a shared central hub.',
   loadingHeadline: 'Thresan: Skyflag',
-  loadingTagline: 'Coming to Kickstarter, October 20, 2026.',
+  loadingTagline: 'Coming to Kickstarter, October 27, 2026.',
 };
 
 // ─── Resolver ───────────────────────────────────────────────────────

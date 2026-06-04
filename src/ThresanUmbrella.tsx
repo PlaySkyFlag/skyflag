@@ -74,7 +74,7 @@ export default function ThresanUmbrella() {
           board could hold. The game is{' '}
           <strong>free to play, always</strong>, jump in below. The
           premium physical board launches on{' '}
-          <strong>Kickstarter on October 20, 2026</strong>.{' '}
+          <strong>Kickstarter on October 27, 2026</strong>.{' '}
           <a href={STORE_URL}>Sign up now</a> to get the launch email.
         </p>
         <a href={GAME_URL} className="thresan-cta">
@@ -98,7 +98,7 @@ export default function ThresanUmbrella() {
           </a>
         </div>
         <a href="https://thresan.com/kickstarter" className="thresan-cta">
-          Notify me, Kickstarter, October 20, 2026 →
+          Notify me, Kickstarter, October 27, 2026 →
         </a>
         <p className="thresan-fineprint">
           Thresan™ is a project of Limnology Research Corp. ·{' '}

@@ -29,7 +29,7 @@ const INTERESTS = [
 // Live launch countdown. Scarcity/urgency lifts pre-launch signups as the
 // date nears. Targets ~9am PDT on launch day; flips to a live-now message
 // once the campaign opens.
-const LAUNCH_TS = new Date('2026-10-20T16:00:00Z').getTime();
+const LAUNCH_TS = new Date('2026-10-27T16:00:00Z').getTime();
 
 function Countdown() {
   const [now, setNow] = useState(() => Date.now());
@@ -46,7 +46,7 @@ function Countdown() {
   return (
     <p className="ks-countdown">
       <strong>{days}</strong> {days === 1 ? 'day' : 'days'} · {hours}h until launch
-      <span className="ks-countdown-date"> — October 20, 2026</span>
+      <span className="ks-countdown-date"> — October 27, 2026</span>
     </p>
   );
 }
@@ -64,7 +64,7 @@ export default function Kickstarter() {
     return applySurfaceMeta({
       title: 'Thresan: Skyflag, coming to Kickstarter',
       description:
-        'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter on October 20, 2026, and claim early-backer pricing.',
+        'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter on October 27, 2026, and claim early-backer pricing.',
       canonicalUrl: 'https://thresan.com/kickstarter',
       ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
       ogImageAlt:
@@ -131,7 +131,7 @@ export default function Kickstarter() {
       <main className="ks-inner">
         {/* ── Hero ─────────────────────────────────────────────── */}
         <header className="ks-hero">
-          <p className="ks-eyebrow">Coming to Kickstarter · October 20, 2026</p>
+          <p className="ks-eyebrow">Coming to Kickstarter · October 27, 2026</p>
           <Countdown />
           <h1 className="ks-headline">
             Three layers. One Nexus.

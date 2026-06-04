@@ -108,7 +108,7 @@ export default function ThresanGames() {
         </section>
 
         <a href="https://thresan.com/kickstarter" className="games-cta games-cta-ks">
-          Notify me, Kickstarter October 20, 2026 →
+          Notify me, Kickstarter October 27, 2026 →
         </a>
 
         <div className="games-outbound">

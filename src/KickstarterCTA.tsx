@@ -21,7 +21,7 @@ export default function KickstarterCTA({ source }: { source?: string }) {
       }}
     >
       <p style={{ margin: '0 0 14px', fontSize: '1.05rem', fontWeight: 600 }}>
-        Thresan: Skyflag comes to Kickstarter on October 20, 2026. Be first to know —
+        Thresan: Skyflag comes to Kickstarter on October 27, 2026. Be first to know —
         and get early-backer pricing.
       </p>
       <InlineCapture source={source} />
