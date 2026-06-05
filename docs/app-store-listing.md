@@ -97,3 +97,36 @@ History, Search History, Contacts, Sensitive Info, Purchases.
 **Account deletion:** reachable in-app for every signed-in user via the account
 screen (AccountDataSection → "Delete my account" → `delete-account` edge
 function). Satisfies Apple Guideline 5.1.1(v). ✅
+
+---
+
+## Notes for Review (App Review Information → Notes)
+
+Thresan is a free two-player abstract strategy board game (chess-like, played
+across three stacked boards). No in-app purchases, no ads, no third-party tracking.
+
+HOW TO TEST — no sign-in required:
+• The full game is playable immediately with NO account. From the main screen, tap
+  Play for a game vs the AI (adjustable difficulty), or pick 2-player pass-and-play
+  to play both sides on one device. That exercises all core gameplay.
+• Object: two ways to win — capture the opponent's Captain (and the Soldier that
+  could replace it), or send your own Captain up through the three boards to the
+  Nexus at the top. A short in-app how-to is available.
+
+OPTIONAL ACCOUNT / ONLINE MULTIPLAYER:
+• An account is optional, needed only for online multiplayer and cross-device sync.
+  Sign-in is passwordless (email magic link): enter any email, tap the link sent.
+  Online play also needs a second player, so it isn't required to evaluate the app —
+  single-player and pass-and-play fully demonstrate it. Test setup available on request.
+
+COMPLIANCE:
+• Account deletion: in-app (account screen → "Delete my account").
+• User content: only a player nickname, profanity-filtered on entry (Guideline 1.2).
+• Encryption: standard HTTPS only (ITSAppUsesNonExemptEncryption = NO).
+• Privacy: email/account + gameplay used only for app functionality, never tracking.
+  Policy: https://playskyflag.com/privacy
+
+Contact: Nelson Jatel — njatel@limnology.ca
+
+(App Review sign-in: leave "Sign-in required" UNCHECKED — the game is fully playable
+without an account.)
