@@ -22,6 +22,7 @@ import { removeAvatar, uploadAvatar } from './game/avatar';
 import { downloadExportFile, exportUserData } from './game/dataExport';
 import { useEntitlement } from './game/entitlements';
 import { loadProfile, saveProfile, type Gender, type Profile } from './game/profile';
+import { containsProfanity } from './game/profanity';
 import {
   countRemainingCodes,
   generateRecoveryCodes,
@@ -557,6 +558,13 @@ export default function AccountModal({ user, open, onClose, onProfileChange }: P
             onSubmit={async (e) => {
               e.preventDefault();
               if (!nickname.trim()) return;
+              // UGC moderation (App Store Guideline 1.2): the nickname is
+              // shown to opponents, so reject obviously offensive handles
+              // before they're saved/broadcast.
+              if (containsProfanity(nickname)) {
+                setMessage('Please choose a different nickname.');
+                return;
+              }
               setBusy(true);
               setMessage(null);
               const ageNum = age === '' ? null : Number(age);
