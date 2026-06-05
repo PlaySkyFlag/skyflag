@@ -237,8 +237,17 @@ createRoot(rootEl).render(
 
         All 7 brand domains roll up into a single Vercel project
         dashboard with a hostname filter — go to Vercel → Project →
-        Analytics → filter by host to see per-domain stats. */}
-    <Analytics />
-    <SpeedInsights />
+        Analytics → filter by host to see per-domain stats.
+
+        WEB ONLY: excluded from the native (App Store) build. The Vercel
+        endpoints don't exist at the Capacitor origin so it wouldn't
+        transmit anyway, but gating it keeps the iOS App Privacy label
+        clean — no third-party SDK / Usage Data to disclose. */}
+    {!isNativeApp && (
+      <>
+        <Analytics />
+        <SpeedInsights />
+      </>
+    )}
   </StrictMode>,
 )
