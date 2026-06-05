@@ -73,3 +73,27 @@ gated build, or a device, then add caption banners in any image tool.
 - [ ] Category Games→Board, Price Free, Support + Privacy URLs
 - [ ] Export compliance: already set (ITSAppUsesNonExemptEncryption=false)
 - [ ] Release option: Manual
+
+---
+
+## App Privacy questionnaire answers (final — native build)
+Vercel Analytics is now gated out of native, so the label is the clean version:
+**no third-party SDKs, no tracking, no ATT prompt.** Answer the App Store Connect
+questionnaire as:
+
+**"Do you collect data from this app?" → Yes.**
+For every item below: **Linked to the user = Yes · Used for tracking = No.**
+
+- **Contact Info → Email Address** — purpose: *App Functionality* (account sign-in via magic link; optional, but still declared).
+- **Identifiers → User ID** — purpose: *App Functionality* (Supabase account id).
+- **Identifiers → Device ID** — purpose: *App Functionality* (APNs push token; only when the user turns on turn-notifications).
+- **User Content** (saved games, ELO/ratings, chosen nickname) — purpose: *App Functionality*.
+
+**Not collected:** Usage Data, Diagnostics, Location, Financial, Health, Browsing
+History, Search History, Contacts, Sensitive Info, Purchases.
+
+**Tracking:** none → no AppTrackingTransparency prompt required.
+
+**Account deletion:** reachable in-app for every signed-in user via the account
+screen (AccountDataSection → "Delete my account" → `delete-account` edge
+function). Satisfies Apple Guideline 5.1.1(v). ✅
