@@ -64,6 +64,14 @@ const MARKER_STYLE: Record<MarkerKind, { fill: string; stroke: string; strokeWid
   p2:    { fill: '#0f1830', stroke: '#e8e8e8', strokeWidth: 0.8 },
 };
 
+// Piece glyphs that must render as monochrome TEXT, not color emoji.
+// iOS/WebKit gives some chess characters — notably the pawn ♟ (U+265F) —
+// an emoji presentation that ignores SVG `fill`, which made the white
+// (p1) Soldier render as a black pawn. Appending U+FE0E (text variation
+// selector) at render forces fill-colorable text. (Captain/rover/pilot
+// happened to render as text already; the pawn was the visible casualty.)
+const PIECE_GLYPHS = new Set(['♚', '♝', '♜', '♟']);
+
 // Fixed-position starfield for the Space board. Hand-placed so stars sit
 // in a pleasant scatter rather than landing on cell centers where pieces
 // stand. Coordinates are in SVG units relative to the board viewBox.
@@ -1076,6 +1084,10 @@ export default function Board({
         '⚑': 0.78, // flag
       };
       const size = sizeBySymbol[m.symbol] ?? 0.78;
+      // Force text (not emoji) presentation so the ivory p1 fill applies
+      // on iOS — see PIECE_GLYPHS note. Size lookup above uses the base
+      // glyph, so it's unaffected.
+      const glyph = PIECE_GLYPHS.has(m.symbol) ? m.symbol + '\uFE0E' : m.symbol;
       return (
         <text
           key={m.id ?? `m-${m.row}-${m.col}-${m.symbol}`}
@@ -1093,7 +1105,7 @@ export default function Board({
           pointerEvents="none"
           style={{ userSelect: 'none' }}
         >
-          {m.symbol}
+          {glyph}
         </text>
       );
     });

@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "smoke": "node scripts/smoke-routes.mjs",
+    "check:render": "node scripts/check-render-invariants.mjs",
     "selfplay": "tsx scripts/selfplay.ts",
     "selfplay:shards": "tsx scripts/selfplay-shards.ts",
     "label-deep": "tsx scripts/label-deep.ts",

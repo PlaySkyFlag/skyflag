@@ -58,3 +58,18 @@ Why it slipped through:
 
 If `npm run smoke` is green, the funnel can capture email. If it's red, it
 can't — treat it as a P0.
+
+## Render invariants (visual regressions HTTP smoke can't catch)
+
+`npm run check:render` (`scripts/check-render-invariants.mjs`) guards
+rendering bugs that don't show up as bad HTTP responses. It runs in the
+`route-smoke` workflow on every push + scheduled QAQC run.
+
+- **Piece glyphs must render as text, not emoji** (added 2026-06-05). iOS/
+  WebKit renders some chess characters — notably the pawn ♟ (U+265F) — as a
+  color *emoji* that ignores SVG `fill`, so white (p1) pieces appeared black.
+  Board.tsx appends the U+FE0E text variation selector to every piece glyph;
+  the check derives the glyph list from `PIECE_SYMBOL` (so a new unguarded
+  glyph also fails) and asserts the fix is present.
+
+Add future visual invariants here as they're discovered.
