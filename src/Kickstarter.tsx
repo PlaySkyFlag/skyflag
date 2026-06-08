@@ -321,9 +321,9 @@ export default function Kickstarter() {
 
         {/* ── Footer strip ─────────────────────────────────────── */}
         <p className="ks-footer">
-          Three layers. Four Lifts. One Nexus. Ages 14+. Thresan™: Skyflag,
-          from the studio of Dr. Nelson Jatel, a project of Limnology
-          Research Corp.{' '}
+          © {new Date().getFullYear()} Limnology Research Corp. · Three layers. Four Lifts. One
+          Nexus. Ages 14+. Thresan™: Skyflag, from the studio of Dr. Nelson
+          Jatel, a project of Limnology Research Corp.{' '}
           <a href={STORE_URL}>The physical edition →</a>
         </p>
       </main>

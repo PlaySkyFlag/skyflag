@@ -154,6 +154,15 @@
   color: rgba(245, 247, 251, 0.55);
 }
 
+.vz-copyright {
+  text-align: center;
+  margin: 0;
+  padding: 0 0 24px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: rgba(245, 247, 251, 0.4);
+}
+
 /* End-of-issue conversion hinge + in-production state. */
 .vz-end,
 .vz-soon {

@@ -457,6 +457,7 @@ export default function Review() {
           <a href="/play">← Back to the game</a>
           {session.roomCode ? <> · <a href={`/watch/${session.roomCode}`}>Watch live</a></> : null}
         </p>
+        <p>© {new Date().getFullYear()} Limnology Research Corp.</p>
       </footer>
     </main>
   );

@@ -107,6 +107,7 @@ export default function AiUse() {
             See also: <a href="/privacy">Privacy</a> ·{' '}
             <a href="/terms">Terms of use</a>.
           </p>
+          <p className="legal-foot">© {new Date().getFullYear()} Limnology Research Corp.</p>
         </article>
       </main>
     </div>

@@ -298,6 +298,7 @@ export default function ThresanStudio() {
         </div>
 
         <p className="studio-fineprint">
+          © {new Date().getFullYear()} Limnology Research Corp. ·{' '}
           Thresan™ is a project of Limnology Research Corp. ·{' '}
           <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
           <a href="https://playskyflag.com/terms">Terms</a> ·{' '}

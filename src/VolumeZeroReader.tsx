@@ -159,6 +159,10 @@ export default function VolumeZeroReader({
         {pageLabel(i, total)}
       </div>
 
+      {!embedded && (
+        <p className="vz-copyright">© {new Date().getFullYear()} Limnology Research Corp.</p>
+      )}
+
       {/* In-comic conversion hinge — shown once the reader reaches the
           end. Play Skyflag + Join the Kickstarter list, per the CTA
           plan. */}

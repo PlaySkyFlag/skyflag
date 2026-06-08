@@ -185,6 +185,7 @@ export default function Privacy() {
             See also: <a href="/terms">Terms of use</a> ·{' '}
             <a href="/ai-use">AI use</a>.
           </p>
+          <p className="legal-foot">© {new Date().getFullYear()} Limnology Research Corp.</p>
         </article>
       </main>
     </div>

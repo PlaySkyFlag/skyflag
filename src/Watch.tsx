@@ -301,6 +301,7 @@ export default function Watch() {
           <a href="/play">← Back to the game</a> · <a href="/">Skyflag</a> ·{' '}
           <a href="/ai-use">AI use</a>
         </p>
+        <p>© {new Date().getFullYear()} Limnology Research Corp.</p>
       </footer>
     </main>
   );

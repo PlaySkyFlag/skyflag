@@ -101,6 +101,7 @@ export default function ThresanUmbrella() {
           Notify me, Kickstarter, October 27, 2026 →
         </a>
         <p className="thresan-fineprint">
+          © {new Date().getFullYear()} Limnology Research Corp. ·{' '}
           Thresan™ is a project of Limnology Research Corp. ·{' '}
           <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
           <a href="https://playskyflag.com/terms">Terms</a> ·{' '}
