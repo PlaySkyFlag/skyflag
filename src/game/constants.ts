@@ -39,12 +39,18 @@ export const FLAG_COORDS: Record<Player, Record<Layer, { row: number; col: numbe
   },
 };
 
+// Pieces enter from hand onto the Meridian (sky) — the middle layer — so a
+// freshly deployed piece is one lift from Empyrean above or Terran below,
+// rather than always climbing up from the floor. The sky deploy cells
+// (0,3)/(5,2) don't collide with a flag or lift cell.
 export const DEPLOY_COORDS: Record<Player, Coord> = {
-  p1: { layer: 'ground', row: 0, col: 3 },
-  p2: { layer: 'ground', row: 5, col: 2 },
+  p1: { layer: 'sky', row: 0, col: 3 },
+  p2: { layer: 'sky', row: 5, col: 2 },
 };
 
-// Direction a Soldier advances on Ground (P1 starts at row 0, advances to row 5).
+// Direction a Soldier advances (P1 starts at row 0, advances to row 5). The
+// same row direction applies on every layer — a Soldier promotes on reaching
+// the far row of whatever layer it's on (see nextPieceState in reducer.ts).
 export const FORWARD_ROW_DELTA: Record<Player, 1 | -1> = {
   p1: 1,
   p2: -1,

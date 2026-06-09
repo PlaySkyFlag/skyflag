@@ -119,7 +119,8 @@ export default function Tutorial({ state, open, onClose }: Props) {
             </p>
             <p>
               <strong>Deploy:</strong> tap a piece in your tray below the board,
-              then tap the dashed <em>deploy pad</em> on Terran.
+              then tap the dashed <em>deploy pad</em> on the Meridian — the
+              middle layer.
             </p>
             <p>
               <strong>Move:</strong> tap a piece on the board, then tap a gold

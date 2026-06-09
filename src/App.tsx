@@ -130,12 +130,13 @@ function markersForLayer(layer: Layer, state: GameState): Marker[] {
 }
 
 function deployCellsForLayer(layer: Layer): DeployCell[] {
-  if (layer !== 'ground') return [];
-  return PLAYERS.map((player) => ({
-    row: DEPLOY_COORDS[player].row,
-    col: DEPLOY_COORDS[player].col,
-    player,
-  }));
+  return PLAYERS.filter((player) => DEPLOY_COORDS[player].layer === layer).map(
+    (player) => ({
+      row: DEPLOY_COORDS[player].row,
+      col: DEPLOY_COORDS[player].col,
+      player,
+    }),
+  );
 }
 
 // Walks history backwards to find the most recent move/deploy. End-turn
@@ -1269,8 +1270,16 @@ export default function App() {
         theme={layerThemes[layer]}
         markers={markersForLayer(layer, state)}
         deployCells={deployCellsForLayer(layer)}
-        activeDeployPlayer={layer === 'ground' ? activeDeployPlayer : null}
-        onDeployCellClick={layer === 'ground' ? handleDeployClick : undefined}
+        activeDeployPlayer={
+          activeDeployPlayer && DEPLOY_COORDS[activeDeployPlayer].layer === layer
+            ? activeDeployPlayer
+            : null
+        }
+        onDeployCellClick={
+          PLAYERS.some((p) => DEPLOY_COORDS[p].layer === layer)
+            ? handleDeployClick
+            : undefined
+        }
         selectedCell={selectedCell}
         legalTargets={legalTargetsByLayer[layer]}
         onCellClick={(row, col) => handleCellClick(layer, row, col)}

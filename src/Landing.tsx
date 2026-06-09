@@ -313,7 +313,8 @@ function HowItWorksSection() {
         <ol className="landing-howto-list">
           <li>
             <strong>Deploy.</strong> Each clan starts with five pieces in
-            hand and one fixed deploy square on the Terran. Bring them
+            hand and one fixed deploy square on the Meridian — the middle
+            layer, one lift from Terran below or Empyrean above. Bring them
             onto the board, one activation at a time.
           </li>
           <li>

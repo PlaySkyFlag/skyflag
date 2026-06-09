@@ -153,8 +153,8 @@ function applyMove(state: GameState, pieceId: PieceId, to: Coord): GameState {
   }
 
   // Flag capture (rulebook turn step 3): runs AFTER any promotion so a Soldier
-  // that promotes by reaching G(5,5)/G(0,0) can capture the opponent's Ground
-  // flag in the same activation. Only Captains capture flags.
+  // that promotes by reaching the far row (on any layer) can capture a flag on
+  // that square in the same activation. Only Captains capture flags.
   const newFlags = maybeCaptureFlag(state.flags, newPiece.kind, state.currentPlayer, to);
 
   // Record the move for the history log. Capture and promotion details are
@@ -264,12 +264,12 @@ function capturesFor(
 }
 
 // Apply any same-activation transformations to a piece that just moved to `to`:
-//   • Soldier → Captain promotion when reaching the far row on Ground.
+//   • Soldier → Captain promotion when reaching the far row on ANY layer.
 //   • Soldier hasMoved flag flips to true after its first move.
 // Captain / Rover / Pilot pass through unchanged.
 function nextPieceState(piece: Piece, to: Coord): Piece {
   if (piece.kind !== 'soldier') return piece;
-  if (to.layer === 'ground' && isPromotionRow(piece.owner, to.row)) {
+  if (isPromotionRow(piece.owner, to.row)) {
     return {
       id: piece.id,
       owner: piece.owner,
