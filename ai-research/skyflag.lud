@@ -1,0 +1,163 @@
+// ============================================================================
+// Skyflag — Ludii ludeme spec  (DRAFT / iterate against the compiler)
+// ============================================================================
+//
+// HONEST STATUS: This file has NOT been run through the Ludii compiler (Ludii
+// is not installed in the authoring environment). It is a best-effort starting
+// draft to iterate against Ludii Studio on your machine. Treat every ludeme as
+// a hypothesis until it compiles AND its perft matches RULES.md §8.
+//
+// Confidence tags below:
+//   [OK]   standard ludeme, high confidence it is roughly right
+//   [CHK]  plausible but verify the exact ludeme name / arg form in Ludii docs
+//   [HARD] the genuinely tricky part — expect real iteration here
+//
+// ACCEPTANCE TEST: Ludii's perft (Tools → "Estimate game tree" / headless
+//   eval.Perft) from the opening MUST reproduce, with one tree edge = one
+//   ACTIVATION (and a forced pass modelled as a no-choice move):
+//     depth 1 → 4,  2 → 17,  3 → 68,  4 → 289,  5 → 2499
+//   See ai-research/RULES.md §8 and the TS oracle `analyze.ts perft`.
+//
+// STAGE THE WORK — do NOT try to one-shot the 3D board:
+//   Stage A  Single-layer "flat" Skyflag (this file). Validates the HARD
+//            ludeme mechanics — hand-deploy, 2 activations/turn, conditional
+//            forced pass, soldier promotion, limited rook/bishop, king,
+//            flag-capture win — in 2D where they are tractable. Build a 1-layer
+//            perft from the TS engine (restrict moves.ts to one layer) and
+//            match it here first.
+//   Stage B  Add the 3 stacked layers + 4 lift cells + per-layer flags + Nexus.
+//            Notes at the bottom. This is where Ludii's multi-board / graph
+//            topology work lives.
+//
+// ----------------------------------------------------------------------------
+// STAGE A — single-layer flat foundation
+// ----------------------------------------------------------------------------
+
+(define "ForwardRow"  // P1 advances to higher rows, P2 to lower (constants.ts FORWARD_ROW_DELTA)
+    (if (is Mover P1) (directions {NNE N NNW}) (directions {SSE S SSW}))
+)
+
+(game "Skyflag (flat)"
+    (players 2)
+
+    (equipment {
+        (board (square 6))                                   // [OK]  6x6, rows/cols 0-5
+        (hand Each size:4)                                   // [OK]  Captain/Soldier/Rover/Pilot start in hand
+
+        // --- pieces -----------------------------------------------------------
+        // Captain: king move, capture-by-landing. [CHK] direction set "All" = 8 on square.
+        (piece "Captain" Each
+            (move Step All
+                (to if:(not (is Friend (who at:(to))))
+                    (apply (remove (to)))))
+        )
+
+        // Soldier: forward-1 to empty, diagonal-forward capture only, first-move 2.
+        // [HARD] the "2 on first move only" + "no forward capture" split.
+        (piece "Soldier" Each
+            (or
+                (move Step (if (is Mover P1) (directions N) (directions S))
+                    (to if:(is Empty (to))))                 // forward, empty only
+                (move Step (if (is Mover P1) (directions {NE NW}) (directions {SE SW}))
+                    (to if:(is Enemy (who at:(to)))          // diagonal-forward capture only
+                        (apply (remove (to)))))
+                // [HARD] first-move double step: gate on (= (state at:(from)) 0)
+                // or use (is Empty) on the intermediate; Ludii idiom is a
+                // ("hasMoved") piece-state flag set after first move.
+            )
+        )
+
+        // Rover: limited rook, range 1-2, no jump, capture by landing at 1 or 2.
+        // [CHK] Slide with (between (max 1) ...) + range cap 2.
+        (piece "Rover" Each
+            (move Slide Orthogonal
+                (between (max 1) if:(is Empty (between)))     // no-jump: only 1 empty between cell
+                (to if:(not (is Friend (who at:(to))))
+                    (apply (remove (to)))))
+        )
+
+        // Pilot: limited bishop, range 1-2, no jump, capture by landing at 1 or 2.
+        (piece "Pilot" Each
+            (move Slide Diagonal
+                (between (max 1) if:(is Empty (between)))
+                (to if:(not (is Friend (who at:(to))))
+                    (apply (remove (to)))))
+        )
+
+        // Flag: static objective. In flat-stage, one enemy flag per side.
+        // [CHK] model as a marker piece "Flag" placed at the flag site; a
+        // Captain landing there captures it (remove) and flips a win latch.
+        (piece "Flag" Each)
+
+        (regions "DeployP1" (sites {"D1"}))   // sky(0,3) analogue — pick a flat cell
+        (regions "DeployP2" (sites {"D6"}))   // sky(5,2) analogue
+    })
+
+    (rules
+        (start {
+            // [CHK] place each player's 4 pieces into the hand, flags onto board.
+            (place "Captain" "Hand" count:1)
+            (place "Soldier" "Hand" count:1)
+            (place "Rover"   "Hand" count:1)
+            (place "Pilot"   "Hand" count:1)
+            // (place "Flag1" ...) (place "Flag2" ...)
+        })
+
+        (play
+            // [HARD] TWO ACTIVATIONS PER TURN. Ludii idiom: (do <move> next:<move>)
+            // or a per-turn move counter that withholds (forfeit/pass). Each
+            // activation is EITHER a deploy from hand OR a board move.
+            //   deploy: (move (from (handSite Mover)) (to (sites "Deploy<Mover>")
+            //              if:(is Empty (to))))
+            //   board move: (forEach Piece)
+            // CONDITIONAL FORCED PASS (RULES.md §7): when the mover has no
+            // deploy and no board move but the game is live, the ONLY legal
+            // action is a pass. Ludii: (or (forEach Piece) ... (if (no Moves Mover) (move Pass))).
+            (forEach Piece)
+        )
+
+        (end {
+            // Nexus / elimination / flag — flat stage: capture the enemy flag.
+            // [CHK] elimination = mover has no Captain and no Soldier in hand or
+            //   on board → (if (no Pieces ... ) (result ... Loss)).
+            (if (= 0 (count Pieces Enemy)) (result Mover Win))
+        })
+    )
+)
+
+// ----------------------------------------------------------------------------
+// STAGE B — 3D extension (NOTES, not yet code)
+// ----------------------------------------------------------------------------
+//
+// BOARD TOPOLOGY [HARD]: three stacked 6x6 grids (ground/sky/space) connected
+//   ONLY at the 4 lift cells (1,1)(1,4)(4,1)(4,4). Options to investigate in
+//   Ludii, easiest-first:
+//     1. Three boards via (merge { (square 6) (square 6) (square 6) }) and add
+//        explicit vertical edges at the 4 lift columns between adjacent layers.
+//     2. A custom (graph vertices:{...} edges:{...}) of 108 vertices — total
+//        control but you lose the named direction system (N/E/Diagonal), which
+//        makes piece movement painful. Avoid unless (1) fails.
+//     3. Ludii's "Layer"/3D site addressing if the version supports stacked
+//        square boards with a Z coordinate.
+//   Per-layer movement (king/rook/bishop/soldier) must stay WITHIN a layer;
+//   only the lift step crosses layers.
+//
+// LIFT STEP [HARD]: any piece on a lift cell may move to the same (row,col) on
+//   an adjacent layer IF that target is empty (no capture). Model as a move
+//   whose `from` is restricted to the lift-cell region and whose `to` is the
+//   vertical neighbour, gated (is Empty (to)).
+//
+// FLAGS / NEXUS [CHK]: 3 flags per player (one per layer) at FLAG_COORDS;
+//   captured by an enemy Captain landing on the layer's flag site. NEXUS win =
+//   a Captain reaches space(3,3) AFTER all 3 enemy flags captured. Track flag
+//   captures with 3 latches (region emptied / counters) and gate the Nexus end
+//   condition on all three.
+//
+// PROMOTION [OK-ish]: Soldier reaching the far row (P1 row5 / P2 row0) of ANY
+//   layer promotes to Captain — and promotion resolves BEFORE flag capture in
+//   the same activation, so a promoting Soldier can capture a flag on that
+//   square. (reducer.ts nextPieceState + ordering.)
+//
+// DRAWS: turn limit 180 turns → draw (tiebreakers unimplemented in code, see
+//   RULES.md §9); mutual no-move → stalemate draw.
+// ============================================================================
