@@ -71,22 +71,49 @@ rollouts stalled on this until the harness added an explicit forced pass
 (`actionsWithPass`). Any Ludii spec or MCTS must model the conditional pass or
 its move tree will diverge from the perft oracle. (RULES.md §7.)
 
+## The `.lud` is grounded in real Ludii games (not invented)
+
+`skyflag.lud` is still **uncompiled** (no Java/Ludii in the dev box), but every
+ludeme is now adapted from a shipped Ludii game file, cited inline, instead of
+written from memory — the whole point of the exercise. Sources (from
+`github.com/Ludeme/Ludii`, v1.3.x):
+
+| mechanic | source file |
+|---|---|
+| hand drops, StepMove/SlideMove+capture, promotion, `("SameTurn")`+`(move Pass)` | `…/shogi/Shogi.lud` |
+| Soldier = chess pawn (forward-empty, diagonal-capture, double-first via `(sites Start)`) | `…/chess/Chess.lud` |
+| Rover/Pilot limited slide `(between (max 1) …)` = move 1 or 2, no jump | `…/race/fill/Agon.lud` |
+| 2 activations/turn via `(then (moveAgain))` | `…/space/line/Connect6.lud` |
+| 3D board as a flattened tall rectangle, vertical links via `(ahead … steps:N)` | `…/space/line/3D Tic-Tac-Toe.lud` |
+
+Remaining `[CHK]`/`[HARD]` tags mark the spots still needing compiler iteration
+even though the surrounding syntax is grounded — chiefly: the pawn double-step
+define (paste Chess's `DoubleStepForwardToEmpty` verbatim), and whether a
+piece-level `(then …)` composes cleanly with the play-level 2-activation control.
+
 ## Iteration loop for the Ludii spec (on your machine)
 
-1. Install **Ludii** (https://ludii.games — Java app + `Ludii.jar` for
-   headless). Open `skyflag.lud` in Ludii Studio.
-2. Get **Stage A** (single-layer) to **compile**, fixing the `[CHK]`/`[HARD]`
-   ludemes against the Ludii language reference. Build a **1-layer perft** from
-   the TS engine (restrict `moves.ts` to one layer) and match it in Ludii first.
-3. Add **Stage B** (3 layers + lifts + per-layer flags + Nexus). Match the full
-   perft table in `RULES.md §8` (4 / 17 / 68 / 289 / 2499). The shallowest depth
-   that disagrees localises the rule bug — in the spec **or** in `src/game`.
+0. Install Java + Ludii:
+   ```bash
+   brew install openjdk           # Ludii needs a JRE/JDK
+   # download Ludii.jar from https://ludii.games/download.php
+   java -jar Ludii.jar            # launches Ludii Studio
+   ```
+1. Open `ai-research/skyflag.lud` in Ludii Studio (File → Load Game). Get
+   **Stage A** (single-layer) to **compile**, fixing the `[CHK]`/`[HARD]` spots
+   against the Ludii language reference + the cited source files.
+2. Build a **1-layer perft** from the TS engine (restrict `moves.ts` to one
+   layer) and match it in Ludii first (Ludii: Tools → tree estimation, or the
+   headless `eval.Perft`).
+3. Add **Stage B** (3 layers + lifts + per-layer flags + Nexus) using the
+   flattened-rectangle model. Match the full perft table in `RULES.md §8`
+   (4 / 17 / 68 / 289 / 2499). The shallowest depth that disagrees localises the
+   rule bug — in the spec **or** in `src/game`.
 4. Once perft matches, run Ludii's **MCTS** for balance metrics and compare to
-   the `analyze.ts balance` baseline. Differences are design signal (e.g. is the
-   ~52% first-player edge bigger or smaller under strong play?).
+   `npm run analyze balance` / `strong`. Differences are design signal.
 5. Optional: use Ludii MCTS as a **sparring opponent / label source** to probe
-   the residual d4-vs-d3 weakness in the NNUE eval — first confirm via Ludii
-   whether it's an engine bug or correct play in an asymmetric position.
+   the residual d4-vs-d3 NNUE weakness — first confirm via Ludii whether it's an
+   engine bug or correct play in an asymmetric position.
 
 ## Reconciliation items (from RULES.md §9)
 
