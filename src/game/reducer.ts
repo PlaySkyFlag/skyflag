@@ -13,7 +13,9 @@ import type {
   Coord,
   FlagsState,
   GameState,
+  GameStatus,
   HistoryEntry,
+  Layer,
   Piece,
   PieceId,
   Player,
@@ -389,16 +391,89 @@ function canActAt(state: GameState, player: Player): boolean {
   return false;
 }
 
+// ─── Turn-limit tiebreakers (rulebook §7) ───────────────────────────────────
+// Applied in priority order; the first criterion with a strict difference
+// decides the winner. Criteria 1–4 favour the HIGHER value, criterion 5 the
+// LOWER (a Captain closer to the Nexus). A full tie across all five is a draw.
+
+const LAYER_RANK: Record<Layer, number> = { ground: 0, sky: 1, space: 2 };
+
+// (1) Opponent flags this player has captured (flags[layer][opp] === true).
+function tbFlagsCaptured(state: GameState, p: Player): number {
+  const opp = opponentOf(p);
+  let n = 0;
+  for (const layer of Object.keys(LAYER_RANK) as Layer[]) {
+    if (state.flags[layer][opp]) n++;
+  }
+  return n;
+}
+
+// (2) This player's surviving pieces — on board plus still in hand.
+function tbPiecesRemaining(state: GameState, p: Player): number {
+  return (
+    state.inHand[p].length +
+    state.onBoard.reduce((n, bp) => n + (bp.piece.owner === p ? 1 : 0), 0)
+  );
+}
+
+// (3) Opponent pieces this player has captured. captured[X] = pieces X lost,
+// so p's captures are the opponent's losses.
+function tbOpponentPiecesCaptured(state: GameState, p: Player): number {
+  return state.captured[opponentOf(p)].length;
+}
+
+// (4) Highest layer (space > sky > ground) on which the player has any piece.
+function tbHighestLayer(state: GameState, p: Player): number {
+  let best = -1;
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner === p) best = Math.max(best, LAYER_RANK[bp.coord.layer]);
+  }
+  return best;
+}
+
+// (5) Smallest Chebyshev (row,col) distance from any of the player's Captains
+// to Space(3,3). Negated by the caller so "closer is better" sorts like the
+// higher-is-better criteria. Infinity (→ −Infinity) when the player has no
+// Captain.
+function tbClosestCaptainToNexus(state: GameState, p: Player): number {
+  let best = Infinity;
+  for (const bp of state.onBoard) {
+    if (bp.piece.owner !== p || bp.piece.kind !== 'captain') continue;
+    const d = Math.max(
+      Math.abs(bp.coord.row - NEXUS_COORD.row),
+      Math.abs(bp.coord.col - NEXUS_COORD.col),
+    );
+    if (d < best) best = d;
+  }
+  return best;
+}
+
+function resolveTurnLimit(state: GameState): GameStatus {
+  const criteria: Array<(s: GameState, p: Player) => number> = [
+    tbFlagsCaptured,
+    tbPiecesRemaining,
+    tbOpponentPiecesCaptured,
+    tbHighestLayer,
+    (s, p) => -tbClosestCaptainToNexus(s, p), // lower distance wins
+  ];
+  for (const score of criteria) {
+    const s1 = score(state, 'p1');
+    const s2 = score(state, 'p2');
+    if (s1 !== s2) {
+      return { kind: 'won', winner: s1 > s2 ? 'p1' : 'p2', reason: 'turn-limit' };
+    }
+  }
+  return { kind: 'draw', reason: 'turn-limit' };
+}
+
 function passInitiative(state: GameState): GameState {
   const nextTurn = state.turnNumber + 1;
-  // Turn-limit draw: 180 turns without a win → game ends. Tiebreakers from
-  // rulebook section 7 (flags → pieces → captures → highest layer → Captain
-  // Chebyshev distance to Space(3,3)) are deferred — for now this is a flat
-  // draw.
+  // Turn limit: 180 turns without a win → game ends, decided by the rulebook
+  // §7 tiebreakers. Only a full tie across all five criteria is a draw.
   if (nextTurn > TURN_LIMIT) {
     return {
       ...state,
-      status: { kind: 'draw', reason: 'turn-limit' },
+      status: resolveTurnLimit(state),
     };
   }
   const next: GameState = {

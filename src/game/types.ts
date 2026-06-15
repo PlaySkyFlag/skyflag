@@ -65,7 +65,10 @@ export type FlagsState = {
 
 export type GameStatus =
   | { kind: 'in-progress' }
-  | { kind: 'won'; winner: Player; reason: 'nexus' | 'elimination' | 'resignation' | 'time-out' }
+  // 'turn-limit' appears as a WON reason too: when the 180-turn limit is
+  // reached the rulebook §7 tiebreakers decide a winner; only a full tie across
+  // all five criteria stays a draw (also 'turn-limit').
+  | { kind: 'won'; winner: Player; reason: 'nexus' | 'elimination' | 'resignation' | 'time-out' | 'turn-limit' }
   | { kind: 'draw'; reason: 'turn-limit' | 'stalemate' | 'agreement' };
 
 // Optional per-game chess-style clock. Ticks for whoever's turn it is.
