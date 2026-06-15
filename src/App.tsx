@@ -1475,10 +1475,17 @@ export default function App() {
         flagsState={state.flags}
       />
       <div className="board-stack">
-        {/* Flow design element FIRST in DOM so it paints behind the boards.
-            Two subtle gradient curves: Ground↔Sky transitions green→blue,
-            Sky↔Space transitions blue→purple. Bidirectional arrowheads
-            indicate that lifts can travel in either direction. */}
+        {/* Lift-channel overlay, FIRST in DOM so it paints behind the boards.
+            Sky sits in the center; the two gaps either side of it are the
+            shafts pieces travel through when they lift between layers. Each
+            gap holds a soft "portal" band plus a bidirectional arrow —
+            left = Sky ↔ Space, right = Sky ↔ Ground. The geometry below
+            assumes the .board-stack row of 3 × 29% boards + 2 × 6.5% gaps:
+              Space  x ∈ [0, 29]      gap x ∈ [29, 35.5]
+              Sky    x ∈ [35.5, 64.5] gap x ∈ [64.5, 71]
+              Ground x ∈ [71, 100]
+            (preserveAspectRatio="none" stretches x/y independently; markers
+            and strokes use non-scaling units so they stay crisp.) */}
         <svg
           className="layer-flow"
           viewBox="0 0 100 100"
@@ -1494,44 +1501,48 @@ export default function App() {
               viewBox="0 0 10 10"
               refX="7"
               refY="5"
-              markerWidth="3.2"
-              markerHeight="3.2"
+              markerWidth="3.4"
+              markerHeight="3.4"
               orient="auto-start-reverse"
             >
               <path d="M 0 1 L 9 5 L 0 9 Z" fill="#c89868" />
             </marker>
+            {/* Portal bands fade in toward the middle of each gap so the
+                channel glows between the two boards it connects. */}
+            <linearGradient id="portal-space" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#9a86d8" stopOpacity="0.05" />
+              <stop offset="0.5" stopColor="#9a86d8" stopOpacity="0.3" />
+              <stop offset="1" stopColor="#7eb3d4" stopOpacity="0.05" />
+            </linearGradient>
+            <linearGradient id="portal-ground" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#7eb3d4" stopOpacity="0.05" />
+              <stop offset="0.5" stopColor="#8cdc82" stopOpacity="0.3" />
+              <stop offset="1" stopColor="#8cdc82" stopOpacity="0.05" />
+            </linearGradient>
           </defs>
-          {/* Ground ↔ Sky — anchored on the r5,c5 cell of each board
-              (Terran's bottom-right cell ↔ Sky's bottom-right cell).
-              The curve bulges OUT to the right to fill the empty
-              wedge between Ground's right edge and Sky's bottom edge,
-              never crossing through any board. Cell positions in the
-              board-stack viewBox:
-                Ground r5,c5 inner corner ≈ (65, 88)
-                Sky    r5,c5 inner corner ≈ (94, 62) */}
+          {/* Left lift channel: Sky (center) ↔ Space (left). */}
+          <rect x="29" y="24" width="6.5" height="52" fill="url(#portal-space)" />
           <path
-            d="M 65 88 C 92 92, 102 76, 94 62"
+            d="M 35.5 50 L 29 50"
             fill="none"
-            stroke="#a0613f"
-            strokeWidth={2}
+            stroke="#8f7bc8"
+            strokeWidth={2.4}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            opacity={0.85}
+            opacity={0.9}
             markerStart="url(#flow-arrow)"
             markerEnd="url(#flow-arrow)"
           />
-          {/* Sky ↔ Space — anchored on the closest top corners of each
-              board (Sky's r0,c0 ↔ Space's r0,c5) so the arc rides
-              over the top without crossing Ground. Slightly cooler
-              bronze (indigo undertone) for the higher / cosmic layer. */}
+          {/* Right lift channel: Sky (center) ↔ Ground (right). */}
+          <rect x="64.5" y="24" width="6.5" height="52" fill="url(#portal-ground)" />
           <path
-            d="M 68 2 Q 50 -10 32 2"
+            d="M 64.5 50 L 71 50"
             fill="none"
-            stroke="#7a5a8a"
-            strokeWidth={2}
+            stroke="#6fae6a"
+            strokeWidth={2.4}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            opacity={0.85}
+            opacity={0.9}
             markerStart="url(#flow-arrow)"
             markerEnd="url(#flow-arrow)"
           />

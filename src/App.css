@@ -682,62 +682,48 @@
 .board-stack {
   position: relative;
   width: 100%;
-  max-width: 880px;
-  /* Wide-and-short aspect for landscape phones — fan spreads horizontally. */
-  aspect-ratio: 2 / 1;
+  max-width: 920px;
   margin: 0 auto;
-  perspective: 1100px;
-  perspective-origin: 50% 85%;
+  /* Horizontal row: Space (left) · Sky (center, entry hub) · Ground (right).
+     Pieces now enter on the Sky board, so it sits in the middle with the
+     other two layers flanking it — lifts travel left to Space and right to
+     Ground. (Was a receding depth "fan"; flattened to a clear side-by-side
+     row so every board reads at the same scale and tap size.) DOM order
+     follows LAYER_ORDER = [space, sky, ground], which is exactly
+     left→center→right. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 3 × 29% boards + 2 × 6.5% gaps = 100%, so the gaps line up exactly with
+     the lift-channel arrows drawn in the .layer-flow overlay below. */
+  gap: 6.5%;
 }
 
 .board-stack-item {
-  position: absolute;
-  width: 32%;
-}
-
-.board-stack-item--space {
-  top: 0;
-  left: 0;
-}
-
-.board-stack-item--sky {
-  top: 0;
-  right: 0;
-}
-
-.board-stack-item--ground {
-  bottom: 0;
-  /* (100% − 32%) / 2 = 34%, centers Ground horizontally in the stack. */
-  left: 34%;
+  position: relative;
+  flex: 0 0 29%;
+  width: 29%;
 }
 
 /* Portrait fallback: when the viewport is taller than wide (phones held
-   upright, narrow desktop windows), abandon the fan and stack the boards
-   vertically — each board gets its own full-width row, readable at any
-   width, no risk of Space and Sky overlapping. */
+   upright, narrow desktop windows), the side-by-side row would squeeze each
+   6×6 board too small to tap. Stack vertically instead — Space on top, Sky
+   in the middle (still the entry hub), Ground at the base — each board a
+   full-width row. */
 @media (orientation: portrait) {
   .board-stack {
-    display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 32px;
-    /* Cancel the fan's aspect-ratio so the stack grows to fit its boards. */
-    aspect-ratio: auto;
+    gap: 28px;
     max-width: 380px;
   }
-  /* Override the absolute positioning used by the fan layout. */
-  .board-stack-item,
-  .board-stack-item--space,
-  .board-stack-item--sky,
-  .board-stack-item--ground {
-    position: relative;
+  .board-stack-item {
     width: 100%;
-    top: auto;
-    left: auto;
-    right: auto;
-    bottom: auto;
+    flex: none;
   }
-  /* Flow arrows are tied to the fan geometry; hide them in stacked mode. */
+  /* Lift-channel arrows are tied to the horizontal-row geometry; hide them
+     when the boards are stacked. (Positional sub-labels are re-worded in a
+     second portrait block AFTER the default ::after rules — see below — so
+     source order lets them win at equal specificity.) */
   .layer-flow {
     display: none;
   }
@@ -745,11 +731,18 @@
 
 .board-stack-label {
   position: absolute;
-  /* Centered horizontally above the playing surface. */
-  top: -18px;
+  /* Sit the whole label (name + positional sub-line) entirely above the
+     playing surface so it never overlaps the top row of cells. */
+  bottom: 100%;
+  margin-bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
+  /* Two stacked lines: the board name, then a smaller positional hint. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
   /* Match the rest of the app's system stack — clean and crisp on screen. */
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 0.82rem;
@@ -769,6 +762,43 @@
      0    2px 4px rgba(0, 0, 0, 0.55);
 }
 
+/* Positional sub-label — tells you which board you're looking at and where
+   it sits in the row (e.g. "Sky · center board · entry"). Driven purely by
+   CSS off the layer class, so every view that uses .board-stack (game,
+   watch, review) gets it without editing each component. The default
+   (landscape row) wording is overridden in the portrait media query above. */
+.board-stack-label::after {
+  font-weight: 600;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  opacity: 0.78;
+  margin-top: 3px;
+}
+.board-stack-item--space .board-stack-label::after {
+  content: 'left board';
+}
+.board-stack-item--sky .board-stack-label::after {
+  content: 'center board · entry';
+}
+.board-stack-item--ground .board-stack-label::after {
+  content: 'right board';
+}
+
+/* Stacked vertically (portrait) the layers read top → middle → bottom
+   rather than left → center → right. Placed AFTER the default ::after rules
+   so it wins on source order at equal specificity. */
+@media (orientation: portrait) {
+  .board-stack-item--space .board-stack-label::after {
+    content: 'top board';
+  }
+  .board-stack-item--sky .board-stack-label::after {
+    content: 'middle board · entry';
+  }
+  .board-stack-item--ground .board-stack-label::after {
+    content: 'bottom board';
+  }
+}
+
 /* Each layer's label takes a tinted color matching its theme — visual
    shorthand for which board you're looking at. */
 .board-stack-item--space .board-stack-label {
@@ -781,35 +811,36 @@
   color: rgb(185, 220, 160);
 }
 
-/* Boards used to be tilted with rotateX(50deg) for a 3D-lectern look,
-   but the perspective compression made bottom-row cells (r5) hard to
-   tap reliably — your finger landed where you SAW the cell, but the
-   transformed hit target was a few cells off. Playability beat the
-   aesthetic; boards now sit flat. The drop-shadow chain stays so
-   each layer still reads with its theme color. */
+/* Boards sit flat (no rotateX) for reliable tap targets. In the side-by-side
+   row each board carries its theme glow; Sky — the center entry board — is
+   the brightest so the eye lands on the hub where pieces deploy. Space and
+   Ground are only lightly dimmed (they used to recede hard in the fan; in a
+   flat row that hurt readability, so they're nearly full strength now). */
 .board-stack-tile {
   border-radius: 8px;
 }
 
 .board-stack-item--space .board-stack-tile {
-  opacity: 0.55;
+  opacity: 0.82;
   filter:
-    drop-shadow(0 0 6px rgba(150, 130, 220, 0.75))
+    drop-shadow(0 0 6px rgba(150, 130, 220, 0.7))
     drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
 }
 
 .board-stack-item--sky .board-stack-tile {
-  opacity: 0.78;
+  /* Entry hub — full opacity and a doubled halo so it reads as the center
+     of play. */
+  opacity: 1;
   filter:
-    drop-shadow(0 0 6px rgba(126, 179, 212, 0.85))
+    drop-shadow(0 0 10px rgba(126, 179, 212, 0.95))
+    drop-shadow(0 0 22px rgba(126, 179, 212, 0.45))
     drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
 }
 
 .board-stack-item--ground .board-stack-tile {
-  /* Ground stays at full opacity — the solid base of the fan. Green LED
-     glow ties it to the layer's theme. */
+  opacity: 0.92;
   filter:
-    drop-shadow(0 0 6px rgba(140, 220, 130, 0.8))
+    drop-shadow(0 0 6px rgba(140, 220, 130, 0.75))
     drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
 }
 
