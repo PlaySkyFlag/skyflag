@@ -13,6 +13,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import ConsentCheckbox from './ConsentCheckbox';
 import './ThresanStudio.css';
+import SiteHeader from './SiteHeader';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
 import {
@@ -123,12 +124,7 @@ export default function ThresanStudio() {
   return (
     <div className="studio">
       <main className="studio-inner">
-        <img src="/3phor-logo.png" alt="" className="studio-sigil" />
-        <p className="studio-eyebrow">The reader&rsquo;s home</p>
-        <h1 className="studio-name">
-          THRESAN<span className="studio-suffix">.studio</span>
-        </h1>
-        <p className="studio-tagline tagline-script">{VOLUME_ZERO.tagline}</p>
+        <SiteHeader role="Studio" />
 
         {/* Single above-the-fold job: capture the email in exchange for
             the free comic. Everything else is below the fold. */}

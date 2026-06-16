@@ -148,7 +148,7 @@ function Hero() {
           alt="Thresan: Skyflag"
           className="landing-hero-logo"
         />
-        <h1 className="landing-hero-title">Thresan: Skyflag</h1>
+        <h1 className="landing-hero-title">Thresan™: Skyflag</h1>
         <p className="landing-hero-tagline tagline-script">Three worlds. One proof.</p>
         <p className="landing-hero-subtitle">
           Where strategists gather. Three boards. Four Lifts.

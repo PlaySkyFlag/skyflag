@@ -7,6 +7,7 @@
 
 import { useEffect } from 'react';
 import './ThresanUmbrella.css';
+import SiteHeader from './SiteHeader';
 import { applySurfaceMeta } from './socialMeta';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-com';
@@ -31,13 +32,7 @@ export default function ThresanUmbrella() {
   return (
     <div className="thresan">
       <main className="thresan-inner">
-        <img src="/3phor-logo.png" alt="" className="thresan-sigil" />
-        <h1 className="thresan-wordmark">
-          THRESAN<span className="thresan-tm">™</span>
-        </h1>
-        <p className="thresan-tagline tagline-script">
-          Three worlds. One proof.
-        </p>
+        <SiteHeader role="Universe" />
         <p className="thresan-lead">
           Thresan is a strategy game with a layered universe around
           it. Three stacked boards, five piece types, an ancient

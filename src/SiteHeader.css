@@ -1,0 +1,78 @@
+/* SiteHeader — shared brand masthead for the Thresan family of sites.
+   One gold-on-dark lockup (sigil logo + THRESAN™ wordmark + role tag +
+   canonical script tagline) used by thresan.com/.studio/.io/.games. Values
+   are literal so the header renders correctly atop any site wrapper even if
+   that page's own stylesheet hasn't loaded. Palette matches the umbrella:
+   gold #C2A46B on near-black. */
+
+.site-header {
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto 32px;
+}
+
+/* Sigil logo. Fluid width, intrinsic square aspect locked so it never
+   causes layout shift while loading. */
+.site-header-sigil {
+  display: block;
+  width: clamp(104px, 26vw, 168px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto 22px;
+  filter: drop-shadow(0 12px 48px rgba(194, 164, 107, 0.18));
+}
+
+/* Per-site role tag — the ONLY thing that differs between sites. A quiet
+   uppercase eyebrow sitting above the wordmark: standard masthead hierarchy
+   (label → wordmark → strapline), and it keeps THRESAN™ alone on its line so
+   the wordmark never wraps regardless of how long the role word is. */
+.site-header-role {
+  font-size: clamp(0.72rem, 1.9vw, 0.92rem);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(194, 164, 107, 0.85);
+  margin: 0 0 10px;
+  /* The 0.4em tracking adds a trailing gap; nudge right so it optically
+     centers under/over the wordmark. */
+  text-indent: 0.4em;
+}
+
+.site-header-wordmark {
+  font-size: clamp(2.5rem, 7vw, 4.2rem);
+  letter-spacing: 0.22em;
+  color: #c2a46b;
+  margin: 0 0 14px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+}
+
+/* Trademark superscript — small and raised, no inherited tracking so it
+   hugs the final N rather than floating away. */
+.site-header-tm {
+  font-size: 0.32em;
+  vertical-align: super;
+  letter-spacing: 0;
+  margin-left: 0.15em;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.site-header-tagline {
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+  color: #c2a46b;
+  margin: 0 auto 18px;
+  text-shadow: 0 2px 18px rgba(194, 164, 107, 0.35);
+}
+
+/* Hairline that closes the masthead and separates it from page content. */
+.site-header::after {
+  content: '';
+  display: block;
+  width: clamp(56px, 12vw, 88px);
+  height: 2px;
+  margin: 0 auto;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(194, 164, 107, 0.85), transparent);
+}

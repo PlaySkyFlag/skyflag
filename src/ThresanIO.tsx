@@ -7,6 +7,7 @@
 
 import { useEffect } from 'react';
 import './ThresanIO.css';
+import SiteHeader from './SiteHeader';
 import { applySurfaceMeta } from './socialMeta';
 import KickstarterCTA from './KickstarterCTA';
 import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
@@ -32,14 +33,7 @@ export default function ThresanIO() {
   return (
     <div className="lab">
       <main className="lab-inner">
-        <img src="/3phor-logo.png" alt="" className="lab-sigil" />
-        <p className="lab-eyebrow">The Lab</p>
-        <h1 className="lab-wordmark">
-          THRESAN<span className="lab-suffix">.io</span>
-        </h1>
-        <p className="lab-tagline tagline-script">
-          The math behind the boards.
-        </p>
+        <SiteHeader role="Lab" />
         <p className="lab-lead">
           This is where the engineering lives. Engine notes for
           Thresan (the game), opening theory, and the build journal

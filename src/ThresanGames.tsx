@@ -9,6 +9,7 @@
 
 import { useEffect } from 'react';
 import './ThresanGames.css';
+import SiteHeader from './SiteHeader';
 import { applySurfaceMeta } from './socialMeta';
 
 const SKYFLAG_URL = 'https://www.playskyflag.com/?ref=thresan-games';
@@ -33,14 +34,7 @@ export default function ThresanGames() {
   return (
     <div className="games">
       <main className="games-inner">
-        <img src="/3phor-logo.png" alt="" className="games-sigil" />
-        <p className="games-eyebrow">The Catalog</p>
-        <h1 className="games-wordmark">
-          THRESAN<span className="games-suffix">.games</span>
-        </h1>
-        <p className="games-tagline tagline-script">
-          The editions of Thresan.
-        </p>
+        <SiteHeader role="Editions" />
         <p className="games-lead">
           Thresan is the game, three boards, five piece types, an
           ancient proof of reach. Each edition brings new pieces, new
