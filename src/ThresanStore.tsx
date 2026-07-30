@@ -15,6 +15,8 @@ import { supabase } from './game/supabase';
 import './ThresanStore.css';
 import ConsentCheckbox from './ConsentCheckbox';
 import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
+import { getUtmSource } from './utmSource';
+import { currentPhase, KICKSTARTER_LIVE_URL } from './campaign';
 
 // ─── Configuration ─────────────────────────────────────────────────
 // Fill these in as the campaign reaches each milestone. Empty strings
@@ -26,9 +28,12 @@ import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 // email-only signup, useful if reservations need to be paused.
 const FOUNDERS_RESERVATION_URL = 'https://buy.stripe.com/14A7sFdUCgpzg9R3PNbwk00';
 
-// Paste the live Kickstarter campaign URL here once the campaign
-// launches. Empty = pre-launch (current state).
-const KICKSTARTER_URL = '';
+// Live-campaign URL, now derived from the shared campaign module rather
+// than a constant someone has to remember to flip on launch morning. It
+// resolves to '' until the phase is LIVE and a live URL is known, so the
+// existing `KICKSTARTER_URL ? … : …` checks below keep their meaning.
+const KICKSTARTER_URL =
+  currentPhase() === 'LIVE' ? KICKSTARTER_LIVE_URL : '';
 
 // Kickstarter pre-launch page URL ("Notify me on launch") — now the live
 // link, sourced from the shared kickstarterLink module so every surface
@@ -275,7 +280,7 @@ function Showcase() {
             <strong>Three 6×6 boards</strong>, Terran, Meridian, Empyrean
           </li>
           <li>
-            <strong>Five pieces per side</strong>, Captain, Soldier,
+            <strong>Five playing pieces per side</strong>, Captain, Soldier,
             Promoted Soldier Captain, Rover, Pilot, slate and ivory
             finishes (ten pieces total in the box)
           </li>
@@ -332,7 +337,7 @@ function GameplayVideo() {
         </div>
         <p className="store-video-caption">
           This is Thresan in play, three stacked boards (Ground, Sky,
-          and Space), five pieces a side moving across all three planes
+          and Space), four pieces a side moving across all three planes
           at once, lifting between worlds to set up captures no flat
           board could hold. The digital game is{' '}
           <strong>free to play, always</strong>, at{' '}
@@ -557,6 +562,7 @@ function Waitlist() {
       .insert({
         email: trimmed,
         source: 'thresan-store',
+        utm_source: getUtmSource(),
         consent: true,
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,

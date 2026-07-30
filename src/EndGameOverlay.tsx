@@ -6,6 +6,9 @@ import type { GameState, GameStatus, RoomState } from './game/types';
 import { FACTION_NAME } from './game/factions';
 import { stashReviewSession } from './game/reviewSession';
 import ConsentCheckbox from './ConsentCheckbox';
+import { getUtmSource } from './utmSource';
+import { track } from '@vercel/analytics';
+import { campaignCta, campaignUrl, currentPhase } from './campaign';
 
 // Persists the user's response to the post-game funnel (waitlist signup
 // AND optional testimonial quote). Either is dismissable; once the user
@@ -245,6 +248,16 @@ function PostGameWaitlist({
   const [city, setCity] = useState('');
   const [consent, setConsent] = useState(false);
 
+  // Denominator for post-game conversion. Fires once per mount, only
+  // when the block is actually rendered (a player who already went
+  // through the funnel is 'dismissed' and never counted), so
+  // postgame_follow_click / postgame_email_submit divide by a real
+  // "was shown it" population rather than by games completed.
+  const shown = phase !== 'dismissed';
+  useEffect(() => {
+    if (shown) track('postgame_shown', {});
+  }, [shown]);
+
   if (phase === 'dismissed') return null;
 
   const handleWaitlistSubmit = async (e: FormEvent) => {
@@ -272,6 +285,7 @@ function PostGameWaitlist({
       .insert({
         email: trimmed,
         source: 'skyflag-postgame',
+        utm_source: getUtmSource(),
         consent: true,
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,
@@ -283,6 +297,8 @@ function PostGameWaitlist({
       setErrorMsg("Couldn't save your email. Try again.");
       return;
     }
+    track('waitlist_signup', { source: 'skyflag-postgame', placement: 'postgame' });
+    track('postgame_email_submit', {});
     // Don't mark handled yet — give the quote ask its turn first.
     setPhase('quote-idle');
   };
@@ -431,11 +447,51 @@ function PostGameWaitlist({
   }
 
   // ─── Stage 1 (waitlist idle / submitting / error) ─────────────
+  //
+  // The single highest-intent moment in the whole funnel: someone has
+  // just finished a full game. Follow is PRIMARY (a Kickstarter
+  // follower converts to a backer far better than an email subscriber,
+  // and it costs the visitor one tap with no typing); email is the
+  // secondary ask for people who won't leave the page. Both are above
+  // the fold at 380px. Never rendered mid-game, and dismissing leaves
+  // the rematch button untouched.
+  const phaseNow = currentPhase();
+  const isLive = phaseNow === 'LIVE';
   return (
-    <section className="end-game-waitlist" aria-label="Kickstarter waitlist">
+    <section className="end-game-waitlist" aria-label="Back the Kickstarter">
+      <p className="end-game-waitlist-title">
+        You just played a full game of Thresan.
+      </p>
       <p className="end-game-waitlist-lead">
-        Liked the game? Get the email when the physical edition
-        launches on Kickstarter. One email. That's it.
+        {isLive ? (
+          <>The physical edition is funding on Kickstarter right now.</>
+        ) : (
+          <>
+            That puts you ahead of nearly everyone who will back the
+            physical edition. It launches on Kickstarter on October 27:
+            three stacked boards, a premium physical set, and the graphic
+            novel that started it.
+          </>
+        )}
+      </p>
+
+      <a
+        href={campaignUrl(phaseNow, 'postgame')}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="end-game-btn end-game-waitlist-follow"
+        onClick={() => track('postgame_follow_click', { phase: phaseNow })}
+      >
+        {campaignCta(phaseNow)}
+      </a>
+      <p className="end-game-waitlist-microcopy">
+        {isLive
+          ? 'Campaign closes November 27.'
+          : 'One tap. Free. You get a single notification when we go live.'}
+      </p>
+
+      <p className="end-game-waitlist-or">
+        Or take the launch note by email instead:
       </p>
       <form
         className="end-game-waitlist-form"
@@ -462,12 +518,15 @@ function PostGameWaitlist({
           className="end-game-btn end-game-waitlist-submit"
           disabled={phase === 'waitlist-submitting'}
         >
-          {phase === 'waitlist-submitting' ? 'Joining…' : 'Join'}
+          {phase === 'waitlist-submitting' ? 'Joining…' : 'Send it'}
         </button>
       </form>
       {phase === 'waitlist-error' && (
         <p className="end-game-waitlist-error">{errorMsg}</p>
       )}
+      <p className="end-game-waitlist-microcopy">
+        A handful of notes between now and launch. Nothing else, ever.
+      </p>
       <button
         type="button"
         className="end-game-waitlist-dismiss"

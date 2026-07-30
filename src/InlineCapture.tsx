@@ -15,6 +15,7 @@ import { useState, type FormEvent } from 'react';
 import { track } from '@vercel/analytics';
 import { supabase } from './game/supabase';
 import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
+import { getUtmSource } from './utmSource';
 
 const GOLD = '#c2a46b';
 const AMBER = '#e8a23c';
@@ -55,6 +56,7 @@ export default function InlineCapture({
       .insert({
         email: trimmed,
         source,
+        utm_source: getUtmSource(),
         interests: ['backing'],
         consent: true,
         referrer: document.referrer || null,

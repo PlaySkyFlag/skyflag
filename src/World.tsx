@@ -251,7 +251,7 @@ export default function World() {
           <h2 className="world-section-title">The four Aetheri templates</h2>
           <p className="world-section-lead">
             The Aetheri left four training-and-augmentation protocols,             shared by both clans, named for the Aetheri who authored them.
-            They are the game’s five pieces. The way each one moves on the
+            They are the game’s four pieces. The way each one moves on the
             board is the way its augmentation worked in the world.
           </p>
           <div className="world-templates">
@@ -280,7 +280,8 @@ export default function World() {
             ))}
           </div>
           <p className="world-note">
-            Five pieces a side, not four: the Soldier promotes. A{' '}
+            Four pieces a side, and a fifth that has to be earned: the
+            Soldier promotes. A{' '}
             <strong>Durren</strong> who crosses the full Terran depth under
             live opposition wakes the latent Dantec implant and becomes a{' '}
             <strong>Captain</strong>: a lawful claimant, able to capture

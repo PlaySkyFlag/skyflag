@@ -15,6 +15,8 @@ import './Kickstarter.css';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
 import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
+import { getUtmSource } from './utmSource';
+import { LAUNCH_TS } from './campaign';
 
 const READER_URL = 'https://thresan.studio/volume-zero';
 const WORLD_URL = 'https://thresan.com/world';
@@ -28,8 +30,8 @@ const INTERESTS = [
 
 // Live launch countdown. Scarcity/urgency lifts pre-launch signups as the
 // date nears. Targets ~9am PDT on launch day; flips to a live-now message
-// once the campaign opens.
-const LAUNCH_TS = new Date('2026-10-27T16:00:00Z').getTime();
+// once the campaign opens. Date now comes from the shared campaign module
+// so the countdown and every CTA can't drift apart (see src/campaign.ts).
 
 function Countdown() {
   const [now, setNow] = useState(() => Date.now());
@@ -98,13 +100,11 @@ export default function Kickstarter() {
     setStatus('submitting');
     setError('');
     // Capture the social platform from the UTM link so signups attribute by
-    // source in the CRM. Keep `source` = 'thresan-kickstarter' (the Kit
-    // tag-sync keys off it); the platform rides in its own column.
-    const utm = new URLSearchParams(window.location.search)
-      .get('utm_source');
-    const utmSource = utm
-      ? utm.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 40)
-      : null;
+    // source in the CRM. Keep `source` = 'thresan-kickstarter' (the tag-sync
+    // keys off it); the platform rides in its own column. Now read via the
+    // shared latch so a visitor who arrived tagged on another page and
+    // navigated here still attributes — see src/utmSource.ts.
+    const utmSource = getUtmSource();
     const { error: insertError } = await supabase
       .from('thresan_waitlist')
       .insert({

@@ -134,26 +134,52 @@
   box-shadow: 0 8px 28px rgba(194, 164, 107, 0.35);
 }
 
+/* Supporting copy under the single primary CTA. */
+.thresan-cta-microcopy {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: rgba(245, 247, 251, 0.6);
+}
+
+.thresan-cta-secondary {
+  margin: 18px 0 0;
+  font-size: 0.95rem;
+  color: rgba(245, 247, 251, 0.75);
+}
+
+.thresan-cta-secondary a {
+  color: #C2A46B;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.thresan-cta-secondary a:hover {
+  text-decoration: underline;
+}
+
+/* Demoted from a stack of five equal-weight CTAs to a quiet inline nav
+   row, so the section links stay reachable without competing with the
+   single Follow ask above. */
 .thresan-secondary {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 12px;
-  margin: 28px 0 0;
+  gap: 8px 20px;
+  margin: 34px 0 0;
 }
 
 .thresan-link {
-  color: #C2A46B;
+  color: rgba(245, 247, 251, 0.55);
   text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 500;
+  font-size: 0.85rem;
   letter-spacing: 0.02em;
-  opacity: 0.88;
-  transition: opacity 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .thresan-link:hover {
-  opacity: 1;
+  color: #C2A46B;
 }
 
 .thresan-fineprint {

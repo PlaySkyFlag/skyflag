@@ -33,6 +33,14 @@ jobs:
       - name: Render invariants (source check — piece glyphs forced to text, not emoji)
         run: node scripts/check-render-invariants.mjs
 
+      # Marketing/attribution guards. Catches the regressions that have
+      # actually bitten: "five pieces a side" copy creeping back in, a new
+      # capture point that forgets utm_source (which blacked out social
+      # attribution for months), and a second hardcoded launch date.
+      # Dependency-free, so it runs here without npm ci.
+      - name: Funnel invariants (piece-count copy, utm_source, ref tags, launch date)
+        run: node scripts/check-funnel-invariants.mjs
+
       - name: Wait for deploy (push only)
         if: github.event_name == 'push'
         run: sleep 120

@@ -12,6 +12,7 @@ import './VolumeZeroLanding.css';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
 import VolumeZeroReader from './VolumeZeroReader';
+import { getUtmSource } from './utmSource';
 import {
   VOLUME_ZERO,
   VOLUME_ZERO_COVER,
@@ -185,6 +186,7 @@ function KickstarterSignup() {
       .insert({
         email: trimmed,
         source: 'thresan-volume-zero-kickstarter',
+        utm_source: getUtmSource(),
         consent: true,
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,

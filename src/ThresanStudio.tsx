@@ -16,6 +16,7 @@ import './ThresanStudio.css';
 import SiteHeader from './SiteHeader';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
+import { getUtmSource } from './utmSource';
 import {
   VOLUME_ZERO,
   VOLUME_ZERO_PAGES,
@@ -51,9 +52,11 @@ const CLANS = [
   },
 ];
 
-// Five pieces a side (Captain, Soldier, Promoted Soldier Captain,
-// Rover, Pilot), canonical per rulebook v20. The Soldier promotes, so
-// Durren is two of the five: Soldier Durren, then Captain Durren.
+// Four pieces deploy from hand (Captain, Soldier, Rover, Pilot), per
+// rulebook v22 §3 "The Four Pieces". The Soldier promotes at the far
+// row into a second Captain — the fifth piece, and the only one that
+// has to be earned. So Durren is two of the roster: Soldier Durren,
+// then Captain Durren. Never say a side "commands five".
 const PIECES = [
   {
     name: 'Captain Dantec',
@@ -65,7 +68,7 @@ const PIECES = [
   },
   {
     name: 'Captain Durren',
-    line: 'The Promoted Soldier Captain, the swap-in Durren becomes on promotion. The fifth piece, and why a side counts five.',
+    line: 'The Promoted Soldier Captain, the swap-in Durren becomes on promotion. The fifth piece, and the only one a side has to earn.',
   },
   {
     name: 'Rover Thandiwe',
@@ -171,8 +174,9 @@ export default function ThresanStudio() {
 
           <h2 className="studio-section-title">The pieces</h2>
           <p className="studio-section-note">
-            Five pieces a side, the Soldier promotes, so Durren is two
-            of them: Soldier Durren, then Captain Durren.
+            Four pieces a side, and a fifth earned in play: the Soldier
+            promotes, so Durren is two of them: Soldier Durren, then
+            Captain Durren.
           </p>
           <ul className="studio-profiles">
             {PIECES.map((p) => (
@@ -250,7 +254,7 @@ export default function ThresanStudio() {
           </div>
           <p className="studio-section-note">
             This is Thresan in play, three stacked boards (Ground, Sky,
-            and Space), five pieces a side moving across all three planes
+            and Space), four pieces a side moving across all three planes
             at once, lifting between worlds to set up captures no flat
             board could hold. The digital game is{' '}
             <strong>free to play, always</strong>, at{' '}
@@ -344,6 +348,7 @@ function KickstarterList() {
       .insert({
         email: trimmed,
         source: 'thresan-studio-kickstarter',
+        utm_source: getUtmSource(),
         consent: true,
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,
@@ -447,6 +452,7 @@ function ChapterOneGate() {
       .insert({
         email: trimmed,
         source: 'thresan-studio-chapter1',
+        utm_source: getUtmSource(),
         consent: true,
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,

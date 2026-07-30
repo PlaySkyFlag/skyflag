@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core'
 import './index.css'
 import ErrorBoundary from './ErrorBoundary.tsx'
 import { migrateLocalStorage } from './game/migrate.ts'
+import { captureUtmSource } from './utmSource.ts'
 
 // Stale-deploy auto-recovery for route chunks. When Vercel redeploys
 // while a user has a tab open, the next route-navigation tries to
@@ -85,6 +86,11 @@ const Watch = lazyWithRetry(() => import('./Watch.tsx'))
 // Run the one-shot rebrand storage migration before anything else reads
 // from localStorage. Idempotent — safe to call on every boot.
 migrateLocalStorage();
+
+// Latch ?utm_source before routing. Navigation here is a hard page load,
+// so the tag must be stored on the landing hit or it's lost to every
+// capture form downstream. See src/utmSource.ts.
+captureUtmSource();
 
 // Path-based routing without react-router. One-time check at mount —
 // hard navigation between pages (full page load) keeps the bundle

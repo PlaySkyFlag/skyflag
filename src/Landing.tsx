@@ -150,8 +150,14 @@ function Hero() {
         />
         <h1 className="landing-hero-title">Thresan™: Skyflag</h1>
         <p className="landing-hero-tagline tagline-script">Three worlds. One proof.</p>
+        {/* Plain-language subhead. The wordmark and tagline are the
+            brand, but a first-time visitor arriving cold from r/chess
+            cannot tell what the game IS from them. One sentence,
+            concrete, before any of the lore. */}
         <p className="landing-hero-subtitle">
-          Where strategists gather. Three boards. Four Lifts.
+          A two-player strategy game played up, not just across. Three
+          stacked boards, 108 squares, four Lifts. No dice, no cards,
+          no luck.
         </p>
         {/* Numeric hero strip, leans on the three-board hook the
             rest of the design is built around. Pure typography, no
@@ -177,8 +183,9 @@ function Hero() {
           </a>
         </div>
         <p className="landing-hero-fineprint">
-          No account required to start. Solo vs AI, 2P hot-seat, and online
-          multiplayer all work in the browser.
+          Learn in one game. 5 to 30 minutes. No account required to
+          start. Solo vs AI, 2P hot-seat, and online multiplayer all
+          work in the browser.
         </p>
         <figure className="landing-hero-render">
           <img
@@ -312,7 +319,7 @@ function HowItWorksSection() {
         <h2 className="landing-section-title">How a game flows</h2>
         <ol className="landing-howto-list">
           <li>
-            <strong>Deploy.</strong> Each clan starts with five pieces in
+            <strong>Deploy.</strong> Each clan starts with four pieces in
             hand and one fixed deploy square on the Meridian — the middle
             layer, one lift from Terran below or Empyrean above. Bring them
             onto the board, one activation at a time.

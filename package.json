@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "smoke": "node scripts/smoke-routes.mjs",
     "check:render": "node scripts/check-render-invariants.mjs",
+    "check:funnel": "node scripts/check-funnel-invariants.mjs",
+    "check": "npm run check:render && npm run check:funnel",
     "analyze": "tsx ai-research/analyze.ts",
     "selfplay": "tsx scripts/selfplay.ts",
     "selfplay:shards": "tsx scripts/selfplay-shards.ts",

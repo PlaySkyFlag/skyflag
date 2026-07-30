@@ -3154,11 +3154,52 @@ button.tray-piece:hover {
   text-align: center;
 }
 
+/* Post-game conversion block. Follow is primary (a tap, no typing);
+   email is the secondary ask. Kept tight so both are reachable without
+   scrolling on a 380px viewport. */
+.end-game-waitlist-title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #f5f7fb;
+}
+
 .end-game-waitlist-lead {
   margin: 0 0 12px;
   font-size: 0.88rem;
   line-height: 1.5;
   color: rgba(245, 247, 251, 0.78);
+}
+
+/* The primary ask. Gold fill so it clearly outranks the email submit,
+   which stays the quieter outline button. */
+.end-game-waitlist-follow {
+  display: inline-block;
+  padding: 11px 24px;
+  border-radius: 8px;
+  background: #c2a46b;
+  color: #0b0e13;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.end-game-waitlist-follow:hover {
+  background: #d4b87f;
+}
+
+.end-game-waitlist-microcopy {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(245, 247, 251, 0.6);
+}
+
+.end-game-waitlist-or {
+  margin: 14px 0 8px;
+  font-size: 0.84rem;
+  color: rgba(245, 247, 251, 0.7);
 }
 
 .end-game-waitlist-form {
