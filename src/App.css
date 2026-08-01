@@ -3214,6 +3214,58 @@ button.tray-piece:hover {
   .end-game-waitlist-form {
     flex-direction: row;
     flex-wrap: wrap;
+    /* The consent label is a full-width flex item, so the submit wraps
+       onto its own line. Without this it sat hard left under a centred
+       block, reading like a layout bug on the most important CTA on the
+       site. */
+    justify-content: center;
+  }
+}
+
+/* Phone tightening. Measured on the live post-game overlay at 380px:
+   the game-result header (winner, tagline, Play again / Review / View
+   board) occupies ~344px before this block even starts, which pushed
+   the email submit below the fold. This reclaims ~70px so the Follow
+   ask and the email field both clear it. The result header is the
+   game's own UI and is deliberately left alone. */
+@media (max-width: 480px) {
+  .end-game-waitlist {
+    padding: 10px 12px 8px;
+  }
+
+  .end-game-waitlist-title {
+    font-size: 0.95rem;
+    margin: 0 0 4px;
+  }
+
+  .end-game-waitlist-lead {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    margin: 0 0 10px;
+  }
+
+  .end-game-waitlist-follow {
+    padding: 10px 20px;
+  }
+
+  .end-game-waitlist-microcopy {
+    margin: 6px 0 0;
+    font-size: 0.74rem;
+    line-height: 1.35;
+  }
+
+  .end-game-waitlist-or {
+    margin: 10px 0 6px;
+    font-size: 0.8rem;
+  }
+
+  .end-game-waitlist-form {
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .end-game-waitlist-dismiss {
+    margin-top: 6px;
   }
 }
 

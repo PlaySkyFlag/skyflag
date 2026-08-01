@@ -467,10 +467,8 @@ function PostGameWaitlist({
           <>The physical edition is funding on Kickstarter right now.</>
         ) : (
           <>
-            That puts you ahead of nearly everyone who will back the
-            physical edition. It launches on Kickstarter on October 27:
-            three stacked boards, a premium physical set, and the graphic
-            novel that started it.
+            That puts you ahead of nearly everyone who will back it. The
+            physical edition launches on Kickstarter, October 27.
           </>
         )}
       </p>
@@ -487,7 +485,7 @@ function PostGameWaitlist({
       <p className="end-game-waitlist-microcopy">
         {isLive
           ? 'Campaign closes November 27.'
-          : 'One tap. Free. You get a single notification when we go live.'}
+          : 'One tap, free. One notification on launch day.'}
       </p>
 
       <p className="end-game-waitlist-or">
