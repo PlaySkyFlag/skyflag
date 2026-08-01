@@ -683,7 +683,14 @@
   position: relative;
   width: 100%;
   max-width: 920px;
-  margin: 0 auto;
+  /* Top margin reserves room for .board-stack-label, which is absolutely
+     positioned at `bottom: 100%` and therefore renders OUTSIDE this box —
+     the stack itself reserves no height for it. Without this the labels
+     ("Space / Empyrean" etc.) ran ~15px into the opponent's hand tray
+     sitting above them. Margin rather than padding on purpose: the
+     .layer-flow overlay is an absolutely-positioned child, so padding
+     would shift the boards down while leaving the lift arrows behind. */
+  margin: 30px auto 0;
   /* Horizontal row: Space (left) · Sky (center, entry hub) · Ground (right).
      Pieces now enter on the Sky board, so it sits in the middle with the
      other two layers flanking it — lifts travel left to Space and right to
@@ -713,7 +720,11 @@
 @media (orientation: portrait) {
   .board-stack {
     flex-direction: column;
-    gap: 28px;
+    /* Each stacked board carries its label above itself at `bottom: 100%`,
+       a ~35px footprint (29px of text + 6px margin). At the old 28px gap
+       the Sky and Ground labels overlapped the board above them by 7px.
+       44px clears the label with a little air left over. */
+    gap: 44px;
     max-width: 380px;
   }
   .board-stack-item {
