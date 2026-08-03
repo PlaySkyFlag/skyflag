@@ -95,15 +95,21 @@ export type CampaignSurface =
   | 'umbrella'
   | 'inline';
 
+// Generated in the Kickstarter dashboard 2026-08-03. NOTE: Kickstarter
+// does NOT use the label you type — it mints its own opaque 6-character
+// tag and that is what its analytics count. The label is only a
+// human-readable name in the dashboard, so the mapping below is the
+// label we chose -> the tag KS actually issued. Don't "tidy" these into
+// readable strings; they would stop matching.
 export const KICKSTARTER_REF_TAGS: Partial<Record<CampaignSurface, string>> = {
-  // postgame:          '',
-  // 'kickstarter-page':'',
-  // store:             '',
-  // studio:            '',
-  // 'volume-zero':     '',
-  // io:                '',
-  // umbrella:          '',
-  // inline:            '',
+  postgame: 'jmx8kf', //          label: game_postgame
+  'kickstarter-page': '1dbtqx', // label: site_kickstarter
+  umbrella: '6uzexc', //          label: site_umbrella
+  store: 'a8bsfx', //             label: site_store
+  studio: 'dqr5ne', //            label: site_studio
+  'volume-zero': 'x8q1ec', //     label: site_comic
+  io: '376snn', //                label: site_lab
+  inline: 'bzbs9c', //            label: site_inline
 };
 
 // Only [a-z0-9_-], so nothing we emit can break the outbound URL.
