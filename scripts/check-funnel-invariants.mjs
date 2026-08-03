@@ -15,6 +15,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const fail = [];
+const notices = [];
 const srcFiles = readdirSync('src')
   .filter((f) => f.endsWith('.tsx') || f.endsWith('.ts'))
   .map((f) => join('src', f));
@@ -99,9 +100,17 @@ for (const file of srcFiles) {
   }
 }
 
-// ── Invariant 3: Kickstarter ref tags are URL-safe ────────────────────
-// Tags are pasted in by hand from the Kickstarter dashboard. A stray
-// space, '&' or '?' would corrupt the outbound campaign URL.
+// ── Invariant 3: Kickstarter ref tags are KS-MINTED, not readable ─────
+// Kickstarter ignores the label you type and mints its own opaque
+// alphanumeric tag; that minted value is the ONLY thing its analytics
+// count. So a well-meaning cleanup that rewrites 'jmx8kf' to the
+// readable 'game_postgame' keeps every link working and silently stops
+// every click being attributed — invisible until you check the KS
+// dashboard weeks later and find zeroes.
+//
+// The old URL-safety check (/^[a-z0-9_-]{1,40}$/) happily PASSED
+// 'game_postgame', so it could not catch that. Minted tags contain no
+// underscores or hyphens, which is what distinguishes them.
 {
   const campaign = read('src/campaign.ts');
   const block = campaign.match(
@@ -113,13 +122,35 @@ for (const file of srcFiles) {
         'guard can no longer verify it. Update this check if it was renamed.',
     );
   } else {
+    const mapped = new Set();
     for (const [, key, val] of block[1].matchAll(
       /^\s*'?([a-z-]+)'?\s*:\s*'([^']*)'/gm,
     )) {
-      if (!/^[a-z0-9_-]{1,40}$/.test(val)) {
+      mapped.add(key);
+      if (!/^[a-z0-9]{4,12}$/.test(val)) {
         fail.push(
-          `src/campaign.ts — ref tag ${key}='${val}' is not URL-safe.\n` +
-            `    Must match /^[a-z0-9_-]{1,40}$/ or it will corrupt the outbound URL.`,
+          `src/campaign.ts — ref tag ${key}='${val}' is not a Kickstarter-minted tag.\n` +
+            `    Expected an opaque alphanumeric value like 'jmx8kf' (/^[a-z0-9]{4,12}$/).\n` +
+            `    Underscores/hyphens mean someone substituted the human LABEL for the\n` +
+            `    minted tag — links keep working, attribution silently stops. Copy the\n` +
+            `    value from the KS dashboard's "Custom tag" column, not the label column.`,
+        );
+      }
+    }
+
+    // Non-fatal: a declared surface with no tag emits an untagged (but
+    // working) link, so this reports rather than blocks — a new surface
+    // legitimately has no tag until someone generates one on Kickstarter.
+    const union = campaign.match(/export type CampaignSurface\s*=([\s\S]*?);/);
+    if (union) {
+      const surfaces = [...union[1].matchAll(/'([a-z-]+)'/g)].map((m) => m[1]);
+      const missing = surfaces.filter((s) => !mapped.has(s));
+      if (missing.length) {
+        notices.push(
+          `${missing.length} campaign surface(s) have no Kickstarter ref tag and will ` +
+            `emit untagged links: ${missing.join(', ')}.\n` +
+            `    Generate them at KS → Promotion → Custom referral tags, then map the ` +
+            `minted value in src/campaign.ts.`,
         );
       }
     }
@@ -181,6 +212,7 @@ for (const file of srcFiles) {
 }
 
 // ── Report ───────────────────────────────────────────────────────────
+for (const n of notices) console.warn('  ! ' + n + '\n');
 if (fail.length) {
   console.error('✗ funnel invariants FAILED\n');
   for (const f of fail) console.error('  • ' + f + '\n');
