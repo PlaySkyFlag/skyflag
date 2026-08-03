@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
+import { track } from '@vercel/analytics';
 import { Capacitor } from '@capacitor/core';
 import Board, { type BoardTheme, type DeployCell, type Marker } from './Board';
 import EndGameOverlay from './EndGameOverlay';
@@ -461,6 +462,18 @@ export default function App() {
     const curr = state.status.kind;
     prevStatusKind.current = curr;
     if (prev === 'in-progress' && (curr === 'won' || curr === 'draw')) {
+      // Funnel numerator. Fired for EVERY completion, including hot-seat,
+      // and deliberately outside the `mode && mySide` guard below — that
+      // guard is for the stats row, which skips hot-seat because both
+      // sides are the same human. It is also independent of the post-game
+      // capture block, which is suppressed by a once-ever localStorage
+      // latch; if this were tied to that, returning players would silently
+      // vanish from the denominator.
+      track('game_completed', {
+        mode: room ? 'online' : aiPlayer ? 'solo-ai' : 'hotseat',
+        reason: state.status.reason,
+        turns: state.turnNumber,
+      });
       // Determine the player's "side" for stats: 1P uses the non-AI side,
       // online MP uses the room role. 2P hot-seat isn't tracked because
       // both sides are the same human.
@@ -682,6 +695,33 @@ export default function App() {
   useEffect(() => {
     if (state.status.kind === 'won') sounds.win();
   }, [state.status.kind]);
+
+  // Funnel denominator: a game_started is the player's FIRST ACTIVATION,
+  // not a page load or a board being dealt. Someone who opens /play and
+  // never touches a piece hasn't started a game, and counting them would
+  // conflate "no traffic" with "traffic that bounces before playing" —
+  // the exact distinction completion rate exists to make.
+  //
+  // Pairs with game_completed below, so
+  //   completion rate = game_completed / game_started
+  // reads as "of the people who actually made a move, how many finished".
+  // Guarded by a ref keyed on the game being fresh, so a re-render or a
+  // remote-sync replacement can't double-count. Resets when history
+  // returns to 0, which is what 'new-game' produces.
+  const startedFired = useRef(false);
+  useEffect(() => {
+    const moves = state.history.length;
+    if (moves === 0) {
+      startedFired.current = false;
+      return;
+    }
+    if (!startedFired.current) {
+      startedFired.current = true;
+      track('game_started', {
+        mode: room ? 'online' : aiPlayer ? 'solo-ai' : 'hotseat',
+      });
+    }
+  }, [state.history.length, room, aiPlayer]);
 
   // Drop any stale hint as soon as the player acts (history advances) or
   // a new game starts. Otherwise the gold arrow would linger over the

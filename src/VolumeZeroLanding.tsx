@@ -13,6 +13,7 @@ import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
 import VolumeZeroReader from './VolumeZeroReader';
 import { getUtmSource } from './utmSource';
+import { track } from '@vercel/analytics';
 import {
   VOLUME_ZERO,
   VOLUME_ZERO_COVER,
@@ -75,7 +76,8 @@ export default function VolumeZeroLanding() {
             >
               Read on GlobalComix
             </a>
-            <a href={GAME_URL} className="vzl-btn">
+            <a href={GAME_URL}
+            onClick={() => track('volume_zero_to_play', {})} className="vzl-btn">
               Play Skyflag
             </a>
             <a href="#kickstarter" className="vzl-btn">
@@ -118,7 +120,8 @@ export default function VolumeZeroLanding() {
         {/* Conversion: play the game now. */}
         <section className="vzl-play">
           <h2 className="vzl-h2">The world is a game you can play right now</h2>
-          <a href={GAME_URL} className="vzl-btn vzl-btn--primary">
+          <a href={GAME_URL}
+            onClick={() => track('volume_zero_to_play', {})} className="vzl-btn vzl-btn--primary">
             Play Skyflag at playskyflag.com →
           </a>
         </section>
@@ -139,7 +142,8 @@ export default function VolumeZeroLanding() {
           </p>
           <p className="vzl-copyright">{VOLUME_ZERO_COPYRIGHT}</p>
           <p className="vzl-fineprint">
-            <a href={GAME_URL}>Play Skyflag</a> ·{' '}
+            <a href={GAME_URL}
+            onClick={() => track('volume_zero_to_play', {})}>Play Skyflag</a> ·{' '}
             <a href="https://playskyflag.com/privacy">Privacy</a> ·{' '}
             <a href="https://playskyflag.com/terms">Terms</a> ·{' '}
             <a href="https://playskyflag.com/ai-use">AI use</a>
@@ -196,6 +200,7 @@ function KickstarterSignup() {
       setError("Couldn't save your email. Please try again.");
       return;
     }
+    track('volume_zero_submit', {});
     setStatus('success');
   };
 
