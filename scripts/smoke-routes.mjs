@@ -115,7 +115,15 @@ async function checkCapture() {
   const res = await fetch(`${url}/rest/v1/thresan_waitlist`, {
     method: 'POST',
     headers: { apikey: anon, Authorization: `Bearer ${anon}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-    body: JSON.stringify({ email, source: 'healthcheck', consent: true }),
+    // consent:false ON PURPOSE — do not "fix" this to true.
+    // Migration 030 gates the MailerLite sync on `consent IS TRUE`, so a
+    // consent-false row exercises the whole at-risk path (anon INSERT +
+    // RLS + the utm_source column) and stops dead before the ESP. With
+    // consent:true this monitor would push a subscriber into MailerLite
+    // and fire a welcome email EVERY 15 MINUTES on the cron schedule —
+    // ~96/day, which exhausts the 1,000-subscriber free tier in about ten
+    // days and buries real signups in canary noise.
+    body: JSON.stringify({ email, source: 'healthcheck', utm_source: 'healthcheck', consent: false }),
   });
   const ok = res.status === 201 || res.status === 204;
   let cleaned = 'left (no service key)';
