@@ -31,9 +31,10 @@ export type CampaignPhase = 'PRELAUNCH' | 'LIVE' | 'ENDED' | 'EVERGREEN';
 // Launch and close instants in UTC, or null while no date is set. The
 // `as` keeps the declared type `number | null` inside this module too, so
 // the null checks below stay meaningful once a date is filled in.
-// 09:00 PDT on 27 Oct 2027; the campaign closes 09:00 PST one month later.
+// 09:00 PDT on 27 Oct 2027; the 28-day campaign (the Kickstarter page's
+// duration) closes 09:00 PST on 24 Nov 2027.
 export const LAUNCH_TS = Date.parse('2027-10-27T16:00:00Z') as number | null;
-export const END_TS = Date.parse('2027-11-27T17:00:00Z') as number | null;
+export const END_TS = Date.parse('2027-11-24T17:00:00Z') as number | null;
 
 // Human-readable launch timing for copy. One place to change it.
 export const LAUNCH_LABEL = 'October 27, 2027';
