@@ -16,7 +16,7 @@ import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
 import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 import { getUtmSource } from './utmSource';
-import { LAUNCH_TS } from './campaign';
+import { LAUNCH_LABEL, LAUNCH_TS } from './campaign';
 
 const READER_URL = 'https://thresan.studio/volume-zero';
 const WORLD_URL = 'https://thresan.com/world';
@@ -28,27 +28,36 @@ const INTERESTS = [
   { id: 'novel', label: 'The Thresan graphic novel' },
 ];
 
-// Live launch countdown. Scarcity/urgency lifts pre-launch signups as the
-// date nears. Targets ~9am PDT on launch day; flips to a live-now message
-// once the campaign opens. Date now comes from the shared campaign module
-// so the countdown and every CTA can't drift apart (see src/campaign.ts).
+// Launch timing line. While no launch date is set (LAUNCH_TS is null) it
+// shows a calm "coming in 2027" line and no countdown, so the page never
+// shows a date that is not real. Once a date is set in src/campaign.ts it
+// counts down to it, then flips to a live-now message. Both read the shared
+// campaign module so this line and every CTA cannot drift apart.
 
 function Countdown() {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
+    if (LAUNCH_TS === null) return;
     const id = setInterval(() => setNow(Date.now()), 60_000);
     return () => clearInterval(id);
   }, []);
+  if (LAUNCH_TS === null) {
+    return (
+      <p className="ks-countdown">
+        Coming to Kickstarter in {LAUNCH_LABEL}. Join the waitlist to be first
+        to know.
+      </p>
+    );
+  }
   const ms = LAUNCH_TS - now;
   if (ms <= 0) {
-    return <p className="ks-countdown ks-countdown-live">🚀 We're live on Kickstarter — back it now</p>;
+    return <p className="ks-countdown ks-countdown-live">We're live on Kickstarter. Back it now.</p>;
   }
   const days = Math.floor(ms / 86_400_000);
   const hours = Math.floor((ms % 86_400_000) / 3_600_000);
   return (
     <p className="ks-countdown">
       <strong>{days}</strong> {days === 1 ? 'day' : 'days'} · {hours}h until launch
-      <span className="ks-countdown-date"> — October 27, 2026</span>
     </p>
   );
 }
@@ -66,7 +75,7 @@ export default function Kickstarter() {
     return applySurfaceMeta({
       title: 'Thresan: Skyflag, coming to Kickstarter',
       description:
-        'A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Be first to know when Thresan: Skyflag launches on Kickstarter on October 27, 2026, and claim early-backer pricing.',
+        `A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Thresan: Skyflag comes to Kickstarter in ${LAUNCH_LABEL}. Join the waitlist to be first to know and claim early-backer pricing.`,
       canonicalUrl: 'https://thresan.com/kickstarter',
       ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
       ogImageAlt:
@@ -131,7 +140,7 @@ export default function Kickstarter() {
       <main className="ks-inner">
         {/* ── Hero ─────────────────────────────────────────────── */}
         <header className="ks-hero">
-          <p className="ks-eyebrow">Coming to Kickstarter · October 27, 2026</p>
+          <p className="ks-eyebrow">Coming to Kickstarter · {LAUNCH_LABEL}</p>
           <Countdown />
           <h1 className="ks-headline">
             Three layers. One Nexus.
@@ -152,7 +161,7 @@ export default function Kickstarter() {
           />
           <div className="ks-hero-ctas">
             <a href="#notify" className="ks-hero-cta">
-              Get the launch email ↓
+              Join the waitlist ↓
             </a>
             <a
               href={KICKSTARTER_PRELAUNCH_URL}

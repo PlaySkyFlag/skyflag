@@ -175,22 +175,53 @@ for (const file of srcFiles) {
   });
 }
 
-// ── Invariant 5: one launch date, and it is Oct 27 2026 ──────────────
-// There was a real Oct 20 vs Oct 27 split across site copy and the CRM.
-// The countdown, the store CTA and every phase boundary now derive from
-// campaign.ts, so a second hardcoded launch date means something has
-// drifted back out of the shared module.
+// ── Invariant 5: the launch date is unset (or 2027), and no stale date ─
+// The Kickstarter did not launch on 27 Oct 2026; it was postponed to 2027
+// with no exact date (owner decision, 8 Nov 2026). Until a date is fixed,
+// LAUNCH_TS in campaign.ts must stay null so the phase is PRELAUNCH and
+// copy says "2027" via LAUNCH_LABEL. A 2027 Date.parse is also accepted so
+// setting the real date later does not trip this guard.
+// Earlier history: there was a real Oct 20 vs Oct 27 split across site
+// copy and the CRM, so the Oct 20 ghost check stays.
 {
   const campaign = read('src/campaign.ts');
-  if (!/LAUNCH_TS\s*=\s*Date\.parse\('2026-10-27T16:00:00Z'\)/.test(campaign)) {
+  const launchOk =
+    /export const LAUNCH_TS\s*(?::[^=]+)?=\s*null\b/.test(campaign) ||
+    /export const LAUNCH_TS\s*(?::[^=]+)?=\s*Date\.parse\('2027-/.test(campaign);
+  if (!launchOk) {
     fail.push(
-      "src/campaign.ts — LAUNCH_TS is not 2026-10-27T16:00:00Z. That date is " +
-        'canonical (resolved 2026-06-04); change it only deliberately.',
+      'src/campaign.ts — LAUNCH_TS is neither null nor a 2027 date. The ' +
+        'campaign was postponed to 2027 (decided 2026-11-08); keep it null ' +
+        'until the real date is set.',
     );
+  }
+  // Stale launch dates in shipped source and copy. Not comment-skipped
+  // for index.html (markup has no // comments); .ts/.tsx skip comments so
+  // the history above can be documented.
+  const STALE_DATE = /October\s+27,?\s+2026|Oct\.?\s+27\b|November\s+27\b|2026-10-27/;
+  const apiFiles = (() => {
+    try {
+      return readdirSync('api')
+        .filter((f) => f.endsWith('.ts') || f.endsWith('.tsx') || f.endsWith('.js'))
+        .map((f) => join('api', f));
+    } catch {
+      return [];
+    }
+  })();
+  for (const file of [...srcFiles, ...apiFiles, 'index.html']) {
+    scanLines(file, (line, n) => {
+      if (STALE_DATE.test(line)) {
+        fail.push(
+          `${file}:${n} — stale launch date (the 27 Oct 2026 launch was ` +
+            `postponed to 2027): "${line.trim().slice(0, 70)}"\n    ` +
+            `Use LAUNCH_LABEL from src/campaign.ts instead.`,
+        );
+      }
+    });
   }
   for (const file of srcFiles.filter((f) => f !== 'src/campaign.ts')) {
     scanLines(file, (line, n) => {
-      if (/2026-10-2\d|new Date\('2026-10-/.test(line)) {
+      if (/new Date\('202[67]-|Date\.parse\('202[67]-/.test(line)) {
         fail.push(
           `${file}:${n} — hardcoded launch date outside campaign.ts: ` +
             `"${line.trim().slice(0, 70)}"\n    Import LAUNCH_TS from './campaign' instead.`,
@@ -203,8 +234,8 @@ for (const file of srcFiles) {
     scanLines(file, (line, n) => {
       if (/October\s+20\b|Oct\.?\s+20\b|2026-10-20/.test(line)) {
         fail.push(
-          `${file}:${n} — launch date says October 20. Canonical is ` +
-            `October 27, 2026: "${line.trim().slice(0, 70)}"`,
+          `${file}:${n} — launch date says October 20. That date was never ` +
+            `right; the launch is postponed to 2027: "${line.trim().slice(0, 70)}"`,
         );
       }
     });
@@ -221,5 +252,5 @@ if (fail.length) {
 console.log(
   '✓ funnel invariants OK — piece-count copy clean, every thresan_waitlist ' +
     'insert records utm_source, ref tags URL-safe, no Next-style env access, ' +
-    'single canonical launch date.',
+    'launch date unset or 2027, no stale Oct 27 / Nov 27 2026 dates.',
 );

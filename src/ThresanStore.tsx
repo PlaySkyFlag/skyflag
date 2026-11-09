@@ -342,8 +342,8 @@ function GameplayVideo() {
           board could hold. The digital game is{' '}
           <strong>free to play, always</strong>, at{' '}
           <a href="https://thresan.com">thresan.com</a>. The premium
-          physical edition launches on <strong>Kickstarter on October 27, 2026</strong>.{' '}
-          <a href="#waitlist">Sign up now</a> to get the launch email.
+          physical edition comes to <strong>Kickstarter in 2027</strong>.{' '}
+          <a href="#waitlist">Sign up now</a> to hear before it goes live.
         </p>
         <div className="store-video-cta">
           <a href={GAME_URL} className="store-cta-button store-cta-ghost">
@@ -417,7 +417,7 @@ function Tiers() {
               className={`store-tier${tier.live ? ' store-tier--live' : ''}`}
             >
               <div className="store-tier-flags">
-                {tier.live && <span className="store-tier-flag store-tier-flag--live">Live now</span>}
+                {tier.live && currentPhase() === 'LIVE' && <span className="store-tier-flag store-tier-flag--live">Live now</span>}
                 {tier.limited && (
                   <span className="store-tier-flag store-tier-flag--limited">Limited</span>
                 )}
@@ -657,7 +657,7 @@ function Faq() {
         <div className="store-faq">
           <FaqItem
             q="When does the Kickstarter launch?"
-            a="The campaign launches October 27, 2026. The waitlist gets a heads-up two to four weeks ahead and a final reminder the morning it goes live."
+            a="The campaign is planned for 2027. The exact date is not set yet. The waitlist gets a heads-up before it goes live."
           />
           <FaqItem
             q="What does the Founders deposit cover?"

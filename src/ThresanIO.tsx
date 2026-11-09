@@ -58,7 +58,12 @@ export default function ThresanIO() {
               the physical, three-board edition of the game you can already
               play free at{' '}
               <a href={GAME_URL} className="lab-mail">playskyflag.com</a>,
-              is cleared to come to Kickstarter on October 27, 2026.
+              is cleared to come to Kickstarter.
+            </p>
+            <p>
+              <em>Update, November 2026: the campaign did not launch on
+              October 27. It is now planned for 2027, date to be
+              confirmed. The waitlist will hear first.</em>
             </p>
             <p>
               The road to that one sentence was longer than I expected.

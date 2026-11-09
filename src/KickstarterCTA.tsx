@@ -10,6 +10,7 @@
 
 import { Capacitor } from '@capacitor/core';
 import InlineCapture from './InlineCapture';
+import { LAUNCH_LABEL } from './campaign';
 
 export default function KickstarterCTA({ source }: { source?: string }) {
   // Never render in the native (App Store) build: this band captures email
@@ -26,8 +27,8 @@ export default function KickstarterCTA({ source }: { source?: string }) {
       }}
     >
       <p style={{ margin: '0 0 14px', fontSize: '1.05rem', fontWeight: 600 }}>
-        Thresan: Skyflag comes to Kickstarter on October 27, 2026. Be first to know —
-        and get early-backer pricing.
+        Thresan: Skyflag comes to Kickstarter in {LAUNCH_LABEL}. Join the
+        waitlist to be first to know and get early-backer pricing.
       </p>
       <InlineCapture source={source} />
       <p style={{ margin: '14px 0 0', fontSize: '0.85rem', opacity: 0.7 }}>

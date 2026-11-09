@@ -8,7 +8,7 @@ import { stashReviewSession } from './game/reviewSession';
 import ConsentCheckbox from './ConsentCheckbox';
 import { getUtmSource } from './utmSource';
 import { track } from '@vercel/analytics';
-import { campaignCta, campaignUrl, currentPhase } from './campaign';
+import { campaignCta, campaignUrl, currentPhase, LAUNCH_LABEL } from './campaign';
 
 // Persists the user's response to the post-game funnel (waitlist signup
 // AND optional testimonial quote). Either is dismissable; once the user
@@ -468,7 +468,7 @@ function PostGameWaitlist({
         ) : (
           <>
             That puts you ahead of nearly everyone who will back it. The
-            physical edition launches on Kickstarter, October 27.
+            physical edition comes to Kickstarter in {LAUNCH_LABEL}.
           </>
         )}
       </p>
@@ -484,8 +484,8 @@ function PostGameWaitlist({
       </a>
       <p className="end-game-waitlist-microcopy">
         {isLive
-          ? 'Campaign closes November 27.'
-          : 'One tap, free. One notification on launch day.'}
+          ? 'Back it before the campaign closes.'
+          : 'One tap, free. Kickstarter notifies you when it goes live.'}
       </p>
 
       <p className="end-game-waitlist-or">

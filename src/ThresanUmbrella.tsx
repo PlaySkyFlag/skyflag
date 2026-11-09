@@ -71,8 +71,8 @@ export default function ThresanUmbrella() {
           at once, lifting between worlds to set up captures no flat
           board could hold. The game is{' '}
           <strong>free to play, always</strong>, jump in below. The
-          premium physical board launches on{' '}
-          <strong>Kickstarter on October 27, 2026</strong>.{' '}
+          premium physical board comes to{' '}
+          <strong>Kickstarter in 2027</strong>.{' '}
         </p>
 
         {/* ── One ask ──────────────────────────────────────────────
@@ -95,8 +95,8 @@ export default function ThresanUmbrella() {
         </a>
         <p className="thresan-cta-microcopy">
           {phase === 'LIVE'
-            ? 'Campaign closes November 27, 2026.'
-            : 'Free, one tap. A single notification on launch day.'}
+            ? 'The campaign is live on Kickstarter now.'
+            : 'Free, one tap. One email when the campaign goes live.'}
         </p>
         <p className="thresan-cta-secondary">
           Not sure yet? <a href={GAME_URL}>The full game is free to play →</a>

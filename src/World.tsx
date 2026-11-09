@@ -368,12 +368,12 @@ export default function World() {
             </a>
           </div>
           <p className="world-section-lead">
-            The physical edition launches on Kickstarter on October 27, 2026, be
-            first in line for early-backer pricing.
+            The physical edition comes to Kickstarter in 2027. Join the
+            waitlist to be first in line for early-backer pricing.
           </p>
           <div className="world-actions">
             <a href="https://thresan.com/kickstarter" className="world-cta">
-              Notify me at launch →
+              Notify me when Thresan comes to Kickstarter →
             </a>
           </div>
         </section>

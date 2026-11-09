@@ -11,26 +11,37 @@
 //   1. This is Vite, not Next.js. `process.env.NEXT_PUBLIC_*` does not
 //      exist in the browser bundle; Vite exposes `import.meta.env.VITE_*`
 //      and inlines it at BUILD time. So an env flip needs a redeploy
-//      anyway — it is not a live switch.
-//   2. It requires a solo operator to remember, at 9am on launch day,
-//      while running a live campaign. The launch date is already known.
-// So the phase is computed from the clock and flips itself, with no
-// deploy. VITE_CAMPAIGN_PHASE stays available as an override purely so
-// LIVE/ENDED can be exercised in a preview build before October.
+//      anyway, so it is not a live switch.
+//   2. It requires a solo operator to remember, on the morning of launch,
+//      while running a live campaign.
+// So once a launch date is set, the phase is computed from the clock and
+// flips itself, with no deploy. VITE_CAMPAIGN_PHASE stays available as an
+// override purely so LIVE/ENDED can be exercised in a preview build.
+//
+// LAUNCH DATE NOT SET. The campaign was postponed to 2027 (owner decision,
+// 8 Nov 2026) with no exact date yet. While LAUNCH_TS is null the phase is
+// always PRELAUNCH, and copy says "2027" via LAUNCH_LABEL instead of
+// rendering a date or a countdown. When the date is fixed: set LAUNCH_TS
+// and END_TS (UTC), update LAUNCH_LABEL, and update
+// scripts/check-funnel-invariants.mjs invariant 5 to match.
 
 import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 
 export type CampaignPhase = 'PRELAUNCH' | 'LIVE' | 'ENDED' | 'EVERGREEN';
 
-// Launch 2026-10-27 ~09:00 PT; campaign runs 28 days and closes
-// 2026-11-27. Kept in UTC so the boundary is unambiguous.
-export const LAUNCH_TS = Date.parse('2026-10-27T16:00:00Z');
-export const END_TS = Date.parse('2026-11-27T16:00:00Z');
+// Launch and close instants in UTC, or null while no date is set. The
+// `as` keeps the declared type `number | null` inside this module too, so
+// the null checks below stay meaningful once a date is filled in.
+export const LAUNCH_TS = null as number | null;
+export const END_TS = null as number | null;
+
+// Human-readable launch timing for copy. One place to change it.
+export const LAUNCH_LABEL = '2027';
 
 // The live-campaign URL is NOT the pre-launch URL — Kickstarter issues a
 // different one when the project goes live. Until that is known this
 // stays empty and every LIVE-phase link falls back to the pre-launch URL
-// rather than rendering a dead href. Fill it in on launch day.
+// rather than rendering a dead href. Fill it in when the campaign goes live.
 export const KICKSTARTER_LIVE_URL = '';
 
 // Late-pledge destination (BackerKit, the store, or nothing). Undecided,
@@ -48,8 +59,8 @@ function envOverride(): CampaignPhase | null {
 }
 
 export function phaseForDate(now: number = Date.now()): CampaignPhase {
-  if (now < LAUNCH_TS) return 'PRELAUNCH';
-  if (now < END_TS) return 'LIVE';
+  if (LAUNCH_TS === null || now < LAUNCH_TS) return 'PRELAUNCH';
+  if (END_TS === null || now < END_TS) return 'LIVE';
   return 'ENDED';
 }
 
@@ -181,13 +192,13 @@ export function campaignBanner(
   switch (phase) {
     case 'PRELAUNCH':
       return {
-        text: 'Thresan: Skyflag launches on Kickstarter October 27.',
+        text: `Thresan: Skyflag comes to Kickstarter in ${LAUNCH_LABEL}.`,
         cta: 'Follow the campaign',
         href: campaignUrl(phase, surface),
       };
     case 'LIVE':
       return {
-        text: 'Thresan: Skyflag is live on Kickstarter. Back the physical edition before November 27.',
+        text: 'Thresan: Skyflag is live on Kickstarter. Back the physical edition before the campaign closes.',
         cta: 'Back it',
         href: campaignUrl(phase, surface),
       };
