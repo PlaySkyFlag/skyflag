@@ -14,9 +14,8 @@ import { track } from '@vercel/analytics';
 import './Kickstarter.css';
 import { applySurfaceMeta } from './socialMeta';
 import { supabase } from './game/supabase';
-import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 import { getUtmSource } from './utmSource';
-import { LAUNCH_LABEL, LAUNCH_TS } from './campaign';
+import { LAUNCH_LABEL, LAUNCH_TS, campaignUrl, currentPhase } from './campaign';
 
 const READER_URL = 'https://thresan.studio/volume-zero';
 const WORLD_URL = 'https://thresan.com/world';
@@ -164,7 +163,7 @@ export default function Kickstarter() {
               Join the waitlist ↓
             </a>
             <a
-              href={KICKSTARTER_PRELAUNCH_URL}
+              href={campaignUrl(currentPhase(), 'kickstarter-page')}
               target="_blank"
               rel="noopener noreferrer"
               className="ks-hero-cta ks-hero-cta-ks"
@@ -203,7 +202,7 @@ export default function Kickstarter() {
               </p>
               <div className="ks-success-actions">
                 <a
-                  href={KICKSTARTER_PRELAUNCH_URL}
+                  href={campaignUrl(currentPhase(), 'kickstarter-page')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ks-btn"

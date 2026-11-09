@@ -1,5 +1,11 @@
 # Welcome email — Thresan launch list (MailerLite)
 
+**Update 8 Nov 2026:** the Kickstarter is postponed to 2027 (no exact date
+yet). The body copy below now says "in 2027" instead of "this fall". The live
+MailerLite welcome automation is a separate copy and must be edited in the
+MailerLite UI to match; this file changing does not change what subscribers
+receive.
+
 **Status (2026-06-02):** Sync is LIVE — every consented signup lands in the
 MailerLite **"Thresan Launch List"** group with `signup_source` + `interests`
 fields (verified end-to-end). The only remaining step is building the
@@ -67,7 +73,7 @@ opens, don't wait.
 > but that third dimension turns it into something of its own.
 >
 > **Skyflag** is the first edition — a premium, three-tier physical object
-> coming to Kickstarter this fall. But you don't have to wait for any of
+> coming to Kickstarter in 2027. But you don't have to wait for any of
 > that:
 >
 > **▶ You can play Thresan online, free, anytime, at [playskyflag.com](https://playskyflag.com).**

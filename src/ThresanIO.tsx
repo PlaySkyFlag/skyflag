@@ -10,7 +10,7 @@ import './ThresanIO.css';
 import SiteHeader from './SiteHeader';
 import { applySurfaceMeta } from './socialMeta';
 import KickstarterCTA from './KickstarterCTA';
-import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
+import { campaignUrl, currentPhase } from './campaign';
 
 const GAME_URL = 'https://www.playskyflag.com/?ref=thresan-io';
 const UMBRELLA_URL = 'https://thresan.com';
@@ -90,7 +90,7 @@ export default function ThresanIO() {
               If you want to be part of that opening push, two things help
               more than anything:{' '}
               <a
-                href={KICKSTARTER_PRELAUNCH_URL}
+                href={campaignUrl(currentPhase(), 'io')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="lab-mail"

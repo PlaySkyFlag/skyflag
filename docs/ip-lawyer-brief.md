@@ -1,5 +1,7 @@
 # Thresan: Skyflag — IP / Trademark / Structure Brief
 
+> **Update 8 Nov 2026:** the Kickstarter is postponed to 2027; deadlines below keyed to Oct 27, 2026 now key to the 2027 launch.
+
 *Prepared for the **June 9, 2026** lawyer meeting. Not legal advice — a
 working agenda so the session is efficient.*
 

@@ -14,7 +14,7 @@
 import { useState, type FormEvent } from 'react';
 import { track } from '@vercel/analytics';
 import { supabase } from './game/supabase';
-import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
+import { campaignUrl, currentPhase } from './campaign';
 import { getUtmSource } from './utmSource';
 
 const GOLD = '#c2a46b';
@@ -79,7 +79,7 @@ export default function InlineCapture({
           You're on the list. One quick thing that genuinely helps:
         </p>
         <a
-          href={KICKSTARTER_PRELAUNCH_URL}
+          href={campaignUrl(currentPhase(), 'inline')}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => track('kickstarter_follow', { placement: 'inline-success' })}

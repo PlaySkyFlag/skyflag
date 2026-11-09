@@ -16,7 +16,7 @@ import './ThresanStore.css';
 import ConsentCheckbox from './ConsentCheckbox';
 import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 import { getUtmSource } from './utmSource';
-import { currentPhase, KICKSTARTER_LIVE_URL } from './campaign';
+import { KICKSTARTER_LIVE_URL, campaignUrl, currentPhase } from './campaign';
 
 // ─── Configuration ─────────────────────────────────────────────────
 // Fill these in as the campaign reaches each milestone. Empty strings
@@ -590,7 +590,7 @@ function Waitlist() {
           <p className="store-waitlist-alt">
             Prefer Kickstarter?{' '}
             <a
-              href={KICKSTARTER_PRELAUNCH_URL}
+              href={campaignUrl(currentPhase(), 'store')}
               target="_blank"
               rel="noreferrer"
             >
