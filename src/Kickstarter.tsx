@@ -28,7 +28,7 @@ const INTERESTS = [
 ];
 
 // Launch timing line. While no launch date is set (LAUNCH_TS is null) it
-// shows a calm "coming in 2027" line and no countdown, so the page never
+// shows a calm "coming soon" line and no countdown, so the page never
 // shows a date that is not real. Once a date is set in src/campaign.ts it
 // counts down to it, then flips to a live-now message. Both read the shared
 // campaign module so this line and every CTA cannot drift apart.
@@ -43,7 +43,7 @@ function Countdown() {
   if (LAUNCH_TS === null) {
     return (
       <p className="ks-countdown">
-        Coming to Kickstarter in {LAUNCH_LABEL}. Join the waitlist to be first
+        Coming to Kickstarter on {LAUNCH_LABEL}. Join the waitlist to be first
         to know.
       </p>
     );
@@ -74,7 +74,7 @@ export default function Kickstarter() {
     return applySurfaceMeta({
       title: 'Thresan: Skyflag, coming to Kickstarter',
       description:
-        `A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Thresan: Skyflag comes to Kickstarter in ${LAUNCH_LABEL}. Join the waitlist to be first to know and claim early-backer pricing.`,
+        `A premium three-layer strategy game: three stacked boards, four Lifts, one Nexus. Thresan: Skyflag comes to Kickstarter on ${LAUNCH_LABEL}. Join the waitlist to be first to know and claim early-backer pricing.`,
       canonicalUrl: 'https://thresan.com/kickstarter',
       ogImage: 'https://thresan.com/thresan-deluxe-board.jpg',
       ogImageAlt:

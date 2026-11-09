@@ -368,7 +368,7 @@ export default function World() {
             </a>
           </div>
           <p className="world-section-lead">
-            The physical edition comes to Kickstarter in 2027. Join the
+            The physical edition comes to Kickstarter on October 27, 2027. Join the
             waitlist to be first in line for early-backer pricing.
           </p>
           <div className="world-actions">

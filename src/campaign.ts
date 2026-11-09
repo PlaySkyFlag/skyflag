@@ -18,12 +18,11 @@
 // flips itself, with no deploy. VITE_CAMPAIGN_PHASE stays available as an
 // override purely so LIVE/ENDED can be exercised in a preview build.
 //
-// LAUNCH DATE NOT SET. The campaign was postponed to 2027 (owner decision,
-// 8 Nov 2026) with no exact date yet. While LAUNCH_TS is null the phase is
-// always PRELAUNCH, and copy says "2027" via LAUNCH_LABEL instead of
-// rendering a date or a countdown. When the date is fixed: set LAUNCH_TS
-// and END_TS (UTC), update LAUNCH_LABEL, and update
-// scripts/check-funnel-invariants.mjs invariant 5 to match.
+// LAUNCH DATE: 27 October 2027, about 09:00 PT (owner decision, 8 Nov
+// 2026). Copy reads the date from LAUNCH_LABEL. If the date moves: change
+// LAUNCH_TS, END_TS and LAUNCH_LABEL together, and update
+// scripts/check-funnel-invariants.mjs invariant 5 to match. Setting
+// LAUNCH_TS to null holds the site in PRELAUNCH with no countdown.
 
 import { KICKSTARTER_PRELAUNCH_URL } from './kickstarterLink';
 
@@ -32,11 +31,12 @@ export type CampaignPhase = 'PRELAUNCH' | 'LIVE' | 'ENDED' | 'EVERGREEN';
 // Launch and close instants in UTC, or null while no date is set. The
 // `as` keeps the declared type `number | null` inside this module too, so
 // the null checks below stay meaningful once a date is filled in.
-export const LAUNCH_TS = null as number | null;
-export const END_TS = null as number | null;
+// 09:00 PDT on 27 Oct 2027; the campaign closes 09:00 PST one month later.
+export const LAUNCH_TS = Date.parse('2027-10-27T16:00:00Z') as number | null;
+export const END_TS = Date.parse('2027-11-27T17:00:00Z') as number | null;
 
 // Human-readable launch timing for copy. One place to change it.
-export const LAUNCH_LABEL = '2027';
+export const LAUNCH_LABEL = 'October 27, 2027';
 
 // The live-campaign URL is NOT the pre-launch URL — Kickstarter issues a
 // different one when the project goes live. Until that is known this
@@ -192,7 +192,7 @@ export function campaignBanner(
   switch (phase) {
     case 'PRELAUNCH':
       return {
-        text: `Thresan: Skyflag comes to Kickstarter in ${LAUNCH_LABEL}.`,
+        text: `Thresan: Skyflag comes to Kickstarter on ${LAUNCH_LABEL}.`,
         cta: 'Follow the campaign',
         href: campaignUrl(phase, surface),
       };

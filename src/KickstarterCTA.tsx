@@ -27,7 +27,7 @@ export default function KickstarterCTA({ source }: { source?: string }) {
       }}
     >
       <p style={{ margin: '0 0 14px', fontSize: '1.05rem', fontWeight: 600 }}>
-        Thresan: Skyflag comes to Kickstarter in {LAUNCH_LABEL}. Join the
+        Thresan: Skyflag comes to Kickstarter on {LAUNCH_LABEL}. Join the
         waitlist to be first to know and get early-backer pricing.
       </p>
       <InlineCapture source={source} />

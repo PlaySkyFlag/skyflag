@@ -175,30 +175,27 @@ for (const file of srcFiles) {
   });
 }
 
-// ── Invariant 5: the launch date is unset (or 2027), and no stale date ─
-// The Kickstarter did not launch on 27 Oct 2026; it was postponed to 2027
-// with no exact date (owner decision, 8 Nov 2026). Until a date is fixed,
-// LAUNCH_TS in campaign.ts must stay null so the phase is PRELAUNCH and
-// copy says "2027" via LAUNCH_LABEL. A 2027 Date.parse is also accepted so
-// setting the real date later does not trip this guard.
+// ── Invariant 5: one launch date, 27 Oct 2027, and no stale 2026 date ─
+// The Kickstarter moved from 27 Oct 2026 to 27 Oct 2027 (owner decision,
+// 8 Nov 2026). LAUNCH_TS must be that instant (or null to hold the site in
+// PRELAUNCH), and no shipped copy may still say the 2026 date.
 // Earlier history: there was a real Oct 20 vs Oct 27 split across site
 // copy and the CRM, so the Oct 20 ghost check stays.
 {
   const campaign = read('src/campaign.ts');
   const launchOk =
     /export const LAUNCH_TS\s*(?::[^=]+)?=\s*null\b/.test(campaign) ||
-    /export const LAUNCH_TS\s*(?::[^=]+)?=\s*Date\.parse\('2027-/.test(campaign);
+    /export const LAUNCH_TS\s*(?::[^=]+)?=\s*Date\.parse\('2027-10-27T16:00:00Z'\)/.test(campaign);
   if (!launchOk) {
     fail.push(
-      'src/campaign.ts — LAUNCH_TS is neither null nor a 2027 date. The ' +
-        'campaign was postponed to 2027 (decided 2026-11-08); keep it null ' +
-        'until the real date is set.',
+      'src/campaign.ts: LAUNCH_TS is neither null nor 2027-10-27T16:00:00Z. ' +
+        'The launch date is October 27, 2027 (decided 2026-11-08).',
     );
   }
   // Stale launch dates in shipped source and copy. Not comment-skipped
   // for index.html (markup has no // comments); .ts/.tsx skip comments so
   // the history above can be documented.
-  const STALE_DATE = /October\s+27,?\s+2026|Oct\.?\s+27\b|November\s+27\b|2026-10-27/;
+  const STALE_DATE = /October\s+27,?\s+2026|Oct\.?\s+27,?\s+2026|November\s+27,?\s+2026|2026-10-27/;
   const apiFiles = (() => {
     try {
       return readdirSync('api')
@@ -252,5 +249,5 @@ if (fail.length) {
 console.log(
   '✓ funnel invariants OK — piece-count copy clean, every thresan_waitlist ' +
     'insert records utm_source, ref tags URL-safe, no Next-style env access, ' +
-    'launch date unset or 2027, no stale Oct 27 / Nov 27 2026 dates.',
+    'launch date October 27, 2027, no stale 2026 launch dates.',
 );

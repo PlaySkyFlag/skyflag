@@ -468,7 +468,7 @@ function PostGameWaitlist({
         ) : (
           <>
             That puts you ahead of nearly everyone who will back it. The
-            physical edition comes to Kickstarter in {LAUNCH_LABEL}.
+            physical edition comes to Kickstarter on {LAUNCH_LABEL}.
           </>
         )}
       </p>

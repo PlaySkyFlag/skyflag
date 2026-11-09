@@ -259,7 +259,7 @@ export default function ThresanStudio() {
             board could hold. The digital game is{' '}
             <strong>free to play, always</strong>, at{' '}
             <a href={UMBRELLA_URL}>thresan.com</a>. The premium physical
-            board comes to <strong>Kickstarter in 2027</strong>.{' '}
+            board comes to <strong>Kickstarter on October 27, 2027</strong>.{' '}
             <a href={STORE_URL}>Sign up now</a> to hear before it goes live.
           </p>
         </section>

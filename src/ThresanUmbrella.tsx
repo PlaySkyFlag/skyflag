@@ -72,7 +72,7 @@ export default function ThresanUmbrella() {
           board could hold. The game is{' '}
           <strong>free to play, always</strong>, jump in below. The
           premium physical board comes to{' '}
-          <strong>Kickstarter in 2027</strong>.{' '}
+          <strong>Kickstarter on October 27, 2027</strong>.{' '}
         </p>
 
         {/* ── One ask ──────────────────────────────────────────────

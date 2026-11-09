@@ -61,7 +61,7 @@ export default function ThresanIO() {
               is cleared to come to Kickstarter.
             </p>
             <p>
-              <em>Update: the campaign is planned for 2027. The waitlist
+              <em>Update: the campaign launches October 27, 2027. The waitlist
               will hear first.</em>
             </p>
             <p>
