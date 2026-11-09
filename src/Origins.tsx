@@ -18,7 +18,7 @@ export default function Origins() {
         'How Ashtapada, one of the oldest known board games, became Thresan: the eight-by-eight grid lifted into three boards. Currently in its Skyflag edition.',
       canonicalUrl: 'https://playskyflag.com/origins',
       ogImage: 'https://playskyflag.com/thresan-og-stack.jpg',
-      ogImageAlt: 'Three stacked boards forming a column, the eighth-century board lifted.',
+      ogImageAlt: 'Three stacked boards forming a column, the ancient board lifted.',
     });
   }, []);
 
@@ -87,11 +87,11 @@ function AshtapadaSection() {
         </figcaption>
       </figure>
       <p className="origins-prose">
-        Ashtapada is one of the oldest known board games. Played in
-        ancient India for thousands of years, on a square board of eight
-        by eight, <em>aṣṭāpada</em>, "eight-stepped." Pieces moved along
-        the grid; the strategy was geometric and contemplative; the game
-        predates chess by millennia.
+        Ashtapada is one of the oldest known board games. It was played
+        in ancient India on a square board of eight by eight,
+        <em>aṣṭāpada</em>, "eight-stepped," and is named in early Buddhist
+        texts among the games of the day. Scholars read it as a race game.
+        The board predates chess by many centuries.
       </p>
     </section>
   );
@@ -132,8 +132,8 @@ function LiftSection() {
         The single grid becomes three stacked grids, Terran, Meridian,
         Empyrean, six by six each. Sixty-four squares become one hundred
         and eight. The mechanical change is a numerical one too: in the
-        tradition that gave us Ashtapada, 108 is the count that runs
-        through cosmology, prayer, and breath. Three worlds. One proof.
+        tradition that gave us Ashtapada, 108 is a sacred number, echoed
+        in cosmology and prayer. Three worlds. One proof.
       </p>
     </section>
   );

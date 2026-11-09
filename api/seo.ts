@@ -76,10 +76,10 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
   },
   'ashtapada.com': {
     title: 'Ashtapada, the ancient root',
-    description: 'Ashtapada is one of the oldest known board games, played in ancient India for thousands of years and the same 8x8 grid that carried Chaturanga west to become chess. Thresan returns to that root and takes a different fork.',
+    description: 'Ashtapada is one of the oldest known board games, the 8x8 grid of ancient India that later carried Chaturanga west to become chess. Thresan returns to that board and takes a different fork.',
     ogImage: 'https://playskyflag.com/ashtapada-carpet-15c.jpg',
     loadingHeadline: 'Ashtapada',
-    loadingTagline: 'The root of chess. The root of Thresan.',
+    loadingTagline: 'The board chess was born on. The root of Thresan.',
   },
 };
 
@@ -111,7 +111,7 @@ const PATH_SURFACES: Record<string, Surface> = {
   },
   '/origins': {
     title: 'Origins, from Ashtapada to Thresan',
-    description: 'Thresan descends from Ashtapada, one of the oldest known board games and the root of chess. A historical bridge from 8th-century India to a three-layer 21st-century abstract.',
+    description: 'Thresan descends from Ashtapada, one of the oldest known board games and the board chess was born on. A historical bridge from ancient India to a three-layer 21st-century abstract.',
     ogImage: 'https://playskyflag.com/thresan-og-card.jpg',
     loadingHeadline: 'Origins',
     loadingTagline: 'From Ashtapada to Thresan.',

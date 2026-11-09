@@ -65,8 +65,8 @@ export default function AshtapadaSplash() {
             <p className="ashtapada-more-eyebrow">Origins</p>
             <p className="ashtapada-more-prose">
               Ashtapada is one of the oldest known board games, the
-              eight-by-eight grid that ancient India played for thousands
-              of years, and the same grid that, centuries later, carried
+              eight-by-eight grid of ancient India, and the same grid
+              that, many centuries later, carried
               Chaturanga west into Persia and eventually became chess.
               Skyflag returns to that root and takes a different fork.
               Where chess kept the single plane, Skyflag lifts it: three

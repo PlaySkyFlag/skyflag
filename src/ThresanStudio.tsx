@@ -72,11 +72,11 @@ const PIECES = [
   },
   {
     name: 'Rover Thandiwe',
-    line: 'The Rover, one of the clan’s two transports between layers; leap-captures up close.',
+    line: 'The Rover, one of the clan’s two transports between layers; strikes in straight lines, up to two squares.',
   },
   {
     name: 'Pilot Voss',
-    line: 'The Pilot, the clan’s other transport between layers; leap-captures up close.',
+    line: 'The Pilot, the clan’s other transport between layers; strikes on the diagonal, up to two squares.',
   },
 ];
 

@@ -208,9 +208,8 @@ function Descriptions() {
         <p className="press-desc-body">
           Pieces move and capture by geometry alone. There are no
           special abilities, no cards, no dice. The game descends from
-          Ashtapada, one of the oldest known board games, played in
-          ancient India for thousands of years and the same 8×8 grid
-          that, centuries later, carried Chaturanga west to become
+          Ashtapada, one of the oldest known board games, the 8×8 grid
+          of ancient India that, many centuries later, carried Chaturanga west to become
           chess. Skyflag returns to that root and takes a different
           fork: three stacked grids, sixty-four squares opened to one
           hundred and eight. A premium physical edition is in
@@ -274,8 +273,8 @@ function History() {
       <h2 className="press-section-title">History</h2>
       <p className="press-desc-body">
         Ashtapada is one of the oldest known board games, the 8×8
-        grid that ancient India played for thousands of years. Around
-        the sixth century, that board carried a new game called
+        grid of ancient India, named in early Buddhist texts. Around
+        the seventh century, that board carried a new game called
         Chaturanga, which travelled west to become Shatranj in Persia
         and eventually chess in Europe. The board persisted; the
         pieces and rules evolved away from their root.
