@@ -75,11 +75,11 @@ const HOSTNAME_SURFACES: Record<string, Surface> = {
     loadingTagline: 'Premium physical edition. Coming to Kickstarter October 27, 2027.',
   },
   'ashtapada.com': {
-    title: 'Ashtapada, the ancient root',
-    description: 'Ashtapada is one of the oldest known board games, the 8x8 grid of ancient India that later carried Chaturanga west to become chess. Thresan returns to that board and takes a different fork.',
+    title: 'Ashtapada, the board chess was born on',
+    description: 'Ashtapada, the 8x8 board of ancient India that carried chaturanga, the game that became chess. Its story, and Thresan, a free strategy game that lifts the board into three.',
     ogImage: 'https://playskyflag.com/ashtapada-carpet-15c.jpg',
     loadingHeadline: 'Ashtapada',
-    loadingTagline: 'The board chess was born on. The root of Thresan.',
+    loadingTagline: 'The board chess was born on, lifted into three.',
   },
 };
 

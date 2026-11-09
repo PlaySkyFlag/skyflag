@@ -1,182 +1,649 @@
-/* AshtapadaSplash — minimal one-screen splash for ashtapada.com.
-   Colors picked to match the Landing/Hero gold-on-dark palette by
-   value (not by variable) so this surface stays self-contained: it
-   has to look right even if no other CSS is loaded. */
+/* AshtapadaSplash: heritage landing page for ashtapada.com.
+   Gold on deep night, matched by value (not by variable) to the
+   Landing/Hero palette so this surface stays self-contained.
+
+   Motion contract: base styles are the finished, readable state.
+   Keyframes start from the hidden state and use fill-mode both, so the
+   page settles exactly on the base styles. prefers-reduced-motion turns
+   every animation off, which leaves the base (resting) state. */
 
 .ashtapada {
+  --ash-gold: #C2A46B;
+  --ash-gold-hi: #ffe4a3;
+  --ash-ink: #06090f;
+  --ash-text: rgba(245, 247, 251, 0.86);
+  --ash-muted: rgba(245, 247, 251, 0.68);
+  --ash-line: rgba(194, 164, 107, 0.2);
+  --ash-terran: #5fae84;
+  --ash-meridian: #5cc4d6;
+  --ash-empyrean: #6f8df0;
+
   background:
-    radial-gradient(ellipse 70% 50% at 50% 18%, rgba(194, 164, 107, 0.14), transparent 70%),
-    radial-gradient(ellipse 60% 80% at 50% 100%, rgba(120, 80, 200, 0.06), transparent 70%),
-    #06090f;
+    radial-gradient(ellipse 70% 40% at 50% 8%, rgba(194, 164, 107, 0.14), transparent 70%),
+    radial-gradient(ellipse 60% 60% at 50% 100%, rgba(120, 80, 200, 0.07), transparent 70%),
+    var(--ash-ink);
   color: #E6E2D8;
   font-family:
     'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Hero is the above-the-fold splash: viewport-tall, content centered.
-   Splitting it out from the page wrapper lets a second section
-   ("Origins" excerpt) flow naturally below without disturbing the
-   centered hero layout. */
-.ashtapada-hero {
-  min-height: 100vh;
+.ashtapada a:focus-visible {
+  outline: 2px solid var(--ash-gold-hi);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ─── Top bar ──────────────────────────────────────────────────── */
+
+.ash-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 16px 20px;
+}
+
+.ash-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ash-gold);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.ash-brand img {
+  display: block;
+  filter: drop-shadow(0 4px 14px rgba(194, 164, 107, 0.25));
+}
+
+.ash-bar-play {
+  color: var(--ash-gold);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  border: 1px solid rgba(194, 164, 107, 0.45);
+  border-radius: 999px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ash-bar-play:hover {
+  background: var(--ash-gold);
+  color: #111826;
+}
+
+/* ─── Hero ─────────────────────────────────────────────────────── */
+
+.ash-hero {
   display: grid;
-  place-items: center;
-  padding: 48px 24px;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: center;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  text-align: center;
 }
 
-/* Cinematic stacked-boards render below the CTA. Doubles as the visual
-   bridge from "Ashtapada, lifted." to the Origins excerpt that
-   follows. */
-.ashtapada-render {
+@media (min-width: 880px) {
+  .ash-hero {
+    grid-template-columns: 1.05fr 1fr;
+    gap: 48px;
+    padding: 48px 20px 64px;
+    min-height: min(86vh, 760px);
+    text-align: left;
+  }
+}
+
+.ashtapada-eyebrow {
+  font-style: italic;
+  color: var(--ash-gold);
+  margin: 0 0 10px;
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
+  letter-spacing: 0.01em;
+}
+
+.ashtapada-title {
+  font-size: clamp(2.6rem, 8vw, 4.4rem);
+  font-weight: 800;
+  color: var(--ash-gold);
+  margin: 0 0 14px;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+}
+
+.ash-lede {
+  font-size: clamp(1.1rem, 2.6vw, 1.35rem);
+  color: var(--ash-text);
+  margin: 0 0 28px;
+  max-width: 34ch;
+  margin-inline: auto;
+}
+
+@media (min-width: 880px) {
+  .ash-lede { margin-inline: 0; }
+}
+
+.ash-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 0 0 18px;
+}
+
+@media (min-width: 880px) {
+  .ash-hero .ash-ctas { justify-content: flex-start; }
+}
+
+.ashtapada-cta,
+.ash-cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-align: center;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ashtapada-cta {
+  background: var(--ash-gold);
+  color: #111826;
+  box-shadow: 0 6px 24px rgba(194, 164, 107, 0.25);
+}
+
+.ashtapada-cta:hover {
+  background: var(--ash-gold-hi);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(194, 164, 107, 0.35);
+}
+
+.ash-cta-ghost {
+  color: var(--ash-gold);
+  border: 1px solid rgba(194, 164, 107, 0.55);
+  background: rgba(194, 164, 107, 0.06);
+}
+
+.ash-cta-ghost:hover {
+  background: rgba(194, 164, 107, 0.16);
+  color: var(--ash-gold-hi);
+}
+
+@media (max-width: 420px) {
+  .ash-ctas a { width: 100%; }
+}
+
+.ashtapada-more-link {
+  display: inline-block;
+  color: var(--ash-gold);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.ashtapada-more-link:hover {
+  border-bottom-color: var(--ash-gold);
+}
+
+.ash-hero-figure {
+  margin: 0;
+}
+
+.ash-hero-figure figcaption {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--ash-muted);
+  text-align: center;
+}
+
+/* ─── Hero animation (SVG) ─────────────────────────────────────── */
+
+.ash-boards {
   display: block;
   width: 100%;
-  max-width: 880px;
+  max-width: 460px;
   height: auto;
-  margin: 36px auto 0;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.ash-beam {
+  stroke: var(--ash-gold);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 5;
+  opacity: 0.45;
+  animation: ash-fade-in 1s ease 2.8s both;
+}
+
+.ash-floor-fill {
+  fill: rgba(194, 164, 107, 0.07);
+}
+
+.ash-floor-line {
+  stroke: var(--ash-gold);
+  stroke-width: 1.2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  vector-effect: non-scaling-stroke;
+  animation: ash-draw 0.9s ease-out calc(var(--i) * 70ms) both;
+}
+
+.ash-floor {
+  opacity: 0.6;
+  animation: ash-floor-dim 1.2s ease 3s both;
+}
+
+.ash-mark rect {
+  fill: rgba(255, 228, 163, 0.32);
+}
+
+.ash-mark path {
+  stroke: var(--ash-gold-hi);
+  stroke-width: 1.2;
+}
+
+.ash-mark {
+  opacity: 1;
+  animation: ash-glow 1.4s ease 1.5s both;
+}
+
+.ash-lift {
+  opacity: 1;
+  transform: translateY(0);
+  animation: ash-lift 1.5s cubic-bezier(0.2, 0.7, 0.2, 1) calc(3s + var(--k) * 0.35s) both;
+}
+
+.ash-lift-edge {
+  fill: rgba(0, 0, 0, 0.55);
+}
+
+.ash-lift-fill {
+  fill-opacity: 0.2;
+}
+
+.ash-lift-line {
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-opacity: 0.9;
+}
+
+.ash-lift-terran .ash-lift-fill { fill: var(--ash-terran); }
+.ash-lift-terran .ash-lift-line { stroke: var(--ash-terran); }
+.ash-lift-meridian .ash-lift-fill { fill: var(--ash-meridian); }
+.ash-lift-meridian .ash-lift-line { stroke: var(--ash-meridian); }
+.ash-lift-empyrean .ash-lift-fill { fill: var(--ash-empyrean); }
+.ash-lift-empyrean .ash-lift-line { stroke: var(--ash-empyrean); }
+
+/* Slow idle float once the lift has finished. */
+.ash-stack {
+  animation: ash-float 7s ease-in-out 5.2s infinite;
+}
+
+@keyframes ash-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes ash-glow {
+  0% { opacity: 0; }
+  45% { opacity: 1; filter: drop-shadow(0 0 6px rgba(255, 228, 163, 0.9)); }
+  100% { opacity: 1; filter: none; }
+}
+
+@keyframes ash-floor-dim {
+  from { opacity: 1; }
+  to { opacity: 0.6; }
+}
+
+@keyframes ash-lift {
+  from { opacity: 0; transform: translateY(var(--dy)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ash-fade-in {
+  from { opacity: 0; }
+  to { opacity: 0.45; }
+}
+
+@keyframes ash-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ─── Facts strip ──────────────────────────────────────────────── */
+
+.ash-facts {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  max-width: 1080px;
+  margin: 0 auto 24px;
+  padding: 0;
+  background: var(--ash-line);
+  border-top: 1px solid var(--ash-line);
+  border-bottom: 1px solid var(--ash-line);
+}
+
+@media (min-width: 640px) {
+  .ash-facts { grid-template-columns: repeat(3, 1fr); }
+}
+
+.ash-facts li {
+  background: var(--ash-ink);
+  padding: 18px 16px;
+  text-align: center;
+}
+
+.ash-facts strong {
+  display: block;
+  color: var(--ash-gold);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.ash-facts span {
+  color: var(--ash-muted);
+  font-size: 0.9rem;
+}
+
+/* ─── Sections ─────────────────────────────────────────────────── */
+
+.ash-section {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 56px 16px;
+  border-top: 1px solid var(--ash-line);
+}
+
+.ash-facts + .ash-section { border-top: 0; }
+
+.ash-kicker {
+  color: var(--ash-gold);
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+.ash-section h2 {
+  color: var(--ash-gold);
+  font-size: clamp(1.6rem, 4.4vw, 2.2rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 18px;
+}
+
+.ash-section p {
+  font-size: 1.05rem;
+  color: var(--ash-text);
+  margin: 0 0 18px;
+}
+
+.ash-section em {
+  color: var(--ash-gold);
+  font-style: italic;
+}
+
+.ash-figure {
+  margin: 8px 0 22px;
+}
+
+.ash-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
   border-radius: 6px;
   border: 1px solid rgba(194, 164, 107, 0.22);
   box-shadow: 0 18px 56px rgba(0, 0, 0, 0.55);
 }
 
-.ashtapada-inner {
-  max-width: 520px;
-  text-align: center;
+.ash-figure figcaption {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--ash-muted);
 }
 
-.ashtapada-sigil {
-  width: clamp(160px, 38vw, 260px);
-  height: auto;
-  display: block;
-  margin: 0 auto 28px;
-  filter: drop-shadow(0 12px 48px rgba(194, 164, 107, 0.18));
+.ash-callout {
+  margin: 8px 0 22px;
+  padding: 18px 20px;
+  border-left: 3px solid var(--ash-gold);
+  background: rgba(194, 164, 107, 0.07);
+  border-radius: 0 8px 8px 0;
 }
 
-/* Eyebrow — italic rather than uppercase-tracked. The line is a
-   sentence ("Ashtapada, lifted."), not a label, so italic preserves
-   its rhythm where small-caps would flatten it. */
-.ashtapada-eyebrow {
+.ash-callout p {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #F1E9D6;
   font-style: italic;
-  color: #C2A46B;
-  margin: 0 0 10px;
-  font-size: clamp(1.0rem, 2.4vw, 1.15rem);
-  letter-spacing: 0.01em;
 }
 
-.ashtapada-title {
-  font-size: clamp(2.2rem, 6vw, 3.4rem);
-  font-weight: 800;
-  color: #C2A46B;
-  margin: 0 0 16px;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  text-shadow: 0 4px 30px rgba(194, 164, 107, 0.18);
+/* Four arms */
+.ash-arms {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 0;
 }
+
+@media (min-width: 640px) {
+  .ash-arms { grid-template-columns: repeat(4, 1fr); }
+}
+
+.ash-arms li {
+  border: 1px solid rgba(194, 164, 107, 0.3);
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+  background: rgba(194, 164, 107, 0.04);
+}
+
+.ash-arms strong {
+  display: block;
+  color: #F1E9D6;
+  font-size: 1.05rem;
+}
+
+.ash-arm-sk {
+  display: block;
+  color: var(--ash-gold);
+  font-style: italic;
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+}
+
+.ash-arm-later {
+  display: block;
+  color: var(--ash-muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* Timeline: a vertical rail; each stop lights its dot and rail segment
+   as it scrolls into view. At rest (no JS, reduced motion) every stop
+   is lit. */
+.ash-timeline {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  position: relative;
+}
+
+.ash-timeline li {
+  position: relative;
+  padding: 0 0 26px 34px;
+}
+
+.ash-timeline li::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 10px;
+  bottom: -10px;
+  width: 2px;
+  background: var(--ash-gold);
+  opacity: 0.55;
+  transform-origin: top;
+}
+
+.ash-timeline li:last-child::before { display: none; }
+
+.ash-timeline li::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--ash-gold);
+  background: var(--ash-gold);
+  box-shadow: 0 0 12px rgba(255, 228, 163, 0.55);
+}
+
+.ash-when {
+  display: block;
+  color: var(--ash-gold);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ash-timeline h3 {
+  margin: 2px 0 4px;
+  font-size: 1.15rem;
+  color: #F1E9D6;
+}
+
+.ash-timeline p {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+/* Bridge */
+.ash-bridge {
+  max-width: 760px;
+}
+
+/* Beats .ash-section p, which would otherwise shrink the script line. */
+.ash-bridge .ashtapada-tagline {
+  display: block;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  color: var(--ash-gold);
+  margin: 8px 0 26px;
+}
+.ash-bridge .ashtapada-tagline,
+.ash-bridge .ashtapada-fineprint { text-align: center; }
 
 .ashtapada-tagline {
   font-size: clamp(1.7rem, 4vw, 2.4rem);
-  color: #C2A46B;
-  margin: 0 0 36px;
+  color: var(--ash-gold);
+  margin: 8px 0 26px;
   text-shadow: 0 2px 18px rgba(194, 164, 107, 0.35);
 }
 
-.ashtapada-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 48px;
-  border-radius: 999px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  background: #C2A46B;
-  color: #111826;
-  text-decoration: none;
-  transition:
-    background 0.15s ease,
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
-  box-shadow: 0 6px 24px rgba(194, 164, 107, 0.25);
-}
-
-.ashtapada-cta:hover {
-  background: #ffe4a3;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 28px rgba(194, 164, 107, 0.35);
-}
+.ash-ctas-center { justify-content: center; }
 
 .ashtapada-fineprint {
-  margin: 28px 0 0;
-  font-size: 0.85rem;
-  color: rgba(245, 247, 251, 0.65);
+  margin: 18px 0 0;
+  font-size: 0.9rem;
+  color: var(--ash-muted);
 }
 
-.ashtapada-fineprint em {
-  color: #C2A46B;
-  font-style: italic;
-}
-
-/* ─── Below-the-fold: Origins excerpt ──────────────────────────── */
-
-.ashtapada-more {
-  padding: 64px 24px 80px;
-  border-top: 1px solid rgba(194, 164, 107, 0.18);
-}
-
-.ashtapada-more-inner {
-  max-width: 640px;
+.ashtapada .ks-funnel-cta {
+  color: #E6E2D8;
+  max-width: 760px;
   margin: 0 auto;
 }
 
-.ashtapada-more-eyebrow {
-  text-align: center;
-  color: #C2A46B;
+/* Sources */
+.ash-sources {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 16px 56px;
+  border-top: 1px solid var(--ash-line);
+  color: var(--ash-muted);
+  font-size: 0.85rem;
+}
+
+.ash-sources h2 {
+  color: var(--ash-gold);
   font-size: 0.78rem;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  font-weight: 600;
-  margin: 0 0 20px;
+  margin: 0 0 10px;
 }
 
-.ashtapada-more-prose {
-  font-size: 1rem;
-  color: rgba(245, 247, 251, 0.85);
-  line-height: 1.7;
-  margin: 0 0 24px;
+.ash-sources ul {
+  margin: 0;
+  padding-left: 18px;
 }
 
-.ashtapada-more-prose em {
-  color: #C2A46B;
-  font-style: italic;
+.ash-sources li { margin-bottom: 4px; }
+
+/* ─── Scroll reveals ───────────────────────────────────────────── */
+/* Only active when JS has set data-reveal="on" (which it skips under
+   reduced motion). Without it, everything is visible. */
+
+.ashtapada[data-reveal='on'] .ash-reveal {
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-.ashtapada-more-link {
-  display: inline-block;
-  color: #C2A46B;
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: 0.04em;
-  text-decoration: none;
-  transition: opacity 0.15s ease;
+.ashtapada[data-reveal='on'] .ash-reveal:not(.is-in) {
+  opacity: 0;
+  transform: translateY(18px);
 }
 
-.ashtapada-more-link:hover {
-  opacity: 0.85;
+.ashtapada[data-reveal='on'] .ash-timeline li::before,
+.ashtapada[data-reveal='on'] .ash-timeline li::after {
+  transition: transform 0.8s ease 0.25s, opacity 0.6s ease 0.2s;
 }
 
-@media (max-width: 540px) {
-  .ashtapada-hero {
-    padding: 36px 16px;
-  }
-  .ashtapada-sigil {
-    margin-bottom: 20px;
-  }
-  .ashtapada-tagline {
-    margin-bottom: 28px;
-  }
-  .ashtapada-more {
-    padding: 48px 16px 64px;
+.ashtapada[data-reveal='on'] .ash-timeline li:not(.is-in)::before {
+  transform: scaleY(0);
+}
+
+.ashtapada[data-reveal='on'] .ash-timeline li:not(.is-in)::after {
+  opacity: 0.2;
+}
+
+/* ─── Reduced motion: the resting state, no movement ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .ashtapada *,
+  .ashtapada *::before,
+  .ashtapada *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
